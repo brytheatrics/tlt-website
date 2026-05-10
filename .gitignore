@@ -1,7 +1,8 @@
-# Big asset folders synced via Google Drive (junctions, not part of git)
-scrape/
-assets/
-mockup/
+# Big asset folders at the REPO ROOT only (synced via Drive, not git).
+# Leading slash anchors the pattern so it doesn't match e.g. wordpress/themes/tlt/assets/
+/scrape/
+/assets/
+/mockup/
 
 # Local server inventory snapshot — too big for git, regenerated as needed
 tlt_server_inventory.json
