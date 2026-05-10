@@ -79,7 +79,11 @@ add_action( 'template_redirect', function () {
 
     $map = wp_cache_get( 'tlt_redirects', 'tlt' );
     if ( ! is_array( $map ) ) {
-        $csv = WP_CONTENT_DIR . '/uploads/migration-redirects.csv';
+        // Prefer theme-bundled redirects (git-synced). Fall back to legacy uploads location.
+        $csv = get_stylesheet_directory() . '/redirects.csv';
+        if ( ! file_exists( $csv ) ) {
+            $csv = WP_CONTENT_DIR . '/uploads/migration-redirects.csv';
+        }
         $map = [];
         if ( file_exists( $csv ) ) {
             $h = fopen( $csv, 'r' );
