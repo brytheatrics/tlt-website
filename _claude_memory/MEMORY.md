@@ -6,3 +6,4 @@
 - [Squarespace slug suffixes are real content](feedback_squarespace_slug_suffixes.md) — `-emp99` etc. URLs are distinct pages, NEVER merge during migration
 - [TLT Squarespace URL mangling is severe](feedback_squarespace_pattern_severe.md) — slugs bear no relationship to content (e.g. `the-underpants-5ypj7-...` is Macbeth); user notes are canonical decoder
 - [Triage notes — names reliable, dates not](feedback_triage_notes_dates.md) — trust user's notes for content identity, derive dates from page HTML
+- [Cross-computer dev workflow](reference_cross_computer_workflow.md) — git + Drive + junctions; answer "what should I do?" sync questions
