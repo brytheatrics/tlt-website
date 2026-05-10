@@ -1,0 +1,5545 @@
+{
+  "website_pdfs": [
+    {
+      "url": "/s/TLT-Amended-Bylaws-2016-11-1.pdf",
+      "filename": "TLT-Amended-Bylaws-2016-11-1.pdf",
+      "server_match": null,
+      "ref_count": 1,
+      "first_ref": {
+        "from": "pages/board-and-staff.html",
+        "text": "View our current bylaws here"
+      }
+    },
+    {
+      "url": "/s/1819-A-Dolls-House.pdf",
+      "filename": "1819-A-Dolls-House.pdf",
+      "server_match": "TLT Programs/2013-2018/1819 A Doll's House.pdf",
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20182019__dollshouse.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1819-The-Foreigner.pdf",
+      "filename": "1819-The-Foreigner.pdf",
+      "server_match": "TLT Programs/2013-2018/1819 The Foreigner.pdf",
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20182019__foreigner.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1819-Hay-Fever.pdf",
+      "filename": "1819-Hay-Fever.pdf",
+      "server_match": "TLT Programs/2013-2018/1819 Hay Fever.pdf",
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20182019__hayfever.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1819-Laura.pdf",
+      "filename": "1819-Laura.pdf",
+      "server_match": "TLT Programs/2013-2018/1819 Laura.pdf",
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20182019__laura.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1819-Night-Music.pdf",
+      "filename": "1819-Night-Music.pdf",
+      "server_match": "TLT Programs/2013-2018/1819 Night Music.pdf",
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20182019__nightmusic.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1819-Scrooge.pdf",
+      "filename": "1819-Scrooge.pdf",
+      "server_match": "TLT Programs/2013-2018/1819 Scrooge.pdf",
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20182019__scrooge.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1920-Calendar-Girls.pdf",
+      "filename": "1920-Calendar-Girls.pdf",
+      "server_match": "TLT Programs/2013-2018/1920 Calendar Girls.pdf",
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20192020__calendargirls.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1920-A-Chorus-Line.pdf",
+      "filename": "1920-A-Chorus-Line.pdf",
+      "server_match": "TLT Programs/2013-2018/1920 A Chorus Line.pdf",
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20192020__chorusline.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1920-Evil-Dead.pdf",
+      "filename": "1920-Evil-Dead.pdf",
+      "server_match": "TLT Programs/2013-2018/1920 Evil Dead.pdf",
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20192020__evildead.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1920-Twas.pdf",
+      "filename": "1920-Twas.pdf",
+      "server_match": "TLT Programs/2013-2018/1920 Twas.pdf",
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20192020__holmes-gaf4k.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1920-Holmes.pdf",
+      "filename": "1920-Holmes.pdf",
+      "server_match": "TLT Programs/2013-2018/1920 Holmes.pdf",
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20192020__holmes.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1920-Shattering.pdf",
+      "filename": "1920-Shattering.pdf",
+      "server_match": "TLT Programs/2013-2018/1920 Shattering.pdf",
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20192020__shattering.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/A-Chorus-Line-2022-Program.pdf",
+      "filename": "A-Chorus-Line-2022-Program.pdf",
+      "server_match": null,
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20212022__clue-633y7.html",
+        "text": "PROGRAM"
+      }
+    },
+    {
+      "url": "/s/TLT-The-Luck-of-the-Irish-program.pdf",
+      "filename": "TLT-The-Luck-of-the-Irish-program.pdf",
+      "server_match": null,
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20212022__clue-anzln-g52ct-dwpf6.html",
+        "text": "PROGRAM"
+      }
+    },
+    {
+      "url": "/s/The-Happiest-Song-Plays-Last-Program.pdf",
+      "filename": "The-Happiest-Song-Plays-Last-Program.pdf",
+      "server_match": null,
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20212022__clue-anzln-g52ct.html",
+        "text": "PROGRAM"
+      }
+    },
+    {
+      "url": "/s/Silent-Sky-Program.pdf",
+      "filename": "Silent-Sky-Program.pdf",
+      "server_match": null,
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20212022__clue-anzln.html",
+        "text": "PROGRAM"
+      }
+    },
+    {
+      "url": "/s/TLT-OZ-Program-redact.pdf",
+      "filename": "TLT-OZ-Program-redact.pdf",
+      "server_match": null,
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20212022__clue-rhe7l.html",
+        "text": "PROGRAM"
+      }
+    },
+    {
+      "url": "/s/Clue-Program.pdf",
+      "filename": "Clue-Program.pdf",
+      "server_match": null,
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20212022__clue.html",
+        "text": "PROGRAM"
+      }
+    },
+    {
+      "url": "/s/TLT-2021-2022-Season-Brochure.pdf",
+      "filename": "TLT-2021-2022-Season-Brochure.pdf",
+      "server_match": null,
+      "ref_count": 1,
+      "first_ref": {
+        "from": "pages_shows/blog__20212022__seasontickets.html",
+        "text": "CLICK HERE TO SEE THE BROCHURE!"
+      }
+    },
+    {
+      "url": "/s/TLT-2020-2021-Season-Ticket-Order-Form.pdf",
+      "filename": "TLT-2020-2021-Season-Ticket-Order-Form.pdf",
+      "server_match": null,
+      "ref_count": 1,
+      "first_ref": {
+        "from": "pages_shows/blog__20212022__seasontickets.html",
+        "text": "CLICK HERE FOR ORDER FORM"
+      }
+    },
+    {
+      "url": "/s/Terms-Program.pdf",
+      "filename": "Terms-Program.pdf",
+      "server_match": null,
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20212022__terms.html",
+        "text": "PROGRAM"
+      }
+    },
+    {
+      "url": "/s/Murder-on-the-Orient-Express-Program.pdf",
+      "filename": "Murder-on-the-Orient-Express-Program.pdf",
+      "server_match": null,
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20222023__murder.html",
+        "text": "PROGRAM"
+      }
+    },
+    {
+      "url": "/s/TLT-Po-Boy-Program.pdf",
+      "filename": "TLT-Po-Boy-Program.pdf",
+      "server_match": null,
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20222023__poboy.html",
+        "text": "PROGRAM"
+      }
+    },
+    {
+      "url": "/s/Rock-of-Ages-Program.pdf",
+      "filename": "Rock-of-Ages-Program.pdf",
+      "server_match": null,
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20222023__rock.html",
+        "text": "PROGRAM"
+      }
+    },
+    {
+      "url": "/s/2627-Season-Descriptions.pdf",
+      "filename": "2627-Season-Descriptions.pdf",
+      "server_match": null,
+      "ref_count": 1,
+      "first_ref": {
+        "from": "pages_shows/blog__20222023__seasontix.html",
+        "text": "CLICK HERE FOR SEASON BROCHURE"
+      }
+    },
+    {
+      "url": "/s/2627-Season-Ticket-Order-Form.pdf",
+      "filename": "2627-Season-Ticket-Order-Form.pdf",
+      "server_match": null,
+      "ref_count": 1,
+      "first_ref": {
+        "from": "pages_shows/blog__20222023__seasontix.html",
+        "text": "CLICK HERE FOR A MAIL IN SEASON TICKET ORDER FORM"
+      }
+    },
+    {
+      "url": "/s/Shawshank-Program.pdf",
+      "filename": "Shawshank-Program.pdf",
+      "server_match": null,
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20222023__shawshank.html",
+        "text": "PROGRAM"
+      }
+    },
+    {
+      "url": "/s/TLT-Significant-Other-Program.pdf",
+      "filename": "TLT-Significant-Other-Program.pdf",
+      "server_match": null,
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20222023__significant.html",
+        "text": "PROGRAM"
+      }
+    },
+    {
+      "url": "/s/Steel-Mags-Program.pdf",
+      "filename": "Steel-Mags-Program.pdf",
+      "server_match": null,
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20222023__steel.html",
+        "text": "PROGRAM"
+      }
+    },
+    {
+      "url": "/s/Xmas-Program.pdf",
+      "filename": "Xmas-Program.pdf",
+      "server_match": null,
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20222023__xmasstory.html",
+        "text": "PROGRAM"
+      }
+    },
+    {
+      "url": "/s/Almost-Maine-Program.pdf",
+      "filename": "Almost-Maine-Program.pdf",
+      "server_match": null,
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20232024__almostmaine.html",
+        "text": "PROGRAM"
+      }
+    },
+    {
+      "url": "/s/A-Dolls-House-Part-2-Program-Single-Page.pdf",
+      "filename": "A-Dolls-House-Part-2-Program-Single-Page.pdf",
+      "server_match": null,
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20232024__dollshouse2.html",
+        "text": "PROGRAM"
+      }
+    },
+    {
+      "url": "/s/audition-poems.pdf",
+      "filename": "audition-poems.pdf",
+      "server_match": null,
+      "ref_count": 1,
+      "first_ref": {
+        "from": "pages_shows/blog__20232024__fiddlerauditions-nrpky.html",
+        "text": "CLICK HERE"
+      }
+    },
+    {
+      "url": "/s/Misery-Program-Opening.pdf",
+      "filename": "Misery-Program-Opening.pdf",
+      "server_match": null,
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20232024__misery.html",
+        "text": "PROGRAM"
+      }
+    },
+    {
+      "url": "/s/Delta-Program.pdf",
+      "filename": "Delta-Program.pdf",
+      "server_match": null,
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20232024__mississippi.html",
+        "text": "PROGRAM"
+      }
+    },
+    {
+      "url": "/s/Rent-Program-Single-Page.pdf",
+      "filename": "Rent-Program-Single-Page.pdf",
+      "server_match": null,
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20232024__rent.html",
+        "text": "PROGRAM"
+      }
+    },
+    {
+      "url": "/s/Rudolph-Program.pdf",
+      "filename": "Rudolph-Program.pdf",
+      "server_match": null,
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20232024__rudolph.html",
+        "text": "PROGRAM"
+      }
+    },
+    {
+      "url": "/s/The-Play-That-Goes-Wrong-Program-PDF-Program.pdf",
+      "filename": "The-Play-That-Goes-Wrong-Program-PDF-Program.pdf",
+      "server_match": null,
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_shows/blog__20232024__wrong-gfw6d.html",
+        "text": "PROGRAM"
+      }
+    },
+    {
+      "url": "/s/Bug-Program.pdf",
+      "filename": "Bug-Program.pdf",
+      "server_match": null,
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20242025__bug.html",
+        "text": "PROGRAM"
+      }
+    },
+    {
+      "url": "/s/Lorca-Program.pdf",
+      "filename": "Lorca-Program.pdf",
+      "server_match": null,
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20242025__curious-y7xjc.html",
+        "text": "PROGRAM"
+      }
+    },
+    {
+      "url": "/s/Lorca-Dramaturgy.pdf",
+      "filename": "Lorca-Dramaturgy.pdf",
+      "server_match": null,
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20242025__curious-y7xjc.html",
+        "text": "DRAMATURGY INFORMATION"
+      }
+    },
+    {
+      "url": "/s/Curious-Program.pdf",
+      "filename": "Curious-Program.pdf",
+      "server_match": null,
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20242025__curious.html",
+        "text": "PROGRAM"
+      }
+    },
+    {
+      "url": "/s/Fiddler-Program.pdf",
+      "filename": "Fiddler-Program.pdf",
+      "server_match": null,
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20242025__fiddler.html",
+        "text": "PROGRAM"
+      }
+    },
+    {
+      "url": "/s/The-Mousetrap-Prorgram.pdf",
+      "filename": "The-Mousetrap-Prorgram.pdf",
+      "server_match": null,
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20242025__mousetrap.html",
+        "text": "PROGRAM"
+      }
+    },
+    {
+      "url": "/s/west-of-the-waterway-parking.pdf",
+      "filename": "west-of-the-waterway-parking.pdf",
+      "server_match": null,
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_shows/blog__20242025__murdermerlot.html",
+        "text": "CLICK HERE FOR PARKING INFORMATION AROUND WEST OF THE WATERWAY"
+      }
+    },
+    {
+      "url": "/s/One-Man-Program.pdf",
+      "filename": "One-Man-Program.pdf",
+      "server_match": null,
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20242025__oneman.html",
+        "text": "PROGRAM"
+      }
+    },
+    {
+      "url": "/s/Rocky-Program.pdf",
+      "filename": "Rocky-Program.pdf",
+      "server_match": null,
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20242025__rocky.html",
+        "text": "PROGRAM"
+      }
+    },
+    {
+      "url": "/s/Da-Vinci-Program.pdf",
+      "filename": "Da-Vinci-Program.pdf",
+      "server_match": null,
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20252026__davinci.html",
+        "text": "PROGRAM"
+      }
+    },
+    {
+      "url": "/s/Matilda-Program.pdf",
+      "filename": "Matilda-Program.pdf",
+      "server_match": null,
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20252026__matilda.html",
+        "text": "PROGRAM"
+      }
+    },
+    {
+      "url": "/s/The-Mountaintop-Dramaturgy.pdf",
+      "filename": "The-Mountaintop-Dramaturgy.pdf",
+      "server_match": null,
+      "ref_count": 4,
+      "first_ref": {
+        "from": "pages_shows/blog__20252026__spring-bpb9w.html",
+        "text": "THE MOUNTAINTOP DRAMATURGY"
+      }
+    },
+    {
+      "url": "/s/The-Mountaintop-Program.pdf",
+      "filename": "The-Mountaintop-Program.pdf",
+      "server_match": null,
+      "ref_count": 4,
+      "first_ref": {
+        "from": "pages_shows/blog__20252026__spring-bpb9w.html",
+        "text": "PROGRAM"
+      }
+    },
+    {
+      "url": "/s/Spring-Awakening-Program.pdf",
+      "filename": "Spring-Awakening-Program.pdf",
+      "server_match": null,
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20252026__spring.html",
+        "text": "PROGRAM"
+      }
+    },
+    {
+      "url": "/s/The-Time-Machine-Program.pdf",
+      "filename": "The-Time-Machine-Program.pdf",
+      "server_match": null,
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_shows/blog__20252026__timemachine.html",
+        "text": "PROGRAM"
+      }
+    },
+    {
+      "url": "/s/1925-The-Taming-of-the-Shrew.pdf",
+      "filename": "1925-The-Taming-of-the-Shrew.pdf",
+      "server_match": "TLT Programs/1925 -1939-40/1925 The Taming of the Shrew.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1918-1930.html",
+        "text": "THE TAMING OF THE SHREW"
+      }
+    },
+    {
+      "url": "/s/1926-1927-PAOLO-AND-FRANCESCA.pdf",
+      "filename": "1926-1927-PAOLO-AND-FRANCESCA.pdf",
+      "server_match": "TLT Programs/1925 -1939-40/1926-1927 PAOLO AND FRANCESCA.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1918-1930.html",
+        "text": "PAOLO AND FRANCESCA"
+      }
+    },
+    {
+      "url": "/s/1927-1928-The-Intimate-Strangers-zj62.pdf",
+      "filename": "1927-1928-The-Intimate-Strangers-zj62.pdf",
+      "server_match": null,
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1918-1930.html",
+        "text": "THE INTIMATE STRANGERS"
+      }
+    },
+    {
+      "url": "/s/1927-1928-TEN-NIGHTS-IN-A-BAR-ROOM.pdf",
+      "filename": "1927-1928-TEN-NIGHTS-IN-A-BAR-ROOM.pdf",
+      "server_match": "TLT Programs/1925 -1939-40/1927-1928 TEN NIGHTS IN A BAR ROOM.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1918-1930.html",
+        "text": "TEN NIGHTS IN A BAR ROOM"
+      }
+    },
+    {
+      "url": "/s/1929-SUN-UP.pdf",
+      "filename": "1929-SUN-UP.pdf",
+      "server_match": "TLT Programs/1925 -1939-40/1929 SUN-UP.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1918-1930.html",
+        "text": "SUN-UP"
+      }
+    },
+    {
+      "url": "/s/1929-Androcles-and-The-Lion.pdf",
+      "filename": "1929-Androcles-and-The-Lion.pdf",
+      "server_match": "TLT Programs/1925 -1939-40/1929 Androcles and The Lion.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1918-1930.html",
+        "text": "ANDROCLES AND THE LION"
+      }
+    },
+    {
+      "url": "/s/1934-THE-STREETS-OF-NEW-YORK.pdf",
+      "filename": "1934-THE-STREETS-OF-NEW-YORK.pdf",
+      "server_match": "TLT Programs/1925 -1939-40/1934 THE STREETS OF NEW YORK.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1930-1940.html",
+        "text": "THE STREETS OF NEW YORK"
+      }
+    },
+    {
+      "url": "/s/1936-East-Lynne.pdf",
+      "filename": "1936-East-Lynne.pdf",
+      "server_match": "TLT Programs/1925 -1939-40/1936 East Lynne.pdf",
+      "ref_count": 6,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1930-1940.html",
+        "text": "EAST LYNNE"
+      }
+    },
+    {
+      "url": "/s/1937-Three-One-Act-Plays.pdf",
+      "filename": "1937-Three-One-Act-Plays.pdf",
+      "server_match": "TLT Programs/1925 -1939-40/1937 Three One-Act Plays.pdf",
+      "ref_count": 9,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1930-1940.html",
+        "text": "VENDETTA"
+      }
+    },
+    {
+      "url": "/s/1938-A-Susan-Glaspell-Evening.pdf",
+      "filename": "1938-A-Susan-Glaspell-Evening.pdf",
+      "server_match": "TLT Programs/1925 -1939-40/1938 A Susan Glaspell Evening.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1930-1940.html",
+        "text": "A SUSAN GASPELL EVENING: TRIFLES, BERNICE"
+      }
+    },
+    {
+      "url": "/s/1938-The-Devil-of-Pei-Ling.pdf",
+      "filename": "1938-The-Devil-of-Pei-Ling.pdf",
+      "server_match": "TLT Programs/1925 -1939-40/1938 The Devil of Pei-Ling.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1930-1940.html",
+        "text": "THE DEVIL OF PEI-LING"
+      }
+    },
+    {
+      "url": "/s/1939-1940-THE-GHOST-OF-YANKEE-DOODLE.pdf",
+      "filename": "1939-1940-THE-GHOST-OF-YANKEE-DOODLE.pdf",
+      "server_match": "TLT Programs/1925 -1939-40/1939-1940 THE GHOST OF YANKEE DOODLE.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1930-1940.html",
+        "text": "THE GHOST OF YANKEE DOODLE"
+      }
+    },
+    {
+      "url": "/s/1939-1940-Ah-Wilderness.pdf",
+      "filename": "1939-1940-Ah-Wilderness.pdf",
+      "server_match": "TLT Programs/1925 -1939-40/1939-1940 Ah, Wilderness.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1930-1940.html",
+        "text": "AH! WILDERNESS"
+      }
+    },
+    {
+      "url": "/s/1940-1940-Tovarich.pdf",
+      "filename": "1940-1940-Tovarich.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1940-1940 Tovarich.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "TOVARICH"
+      }
+    },
+    {
+      "url": "/s/1940-1941-Ethan-Frome.pdf",
+      "filename": "1940-1941-Ethan-Frome.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1940-1941 Ethan Frome.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "ETHAN FROME"
+      }
+    },
+    {
+      "url": "/s/1940-1941-Three-Workshop-Plays.pdf",
+      "filename": "1940-1941-Three-Workshop-Plays.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1940-1941 Three Workshop Plays.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "WORKSHOP PLAYS: THE NEIGHBORS, A NIGHT AT THE INN, THE FLATTERING WORD"
+      }
+    },
+    {
+      "url": "/s/1940-1941-CALL-IT-A-DAY.pdf",
+      "filename": "1940-1941-CALL-IT-A-DAY.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1940-1941 CALL IT A DAY.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "CALL IT A DAY"
+      }
+    },
+    {
+      "url": "/s/1940-1941-OUTWARD-BOUND.pdf",
+      "filename": "1940-1941-OUTWARD-BOUND.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1940-1941 OUTWARD BOUND.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "OUTWARD BOUND"
+      }
+    },
+    {
+      "url": "/s/1940-1941-Die-Fledermaus.pdf",
+      "filename": "1940-1941-Die-Fledermaus.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1940-1941 Die Fledermaus.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "DIE FLEDERMAUS"
+      }
+    },
+    {
+      "url": "/s/1941-1942-THE-WOMEN.pdf",
+      "filename": "1941-1942-THE-WOMEN.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1941-1942 THE WOMEN.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "THE WOMEN"
+      }
+    },
+    {
+      "url": "/s/1940-1941-Three-Workshop-Plays-lz5h.pdf",
+      "filename": "1940-1941-Three-Workshop-Plays-lz5h.pdf",
+      "server_match": null,
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "WORKSHOP PLAYS: THE ANNIVERSARY, AFRAID OF THE DARK, COMPANY HOUSE"
+      }
+    },
+    {
+      "url": "/s/1941-1942-Night-of-January-16.pdf",
+      "filename": "1941-1942-Night-of-January-16.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1941-1942 Night of January 16.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "NIGHT OF JANUARY 16TH"
+      }
+    },
+    {
+      "url": "/s/1941-1942-SPRINGTIME-FOR-HENRY.pdf",
+      "filename": "1941-1942-SPRINGTIME-FOR-HENRY.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1941-1942 SPRINGTIME FOR HENRY.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "SPRINGTIME FOR HENRY"
+      }
+    },
+    {
+      "url": "/s/1941-1942-GEORGE-WASHINGTON-SLEPT-HERE.pdf",
+      "filename": "1941-1942-GEORGE-WASHINGTON-SLEPT-HERE.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1941-1942 GEORGE WASHINGTON SLEPT HERE.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "GEORGE WASHINGTON SLEPT HERE"
+      }
+    },
+    {
+      "url": "/s/1941-1942-PYGMALION.pdf",
+      "filename": "1941-1942-PYGMALION.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1941-1942 PYGMALION.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "PYGMALION"
+      }
+    },
+    {
+      "url": "/s/1942-1943-KISMET.pdf",
+      "filename": "1942-1943-KISMET.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1942-1943 KISMET.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "KISMET"
+      }
+    },
+    {
+      "url": "/s/1942-1943-Arsenic-and-OLD-LACE.pdf",
+      "filename": "1942-1943-Arsenic-and-OLD-LACE.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1942-1943 Arsenic and Old Lace.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "ARSENIC AND OLD LACE"
+      }
+    },
+    {
+      "url": "/s/1942-1943-THE-MARRIAGE-OF-FIGARO.pdf",
+      "filename": "1942-1943-THE-MARRIAGE-OF-FIGARO.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1942-1943 THE MARRIAGE OF FIGARO.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "THE MARRIAGE OF FIGARO"
+      }
+    },
+    {
+      "url": "/s/1942-1943-The-Man-Who-Came-to-Dinner.pdf",
+      "filename": "1942-1943-The-Man-Who-Came-to-Dinner.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1942-1943 The Man Who Came to Dinner.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "THE MAN WHO CAME TO DINNER"
+      }
+    },
+    {
+      "url": "/s/1942-1943-Ladies-in-Retirement.pdf",
+      "filename": "1942-1943-Ladies-in-Retirement.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1942-1943 Ladies in Retirement.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "LADIES IN RETIREMENT"
+      }
+    },
+    {
+      "url": "/s/1942-1943-LOVE-RIDES-THE-RALS-or-Will-the-Mail-Train-Run-Tonight.pdf",
+      "filename": "1942-1943-LOVE-RIDES-THE-RALS-or-Will-the-Mail-Train-Run-Tonight.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1942-1943 LOVE RIDES THE RALS or Will the Mail Train Run Tonight.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "LOVE RIDES THE RAILS"
+      }
+    },
+    {
+      "url": "/s/1942-1943-Juno-and-the-Paycock.pdf",
+      "filename": "1942-1943-Juno-and-the-Paycock.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1942-1943 Juno and the Paycock.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "JUNO AND THE PAYCOCK"
+      }
+    },
+    {
+      "url": "/s/1943-1944-CLAUDIA.pdf",
+      "filename": "1943-1944-CLAUDIA.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1943-1944 CLAUDIA.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "CLAUDIA"
+      }
+    },
+    {
+      "url": "/s/1943-1944-PRIVATE-LIVES.pdf",
+      "filename": "1943-1944-PRIVATE-LIVES.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1943-1944 PRIVATE LIVES.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "PRIVATE LIVES"
+      }
+    },
+    {
+      "url": "/s/1943-1944-HEART-OF-A-CITY.pdf",
+      "filename": "1943-1944-HEART-OF-A-CITY.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1943-1944 HEART OF A CITY.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "HEART OF A CITY"
+      }
+    },
+    {
+      "url": "/s/1943-1944-A-MURDER-HAD-BEEN-ARRANGED.pdf",
+      "filename": "1943-1944-A-MURDER-HAD-BEEN-ARRANGED.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1943-1944 A MURDER HAD BEEN ARRANGED.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "A MURDER HAS BEEN ARRANGED"
+      }
+    },
+    {
+      "url": "/s/1943-1944-ANNA-CHRISTIE.pdf",
+      "filename": "1943-1944-ANNA-CHRISTIE.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1943-1944 ANNA CHRISTIE.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "ANNA CHRISTIE"
+      }
+    },
+    {
+      "url": "/s/1944-1945-Junior-Miss.pdf",
+      "filename": "1944-1945-Junior-Miss.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1944-1945 Junior Miss.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "JUNIOR MISS"
+      }
+    },
+    {
+      "url": "/s/1944-1945-Village-Green-p9gd.pdf",
+      "filename": "1944-1945-Village-Green-p9gd.pdf",
+      "server_match": null,
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "VILLAGE GREEN"
+      }
+    },
+    {
+      "url": "/s/1944-1945-The-Philadelphia-Story.pdf",
+      "filename": "1944-1945-The-Philadelphia-Story.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1944-1945 The Philadelphia Story.pdf",
+      "ref_count": 6,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "THE PHILADELPHIA STORY"
+      }
+    },
+    {
+      "url": "/s/1944-1945-Kiss-and-Tell.pdf",
+      "filename": "1944-1945-Kiss-and-Tell.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1944-1945 Kiss and Tell.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "KISS AND TELL"
+      }
+    },
+    {
+      "url": "/s/1944-1945-Only-an-Orphan-Girl.pdf",
+      "filename": "1944-1945-Only-an-Orphan-Girl.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1944-1945 Only an Orphan Girl.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "ONLY AN ORPHAN GIRL"
+      }
+    },
+    {
+      "url": "/s/1945-1946-ITS-A-WISE-CHILD.pdf",
+      "filename": "1945-1946-ITS-A-WISE-CHILD.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1945-1946 IT'S A WISE CHILD.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "IT\u2019S A WISE CHILD"
+      }
+    },
+    {
+      "url": "/s/1945-1946-THE-MALE-ANIMAL.pdf",
+      "filename": "1945-1946-THE-MALE-ANIMAL.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1945-1946 THE MALE ANIMAL.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "THE MALE ANIMAL"
+      }
+    },
+    {
+      "url": "/s/1945-1946-HEAVEN-CAN-WAT.pdf",
+      "filename": "1945-1946-HEAVEN-CAN-WAT.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1945-1946 HEAVEN CAN WAT.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "HEAVEN CAN WAIT"
+      }
+    },
+    {
+      "url": "/s/1945-1946-Family-Portrait.pdf",
+      "filename": "1945-1946-Family-Portrait.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1945-1946 Family Portrait.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "FAMILY PORTRAIT"
+      }
+    },
+    {
+      "url": "/s/1945-1946-PERSONAL-APPEARANCE.pdf",
+      "filename": "1945-1946-PERSONAL-APPEARANCE.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1945-1946 PERSONAL APPEARANCE.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "PERSONAL APPEARANCE"
+      }
+    },
+    {
+      "url": "/s/1945-1946-NOTHING-BUT-THE-TRUTH.pdf",
+      "filename": "1945-1946-NOTHING-BUT-THE-TRUTH.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1945-1946 NOTHING BUT THE TRUTH.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "NOTHING BUT THE TRUTH"
+      }
+    },
+    {
+      "url": "/s/1946-1947-Dear-Ruth.pdf",
+      "filename": "1946-1947-Dear-Ruth.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1946-1947 Dear Ruth.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "DEAR RUTH"
+      }
+    },
+    {
+      "url": "/s/1946-1947-BLITHE-SPIRIT.pdf",
+      "filename": "1946-1947-BLITHE-SPIRIT.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1946-1947 BLITHE SPIRIT.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "BLITHE SPIRIT"
+      }
+    },
+    {
+      "url": "/s/1946-1947-What-a-Life.pdf",
+      "filename": "1946-1947-What-a-Life.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1946-1947 What a Life.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "WHAT A LIFE"
+      }
+    },
+    {
+      "url": "/s/1946-1947-OUR-TOWN.pdf",
+      "filename": "1946-1947-OUR-TOWN.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1946-1947 OUR TOWN.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "OUR TOWN"
+      }
+    },
+    {
+      "url": "/s/1946-1947-The-Torch-Bearers.pdf",
+      "filename": "1946-1947-The-Torch-Bearers.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1946-1947 The Torch Bearers.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "THE TORCHBEARERS"
+      }
+    },
+    {
+      "url": "/s/1946-1947-MY-SISTER-EILEEN.pdf",
+      "filename": "1946-1947-MY-SISTER-EILEEN.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1946-1947 MY SISTER EILEEN.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "MY SISTER EILEEN"
+      }
+    },
+    {
+      "url": "/s/1946-1947-DIRTY-WORK-AT-THE-CROSSROADS-or-TEMPTED-TRIED-AND-TRUE.pdf",
+      "filename": "1946-1947-DIRTY-WORK-AT-THE-CROSSROADS-or-TEMPTED-TRIED-AND-TRUE.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1946-1947 DIRTY WORK AT THE CROSSROADS or TEMPTED, TRIED AND TRUE.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "DIRTY WORK AT THE CROSS ROADS"
+      }
+    },
+    {
+      "url": "/s/1947-1948-STATE-OF-THE-UNION.pdf",
+      "filename": "1947-1948-STATE-OF-THE-UNION.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1947-1948 STATE OF THE UNION.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "STATE OF THE UNION"
+      }
+    },
+    {
+      "url": "/s/1947-1948-PAPA-IS-ALL.pdf",
+      "filename": "1947-1948-PAPA-IS-ALL.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1947-1948 PAPA IS ALL.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "PAPA IS ALL"
+      }
+    },
+    {
+      "url": "/s/1947-1948-The-Amazing-Dr-Clitterhouse.pdf",
+      "filename": "1947-1948-The-Amazing-Dr-Clitterhouse.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1947-1948 The Amazing Dr Clitterhouse.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "THE AMAZING DR. CLITTERHOUSE"
+      }
+    },
+    {
+      "url": "/s/1947-1948-JANIE.pdf",
+      "filename": "1947-1948-JANIE.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1947-1948 JANIE.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "JANIE"
+      }
+    },
+    {
+      "url": "/s/1947-1948-LAURA.pdf",
+      "filename": "1947-1948-LAURA.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1947-1948 LAURA.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "LAURA"
+      }
+    },
+    {
+      "url": "/s/1947-1948-ROOM-SERVICE.pdf",
+      "filename": "1947-1948-ROOM-SERVICE.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1947-1948 ROOM SERVICE.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "ROOM SERVICE"
+      }
+    },
+    {
+      "url": "/s/1947-1948-The-Women.pdf",
+      "filename": "1947-1948-The-Women.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1947-1948 The Women.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "THE WOMEN"
+      }
+    },
+    {
+      "url": "/s/1947-1948-PURE-AS-THE-DRIVEN-SNOW-or-A-WORKING-GIRLS-SECRET.pdf",
+      "filename": "1947-1948-PURE-AS-THE-DRIVEN-SNOW-or-A-WORKING-GIRLS-SECRET.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1947-1948 PURE AS THE DRIVEN SNOW or A WORKING GIRL'S SECRET.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "PURE AS THE DRIVEN SNOW"
+      }
+    },
+    {
+      "url": "/s/1948-1949-THE-MILKY-WAY.pdf",
+      "filename": "1948-1949-THE-MILKY-WAY.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1948-1949 THE MILKY WAY.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "THE MILKY WAY"
+      }
+    },
+    {
+      "url": "/s/1948-1949-THROUGH-THE-NIGHT.pdf",
+      "filename": "1948-1949-THROUGH-THE-NIGHT.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1948-1949 THROUGH THE NIGHT.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "THROUGH THE NIGHT"
+      }
+    },
+    {
+      "url": "/s/1948-1949-I-REMEMBER-MAMA.pdf",
+      "filename": "1948-1949-I-REMEMBER-MAMA.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1948-1949 I REMEMBER MAMA.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "I REMEMBER MAMA"
+      }
+    },
+    {
+      "url": "/s/1948-1949-3-MEN-ON-A-HORSE.pdf",
+      "filename": "1948-1949-3-MEN-ON-A-HORSE.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1948-1949 3 MEN ON A HORSE.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "3 MEN ON A HORSE"
+      }
+    },
+    {
+      "url": "/s/1948-1949-ANGEL-STREET.pdf",
+      "filename": "1948-1949-ANGEL-STREET.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1948-1949 ANGEL STREET.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "ANGEL STREET"
+      }
+    },
+    {
+      "url": "/s/1948-1949-Biography.pdf",
+      "filename": "1948-1949-Biography.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1948-1949 Biography.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "BIOGRAPHY"
+      }
+    },
+    {
+      "url": "/s/1948-1949-CHICKEN-EVERY-SUNDAY.pdf",
+      "filename": "1948-1949-CHICKEN-EVERY-SUNDAY.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1948-1949 CHICKEN EVERY SUNDAY.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "CHICKEN EVERY SUNDAY"
+      }
+    },
+    {
+      "url": "/s/1948-1949-THE-CURSE-OF-AN-ACHING-HEART-or-TRAPPED-IN-THE-SPIDERS-WEB.pdf",
+      "filename": "1948-1949-THE-CURSE-OF-AN-ACHING-HEART-or-TRAPPED-IN-THE-SPIDERS-WEB.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1948-1949 THE CURSE OF AN ACHING HEART or TRAPPED IN THE SPIDER'S WEB.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "THE CURSE OF AN ACHING HEART"
+      }
+    },
+    {
+      "url": "/s/1949-1950-LIFE-WITH-FATHER.pdf",
+      "filename": "1949-1950-LIFE-WITH-FATHER.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1949-1950 LIFE WITH FATHER.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "LIFE WITH FATHER"
+      }
+    },
+    {
+      "url": "/s/1949-1950-BOY-MEETS-GIRL.pdf",
+      "filename": "1949-1950-BOY-MEETS-GIRL.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1949-1950 BOY MEETS GIRL.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "BOY MEETS GIRL"
+      }
+    },
+    {
+      "url": "/s/1949-1950-Peg-O-My-Heart.pdf",
+      "filename": "1949-1950-Peg-O-My-Heart.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1949-1950 Peg O' My Heart.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "PEG \u2018O MY HEART"
+      }
+    },
+    {
+      "url": "/s/1949-1950-JOHN-LOVES-MARY.pdf",
+      "filename": "1949-1950-JOHN-LOVES-MARY.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1949-1950 JOHN LOVES MARY.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "JOHN LOVES MARY"
+      }
+    },
+    {
+      "url": "/s/1949-1950-ARMS-AND-THE-MAN.pdf",
+      "filename": "1949-1950-ARMS-AND-THE-MAN.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1949-1950 ARMS AND THE MAN.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "ARMS AND THE MAN"
+      }
+    },
+    {
+      "url": "/s/1949-1950-BEGGAR-ON-HORSEBACK.pdf",
+      "filename": "1949-1950-BEGGAR-ON-HORSEBACK.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1949-1950 BEGGAR ON HORSEBACK.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "BEGGAR ON HORSEBACK"
+      }
+    },
+    {
+      "url": "/s/1949-1950-A-Date-With-Judy.pdf",
+      "filename": "1949-1950-A-Date-With-Judy.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1949-1950 A Date With Judy.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "A DATE WITH JUDY"
+      }
+    },
+    {
+      "url": "/s/1949-1950-PETTICOAT-FEVER.pdf",
+      "filename": "1949-1950-PETTICOAT-FEVER.pdf",
+      "server_match": "TLT Programs/1941-42 - 1949-50/1949-1950 PETTICOAT FEVER.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1940-1950.html",
+        "text": "PETTICOAT FEVER"
+      }
+    },
+    {
+      "url": "/s/1950-1951-THE-HEIRESS.pdf",
+      "filename": "1950-1951-THE-HEIRESS.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1950-1951 THE HEIRESS.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "THE HEIRESS"
+      }
+    },
+    {
+      "url": "/s/1950-1951-GOOD-NEWS.pdf",
+      "filename": "1950-1951-GOOD-NEWS.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1950-1951 GOOD NEWS.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "GOOD NEWS"
+      }
+    },
+    {
+      "url": "/s/1950-1951-ABIES-IRISH-ROSE.pdf",
+      "filename": "1950-1951-ABIES-IRISH-ROSE.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1950-1951 ABIE'S IRISH ROSE.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "ABIE\u2019S IRISH ROSE"
+      }
+    },
+    {
+      "url": "/s/1950-1951-The-Voice-of-the-Turtle.pdf",
+      "filename": "1950-1951-The-Voice-of-the-Turtle.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1950-1951 The Voice of the Turtle.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "VOICE OF THE TURTLE"
+      }
+    },
+    {
+      "url": "/s/1950-1951-Belvedere.pdf",
+      "filename": "1950-1951-Belvedere.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1950-1951 Belvedere.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "BELVEDERE"
+      }
+    },
+    {
+      "url": "/s/1950-1951-HARVEY.pdf",
+      "filename": "1950-1951-HARVEY.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1950-1951 HARVEY.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "HARVEY"
+      }
+    },
+    {
+      "url": "/s/1950-1951-TWO-BLIND-MICE.pdf",
+      "filename": "1950-1951-TWO-BLIND-MICE.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1950-1951 TWO BLIND MICE.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "TWO BLIND MICE"
+      }
+    },
+    {
+      "url": "/s/1951-1952-Goodbuy-My-Fancy.pdf",
+      "filename": "1951-1952-Goodbuy-My-Fancy.pdf",
+      "server_match": null,
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "GOODBYE, MY FANCY"
+      }
+    },
+    {
+      "url": "/s/1951-1952-Seventeen.pdf",
+      "filename": "1951-1952-Seventeen.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1951-1952 Seventeen.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "SEVENTEEN"
+      }
+    },
+    {
+      "url": "/s/1951-1952-The-Silver-Whistle.pdf",
+      "filename": "1951-1952-The-Silver-Whistle.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1951-1952 The Silver Whistle.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "THE SILVER WHISTLE"
+      }
+    },
+    {
+      "url": "/s/1951-1952-The-Two-Mrs-Carrolls.pdf",
+      "filename": "1951-1952-The-Two-Mrs-Carrolls.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1951-1952 The Two Mrs. Carrolls.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "THE TWO MRS. CARROLLS"
+      }
+    },
+    {
+      "url": "/s/1951-1952-Strange-Bedfellows.pdf",
+      "filename": "1951-1952-Strange-Bedfellows.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1951-1952 Strange Bedfellows.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "STRANGE BEDFELLOWS"
+      }
+    },
+    {
+      "url": "/s/1951-1952-COMMAND-DECISION.pdf",
+      "filename": "1951-1952-COMMAND-DECISION.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1951-1952 COMMAND DECISION.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "COMMAND DECISION"
+      }
+    },
+    {
+      "url": "/s/1951-1952-Smilin-Through.pdf",
+      "filename": "1951-1952-Smilin-Through.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1951-1952 Smilin' Through.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "SMILIN\u2019 THROUGH"
+      }
+    },
+    {
+      "url": "/s/1951-1952-THE-TAVERN.pdf",
+      "filename": "1951-1952-THE-TAVERN.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1951-1952 THE TAVERN.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "THE TAVERN"
+      }
+    },
+    {
+      "url": "/s/1952-1953-FIRST-LADY.pdf",
+      "filename": "1952-1953-FIRST-LADY.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1952-1953 FIRST LADY.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "FIRST LADY"
+      }
+    },
+    {
+      "url": "/s/1952-1953-DODSWORTH.pdf",
+      "filename": "1952-1953-DODSWORTH.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1952-1953 DODSWORTH.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "DODSWORTH"
+      }
+    },
+    {
+      "url": "/s/1952-1953-The-Shop-at-Sly-Corner.pdf",
+      "filename": "1952-1953-The-Shop-at-Sly-Corner.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1952-1953 The Shop at Sly Corner.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "THE SHOP AT SLY CORNER"
+      }
+    },
+    {
+      "url": "/s/1952-1953-CHARLEYS-AUNT.pdf",
+      "filename": "1952-1953-CHARLEYS-AUNT.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1952-1953 CHARLEY'S AUNT.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "CHARLEY\u2019S AUNT"
+      }
+    },
+    {
+      "url": "/s/1952-1953-DEECTIVE-STORY.pdf",
+      "filename": "1952-1953-DEECTIVE-STORY.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1952-1953 DEECTIVE STORY.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "DETECTIVE STORY"
+      }
+    },
+    {
+      "url": "/s/1952-1953-The-Merry-Widow.pdf",
+      "filename": "1952-1953-The-Merry-Widow.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1952-1953 The Merry Widow.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "THE MERRY WIDOW"
+      }
+    },
+    {
+      "url": "/s/1952-1953-Fancy-Meeting-You-Again.pdf",
+      "filename": "1952-1953-Fancy-Meeting-You-Again.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1952-1953 Fancy Meeting You Again.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "FANCY MEETING YOU AGAIN"
+      }
+    },
+    {
+      "url": "/s/1952-1953-AARON-SLICK-FROM-PUNKIN-CRICK.pdf",
+      "filename": "1952-1953-AARON-SLICK-FROM-PUNKIN-CRICK.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1952-1953 AARON SLICK FROM PUNKIN CRICK.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "AARON SLICK FROM PUMKIN CRICK"
+      }
+    },
+    {
+      "url": "/s/1953-1954-MISTER-ROBERTS.pdf",
+      "filename": "1953-1954-MISTER-ROBERTS.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1953-1954 MISTER ROBERTS.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "MISTER ROBERTS"
+      }
+    },
+    {
+      "url": "/s/1953-1954-THE-LETTER.pdf",
+      "filename": "1953-1954-THE-LETTER.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1953-1954 THE LETTER.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "THE LETTER"
+      }
+    },
+    {
+      "url": "/s/1953-1954-Affairs-of-State.pdf",
+      "filename": "1953-1954-Affairs-of-State.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1953-1954 Affairs of State.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "AFFAIRS OF STATE"
+      }
+    },
+    {
+      "url": "/s/1953-1954-SUDS-IN-YOUR-EYE.pdf",
+      "filename": "1953-1954-SUDS-IN-YOUR-EYE.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1953-1954 SUDS IN YOUR EYE.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "SUDS IN YOUR EYE"
+      }
+    },
+    {
+      "url": "/s/1953-1954-Dinner-at-Eight.pdf",
+      "filename": "1953-1954-Dinner-at-Eight.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1953-1954 Dinner at Eight.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "DINNER AT EIGHT"
+      }
+    },
+    {
+      "url": "/s/1953-1954-See-How-They-Run.pdf",
+      "filename": "1953-1954-See-How-They-Run.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1953-1954 See How They Run.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "SEE HOW THEY RUN"
+      }
+    },
+    {
+      "url": "/s/1953-1954-The-Firefly.pdf",
+      "filename": "1953-1954-The-Firefly.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1953-1954 The Firefly.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "THE FIREFLY"
+      }
+    },
+    {
+      "url": "/s/1954-1955-Born-Yesterday.pdf",
+      "filename": "1954-1955-Born-Yesterday.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1954-1955 Born Yesterday.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "BORN YESTERDAY"
+      }
+    },
+    {
+      "url": "/s/1954-1955-THE-LITTLE-FOXES.pdf",
+      "filename": "1954-1955-THE-LITTLE-FOXES.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1954-1955 THE LITTLE FOXES.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "THE LITTLE FOXES"
+      }
+    },
+    {
+      "url": "/s/1954-1955-YOU-CANT-TAKE-IT-WITH-YOU.pdf",
+      "filename": "1954-1955-YOU-CANT-TAKE-IT-WITH-YOU.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1954-1955 YOU CAN'T TAKE IT WITH YOU.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "YOU CAN\u2019T TAKE IT WITH YOU"
+      }
+    },
+    {
+      "url": "/s/1954-1955-TIME-OF-THE-CUCKOO.pdf",
+      "filename": "1954-1955-TIME-OF-THE-CUCKOO.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1954-1955 TIME OF THE CUCKOO.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "TIME OF THE CUCKOO"
+      }
+    },
+    {
+      "url": "/s/1954-1955-SABRINA-FAIR.pdf",
+      "filename": "1954-1955-SABRINA-FAIR.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1954-1955 SABRINA FAIR.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "SABRINA FAIR"
+      }
+    },
+    {
+      "url": "/s/1954-1955-Three-Men-On-A-Horse.pdf",
+      "filename": "1954-1955-Three-Men-On-A-Horse.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1954-1955 Three Men On A Horse.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "THREE MEN ON A HORSE"
+      }
+    },
+    {
+      "url": "/s/1954-1955-SONG-OF-NORWAY.pdf",
+      "filename": "1954-1955-SONG-OF-NORWAY.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1954-1955 SONG OF NORWAY.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "SONG OF NORWAY"
+      }
+    },
+    {
+      "url": "/s/1955-1956-My-Three-Angels.pdf",
+      "filename": "1955-1956-My-Three-Angels.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1955-1956 My Three Angels.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "MY THREE ANGELS"
+      }
+    },
+    {
+      "url": "/s/1955-1956-The-Caine-Mutiny-Court-Martial.pdf",
+      "filename": "1955-1956-The-Caine-Mutiny-Court-Martial.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1955-1956 The Caine Mutiny Court-Martial.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "THE CAINE MUTINY"
+      }
+    },
+    {
+      "url": "/s/1955-1956-Twin-Beds.pdf",
+      "filename": "1955-1956-Twin-Beds.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1955-1956 Twin Beds.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "TWIN BEDS"
+      }
+    },
+    {
+      "url": "/s/1955-1956-Kind-Sir.pdf",
+      "filename": "1955-1956-Kind-Sir.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1955-1956 Kind Sir.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "KIND SIR"
+      }
+    },
+    {
+      "url": "/s/1955-1956-The-Girl-of-the-Golden-West.pdf",
+      "filename": "1955-1956-The-Girl-of-the-Golden-West.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1955-1956 The Girl of the Golden West.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "GIRL OF THE GOLDEN WEST"
+      }
+    },
+    {
+      "url": "/s/1955-1956-The-King-of-Hearts.pdf",
+      "filename": "1955-1956-The-King-of-Hearts.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1955-1956 The King of Hearts.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "KING OF HEARTS"
+      }
+    },
+    {
+      "url": "/s/1955-1956-Irene.pdf",
+      "filename": "1955-1956-Irene.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1955-1956 Irene.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "IRENE"
+      }
+    },
+    {
+      "url": "/s/1956-1957-Twentieth-Century.pdf",
+      "filename": "1956-1957-Twentieth-Century.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1956-1957 Twentieth Century.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "TWENTIETH CENTURY"
+      }
+    },
+    {
+      "url": "/s/1956-1957-Dial-M-for-Murder.pdf",
+      "filename": "1956-1957-Dial-M-for-Murder.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1956-1957 Dial M for Murder.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "DIAL \u201cM\u201d FOR MURDER"
+      }
+    },
+    {
+      "url": "/s/1956-1957-The-Tender-Trap.pdf",
+      "filename": "1956-1957-The-Tender-Trap.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1956-1957 The Tender Trap.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "THE TENDER TRAP"
+      }
+    },
+    {
+      "url": "/s/1956-1957-The-Ponder-Heart.pdf",
+      "filename": "1956-1957-The-Ponder-Heart.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1956-1957 The Ponder Heart.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "THE PONDER HEART"
+      }
+    },
+    {
+      "url": "/s/1956-1957-The-Philadelphia-Story.pdf",
+      "filename": "1956-1957-The-Philadelphia-Story.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1956-1957 The Philadelphia Story.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "THE PHILADELPHIA STORY"
+      }
+    },
+    {
+      "url": "/s/1956-1957-Teahouse-of-the-August-Moon.pdf",
+      "filename": "1956-1957-Teahouse-of-the-August-Moon.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1956-1957 Teahouse of the August Moon.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "TEAHOUSE OF THE AUGUST MOON"
+      }
+    },
+    {
+      "url": "/s/1956-1957-The-Constant-Wife.pdf",
+      "filename": "1956-1957-The-Constant-Wife.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1956-1957 The Constant Wife.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "THE CONSTANT WIFE"
+      }
+    },
+    {
+      "url": "/s/1956-1957-Carousel.pdf",
+      "filename": "1956-1957-Carousel.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1956-1957 Carousel.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "CAROUSEL"
+      }
+    },
+    {
+      "url": "/s/1957-1958-The-Great-Sebastians.pdf",
+      "filename": "1957-1958-The-Great-Sebastians.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1957-1958 The Great Sebastians.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "THE GREAT SEBASTIANS"
+      }
+    },
+    {
+      "url": "/s/1957-1958-The-Desk-Set.pdf",
+      "filename": "1957-1958-The-Desk-Set.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1957-1958 The Desk Set.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "THE DESK SET"
+      }
+    },
+    {
+      "url": "/s/1957-1958-Witness-for-the-Prosecution.pdf",
+      "filename": "1957-1958-Witness-for-the-Prosecution.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1957-1958 Witness for the Prosecution.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "WITNESS FOR THE PROSECUTION"
+      }
+    },
+    {
+      "url": "/s/1957-1958-The-Reluctant-Debutante.pdf",
+      "filename": "1957-1958-The-Reluctant-Debutante.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1957-1958 The Reluctant Debutante.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "THE RELUCTANT DEBUTANTE"
+      }
+    },
+    {
+      "url": "/s/1957-1958-The-Desperate-Hours.pdf",
+      "filename": "1957-1958-The-Desperate-Hours.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1957-1958 The Desperate Hours.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "THE DESPERATE HOURS"
+      }
+    },
+    {
+      "url": "/s/1957-1958-Bus-Stop.pdf",
+      "filename": "1957-1958-Bus-Stop.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1957-1958 Bus Stop.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "BUS STOP"
+      }
+    },
+    {
+      "url": "/s/1957-1958-The-Desert-Song.pdf",
+      "filename": "1957-1958-The-Desert-Song.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1957-1958 The Desert Song.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "THE DESERT SONG"
+      }
+    },
+    {
+      "url": "/s/1958-1958-No-Time-for-Sergeants.pdf",
+      "filename": "1958-1958-No-Time-for-Sergeants.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1958-1958 No Time for Sergeants.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "NO TIME FOR SERGEANTS"
+      }
+    },
+    {
+      "url": "/s/1958-1958-Inherit-the-Wind.pdf",
+      "filename": "1958-1958-Inherit-the-Wind.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1958-1958 Inherit the Wind.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "INHERIT THE WIND"
+      }
+    },
+    {
+      "url": "/s/1958-1958-The-Happiest-Millionaire.pdf",
+      "filename": "1958-1958-The-Happiest-Millionaire.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1958-1958 The Happiest Millionaire.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "THE HAPPIEST MILLIONAIRE"
+      }
+    },
+    {
+      "url": "/s/1958-1958-Visit-To-A-Small-Planet.pdf",
+      "filename": "1958-1958-Visit-To-A-Small-Planet.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1958-1958 Visit To A Small Planet.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "VISIT TO A SMALL PLANET"
+      }
+    },
+    {
+      "url": "/s/1958-1958-Point-of-No-Return.pdf",
+      "filename": "1958-1958-Point-of-No-Return.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1958-1958 Point of No Return.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "POINT OF NO RETURN"
+      }
+    },
+    {
+      "url": "/s/1958-1958-The-Remarkable-Mr-Pennypacker.pdf",
+      "filename": "1958-1958-The-Remarkable-Mr-Pennypacker.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1958-1958 The Remarkable Mr. Pennypacker.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "THE REMARKABLE MR. PENNYPACKER"
+      }
+    },
+    {
+      "url": "/s/1958-1958-The-Red-Mill.pdf",
+      "filename": "1958-1958-The-Red-Mill.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1958-1958 The Red Mill.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "THE RED MILL"
+      }
+    },
+    {
+      "url": "/s/1959-1960-GIGI.pdf",
+      "filename": "1959-1960-GIGI.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1959-1960 GIGI.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "GIGI"
+      }
+    },
+    {
+      "url": "/s/1959-1960-20th-Century-Follies.pdf",
+      "filename": "1959-1960-20th-Century-Follies.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1959-1960 20th Century Follies.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "20TH CENTURY FOLLIES"
+      }
+    },
+    {
+      "url": "/s/1959-1960-Ah-Wilderness.pdf",
+      "filename": "1959-1960-Ah-Wilderness.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1959-1960 Ah, Wilderness.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "AH WILDERNESS!"
+      }
+    },
+    {
+      "url": "/s/1959-1960-Diary-of-Anne-Frank.pdf",
+      "filename": "1959-1960-Diary-of-Anne-Frank.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1959-1960 Diary of Anne Frank.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "THE DIARY OF ANNE FRANK"
+      }
+    },
+    {
+      "url": "/s/1959-1960-Bell-Book-and-Candle.pdf",
+      "filename": "1959-1960-Bell-Book-and-Candle.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1959-1960 Bell, Book and Candle.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "BELL, BOOK, AND CANDLE"
+      }
+    },
+    {
+      "url": "/s/1959-1960-Present-Laughter.pdf",
+      "filename": "1959-1960-Present-Laughter.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1959-1960 Present Laughter.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "PRESENT LAUGHTER"
+      }
+    },
+    {
+      "url": "/s/1959-1960-Oklahoma.pdf",
+      "filename": "1959-1960-Oklahoma.pdf",
+      "server_match": "TLT Programs/1950-51 - 1959-60/1959-1960 Oklahoma.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1950-1960.html",
+        "text": "OKLAHOMA"
+      }
+    },
+    {
+      "url": "/s/1960-1961-The-Women.pdf",
+      "filename": "1960-1961-The-Women.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1960-1961 The Women.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "THE WOMEN"
+      }
+    },
+    {
+      "url": "/s/1960-1961-The-Dark-at-the-Top-of-the-Stairs.pdf",
+      "filename": "1960-1961-The-Dark-at-the-Top-of-the-Stairs.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1960-1961 The Dark at the Top of the Stairs.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "THE DARK AT THE TOP OF THE STAIRS"
+      }
+    },
+    {
+      "url": "/s/1960-1961-Once-More-With-Feeling.pdf",
+      "filename": "1960-1961-Once-More-With-Feeling.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1960-1961 Once More With Feeling.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "ONCE MORE WITH FEELING"
+      }
+    },
+    {
+      "url": "/s/1960-1961-THE-BAT.pdf",
+      "filename": "1960-1961-THE-BAT.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1960-1961 THE BAT.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "THE BAT"
+      }
+    },
+    {
+      "url": "/s/1960-1961-A-DOLLS-HOUSE.pdf",
+      "filename": "1960-1961-A-DOLLS-HOUSE.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1960-1961 A DOLL'S HOUSE.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "A DOLL\u2019S HOUSE"
+      }
+    },
+    {
+      "url": "/s/1960-1961-The-Pleasure-of-His-Company.pdf",
+      "filename": "1960-1961-The-Pleasure-of-His-Company.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1960-1961 The Pleasure of His Company.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "THE PLEASURE OF HIS COMPANY"
+      }
+    },
+    {
+      "url": "/s/1960-1961-South-Pacific.pdf",
+      "filename": "1960-1961-South-Pacific.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1960-1961 South Pacific.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "SOUTH PACIFIC"
+      }
+    },
+    {
+      "url": "/s/1961-1962-Golden-Fleecing.pdf",
+      "filename": "1961-1962-Golden-Fleecing.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1961-1962 Golden Fleecing.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "GOLDEN FLEECING"
+      }
+    },
+    {
+      "url": "/s/1961-1962-Look-Homeward-Angel.pdf",
+      "filename": "1961-1962-Look-Homeward-Angel.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1961-1962 Look Homeward, Angel.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "LOOK HOMEWARD ANGEL"
+      }
+    },
+    {
+      "url": "/s/1961-1962-Third-Best-Sport.pdf",
+      "filename": "1961-1962-Third-Best-Sport.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1961-1962 Third Best Sport.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "THIRD BEST SPORT"
+      }
+    },
+    {
+      "url": "/s/1961-1962-Taming-of-the-Shrew.pdf",
+      "filename": "1961-1962-Taming-of-the-Shrew.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1961-1962 Taming of the Shrew.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "THE TAMING OF THE SHREW"
+      }
+    },
+    {
+      "url": "/s/1961-1962-A-MAJORITY-OF-ONE.pdf",
+      "filename": "1961-1962-A-MAJORITY-OF-ONE.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1961-1962 A MAJORITY OF ONE.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "A MAJORITY OF ONE"
+      }
+    },
+    {
+      "url": "/s/1961-1962-Blithe-Spirit.pdf",
+      "filename": "1961-1962-Blithe-Spirit.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1961-1962 Blithe Spirit.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "BLITHE SPIRIT"
+      }
+    },
+    {
+      "url": "/s/1961-1962-BRIGADOON.pdf",
+      "filename": "1961-1962-BRIGADOON.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1961-1962 BRIGADOON.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "BRIGADOON"
+      }
+    },
+    {
+      "url": "/s/1962-1963-Operation-Mad-Ball.pdf",
+      "filename": "1962-1963-Operation-Mad-Ball.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1962-1963 Operation Mad Ball.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "OPERATION MAD BALL"
+      }
+    },
+    {
+      "url": "/s/1962-1963-Send-Me-No-Flowers.pdf",
+      "filename": "1962-1963-Send-Me-No-Flowers.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1962-1963 Send Me No Flowers.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "SEND ME NO FLOWERS"
+      }
+    },
+    {
+      "url": "/s/1962-1963-OTHELLO.pdf",
+      "filename": "1962-1963-OTHELLO.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1962-1963 OTHELLO.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "OTHELLO"
+      }
+    },
+    {
+      "url": "/s/1962-1963-Strange-Bedfellows.pdf",
+      "filename": "1962-1963-Strange-Bedfellows.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1962-1963 Strange Bedfellows.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "STRANGE BEDFELLOWS"
+      }
+    },
+    {
+      "url": "/s/1962-1963-PICNIC.pdf",
+      "filename": "1962-1963-PICNIC.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1962-1963 PICNIC.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "PICNIC"
+      }
+    },
+    {
+      "url": "/s/1962-1963-The-Fifth-Season.pdf",
+      "filename": "1962-1963-The-Fifth-Season.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1962-1963 The Fifth Season.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "THE FIFTH SEASON"
+      }
+    },
+    {
+      "url": "/s/1962-1963-SHOWBOAT.pdf",
+      "filename": "1962-1963-SHOWBOAT.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1962-1963 SHOWBOAT.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "SHOW BOAT"
+      }
+    },
+    {
+      "url": "/s/1963-1964-Roman-Candle.pdf",
+      "filename": "1963-1964-Roman-Candle.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1963-1964 Roman Candle.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "ROMAN CANDLE"
+      }
+    },
+    {
+      "url": "/s/1963-1964-The-Heiress.pdf",
+      "filename": "1963-1964-The-Heiress.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1963-1964 The Heiress.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "THE HEIRESS"
+      }
+    },
+    {
+      "url": "/s/1963-1964-Everybody-Loves-Opal.pdf",
+      "filename": "1963-1964-Everybody-Loves-Opal.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1963-1964 Everybody Loves Opal.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "EVERYBODY LOVES OPAL"
+      }
+    },
+    {
+      "url": "/s/1963-1964-Breath-of-Spring.pdf",
+      "filename": "1963-1964-Breath-of-Spring.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1963-1964 Breath of Spring.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "BREATH OF SPRING"
+      }
+    },
+    {
+      "url": "/s/1963-1934-A-Far-Country.pdf",
+      "filename": "1963-1934-A-Far-Country.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1963-1934 A Far Country.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "A FAR COUNTRY"
+      }
+    },
+    {
+      "url": "/s/1963-1964-Come-Blow-Your-Horn.pdf",
+      "filename": "1963-1964-Come-Blow-Your-Horn.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1963-1964 Come Blow Your Horn.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "COME BLOW YOUR HORN"
+      }
+    },
+    {
+      "url": "/s/1963-1964-Annie-Get-Your-Gun.pdf",
+      "filename": "1963-1964-Annie-Get-Your-Gun.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1963-1964 Annie Get Your Gun.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "ANNIE GET YOUR GUN"
+      }
+    },
+    {
+      "url": "/s/1964-1965-GAZEBO.pdf",
+      "filename": "1964-1965-GAZEBO.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1964-1965 GAZEBO.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "GAZEBO"
+      }
+    },
+    {
+      "url": "/s/1964-1965-The-Best-Man.pdf",
+      "filename": "1964-1965-The-Best-Man.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1964-1965 The Best Man.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "THE BEST MAN"
+      }
+    },
+    {
+      "url": "/s/1964-1965-The-Sleeping-Prince-7xkg.pdf",
+      "filename": "1964-1965-The-Sleeping-Prince-7xkg.pdf",
+      "server_match": null,
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "THE SLEEPING PRINCE"
+      }
+    },
+    {
+      "url": "/s/1964-1965-Lullaby.pdf",
+      "filename": "1964-1965-Lullaby.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1964-1965 Lullaby.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "LULLABY"
+      }
+    },
+    {
+      "url": "/s/1964-1965-Summer-and-Smoke.pdf",
+      "filename": "1964-1965-Summer-and-Smoke.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1964-1965 Summer and Smoke.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "SUMMER AND SMOKE"
+      }
+    },
+    {
+      "url": "/s/1964-1965-A-Thousand-Clowns.pdf",
+      "filename": "1964-1965-A-Thousand-Clowns.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1964-1965 A Thousand Clowns.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "A THOUSAND CLOWNS"
+      }
+    },
+    {
+      "url": "/s/1964-1965-Anything-Goes.pdf",
+      "filename": "1964-1965-Anything-Goes.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1964-1965 Anything Goes.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "ANYTHING GOES"
+      }
+    },
+    {
+      "url": "/s/1965-1966-The-Rainmaker.pdf",
+      "filename": "1965-1966-The-Rainmaker.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1965-1966 The Rainmaker.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "THE RAINMAKER"
+      }
+    },
+    {
+      "url": "/s/1964-1965-Love-From-a-Stranger.pdf",
+      "filename": "1964-1965-Love-From-a-Stranger.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1964-1965 Love From a Stranger.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "LOVE FROM A STRANGER"
+      }
+    },
+    {
+      "url": "/s/1964-1965-Dear-Charles.pdf",
+      "filename": "1964-1965-Dear-Charles.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1964-1965 Dear Charles.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "DEAR CHARLES"
+      }
+    },
+    {
+      "url": "/s/1964-1965-A-Shot-in-the-Dark.pdf",
+      "filename": "1964-1965-A-Shot-in-the-Dark.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1964-1965 A Shot in the Dark.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "A SHOT IN THE DARK"
+      }
+    },
+    {
+      "url": "/s/1964-1965-DAUGHTER-OF-SILENCE.pdf",
+      "filename": "1964-1965-DAUGHTER-OF-SILENCE.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1964-1965 DAUGHTER OF SILENCE.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "DAUGHTER OF SILENCE"
+      }
+    },
+    {
+      "url": "/s/1964-1965-Mary-Mary.pdf",
+      "filename": "1964-1965-Mary-Mary.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1964-1965 Mary, Mary.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "MARY, MARY"
+      }
+    },
+    {
+      "url": "/s/1964-1965-THE-MUSIC-MAN.pdf",
+      "filename": "1964-1965-THE-MUSIC-MAN.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1964-1965 THE MUSIC MAN.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "THE MUSIC MAN"
+      }
+    },
+    {
+      "url": "/s/1966-1967-Never-Too-Late.pdf",
+      "filename": "1966-1967-Never-Too-Late.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1966-1967 Never Too Late.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "NEVER TOO LATE"
+      }
+    },
+    {
+      "url": "/s/1966-1967-THE-AUTUMN-GARDEN.pdf",
+      "filename": "1966-1967-THE-AUTUMN-GARDEN.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1966-1967 THE AUTUMN GARDEN.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "THE AUTUMN GARDEN"
+      }
+    },
+    {
+      "url": "/s/1966-1967-For-Better-For-Worse.pdf",
+      "filename": "1966-1967-For-Better-For-Worse.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1966-1967 For Better For Worse.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "FOR BETTER, FOR WORSE"
+      }
+    },
+    {
+      "url": "/s/1966-1967-The-Warm-Peninsula.pdf",
+      "filename": "1966-1967-The-Warm-Peninsula.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1966-1967 The Warm Peninsula.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "THE WARM PENINSULA"
+      }
+    },
+    {
+      "url": "/s/1966-1967-Mornings-At-Seven.pdf",
+      "filename": "1966-1967-Mornings-At-Seven.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1966-1967 Morning's At Seven.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "MORNING\u2019S AT SEVEN"
+      }
+    },
+    {
+      "url": "/s/1966-1967-The-Absence-of-a-Cello.pdf",
+      "filename": "1966-1967-The-Absence-of-a-Cello.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1966-1967 The Absence of a Cello.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "THE ABSENCE OF A CELLO"
+      }
+    },
+    {
+      "url": "/s/1966-1967-Carnival.pdf",
+      "filename": "1966-1967-Carnival.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1966-1967 Carnival.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "CARNIVAL"
+      }
+    },
+    {
+      "url": "/s/1967-1968-CHICKEN-EVERY-SUNDAY.pdf",
+      "filename": "1967-1968-CHICKEN-EVERY-SUNDAY.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1967-1968 CHICKEN EVERY SUNDAY.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "CHICKEN EVERY SUNDAY"
+      }
+    },
+    {
+      "url": "/s/1967-1968-ADVISE-AND-CONSENT.pdf",
+      "filename": "1967-1968-ADVISE-AND-CONSENT.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1967-1968 ADVISE AND CONSENT.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "ADVISE AND CONSENT"
+      }
+    },
+    {
+      "url": "/s/1967-1968-Any-Wednesday.pdf",
+      "filename": "1967-1968-Any-Wednesday.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1967-1968 Any Wednesday.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "ANY WEDNESDAY"
+      }
+    },
+    {
+      "url": "/s/1967-1968-POOR-RICHARD.pdf",
+      "filename": "1967-1968-POOR-RICHARD.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1967-1968 POOR RICHARD.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "POOR RICHARD"
+      }
+    },
+    {
+      "url": "/s/1967-1968-THE-SUBJECT-WAS-ROSES.pdf",
+      "filename": "1967-1968-THE-SUBJECT-WAS-ROSES.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1967-1968 THE SUBJECT WAS ROSES.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "THE SUBJECT WAS ROSES"
+      }
+    },
+    {
+      "url": "/s/1967-1968-BAREFOOT-IN-THE-PARK.pdf",
+      "filename": "1967-1968-BAREFOOT-IN-THE-PARK.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1967-1968 BAREFOOT IN THE PARK.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "BAREFOOT IN THE PARK"
+      }
+    },
+    {
+      "url": "/s/1967-1968-SOUND-OF-MUSIC.pdf",
+      "filename": "1967-1968-SOUND-OF-MUSIC.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1967-1968 SOUND OF MUSIC.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "THE SOUND OF MUSIC"
+      }
+    },
+    {
+      "url": "/s/1968-1969-Mister-Roberts.pdf",
+      "filename": "1968-1969-Mister-Roberts.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1968-1969 Mister Roberts.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "MISTER ROBERTS"
+      }
+    },
+    {
+      "url": "/s/1968-1969-The-Letter.pdf",
+      "filename": "1968-1969-The-Letter.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1968-1969 The Letter.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "THE LETTER"
+      }
+    },
+    {
+      "url": "/s/1968-1969-The-Man-Who-Came-To-Dinner.pdf",
+      "filename": "1968-1969-The-Man-Who-Came-To-Dinner.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1968-1969 The Man Who Came To Dinner.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "THE MAN WHO CAME TO DINNER"
+      }
+    },
+    {
+      "url": "/s/1968-1969-Bus-Stop.pdf",
+      "filename": "1968-1969-Bus-Stop.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1968-1969 Bus Stop.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "BUS STOP"
+      }
+    },
+    {
+      "url": "/s/1968-1969-Dinner-at-Eight.pdf",
+      "filename": "1968-1969-Dinner-at-Eight.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1968-1969 Dinner at Eight.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "DINNER AT EIGHT"
+      }
+    },
+    {
+      "url": "/s/1968-1969-Born-Yesterday.pdf",
+      "filename": "1968-1969-Born-Yesterday.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1968-1969 Born Yesterday.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "BORN YESTERDAY"
+      }
+    },
+    {
+      "url": "/s/1968-1969-South-Pacific.pdf",
+      "filename": "1968-1969-South-Pacific.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1968-1969 South Pacific.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "SOUTH PACIFIC"
+      }
+    },
+    {
+      "url": "/s/1969-1970-The-Odd-Couple.pdf",
+      "filename": "1969-1970-The-Odd-Couple.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1969-1970 The Odd Couple.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "THE ODD COUPLE"
+      }
+    },
+    {
+      "url": "/s/1969-1970-The-NIght-of-the-Iguana.pdf",
+      "filename": "1969-1970-The-NIght-of-the-Iguana.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1969-1970 The NIght of the Iguana.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "THE NIGHT OF THE IGUANA"
+      }
+    },
+    {
+      "url": "/s/1969-1970-Dont-Drink-the-Water.pdf",
+      "filename": "1969-1970-Dont-Drink-the-Water.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1969-1970 Don't Drink the Water.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "DON\u2019T DRINK THE WATER"
+      }
+    },
+    {
+      "url": "/s/1969-1970-Time-of-the-Cuckoo.pdf",
+      "filename": "1969-1970-Time-of-the-Cuckoo.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1969-1970 Time of the Cuckoo.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "THE TIME OF THE CUCKOO"
+      }
+    },
+    {
+      "url": "/s/1969-1970-Waltz-of-the-Toreadors.pdf",
+      "filename": "1969-1970-Waltz-of-the-Toreadors.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1969-1970 Waltz of the Toreadors.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "THE WALTZ OF THE TOREADORS"
+      }
+    },
+    {
+      "url": "/s/1969-1970-Reluctant-Debutante-6lbc.pdf",
+      "filename": "1969-1970-Reluctant-Debutante-6lbc.pdf",
+      "server_match": null,
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "RELUCTANT DEBUTANTE"
+      }
+    },
+    {
+      "url": "/s/1969-1970-The-King-and-I.pdf",
+      "filename": "1969-1970-The-King-and-I.pdf",
+      "server_match": "TLT Programs/1960-61 - 1969-70/1969-1970 The King and I.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1960-1970.html",
+        "text": "THE KING AND I"
+      }
+    },
+    {
+      "url": "/s/1970-1971-The-Cactus-Flower.pdf",
+      "filename": "1970-1971-The-Cactus-Flower.pdf",
+      "server_match": null,
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "CACTUS FLOWER"
+      }
+    },
+    {
+      "url": "/s/1970-1972-A-Case-of-Libel.pdf",
+      "filename": "1970-1972-A-Case-of-Libel.pdf",
+      "server_match": null,
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "A CASE OF LIBEL"
+      }
+    },
+    {
+      "url": "/s/1970-1971-Suds-in-Your-Eye.pdf",
+      "filename": "1970-1971-Suds-in-Your-Eye.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1970-1971 Suds in Your Eye.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "SUDS IN YOUR EYE"
+      }
+    },
+    {
+      "url": "/s/1970-1971-Love-in-E-Flat.pdf",
+      "filename": "1970-1971-Love-in-E-Flat.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1970-1971 Love in E-Flat.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "LOVE IN \u201cE\u201d FLAT"
+      }
+    },
+    {
+      "url": "/s/1970-1971-Harvey.pdf",
+      "filename": "1970-1971-Harvey.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1970-1971 Harvey.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "HARVEY"
+      }
+    },
+    {
+      "url": "/s/1970-1971-Critics-Choice.pdf",
+      "filename": "1970-1971-Critics-Choice.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1970-1971 Critic's Choice.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "CRITIC\u2019S CHOICE"
+      }
+    },
+    {
+      "url": "/s/1970-1971-Damn-Yankees.pdf",
+      "filename": "1970-1971-Damn-Yankees.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1970-1971 Damn Yankees.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "DAMN YANKEES"
+      }
+    },
+    {
+      "url": "/s/1971-1972-Goodbye-Charlie.pdf",
+      "filename": "1971-1972-Goodbye-Charlie.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1971-1972 Goodbye Charlie.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "GOODBYE CHARLIE"
+      }
+    },
+    {
+      "url": "/s/1971-1972-The-Best-Laid-Plans.pdf",
+      "filename": "1971-1972-The-Best-Laid-Plans.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1971-1972 The Best Laid Plans.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "THE BEST LAID PLANS"
+      }
+    },
+    {
+      "url": "/s/1971-1972-Period-Of-Adjustment.pdf",
+      "filename": "1971-1972-Period-Of-Adjustment.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1971-1972 Period Of Adjustment.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "PERIOD OF ADJUSTMENT"
+      }
+    },
+    {
+      "url": "/s/1971-1972-The-Price.pdf",
+      "filename": "1971-1972-The-Price.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1971-1972 The Price.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "THE PRICE"
+      }
+    },
+    {
+      "url": "/s/1971-1972-Private-Lives.pdf",
+      "filename": "1971-1972-Private-Lives.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1971-1972 Private Lives.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "PRIVATE LIVES"
+      }
+    },
+    {
+      "url": "/s/1971-1972-Plaza-Suite.pdf",
+      "filename": "1971-1972-Plaza-Suite.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1971-1972 Plaza Suite.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "PLAZA SUITE"
+      }
+    },
+    {
+      "url": "/s/1971-1972-Gypsy.pdf",
+      "filename": "1971-1972-Gypsy.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1971-1972 Gypsy.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "GYPSY"
+      }
+    },
+    {
+      "url": "/s/1972-1973-The-Girl-in-the-Freudian-Slip.pdf",
+      "filename": "1972-1973-The-Girl-in-the-Freudian-Slip.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1972-1973 The Girl in the Freudian Slip.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "THE GIRL IN THE FREUDIAN SLIP"
+      }
+    },
+    {
+      "url": "/s/1972-1973-Whos-Afraid-of-Virgnia-Woolf.pdf",
+      "filename": "1972-1973-Whos-Afraid-of-Virgnia-Woolf.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1972-1973 Who's Afraid of Virgnia Woolf.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "WHO\u2019S AFRAID OF VIRGINIA WOOLF"
+      }
+    },
+    {
+      "url": "/s/1972-1973-Halfway-Up-The-Tree.pdf",
+      "filename": "1972-1973-Halfway-Up-The-Tree.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1972-1973 Halfway Up The Tree.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "HALF WAY UP THE TREE"
+      }
+    },
+    {
+      "url": "/s/1972-1973-The-Mousetrap.pdf",
+      "filename": "1972-1973-The-Mousetrap.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1972-1973 The Mousetrap.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "THE MOUSETRAP"
+      }
+    },
+    {
+      "url": "/s/1972-1973-The-Solid-Gold-Cadillac.pdf",
+      "filename": "1972-1973-The-Solid-Gold-Cadillac.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1972-1973 The Solid Gold Cadillac.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "THE SOLID GOLD CADILLAC"
+      }
+    },
+    {
+      "url": "/s/1972-1973-Beekman-Place.pdf",
+      "filename": "1972-1973-Beekman-Place.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1972-1973 Beekman Place.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "BEEKMAN PLACE"
+      }
+    },
+    {
+      "url": "/s/1972-1973-HELLO-DOLLY.pdf",
+      "filename": "1972-1973-HELLO-DOLLY.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1972-1973 HELLO, DOLLY.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "HELLO, DOLLY"
+      }
+    },
+    {
+      "url": "/s/1973-1974-FORTY-CARATS.pdf",
+      "filename": "1973-1974-FORTY-CARATS.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1973-1974 FORTY CARATS.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "FORTY CARATS"
+      }
+    },
+    {
+      "url": "/s/1973-1974-PICNIC.pdf",
+      "filename": "1973-1974-PICNIC.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1973-1974 PICNIC.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "PICNIC"
+      }
+    },
+    {
+      "url": "/s/1973-1974-Bell-Book-and-Candle.pdf",
+      "filename": "1973-1974-Bell-Book-and-Candle.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1973-1974 Bell, Book and Candle.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "BELL, BOOK, AND CANDLE"
+      }
+    },
+    {
+      "url": "/s/1973-1974-Prescription-Murder.pdf",
+      "filename": "1973-1974-Prescription-Murder.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1973-1974 Prescription - Murder.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "PRESCRIPTION:  MURDER"
+      }
+    },
+    {
+      "url": "/s/1973-1974-Anastasia.pdf",
+      "filename": "1973-1974-Anastasia.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1973-1974 Anastasia.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "ANASTASIA"
+      }
+    },
+    {
+      "url": "/s/1973-1974-The-Seven-Year-Itch.pdf",
+      "filename": "1973-1974-The-Seven-Year-Itch.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1973-1974 The Seven Year Itch.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "THE SEVEN YEAR ITCH"
+      }
+    },
+    {
+      "url": "/s/1973-1974-My-Fair-Lady.pdf",
+      "filename": "1973-1974-My-Fair-Lady.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1973-1974 My Fair Lady.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "MY FAIR LADY"
+      }
+    },
+    {
+      "url": "/s/1974-1975-ENTER-LAUGHING.pdf",
+      "filename": "1974-1975-ENTER-LAUGHING.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1974-1975 ENTER LAUGHING.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "ENTER LAUGHING"
+      }
+    },
+    {
+      "url": "/s/1974-1975-BUTTERFLIES-ARE-FREE.pdf",
+      "filename": "1974-1975-BUTTERFLIES-ARE-FREE.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1974-1975 BUTTERFLIES ARE FREE.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "BUTTERFLIES ARE FREE"
+      }
+    },
+    {
+      "url": "/s/1974-1975-The-Girls-In-509.pdf",
+      "filename": "1974-1975-The-Girls-In-509.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1974-1975 The Girls In 509.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "THE GIRLS IN 509"
+      }
+    },
+    {
+      "url": "/s/1974-1975-Night-Watch.pdf",
+      "filename": "1974-1975-Night-Watch.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1974-1975 Night Watch.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "NIGHT WATCH"
+      }
+    },
+    {
+      "url": "/s/1974-1975-Miracle-Worker.pdf",
+      "filename": "1974-1975-Miracle-Worker.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1974-1975 Miracle Worker.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "THE MIRACLE WORKER"
+      }
+    },
+    {
+      "url": "/s/1974-1975-SHEEP-ON-THE-RUNWAY.pdf",
+      "filename": "1974-1975-SHEEP-ON-THE-RUNWAY.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1974-1975 SHEEP ON THE RUNWAY.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "SHEEP ON THE RUNWAY"
+      }
+    },
+    {
+      "url": "/s/1974-1975-SWEET-CHARITY.pdf",
+      "filename": "1974-1975-SWEET-CHARITY.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1974-1975 SWEET CHARITY.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "SWEET CHARITY"
+      }
+    },
+    {
+      "url": "/s/1975-1976-Idiots-Delight.pdf",
+      "filename": "1975-1976-Idiots-Delight.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1975-1976 Idiot's Delight.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "IDIOT\u2019S DELIGHT"
+      }
+    },
+    {
+      "url": "/s/1975-1976-George-Washington-Slept-Here.pdf",
+      "filename": "1975-1976-George-Washington-Slept-Here.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1975-1976 George Washington Slept Here.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "GEORGE WASHINGTON SLEPT HERE"
+      }
+    },
+    {
+      "url": "/s/1975-1976-Our-Hearts-Were-Young-And-Gay.pdf",
+      "filename": "1975-1976-Our-Hearts-Were-Young-And-Gay.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1975-1976 Our Hearts Were Young And Gay.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "OUR HEARTS WERE YOUNG AND GAY"
+      }
+    },
+    {
+      "url": "/s/1975-1976-NIGHT-MUST-FALL.pdf",
+      "filename": "1975-1976-NIGHT-MUST-FALL.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1975-1976 NIGHT MUST FALL.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "NIGHT MUST FALL"
+      }
+    },
+    {
+      "url": "/s/1975-1976-Cat-On-A-Hot-Tin-Roof.pdf",
+      "filename": "1975-1976-Cat-On-A-Hot-Tin-Roof.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1975-1976 Cat On A Hot Tin Roof.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "CAT ON A HOT TIN ROOF"
+      }
+    },
+    {
+      "url": "/s/1975-1976-LIFE-WITH-FATHER.pdf",
+      "filename": "1975-1976-LIFE-WITH-FATHER.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1975-1976 LIFE WITH FATHER.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "LIFE WITH FATHER"
+      }
+    },
+    {
+      "url": "/s/1975-1976-CABARET.pdf",
+      "filename": "1975-1976-CABARET.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1975-1976 CABARET.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "CABARET"
+      }
+    },
+    {
+      "url": "/s/1976-1977-The-PRISONER-of-2nd-AVENUE.pdf",
+      "filename": "1976-1977-The-PRISONER-of-2nd-AVENUE.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1976-1977 The PRISONER of 2nd AVENUE.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "THE PRISONER OF SECOND AVENUE"
+      }
+    },
+    {
+      "url": "/s/1976-1977-Sleuth.pdf",
+      "filename": "1976-1977-Sleuth.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1976-1977 Sleuth.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "SLEUTH"
+      }
+    },
+    {
+      "url": "/s/1976-1977-Spoon-River-Anthology.pdf",
+      "filename": "1976-1977-Spoon-River-Anthology.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1976-1977 Spoon River Anthology.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "SPOON RIVER ANTHOLOGY"
+      }
+    },
+    {
+      "url": "/s/1976-1977-Finishing-Touches.pdf",
+      "filename": "1976-1977-Finishing-Touches.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1976-1977 Finishing Touches.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "FINISHING TOUCHES"
+      }
+    },
+    {
+      "url": "/s/1976-1977-CHILDRENS-HOUR.pdf",
+      "filename": "1976-1977-CHILDRENS-HOUR.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1976-1977 CHILDREN'S HOUR.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "THE CHILDREN\u2019S HOUR"
+      }
+    },
+    {
+      "url": "/s/1976-1977-See-How-They-Run.pdf",
+      "filename": "1976-1977-See-How-They-Run.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1976-1977 See How They Run.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "SEE HOW THEY RUN"
+      }
+    },
+    {
+      "url": "/s/1976-1977-CAROUSEL.pdf",
+      "filename": "1976-1977-CAROUSEL.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1976-1977 CAROUSEL.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "CAROUSEL"
+      }
+    },
+    {
+      "url": "/s/1977-1978-The-Sunshine-Boys.pdf",
+      "filename": "1977-1978-The-Sunshine-Boys.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1977-1978 The Sunshine Boys.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "THE SUNSHINE BOYS"
+      }
+    },
+    {
+      "url": "/s/1977-1978-THE-BAT.pdf",
+      "filename": "1977-1978-THE-BAT.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1977-1978 THE BAT.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "THE BAT"
+      }
+    },
+    {
+      "url": "/s/1977-1978-H-M-S-PINAFORE.pdf",
+      "filename": "1977-1978-H-M-S-PINAFORE.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1977-1978 H. M. S. PINAFORE.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "H.M.S. PINAFORE"
+      }
+    },
+    {
+      "url": "/s/1977-1978-6-Rms-Riv-Vu.pdf",
+      "filename": "1977-1978-6-Rms-Riv-Vu.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1977-1978 6 Rms Riv Vu.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "6 RMS RIV VU"
+      }
+    },
+    {
+      "url": "/s/1977-1978-No-Sex-Please-Were-British.pdf",
+      "filename": "1977-1978-No-Sex-Please-Were-British.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1977-1978 No Sex Please, We're British.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "NO SEX PLEASE, WE\u2019RE BRITISH"
+      }
+    },
+    {
+      "url": "/s/1977-1978-BABES-IN-ARMS.pdf",
+      "filename": "1977-1978-BABES-IN-ARMS.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1977-1978 BABES IN ARMS.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "BABES IN ARMS"
+      }
+    },
+    {
+      "url": "/s/1978-1979-Last-of-the-Red-Hot-Lovers.pdf",
+      "filename": "1978-1979-Last-of-the-Red-Hot-Lovers.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1978-1979 Last of the Red Hot Lovers.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "THE LAST OF THE RED HOT LOVERS"
+      }
+    },
+    {
+      "url": "/s/1978-1979-Wait-Until-Dark.pdf",
+      "filename": "1978-1979-Wait-Until-Dark.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1978-1979 Wait Until Dark.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "WAIT UNTIL DARK"
+      }
+    },
+    {
+      "url": "/s/1978-1979-THE-MIKADO.pdf",
+      "filename": "1978-1979-THE-MIKADO.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1978-1979 THE MIKADO.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "THE MIKADO"
+      }
+    },
+    {
+      "url": "/s/1978-1979-The-Dark-at-the-Top-of-the-Stairs.pdf",
+      "filename": "1978-1979-The-Dark-at-the-Top-of-the-Stairs.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1978-1979 The Dark at the Top of the Stairs.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "THE DARK AT THE TOP OF THE STAIRS"
+      }
+    },
+    {
+      "url": "/s/1978-1979-ARSENIC-AND-OLD-LACE.pdf",
+      "filename": "1978-1979-ARSENIC-AND-OLD-LACE.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1978-1979 ARSENIC AND OLD LACE.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "ARSENIC AND OLD LACE"
+      }
+    },
+    {
+      "url": "/s/1978-1979-DID-YOU-YEAR.pdf",
+      "filename": "1978-1979-DID-YOU-YEAR.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1978-1979 DID YOU YEAR.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "DID YOU HEAR"
+      }
+    },
+    {
+      "url": "/s/1979-1980-UNDER-THE-YUM-YUM-TREE.pdf",
+      "filename": "1979-1980-UNDER-THE-YUM-YUM-TREE.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1979-1980 UNDER THE YUM YUM TREE.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "UNDER THE YUM YUM TREE"
+      }
+    },
+    {
+      "url": "/s/1979-1980-DIAL-M-FOR-MURDER.pdf",
+      "filename": "1979-1980-DIAL-M-FOR-MURDER.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1979-1980 DIAL M FOR MURDER.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "DIAL \u201cM\u201dFOR MURDER"
+      }
+    },
+    {
+      "url": "/s/1979-1980-THE-EFFECT-OF-GAMMA-RAYS-ON-MAN-IN-THE-MOON-MARIGOLDS.pdf",
+      "filename": "1979-1980-THE-EFFECT-OF-GAMMA-RAYS-ON-MAN-IN-THE-MOON-MARIGOLDS.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1979-1980 THE EFFECT OF GAMMA RAYS ON MAN-IN-THE-MOON MARIGOLDS.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "THE EFFECT OF GAMMA RAYS ON MAN-IN-THE-MOON MARIGOLDS"
+      }
+    },
+    {
+      "url": "/s/1979-1980-THE-IMPORTANCE-OF-BEING-EARNEST-blxc.pdf",
+      "filename": "1979-1980-THE-IMPORTANCE-OF-BEING-EARNEST-blxc.pdf",
+      "server_match": null,
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "THE IMPORTANCE OF BEING EARNEST"
+      }
+    },
+    {
+      "url": "/s/1979-1980-MARYMARY.pdf",
+      "filename": "1979-1980-MARYMARY.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1979-1980 MARY,MARY.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "MARY, MARY"
+      }
+    },
+    {
+      "url": "/s/1979-1980-BY-STROUSE.pdf",
+      "filename": "1979-1980-BY-STROUSE.pdf",
+      "server_match": "TLT Programs/1970-71 - 1979-80/1979-1980 BY STROUSE.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1970-1980.html",
+        "text": "BY STROUSE"
+      }
+    },
+    {
+      "url": "/s/1980-1981-THE-WILD-GOOSE-CHASE.pdf",
+      "filename": "1980-1981-THE-WILD-GOOSE-CHASE.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1980-1981 THE WILD GOOSE CHASE.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "THE WILD GOOSE CHASE"
+      }
+    },
+    {
+      "url": "/s/1980-1981-The-Bad-Seed.pdf",
+      "filename": "1980-1981-The-Bad-Seed.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1980-1981 The Bad Seed.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "THE BAD SEED"
+      }
+    },
+    {
+      "url": "/s/1980-1981-Heaven-Can-Wait.pdf",
+      "filename": "1980-1981-Heaven-Can-Wait.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1980-1981 Heaven Can Wait.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "HEAVEN CAN WAIT"
+      }
+    },
+    {
+      "url": "/s/1980-1981-SCROOGE.pdf",
+      "filename": "1980-1981-SCROOGE.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1980-1981 SCROOGE.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "SCROOGE"
+      }
+    },
+    {
+      "url": "/s/1980-1981-Lilies-Of-The-Field.pdf",
+      "filename": "1980-1981-Lilies-Of-The-Field.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1980-1981 Lilies Of The Field.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "THE LILIES OF THE FIELD"
+      }
+    },
+    {
+      "url": "/s/1980-1981-Royal-Gambit.pdf",
+      "filename": "1980-1981-Royal-Gambit.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1980-1981 Royal Gambit.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "ROYAL GAMBIT"
+      }
+    },
+    {
+      "url": "/s/1980-1981-LOVE-RIDES-THE-RAILS-or-WILL-THE-MAIL-TRAIN-RUN-TONIGHT.pdf",
+      "filename": "1980-1981-LOVE-RIDES-THE-RAILS-or-WILL-THE-MAIL-TRAIN-RUN-TONIGHT.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1980-1981 LOVE RIDES THE RAILS or WILL THE MAIL TRAIN RUN TONIGHT.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "LOVE RIDES THE RAILS"
+      }
+    },
+    {
+      "url": "/s/1980-1981-Kiss-Me-Kate.pdf",
+      "filename": "1980-1981-Kiss-Me-Kate.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1980-1981 Kiss Me Kate.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "KISS ME KATE"
+      }
+    },
+    {
+      "url": "/s/1981-1982-A-THOUSAND-CLOWNS.pdf",
+      "filename": "1981-1982-A-THOUSAND-CLOWNS.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1981-1982 A THOUSAND CLOWNS.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "A THOUSAND CLOWNS"
+      }
+    },
+    {
+      "url": "/s/1981-1982-The-Royal-Family.pdf",
+      "filename": "1981-1982-The-Royal-Family.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1981-1982 The Royal Family.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "THE ROYAL FAMILY"
+      }
+    },
+    {
+      "url": "/s/1981-1982-BEDROOM-FARCE.pdf",
+      "filename": "1981-1982-BEDROOM-FARCE.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1981-1982 BEDROOM FARCE.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "BEDROOM FARCE"
+      }
+    },
+    {
+      "url": "/s/1981-1982-Death-of-a-Salesman.pdf",
+      "filename": "1981-1982-Death-of-a-Salesman.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1981-1982 Death of a Salesman.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "DEATH OF A SALESMAN"
+      }
+    },
+    {
+      "url": "/s/1981-1982-BORN-YESTERDAY.pdf",
+      "filename": "1981-1982-BORN-YESTERDAY.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1981-1982  BORN YESTERDAY.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "BORN YESTERDAY"
+      }
+    },
+    {
+      "url": "/s/1981-1982-GYPSY.pdf",
+      "filename": "1981-1982-GYPSY.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1981-1982 GYPSY.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "GYPSY"
+      }
+    },
+    {
+      "url": "/s/1982-1893-APPLAUSE.pdf",
+      "filename": "1982-1893-APPLAUSE.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1982-1893 APPLAUSE.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "APPLAUSE"
+      }
+    },
+    {
+      "url": "/s/1982-1983-Murder-Among-Friends.pdf",
+      "filename": "1982-1983-Murder-Among-Friends.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1982-1983 Murder Among Friends.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "MURDER AMONG FRIENDS"
+      }
+    },
+    {
+      "url": "/s/1982-1983-ABIES-IRISH-ROSE.pdf",
+      "filename": "1982-1983-ABIES-IRISH-ROSE.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1982-1983 ABIE'S IRISH ROSE.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "ABIE\u2019S IRISH ROSE"
+      }
+    },
+    {
+      "url": "/s/1982-1983-The-Glass-Menagerie.pdf",
+      "filename": "1982-1983-The-Glass-Menagerie.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1982-1983 The Glass Menagerie.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "THE GLASS MENAGERIE"
+      }
+    },
+    {
+      "url": "/s/1982-1983-on-golden-pond.pdf",
+      "filename": "1982-1983-on-golden-pond.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1982-1983 on golden pond.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "ON GOLDEN POND"
+      }
+    },
+    {
+      "url": "/s/1983-1984-NOEL-COWARDS-PRESENT-LAUGHTER.pdf",
+      "filename": "1983-1984-NOEL-COWARDS-PRESENT-LAUGHTER.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1983-1984 NOEL COWARD'S PRESENT LAUGHTER.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "PRESENT LAUGHTER"
+      }
+    },
+    {
+      "url": "/s/1983-1984-Sweeney-Todd.pdf",
+      "filename": "1983-1984-Sweeney-Todd.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1983-1984 Sweeney Todd.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "SWEENEY TODD"
+      }
+    },
+    {
+      "url": "/s/1983-1984-Here-Lies-Jeremy-Troy.pdf",
+      "filename": "1983-1984-Here-Lies-Jeremy-Troy.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1983-1984 Here Lies Jeremy Troy.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "HERE LIES JEREMY TROY"
+      }
+    },
+    {
+      "url": "/s/1983-1984-TRIBUTE.pdf",
+      "filename": "1983-1984-TRIBUTE.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1983-1984 TRIBUTE.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "TRIBUTE"
+      }
+    },
+    {
+      "url": "/s/1983-1984-NO-SOONER-WON-THAN-WED.pdf",
+      "filename": "1983-1984-NO-SOONER-WON-THAN-WED.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1983-1984 NO SOONER WON THAN WED.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "NO SOONER WON THAN WED"
+      }
+    },
+    {
+      "url": "/s/1984-1985-HAY-FEVER.pdf",
+      "filename": "1984-1985-HAY-FEVER.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1984-1985 HAY FEVER.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "HAY FEVER"
+      }
+    },
+    {
+      "url": "/s/1984-1985-SEA-HORSE.pdf",
+      "filename": "1984-1985-SEA-HORSE.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1984-1985 SEA HORSE.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "THE SEA HORSE"
+      }
+    },
+    {
+      "url": "/s/1984-1985-ARMS-AND-THE-MAN.pdf",
+      "filename": "1984-1985-ARMS-AND-THE-MAN.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1984-1985 ARMS AND THE MAN.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "ARMS AND THE MAN"
+      }
+    },
+    {
+      "url": "/s/1984-1985-MURDER-ON-ARRIVAL.pdf",
+      "filename": "1984-1985-MURDER-ON-ARRIVAL.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1984-1985 MURDER ON ARRIVAL.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "MURDER ON ARRIVAL"
+      }
+    },
+    {
+      "url": "/s/1984-1985-JENNY-the-mail-order-bride.pdf",
+      "filename": "1984-1985-JENNY-the-mail-order-bride.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1984-1985 JENNY the mail order bride.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "JENNY, THE MAIL ORDER BRIDE"
+      }
+    },
+    {
+      "url": "/s/1985-1986-ARTICHOKE.pdf",
+      "filename": "1985-1986-ARTICHOKE.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1985-1986 ARTICHOKE.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "ARTICHOKE"
+      }
+    },
+    {
+      "url": "/s/1985-1986-ANGEL-STREET.pdf",
+      "filename": "1985-1986-ANGEL-STREET.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1985-1986 ANGEL STREET.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "ANGEL STREET"
+      }
+    },
+    {
+      "url": "/s/1985-1886-Lion-in-Winter.pdf",
+      "filename": "1985-1886-Lion-in-Winter.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1985-1886 Lion in Winter.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "LION IN THE WINTER"
+      }
+    },
+    {
+      "url": "/s/1985-1986-THE-SCHOOL-FOR-WIVES.pdf",
+      "filename": "1985-1986-THE-SCHOOL-FOR-WIVES.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1985-1986 THE SCHOOL FOR WIVES.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "THE SCHOOL FOR WIVES"
+      }
+    },
+    {
+      "url": "/s/1985-1986-Habeas-Corpus.pdf",
+      "filename": "1985-1986-Habeas-Corpus.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1985-1986 Habeas Corpus.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "HABEAS CORPUS"
+      }
+    },
+    {
+      "url": "/s/1985-1986-Murder-by-the-Book.pdf",
+      "filename": "1985-1986-Murder-by-the-Book.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1985-1986 Murder by the Book.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "MURDER BY THE BOOK"
+      }
+    },
+    {
+      "url": "/s/1985-1986-The-Fantasticks.pdf",
+      "filename": "1985-1986-The-Fantasticks.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1985-1986 The Fantasticks.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "THE FANTASTICKS"
+      }
+    },
+    {
+      "url": "/s/1985-1986-THE-CLOWN-WHO-RAN-AWAY.pdf",
+      "filename": "1985-1986-THE-CLOWN-WHO-RAN-AWAY.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1985-1986 THE CLOWN WHO RAN AWAY.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "THE CLOWN WHO RAN AWAY"
+      }
+    },
+    {
+      "url": "/s/1986-1987-Spoon-River-Anthology.pdf",
+      "filename": "1986-1987-Spoon-River-Anthology.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1986-1987 Spoon River Anthology.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "SPOON RIVER ANTHOLOGY"
+      }
+    },
+    {
+      "url": "/s/1986-1987-To-Gillian-On-Her-37th-Birthday.pdf",
+      "filename": "1986-1987-To-Gillian-On-Her-37th-Birthday.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1986-1987 To Gillian, On Her 37th Birthday.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "TO GILLIAN ON HER 37TH BIRTHDAY"
+      }
+    },
+    {
+      "url": "/s/1986-1987-Sly-Fox.pdf",
+      "filename": "1986-1987-Sly-Fox.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1986-1987 Sly Fox.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "SLY FOX"
+      }
+    },
+    {
+      "url": "/s/1986-1987-Episode-26.pdf",
+      "filename": "1986-1987-Episode-26.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1986-1987 Episode 26.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "EPISODE 26"
+      }
+    },
+    {
+      "url": "/s/1986-1987-THE-LITTLE-FOXES.pdf",
+      "filename": "1986-1987-THE-LITTLE-FOXES.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1986-1987 THE LITTLE FOXES.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "THE LITTLE FOXES"
+      }
+    },
+    {
+      "url": "/s/1986-1987-A-Day-in-the-Death-of-Joe-Egg.pdf",
+      "filename": "1986-1987-A-Day-in-the-Death-of-Joe-Egg.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1986-1987 A Day in the Death of Joe Egg.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "A DAY IN THE LIFE OF JOE EGG"
+      }
+    },
+    {
+      "url": "/s/1986-1987-Somethings-Afoot.pdf",
+      "filename": "1986-1987-Somethings-Afoot.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1986-1987 Something's Afoot.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "SOMETHING\u2019S AFOOT"
+      }
+    },
+    {
+      "url": "/s/1987-1988-THE-LIAR.pdf",
+      "filename": "1987-1988-THE-LIAR.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1987-1988 THE LIAR.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "THE LIAR"
+      }
+    },
+    {
+      "url": "/s/1987-1988-THE-COUNTRY-GIRL.pdf",
+      "filename": "1987-1988-THE-COUNTRY-GIRL.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1987-1988 THE COUNTRY GIRL.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "THE COUNTRY GIRL"
+      }
+    },
+    {
+      "url": "/s/1987-1988-ABSURD-PERSON-SINGULAR.pdf",
+      "filename": "1987-1988-ABSURD-PERSON-SINGULAR.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1987-1988 ABSURD PERSON SINGULAR.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "ABSURD PERSON SINGULAR"
+      }
+    },
+    {
+      "url": "/s/1987-1988-Ring-Round-the-Moon.pdf",
+      "filename": "1987-1988-Ring-Round-the-Moon.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1987-1988 Ring Round the Moon.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "RING AROUND THE MOON"
+      }
+    },
+    {
+      "url": "/s/1987-1988-PACK-OF-LIES.pdf",
+      "filename": "1987-1988-PACK-OF-LIES.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1987-1988 PACK OF LIES.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "PACK OF LIES"
+      }
+    },
+    {
+      "url": "/s/1987-1988-DAMES-AT-SEA.pdf",
+      "filename": "1987-1988-DAMES-AT-SEA.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1987-1988 DAMES AT SEA.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "DAMES AT SEA"
+      }
+    },
+    {
+      "url": "/s/1988-1989-Whodunnit.pdf",
+      "filename": "1988-1989-Whodunnit.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1988-1989 Whodunnit.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "WHODUNNIT"
+      }
+    },
+    {
+      "url": "/s/1988-1989-STRANGE-SNOW.pdf",
+      "filename": "1988-1989-STRANGE-SNOW.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1988-1989 STRANGE SNOW.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "STRANGE SNOW"
+      }
+    },
+    {
+      "url": "/s/1988-1989-LUNCH-HOUR.pdf",
+      "filename": "1988-1989-LUNCH-HOUR.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1988-1989 LUNCH HOUR.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "LUNCH HOUR"
+      }
+    },
+    {
+      "url": "/s/1988-1989-Crimes-of-the-Heart.pdf",
+      "filename": "1988-1989-Crimes-of-the-Heart.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1988-1989 Crimes of the Heart.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "CRIMES OF THE HEART"
+      }
+    },
+    {
+      "url": "/s/1988-1989-OLIVER.pdf",
+      "filename": "1988-1989-OLIVER.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1988-1989 OLIVER!.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "OLIVER!"
+      }
+    },
+    {
+      "url": "/s/1989-1990-See-How-They-Run.pdf",
+      "filename": "1989-1990-See-How-They-Run.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1989-1990 See How They Run.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "SEE HOW THEY RUN"
+      }
+    },
+    {
+      "url": "/s/1989-1990-Semper-Fi.pdf",
+      "filename": "1989-1990-Semper-Fi.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1989-1990 Semper Fi.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "SEMPER FI"
+      }
+    },
+    {
+      "url": "/s/1989-1990-EDUCATING-RITA.pdf",
+      "filename": "1989-1990-EDUCATING-RITA.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1989-1990 EDUCATING RITA.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "EDUCATING RITA"
+      }
+    },
+    {
+      "url": "/s/1989-1990-Pass-the-Butler.pdf",
+      "filename": "1989-1990-Pass-the-Butler.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1989-1990 Pass the Butler.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "PASS THE BUTLER"
+      }
+    },
+    {
+      "url": "/s/1989-1990-MASTER-HAROLD-and-the-boys.pdf",
+      "filename": "1989-1990-MASTER-HAROLD-and-the-boys.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1989-1990 MASTER HAROLD and the boys.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "MASTER HAROLD AND THE BOYS"
+      }
+    },
+    {
+      "url": "/s/1989-1990-ELIZA-and-THE-LUMBERJACK.pdf",
+      "filename": "1989-1990-ELIZA-and-THE-LUMBERJACK.pdf",
+      "server_match": "TLT Programs/1980-81 - 1989-90/1989-1990 ELIZA and THE LUMBERJACK.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1980-1990.html",
+        "text": "ELIZA AND THE LUMBERJACK"
+      }
+    },
+    {
+      "url": "/s/1990-1991-BLITHE-SPIRIT.pdf",
+      "filename": "1990-1991-BLITHE-SPIRIT.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1990-1991 BLITHE SPIRIT.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "BLITHE SPIRIT"
+      }
+    },
+    {
+      "url": "/s/1990-1991-THE-FOX.pdf",
+      "filename": "1990-1991-THE-FOX.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1990-1991 THE FOX.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "THE FOX"
+      }
+    },
+    {
+      "url": "/s/1990-1991-Shivaree.pdf",
+      "filename": "1990-1991-Shivaree.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1990-1991 Shivaree.pdf",
+      "ref_count": 6,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "SHIVAREE"
+      }
+    },
+    {
+      "url": "/s/1990-1991-Laundry-and-Bourbon-AND-Lone-Star.pdf",
+      "filename": "1990-1991-Laundry-and-Bourbon-AND-Lone-Star.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1990-1991 Laundry and Bourbon AND Lone Star.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "LAUNDRY & BOURBON / LONE STAR"
+      }
+    },
+    {
+      "url": "/s/1990-1991-Camelot.pdf",
+      "filename": "1990-1991-Camelot.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1990-1991 Camelot.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "CAMELOT"
+      }
+    },
+    {
+      "url": "/s/1991-1992-The-Wiz.pdf",
+      "filename": "1991-1992-The-Wiz.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1991-1992 The Wiz.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "THE WIZ"
+      }
+    },
+    {
+      "url": "/s/1991-1992-Bullshot-Crummond.pdf",
+      "filename": "1991-1992-Bullshot-Crummond.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1991-1992 Bullshot Crummond.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "BULLSHOT CRUMMOND"
+      }
+    },
+    {
+      "url": "/s/1991-1992-Agnes-of-God.pdf",
+      "filename": "1991-1992-Agnes-of-God.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1991-1992 Agnes of God.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "AGNES OF GOD"
+      }
+    },
+    {
+      "url": "/s/1991-1992-A-Company-of-Wayward-Saints.pdf",
+      "filename": "1991-1992-A-Company-of-Wayward-Saints.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1991-1992 A Company of Wayward Saints.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "COMPANY OF WAYWARD SAINTS"
+      }
+    },
+    {
+      "url": "/s/1991-1992-The-Diviners.pdf",
+      "filename": "1991-1992-The-Diviners.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1991-1992 The Diviners.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "THE DIVINERS"
+      }
+    },
+    {
+      "url": "/s/1991-1992-The-Bakers-Wife.pdf",
+      "filename": "1991-1992-The-Bakers-Wife.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1991-1992 The Baker's Wife.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "THE BAKER\u2019S WIFE"
+      }
+    },
+    {
+      "url": "/s/1992-1993-Quilters.pdf",
+      "filename": "1992-1993-Quilters.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1992-1993 Quilters.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "QUILTERS"
+      }
+    },
+    {
+      "url": "/s/1992-1993-The-Crucible.pdf",
+      "filename": "1992-1993-The-Crucible.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1992-1993 The Crucible.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "THE CRUCIBLE"
+      }
+    },
+    {
+      "url": "/s/1992-1993-The-Boys-in-Autumn.pdf",
+      "filename": "1992-1993-The-Boys-in-Autumn.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1992-1993 The Boys in Autumn.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "THE BOYS IN AUTUMN"
+      }
+    },
+    {
+      "url": "/s/1992-1993-Daddys-Dyin-Whos-Got-the-Will.pdf",
+      "filename": "1992-1993-Daddys-Dyin-Whos-Got-the-Will.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1992-1993 Daddy's Dyin' (Who's Got the Will).pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "DADDY\u2019S DYI\u2019N (WHO\u2019S GOT THE WILL?)"
+      }
+    },
+    {
+      "url": "/s/1992-1993-Driving-Miss-Daisy.pdf",
+      "filename": "1992-1993-Driving-Miss-Daisy.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1992-1993 Driving Miss Daisy.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "DRIVING MISS DAISY"
+      }
+    },
+    {
+      "url": "/s/1992-1993-FIDDLER-ON-THE-ROOF.pdf",
+      "filename": "1992-1993-FIDDLER-ON-THE-ROOF.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1992-1993 FIDDLER ON  THE ROOF.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "FIDDLER ON THE ROOF"
+      }
+    },
+    {
+      "url": "/s/1993-1994-The-Importance-of-Being-Earnest.pdf",
+      "filename": "1993-1994-The-Importance-of-Being-Earnest.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1993-1994 The Importance of Being Earnest.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "THE IMPORTANCE OF BEING EARNEST"
+      }
+    },
+    {
+      "url": "/s/1993-1994-You-Cant-Take-it-With-You.pdf",
+      "filename": "1993-1994-You-Cant-Take-it-With-You.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1993-1994 You Can't Take it With You.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "YOU CAN\u2019T TAKE IT WITH YOU"
+      }
+    },
+    {
+      "url": "/s/1993-1994-The-1940s-Radio-Hour.pdf",
+      "filename": "1993-1994-The-1940s-Radio-Hour.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1993-1994 The 1940's Radio Hour.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "THE 1940\u2019S RADIO HOUR"
+      }
+    },
+    {
+      "url": "/s/1993-1994-The-Good-Times-Are-Killing-Me.pdf",
+      "filename": "1993-1994-The-Good-Times-Are-Killing-Me.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1993-1994 The Good Times Are Killing Me.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "THE GOOD TIMES ARE KILLING ME"
+      }
+    },
+    {
+      "url": "/s/1993-1994-Eleemosynary.pdf",
+      "filename": "1993-1994-Eleemosynary.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1993-1994 Eleemosynary.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "ELEEMOSYNARY"
+      }
+    },
+    {
+      "url": "/s/1993-1994-Aint-Misbehavin.pdf",
+      "filename": "1993-1994-Aint-Misbehavin.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1993-1994 Ain't Misbehavin'.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "AIN\u2019T MISBEHAVIN\u2019"
+      }
+    },
+    {
+      "url": "/s/1994-1995-Kiss-Me-Kate.pdf",
+      "filename": "1994-1995-Kiss-Me-Kate.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1994-1995 Kiss Me Kate.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "KISS ME KATE"
+      }
+    },
+    {
+      "url": "/s/1994-1995-To-Kill-a-Mockingbird.pdf",
+      "filename": "1994-1995-To-Kill-a-Mockingbird.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1994-1995 To Kill a Mockingbird.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "TO KILL A MOCKINGBIRD"
+      }
+    },
+    {
+      "url": "/s/1994-1995-Joined-at-the-Head.pdf",
+      "filename": "1994-1995-Joined-at-the-Head.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1994-1995 Joined at the Head.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "JOINED AT THE HEAD"
+      }
+    },
+    {
+      "url": "/s/1994-1995-The-Glass-Menagerie.pdf",
+      "filename": "1994-1995-The-Glass-Menagerie.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1994-1995 The Glass Menagerie.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "THE GLASS MENAGERIE"
+      }
+    },
+    {
+      "url": "/s/1994-1995-Pippin.pdf",
+      "filename": "1994-1995-Pippin.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1994-1995 Pippin.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "PIPPIN"
+      }
+    },
+    {
+      "url": "/s/1995-1996-Lend-Me-A-Tenor.pdf",
+      "filename": "1995-1996-Lend-Me-A-Tenor.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1995-1996 Lend Me A Tenor.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "LEND ME A TENOR"
+      }
+    },
+    {
+      "url": "/s/1996-1997-Joseph-and-the-Amazing-Technicolor-Dreamcoat.pdf",
+      "filename": "1996-1997-Joseph-and-the-Amazing-Technicolor-Dreamcoat.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1996-1997 Joseph and the Amazing Technicolor Dreamcoat.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "JOSEPH & THE AMAZING TECHNICOLOR DREAMCOAT"
+      }
+    },
+    {
+      "url": "/s/1995-1996-Private-Lives.pdf",
+      "filename": "1995-1996-Private-Lives.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1995-1996 Private Lives.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "PRIVATE LIVES"
+      }
+    },
+    {
+      "url": "/s/1995-1996-Man-of-La-Mancha.pdf",
+      "filename": "1995-1996-Man-of-La-Mancha.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1995-1996 Man of La Mancha.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "MAN OF LA MANCHA"
+      }
+    },
+    {
+      "url": "/s/1996-1997-Noises-Off.pdf",
+      "filename": "1996-1997-Noises-Off.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1996-1997 Noises Off.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "NOISES OFF"
+      }
+    },
+    {
+      "url": "/s/1996-1997-Of-Thee-I-Sing.pdf",
+      "filename": "1996-1997-Of-Thee-I-Sing.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1996-1997 Of Thee I Sing.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "OF THEE I SING"
+      }
+    },
+    {
+      "url": "/s/1996-1997-Joseph-and-the-Amazing-Technicolor-Dreamcoat-2lgn.pdf",
+      "filename": "1996-1997-Joseph-and-the-Amazing-Technicolor-Dreamcoat-2lgn.pdf",
+      "server_match": null,
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "JOSEPH & THE AMAZING TECHNICOLOR DREAMCOAT (Special)"
+      }
+    },
+    {
+      "url": "/s/1996-1997-A-Thousand-Clowns.pdf",
+      "filename": "1996-1997-A-Thousand-Clowns.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1996-1997 A Thousand Clowns.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "A THOUSAND CLOWNS"
+      }
+    },
+    {
+      "url": "/s/1996-1997-Once-Upon-a-Mattress.pdf",
+      "filename": "1996-1997-Once-Upon-a-Mattress.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1996-1997 Once Upon a Mattress.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "ONCE UPON A MATTRESS"
+      }
+    },
+    {
+      "url": "/s/1997-1998-The-Servant-of-Two-Masters.pdf",
+      "filename": "1997-1998-The-Servant-of-Two-Masters.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1997-1998 The Servant of Two Masters.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "THE SERVANT OF TWO MASTERS"
+      }
+    },
+    {
+      "url": "/s/1997-1998-A-Little-Night-Music.pdf",
+      "filename": "1997-1998-A-Little-Night-Music.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1997-1998 A Little Night Music.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "A LITTLE NIGHT MUSIC"
+      }
+    },
+    {
+      "url": "/s/1997-1998-The-Amen-Corner.pdf",
+      "filename": "1997-1998-The-Amen-Corner.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1997-1998 The Amen Corner.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "THE AMEN CORNER"
+      }
+    },
+    {
+      "url": "/s/1997-1998-The-Rainmaker.pdf",
+      "filename": "1997-1998-The-Rainmaker.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1997-1998 The Rainmaker.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "THE RAINMAKER"
+      }
+    },
+    {
+      "url": "/s/1997-1998-Little-Shop-of-Horrors.pdf",
+      "filename": "1997-1998-Little-Shop-of-Horrors.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1997-1998 Little Shop of Horrors.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "LITTLE SHOP OF HORRORS"
+      }
+    },
+    {
+      "url": "/s/1998-1999-Lost-in-Yonkers.pdf",
+      "filename": "1998-1999-Lost-in-Yonkers.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1998-1999 Lost in Yonkers.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "LOST IN YONKERS"
+      }
+    },
+    {
+      "url": "/s/1998-1999-The-Sound-of-Music.pdf",
+      "filename": "1998-1999-The-Sound-of-Music.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1998-1999 The Sound of Music.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "THE SOUND OF MUSIC"
+      }
+    },
+    {
+      "url": "/s/1998-1999-TWELVE-ANGRY-MEN.pdf",
+      "filename": "1998-1999-TWELVE-ANGRY-MEN.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1998-1999 TWELVE ANGRY MEN.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "TWELVE ANGRY MEN"
+      }
+    },
+    {
+      "url": "/s/1998-1999-Steel-Magnolias.pdf",
+      "filename": "1998-1999-Steel-Magnolias.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1998-1999 Steel Magnolias.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "STEEL MAGNOLIAS"
+      }
+    },
+    {
+      "url": "/s/1998-1999-The-Pirates-of-Penzance.pdf",
+      "filename": "1998-1999-The-Pirates-of-Penzance.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1998-1999 The Pirates of Penzance.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "THE PIRATES OF PENZANCE"
+      }
+    },
+    {
+      "url": "/s/1999-2000-Peter-Pan.pdf",
+      "filename": "1999-2000-Peter-Pan.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1999-2000 Peter Pan.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "PETER PAN"
+      }
+    },
+    {
+      "url": "/s/1999-2000-Bubbling-BROWN-SUGAR.pdf",
+      "filename": "1999-2000-Bubbling-BROWN-SUGAR.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1999-2000 Bubbling BROWN SUGAR.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "BUBBLING BROWN SUGAR"
+      }
+    },
+    {
+      "url": "/s/1999-2000-the-DIARY-of-Anne-Frank.pdf",
+      "filename": "1999-2000-the-DIARY-of-Anne-Frank.pdf",
+      "server_match": "TLT Programs/1990-91 - 1999-2000/1999-2000 the DIARY of Anne Frank.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__1990-2000.html",
+        "text": "THE DIARY OF ANNE FRANK"
+      }
+    },
+    {
+      "url": "/s/2000-2001-Pump-Boys-and-Dinettes.pdf",
+      "filename": "2000-2001-Pump-Boys-and-Dinettes.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2000-2001 Pump Boys and Dinettes.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "Pump Boys And Dinettes"
+      }
+    },
+    {
+      "url": "/s/2000-2001-Yes-Vingina-There-is-a-Santa-Claus.pdf",
+      "filename": "2000-2001-Yes-Vingina-There-is-a-Santa-Claus.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2000-2001 Yes Vingina, There is a Santa Claus.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "Yes Virginia, There Is A Santa Claus"
+      }
+    },
+    {
+      "url": "/s/2000-2001-The-Musical-Comedy-Murders-of-1940.pdf",
+      "filename": "2000-2001-The-Musical-Comedy-Murders-of-1940.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2000-2001 The Musical Comedy Murders of 1940.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "The Musical Comedy Murders Of 1940"
+      }
+    },
+    {
+      "url": "/s/2000-2001-Harvey.pdf",
+      "filename": "2000-2001-Harvey.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2000-2001 Harvey.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "Harvey"
+      }
+    },
+    {
+      "url": "/s/2000-2001-Guys-Dolls.pdf",
+      "filename": "2000-2001-Guys-Dolls.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2000-2001 Guys & Dolls.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "Guys & Dolls"
+      }
+    },
+    {
+      "url": "/s/2001-2002-Arsenic-Old-Lace.pdf",
+      "filename": "2001-2002-Arsenic-Old-Lace.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2001-2002 Arsenic & Old Lace.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "Arsenic & Old Lace"
+      }
+    },
+    {
+      "url": "/s/2001-2002-Oliver.pdf",
+      "filename": "2001-2002-Oliver.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2001-2002 Oliver!.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "Oliver!"
+      }
+    },
+    {
+      "url": "/s/2001-2002-The-Complete-Works-of-William-Shakespeare-Abridged.pdf",
+      "filename": "2001-2002-The-Complete-Works-of-William-Shakespeare-Abridged.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2001-2002 The Complete Works of William Shakespeare (Abridged).pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "The Complete Works Of William Shakespeare, Abridged (Special)"
+      }
+    },
+    {
+      "url": "/s/2001-2002-THE-PIANO-LESSON.pdf",
+      "filename": "2001-2002-THE-PIANO-LESSON.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2001-2002 THE PIANO LESSON.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "The Piano Lesson"
+      }
+    },
+    {
+      "url": "/s/2001-2002-Brighton-Beach-Memoirs.pdf",
+      "filename": "2001-2002-Brighton-Beach-Memoirs.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2001-2002 Brighton Beach Memoirs.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "Brighton Beach Memoirs"
+      }
+    },
+    {
+      "url": "/s/2001-2002-SOUTH-PACIFIC.pdf",
+      "filename": "2001-2002-SOUTH-PACIFIC.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2001-2002 SOUTH PACIFIC.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "South Pacific"
+      }
+    },
+    {
+      "url": "/s/2002-2003-The-Foreigner.pdf",
+      "filename": "2002-2003-The-Foreigner.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2002-2003 The Foreigner.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "The Foreigner"
+      }
+    },
+    {
+      "url": "/s/2002-2003-Cinderella.pdf",
+      "filename": "2002-2003-Cinderella.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2002-2003 Cinderella.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "Cinderella"
+      }
+    },
+    {
+      "url": "/s/2002-2003-Inherit-the-Wind.pdf",
+      "filename": "2002-2003-Inherit-the-Wind.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2002-2003 Inherit the Wind.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "Inherit The Wind"
+      }
+    },
+    {
+      "url": "/s/2002-2003-BILOXI-BLUES.pdf",
+      "filename": "2002-2003-BILOXI-BLUES.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2002-2003 BILOXI BLUES.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "Biloxi Blues"
+      }
+    },
+    {
+      "url": "/s/2002-2003-Hello-Dolly.pdf",
+      "filename": "2002-2003-Hello-Dolly.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2002-2003 Hello, Dolly!.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "Hello, Dolly!"
+      }
+    },
+    {
+      "url": "/s/2003-2004-Camelot.pdf",
+      "filename": "2003-2004-Camelot.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2003-2004 Camelot.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "Camelot"
+      }
+    },
+    {
+      "url": "/s/2004-2005-ANNIE-GET-YOUR-GUN.pdf",
+      "filename": "2004-2005-ANNIE-GET-YOUR-GUN.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2004-2005 ANNIE GET YOUR GUN.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "Annie Get Your Gun"
+      }
+    },
+    {
+      "url": "/s/2005-2006-CHARLEYS-AUNT.pdf",
+      "filename": "2005-2006-CHARLEYS-AUNT.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2005-2006 CHARLEY'S AUNT.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "Charley's Aunt"
+      }
+    },
+    {
+      "url": "/s/2005-2006-The-Secret-Garden.pdf",
+      "filename": "2005-2006-The-Secret-Garden.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2005-2006 The Secret Garden.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "The Secret Garden"
+      }
+    },
+    {
+      "url": "/s/2005-2006-Aint-Misbehavin.pdf",
+      "filename": "2005-2006-Aint-Misbehavin.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2005-2006 Ain't Misbehavin'.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "Ain't Misbehavin"
+      }
+    },
+    {
+      "url": "/s/2005-2006-The-Women.pdf",
+      "filename": "2005-2006-The-Women.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2005-2006 The Women.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "The Women"
+      }
+    },
+    {
+      "url": "/s/2005-2006-1776.pdf",
+      "filename": "2005-2006-1776.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2005-2006 1776.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "1776"
+      }
+    },
+    {
+      "url": "/s/2006-2007-DREAMGIRLS.pdf",
+      "filename": "2006-2007-DREAMGIRLS.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2006-2007 DREAMGIRLS.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "Dreamgirls"
+      }
+    },
+    {
+      "url": "/s/2006-2007-THE-LION-THE-WITCH-AND-THE-WARDROBE.pdf",
+      "filename": "2006-2007-THE-LION-THE-WITCH-AND-THE-WARDROBE.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2006-2007 THE LION, THE WITCH AND THE WARDROBE.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "The Lion, The Witch, And The Wardrobe"
+      }
+    },
+    {
+      "url": "/s/2006-2007-The-Seven-Year-Itch.pdf",
+      "filename": "2006-2007-The-Seven-Year-Itch.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2006-2007 The Seven Year Itch.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "The Seven Year Itch"
+      }
+    },
+    {
+      "url": "/s/2006-2007-Wait-Until-Dark.pdf",
+      "filename": "2006-2007-Wait-Until-Dark.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2006-2007 Wait Until Dark.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "Wait Until Dark"
+      }
+    },
+    {
+      "url": "/s/2006-2007-The-Best-Little-Whorehouse-In-Texas.pdf",
+      "filename": "2006-2007-The-Best-Little-Whorehouse-In-Texas.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2006-2007 The Best Little Whorehouse In Texas.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "The Best Little Whorehouse In Texas"
+      }
+    },
+    {
+      "url": "/s/2007-2008-Auntie-Mame.pdf",
+      "filename": "2007-2008-Auntie-Mame.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2007-2008 Auntie Mame.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "Auntie Mame"
+      }
+    },
+    {
+      "url": "/s/2007-2008-Sleeping-Beauty.pdf",
+      "filename": "2007-2008-Sleeping-Beauty.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2007-2008 Sleeping Beauty.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "Sleeping Beauty: A Fairy Tale"
+      }
+    },
+    {
+      "url": "/s/2007-2008-Blithe-Spirit.pdf",
+      "filename": "2007-2008-Blithe-Spirit.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2007-2008 Blithe Spirit.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "Blithe Spirit"
+      }
+    },
+    {
+      "url": "/s/2007-2008-Cat-On-A-Hot-Tin-Roof.pdf",
+      "filename": "2007-2008-Cat-On-A-Hot-Tin-Roof.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2007-2008 Cat On A Hot Tin Roof.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "Cat on a Hot Tin Roof"
+      }
+    },
+    {
+      "url": "/s/2007-2008-Broadways-Fabulous-Fifties.pdf",
+      "filename": "2007-2008-Broadways-Fabulous-Fifties.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2007-2008 Broadway's Fabulous Fifties.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "Broadway's Fabulous Fifties"
+      }
+    },
+    {
+      "url": "/s/2008-2009-Dear-Santa.pdf",
+      "filename": "2008-2009-Dear-Santa.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2008-2009 Dear Santa.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "Dear Santa"
+      }
+    },
+    {
+      "url": "/s/2008-2009-Arthur-Millers-THE-CRUCIBLE.pdf",
+      "filename": "2008-2009-Arthur-Millers-THE-CRUCIBLE.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2008-2009 Arthur Miller's THE CRUCIBLE.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "The Crucible"
+      }
+    },
+    {
+      "url": "/s/2009-2010-Neil-Simons-THE-STAR-SPANGLED-GIRL.pdf",
+      "filename": "2009-2010-Neil-Simons-THE-STAR-SPANGLED-GIRL.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2009-2010 Neil Simon's THE STAR-SPANGLED GIRL.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "The Star Spangled Girl"
+      }
+    },
+    {
+      "url": "/s/2009-2010-Ken-Ludwigs-Lend-me-a-Tenor.pdf",
+      "filename": "2009-2010-Ken-Ludwigs-Lend-me-a-Tenor.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2009-2010 Ken Ludwig's Lend me a Tenor.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "Lend me a Tenor"
+      }
+    },
+    {
+      "url": "/s/2009-2010-A-Christmas-Story.pdf",
+      "filename": "2009-2010-A-Christmas-Story.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2009-2010 A Christmas Story.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "A Christmas Story"
+      }
+    },
+    {
+      "url": "/s/2009-2010-Over-the-River-Through-the-Woods.pdf",
+      "filename": "2009-2010-Over-the-River-Through-the-Woods.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2009-2010 Over the River & Through the Woods.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "Over the River and Through the Woods"
+      }
+    },
+    {
+      "url": "/s/2009-2010-NOISES-OFF.pdf",
+      "filename": "2009-2010-NOISES-OFF.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2009-2010 NOISES OFF.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "Noises Off"
+      }
+    },
+    {
+      "url": "/s/2009-2010-MAJOR-BARBARA-by-Bernard-Shaw.pdf",
+      "filename": "2009-2010-MAJOR-BARBARA-by-Bernard-Shaw.pdf",
+      "server_match": "TLT Programs/2000-01 - 2009-10/2009-2010 MAJOR BARBARA by Bernard Shaw.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2000-2010.html",
+        "text": "Major Barbara"
+      }
+    },
+    {
+      "url": "/s/2010-2011-Sleuth.pdf",
+      "filename": "2010-2011-Sleuth.pdf",
+      "server_match": "TLT Programs/2010-11 - 2014-15/2010-2011 Sleuth.pdf",
+      "ref_count": 4,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2010-2011.html",
+        "text": "Sleuth"
+      }
+    },
+    {
+      "url": "/s/2010-2011-el-ee-mos-y-nar-y.pdf",
+      "filename": "2010-2011-el-ee-mos-y-nar-y.pdf",
+      "server_match": "TLT Programs/2010-11 - 2014-15/2010-2011 el-ee-mos-y-nar-y.pdf",
+      "ref_count": 4,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2010-2011.html",
+        "text": "Eleemosynary"
+      }
+    },
+    {
+      "url": "/s/2010-2011-Annie.pdf",
+      "filename": "2010-2011-Annie.pdf",
+      "server_match": "TLT Programs/2010-11 - 2014-15/2010-2011 Annie.pdf",
+      "ref_count": 4,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2010-2011.html",
+        "text": "Annie"
+      }
+    },
+    {
+      "url": "/s/2010-2011-FROST-NIXON.pdf",
+      "filename": "2010-2011-FROST-NIXON.pdf",
+      "server_match": "TLT Programs/2010-11 - 2014-15/2010-2011 FROST NIXON.pdf",
+      "ref_count": 4,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2010-2011.html",
+        "text": "Frost / Nixon"
+      }
+    },
+    {
+      "url": "/s/2010-2011-A-Flea-in-Her-Ear.pdf",
+      "filename": "2010-2011-A-Flea-in-Her-Ear.pdf",
+      "server_match": "TLT Programs/2010-11 - 2014-15/2010-2011 A Flea in Her Ear.pdf",
+      "ref_count": 4,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2010-2011.html",
+        "text": "A Flea in Her Ear"
+      }
+    },
+    {
+      "url": "/s/2010-2011-Always-Patsy-Cline.pdf",
+      "filename": "2010-2011-Always-Patsy-Cline.pdf",
+      "server_match": "TLT Programs/2010-11 - 2014-15/2010-2011 Always Patsy Cline.pdf",
+      "ref_count": 4,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2010-2011.html",
+        "text": "Always Patsy Cline"
+      }
+    },
+    {
+      "url": "/s/2011-2012-Dr-Jekyll-and-Mr-Hyde.pdf",
+      "filename": "2011-2012-Dr-Jekyll-and-Mr-Hyde.pdf",
+      "server_match": "TLT Programs/2010-11 - 2014-15/2011-2012 Dr. Jekyll and Mr. Hyde.pdf",
+      "ref_count": 4,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2011-2012.html",
+        "text": "Dr. Jekyll and Mr. Hyde"
+      }
+    },
+    {
+      "url": "/s/2011-2012-A-Christmas-Carol.pdf",
+      "filename": "2011-2012-A-Christmas-Carol.pdf",
+      "server_match": "TLT Programs/2010-11 - 2014-15/2011-2012 A Christmas Carol.pdf",
+      "ref_count": 4,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2011-2012.html",
+        "text": "A Christmas Carol"
+      }
+    },
+    {
+      "url": "/s/2011-2012-California-Suite.pdf",
+      "filename": "2011-2012-California-Suite.pdf",
+      "server_match": "TLT Programs/2010-11 - 2014-15/2011-2012 California Suite.pdf",
+      "ref_count": 4,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2011-2012.html",
+        "text": "California Suite"
+      }
+    },
+    {
+      "url": "/s/2011-2012-SOMEONE-WHOLL-WATCH-OVER-ME.pdf",
+      "filename": "2011-2012-SOMEONE-WHOLL-WATCH-OVER-ME.pdf",
+      "server_match": "TLT Programs/2010-11 - 2014-15/2011-2012 SOMEONE WHO'LL WATCH OVER ME.pdf",
+      "ref_count": 4,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2011-2012.html",
+        "text": "Someone Who'll Watch Over Me"
+      }
+    },
+    {
+      "url": "/s/2011-2012-Footloose.pdf",
+      "filename": "2011-2012-Footloose.pdf",
+      "server_match": "TLT Programs/2010-11 - 2014-15/2011-2012 Footloose.pdf",
+      "ref_count": 4,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2011-2012.html",
+        "text": "Footloose the Musical"
+      }
+    },
+    {
+      "url": "/s/2012-2013-SYLVIA.pdf",
+      "filename": "2012-2013-SYLVIA.pdf",
+      "server_match": "TLT Programs/2010-11 - 2014-15/2012-2013 SYLVIA.pdf",
+      "ref_count": 4,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2012-2013.html",
+        "text": "Sylvia"
+      }
+    },
+    {
+      "url": "/s/2012-2013-NIGHT-WATCH.pdf",
+      "filename": "2012-2013-NIGHT-WATCH.pdf",
+      "server_match": "TLT Programs/2010-11 - 2014-15/2012-2013 NIGHT WATCH.pdf",
+      "ref_count": 4,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2012-2013.html",
+        "text": "Night Watch"
+      }
+    },
+    {
+      "url": "/s/2012-2013-MIRACLE-ON-34TH-STREET.pdf",
+      "filename": "2012-2013-MIRACLE-ON-34TH-STREET.pdf",
+      "server_match": "TLT Programs/2010-11 - 2014-15/2012-2013 MIRACLE ON 34TH STREET.pdf",
+      "ref_count": 4,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2012-2013.html",
+        "text": "Miracle on 34th Street"
+      }
+    },
+    {
+      "url": "/s/2012-2013-Six-Dance-Lessons-in-Six-Weeks.pdf",
+      "filename": "2012-2013-Six-Dance-Lessons-in-Six-Weeks.pdf",
+      "server_match": "TLT Programs/2010-11 - 2014-15/2012-2013 Six Dance Lessons in Six Weeks.pdf",
+      "ref_count": 4,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2012-2013.html",
+        "text": "Six Dance Lessons in Six Weeks"
+      }
+    },
+    {
+      "url": "/s/2012-2013-LITTLE-SHOP-OF-HORRORS.pdf",
+      "filename": "2012-2013-LITTLE-SHOP-OF-HORRORS.pdf",
+      "server_match": "TLT Programs/2010-11 - 2014-15/2012-2013 LITTLE SHOP OF HORRORS.pdf",
+      "ref_count": 4,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__2012-2013.html",
+        "text": "Little Shop of Horrors"
+      }
+    },
+    {
+      "url": "/s/CASTLIST-2.pdf",
+      "filename": "CASTLIST-2.pdf",
+      "server_match": null,
+      "ref_count": 1,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__5__11__the-music-man-junior.html",
+        "text": "Cast List"
+      }
+    },
+    {
+      "url": "/s/1516-A-Christmas-Story-Program.pdf",
+      "filename": "1516-A-Christmas-Story-Program.pdf",
+      "server_match": "TLT Programs/2013-2018/1516 A Christmas Story Program.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__a-christmas-story.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1415-Midsummer-Program.pdf",
+      "filename": "1415-Midsummer-Program.pdf",
+      "server_match": "TLT Programs/2013-2018/1415 Midsummer Program.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__a-midsummer-nights-dream.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1516-Boeing-Boeing-Program.pdf",
+      "filename": "1516-Boeing-Boeing-Program.pdf",
+      "server_match": "TLT Programs/2013-2018/1516 Boeing Boeing Program.pdf",
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__boeing-boeing.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1314-Bye-Bye-Birdie-Program.pdf",
+      "filename": "1314-Bye-Bye-Birdie-Program.pdf",
+      "server_match": "TLT Programs/2013-2018/1314 Bye Bye Birdie Program.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__bye-bye-birdie.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1415-Cabaret-Program.pdf",
+      "filename": "1415-Cabaret-Program.pdf",
+      "server_match": "TLT Programs/2013-2018/1415 Cabaret Program.pdf",
+      "ref_count": 4,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__cabaret.html",
+        "text": "program"
+      }
+    },
+    {
+      "url": "/s/1314-Chapter-Two-Program.pdf",
+      "filename": "1314-Chapter-Two-Program.pdf",
+      "server_match": "TLT Programs/2013-2018/1314 Chapter Two Program.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__chapter-two.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1415-Dial-M-Program.pdf",
+      "filename": "1415-Dial-M-Program.pdf",
+      "server_match": "TLT Programs/2013-2018/1415 Dial M Program.pdf",
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__dial-m-for-murder.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1314-Wonderful-Life-Program.pdf",
+      "filename": "1314-Wonderful-Life-Program.pdf",
+      "server_match": "TLT Programs/2013-2018/1314 Wonderful Life Program.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__its-a-wonderful-life.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1314-Moonlight-Program.pdf",
+      "filename": "1314-Moonlight-Program.pdf",
+      "server_match": "TLT Programs/2013-2018/1314 Moonlight Program.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__moonlight-and-magnolias.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1415-Picasso-Program.pdf",
+      "filename": "1415-Picasso-Program.pdf",
+      "server_match": "TLT Programs/2013-2018/1415 Picasso Program.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__picasso-at-the-lapin-agile.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1516-Rabbit-Hole-Program.pdf",
+      "filename": "1516-Rabbit-Hole-Program.pdf",
+      "server_match": "TLT Programs/2013-2018/1516 Rabbit Hole Program.pdf",
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__rabbit-hole.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1415-Scrooge-Program.pdf",
+      "filename": "1415-Scrooge-Program.pdf",
+      "server_match": "TLT Programs/2013-2018/1415 Scrooge Program.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__scrooge-the-musical.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1516-Second-Samuel-Program.pdf",
+      "filename": "1516-Second-Samuel-Program.pdf",
+      "server_match": "TLT Programs/2013-2018/1516 Second Samuel Program.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__second-samuel.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1516-Smokey-Program.pdf",
+      "filename": "1516-Smokey-Program.pdf",
+      "server_match": "TLT Programs/2013-2018/1516 Smokey Program.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__smokey-joes-cafe.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1314-Steel-Magnolias-Program.pdf",
+      "filename": "1314-Steel-Magnolias-Program.pdf",
+      "server_match": "TLT Programs/2013-2018/1314 Steel Magnolias Program.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__steele-magnolias.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1314-Shakespeare-Program.pdf",
+      "filename": "1314-Shakespeare-Program.pdf",
+      "server_match": "TLT Programs/2013-2018/1314 Shakespeare Program.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__the-complete-works-of-william-shakespeare-abridged-revised.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1415-Fox-Program.pdf",
+      "filename": "1415-Fox-Program.pdf",
+      "server_match": "TLT Programs/2013-2018/1415 Fox Program.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__the-fox-on-the-fairway.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1415-Gatsby-Program.pdf",
+      "filename": "1415-Gatsby-Program.pdf",
+      "server_match": "TLT Programs/2013-2018/1415 Gatsby Program.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__the-great-gatsby.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1516-Ballyhoo-Program.pdf",
+      "filename": "1516-Ballyhoo-Program.pdf",
+      "server_match": "TLT Programs/2013-2018/1516 Ballyhoo Program.pdf",
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__the-last-night-of-ballyhoo.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1314-Weir-Program.pdf",
+      "filename": "1314-Weir-Program.pdf",
+      "server_match": "TLT Programs/2013-2018/1314 Weir Program.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__the-weir.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1314-Mockingbird-Program.pdf",
+      "filename": "1314-Mockingbird-Program.pdf",
+      "server_match": "TLT Programs/2013-2018/1314 Mockingbird Program.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__to-kill-a-mockingbird.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1516-Vanya-Program.pdf",
+      "filename": "1516-Vanya-Program.pdf",
+      "server_match": "TLT Programs/2013-2018/1516 Vanya Program.pdf",
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2015__vanya-sonia-masha-and-spike.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1617-Dracula-Program.pdf",
+      "filename": "1617-Dracula-Program.pdf",
+      "server_match": "TLT Programs/2013-2018/1617 Dracula Program.pdf",
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2016__dracula.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1617-Exit-Laughing-Program.pdf",
+      "filename": "1617-Exit-Laughing-Program.pdf",
+      "server_match": "TLT Programs/2013-2018/1617 Exit Laughing Program.pdf",
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2016__exit-laughing.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1617-Gypsy.pdf",
+      "filename": "1617-Gypsy.pdf",
+      "server_match": "TLT Programs/2013-2018/1617 Gypsy.pdf",
+      "ref_count": 3,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2016__gypsy.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1617-Miracle-Program.pdf",
+      "filename": "1617-Miracle-Program.pdf",
+      "server_match": "TLT Programs/2013-2018/1617 Miracle Program.pdf",
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2016__miracle-on-34th-street.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1617-Mice-Program.pdf",
+      "filename": "1617-Mice-Program.pdf",
+      "server_match": "TLT Programs/2013-2018/1617 Mice Program.pdf",
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2016__of-mice-and-men.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1617-The-Man-Who-Shot-Liberty-Valance-Program.pdf",
+      "filename": "1617-The-Man-Who-Shot-Liberty-Valance-Program.pdf",
+      "server_match": "TLT Programs/2013-2018/1617 The Man Who Shot Liberty Valance Program.pdf",
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2016__the-man-who-shot-liberty-valance-1.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1718-Macbeth.pdf",
+      "filename": "1718-Macbeth.pdf",
+      "server_match": "TLT Programs/2013-2018/1718 Macbeth.pdf",
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2016__the-underpants-5ypj7-em9m8-l4mjh-y6c62-hkpgb-86s8n.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1718-The-Pillowman-Program.pdf",
+      "filename": "1718-The-Pillowman-Program.pdf",
+      "server_match": "TLT Programs/2013-2018/1718 The Pillowman Program.pdf",
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2016__the-underpants-5ypj7-em9m8-l4mjh-y6c62-hkpgb.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1718-JCS-Program.pdf",
+      "filename": "1718-JCS-Program.pdf",
+      "server_match": "TLT Programs/2013-2018/1718 JCS Program.pdf",
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2016__the-underpants-5ypj7-em9m8-l4mjh-y6c62.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1718-Lesser-God.pdf",
+      "filename": "1718-Lesser-God.pdf",
+      "server_match": "TLT Programs/2013-2018/1718 Lesser God.pdf",
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2016__the-underpants-5ypj7-em9m8-l4mjh.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1718-Seussical-Program.pdf",
+      "filename": "1718-Seussical-Program.pdf",
+      "server_match": "TLT Programs/2013-2018/1718 Seussical Program.pdf",
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2016__the-underpants-5ypj7-em9m8.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1718-Blithe-Spirit-Program.pdf",
+      "filename": "1718-Blithe-Spirit-Program.pdf",
+      "server_match": "TLT Programs/2013-2018/1718 Blithe Spirit Program.pdf",
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2016__the-underpants-5ypj7-yzws8.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1718-Rumors-Program.pdf",
+      "filename": "1718-Rumors-Program.pdf",
+      "server_match": "TLT Programs/2013-2018/1718 Rumors Program.pdf",
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2016__the-underpants-5ypj7.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1617-Underpants-Program.pdf",
+      "filename": "1617-Underpants-Program.pdf",
+      "server_match": "TLT Programs/2013-2018/1617 Underpants Program.pdf",
+      "ref_count": 2,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2016__the-underpants.html",
+        "text": "Program"
+      }
+    },
+    {
+      "url": "/s/1617SpringEnrollmentForm.pdf",
+      "filename": "1617SpringEnrollmentForm.pdf",
+      "server_match": null,
+      "ref_count": 1,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2017__after-school-tlt-hansel-gretel.html",
+        "text": "Click here for a downloadable flier"
+      }
+    },
+    {
+      "url": "https://tacomalittletheatre.squarespace.com/s/1617SummerEnrollmentForm.pdf",
+      "filename": "1617SummerEnrollmentForm.pdf",
+      "server_match": null,
+      "ref_count": 1,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2017__legally-blond-jr.html",
+        "text": "Download our flier for more information"
+      }
+    },
+    {
+      "url": "/s/Audition-Monologues.pdf",
+      "filename": "Audition-Monologues.pdf",
+      "server_match": null,
+      "ref_count": 1,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2018__auditionsveteransday.html",
+        "text": "CLICK HERE FOR AUDITION LETTERS"
+      }
+    },
+    {
+      "url": "/s/1920-Season-Ticket-Order-Form.pdf",
+      "filename": "1920-Season-Ticket-Order-Form.pdf",
+      "server_match": null,
+      "ref_count": 1,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2019__season101.html",
+        "text": "CLICK HERE FOR ORDER FORM"
+      }
+    },
+    {
+      "url": "/s/2019-2020-TLT-Season-Brochure.pdf",
+      "filename": "2019-2020-TLT-Season-Brochure.pdf",
+      "server_match": null,
+      "ref_count": 1,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2019__season101.html",
+        "text": "CLICK HERE FOR OUR SEASON BROCHURE"
+      }
+    },
+    {
+      "url": "/s/TLT-Education-Program-COVID-Guidelines.pdf",
+      "filename": "TLT-Education-Program-COVID-Guidelines.pdf",
+      "server_match": null,
+      "ref_count": 1,
+      "first_ref": {
+        "from": "pages_other_blog/blog__2021__summercamp.html",
+        "text": "TLT COVID GUIDELINES FOR EDUCATION"
+      }
+    }
+  ],
+  "server_pdf_count": 548
+}

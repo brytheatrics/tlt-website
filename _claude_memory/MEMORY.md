@@ -1,0 +1,8 @@
+- [User role at TLT](user_role.md) — Blake works at Tacoma Little Theatre; running website migration project
+- [TLT server access](reference_tlt_server.md) — `\\TLT-SERVER\` UNC share has theatre archives; full read access, NEVER delete
+- [TLT photo archive size](project_photo_archive.md) — TLT Photos folder is 155 GB; can't go on website wholesale
+- [TLT website project](project_website_migration.md) — Squarespace → self-hosted WordPress migration; see PROJECT.md in working dir
+- [Boss owns server setup](project_boss_server.md) — User's boss set up TLT-SERVER; lost data would be a serious problem
+- [Squarespace slug suffixes are real content](feedback_squarespace_slug_suffixes.md) — `-emp99` etc. URLs are distinct pages, NEVER merge during migration
+- [TLT Squarespace URL mangling is severe](feedback_squarespace_pattern_severe.md) — slugs bear no relationship to content (e.g. `the-underpants-5ypj7-...` is Macbeth); user notes are canonical decoder
+- [Triage notes — names reliable, dates not](feedback_triage_notes_dates.md) — trust user's notes for content identity, derive dates from page HTML

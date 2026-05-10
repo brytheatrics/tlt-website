@@ -1,0 +1,27 @@
+# Big asset folders synced via Google Drive (junctions, not part of git)
+scrape/
+assets/
+mockup/
+
+# Local server inventory snapshot — too big for git, regenerated as needed
+tlt_server_inventory.json
+
+# Triage app's intermediate output
+triage/candidates.json
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Local test artifacts
+*.log

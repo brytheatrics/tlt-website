@@ -1,0 +1,2967 @@
+[
+  {
+    "old": "/blog",
+    "new": "/news/",
+    "note": "blog index"
+  },
+  {
+    "old": "/blog/25fallclasses-2kptp",
+    "new": "/news/25fallclasses-2kptp/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/springawakeningauditioninfo",
+    "new": "/news/springawakeningauditioninfo/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/tacoma-arts-month",
+    "new": "/news/2016/tacoma-arts-month/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/25fallclasses",
+    "new": "/news/25fallclasses/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/asyou",
+    "new": "/news/asyou/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20252026/davinciaudition-fd3g3",
+    "new": "/shows/2025-2026/davinciaudition/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20252026/davinci",
+    "new": "/shows/2025-2026/davinci/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20252026/matilda",
+    "new": "/shows/2025-2026/matilda/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20252026/timemachine",
+    "new": "/shows/2025-2026/timemachine/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20252026/spring",
+    "new": "/shows/2025-2026/spring/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20252026/spring-bpb9w",
+    "new": "/shows/2025-2026/spring/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20252026/sotto",
+    "new": "/shows/2025-2026/sotto/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20252026/bedroom",
+    "new": "/shows/2025-2026/bedroom/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20252026/davinciaudition",
+    "new": "/shows/2025-2026/davinciaudition/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/summer24-g2226",
+    "new": "/news/summer24-g2226/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/hadesteen",
+    "new": "/news/hadesteen/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/board/kay-emp99",
+    "new": "/news/board/kay-emp99/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/board/kay-njsdj",
+    "new": "/news/board/kay-njsdj/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/board/kay-rdzag",
+    "new": "/news/board/kay-rdzag/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/board/leah",
+    "new": "/news/board/leah/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2022annualfund",
+    "new": "/news/2022annualfund/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20252026/sottoaud",
+    "new": "/shows/2025-2026/sottoaud/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20252026/otsmetamorphoses",
+    "new": "/shows/2025-2026/otsmetamorphoses/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20252026/bedauditions",
+    "new": "/shows/2025-2026/bedauditions/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/2022/steelcovid",
+    "new": "/news/2022/steelcovid/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20252026/davinciaudition-fd3g3-msre8",
+    "new": "/shows/2025-2026/davinciaudition/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/2018/sexiest-9glhh",
+    "new": "/news/2018/sexiest-9glhh/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2025/revenge-s2keg",
+    "new": "/news/2025/revenge-s2keg/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20252026/springclass",
+    "new": "/shows/2025-2026/springclass/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/2018/sexiest",
+    "new": "/news/2018/sexiest/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20252026/otshijinx",
+    "new": "/shows/2025-2026/otshijinx/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20242025/oneman-4w9jr-89y5p",
+    "new": "/shows/2024-2025/oneman/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20252026/springawakeningaudition",
+    "new": "/shows/2025-2026/springawakeningaudition/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20232024/danceharry",
+    "new": "/shows/2023-2024/danceharry/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/2019/inclement-weather-information-xpp5l",
+    "new": "/news/2019/inclement-weather-information-xpp5l/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2022/spring-education-2022-bgrgt-267bt-xse3d-sgdlr-ajmyl-s5bfx",
+    "new": "/news/2022/spring-education-2022-bgrgt-267bt-xse3d-sgdlr-ajmyl-s5bfx/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20252026/summercamp",
+    "new": "/shows/2025-2026/summercamp/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/2025/revenge",
+    "new": "/news/2025/revenge/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20232024/fiddlerauditions-nrpky",
+    "new": "/shows/2023-2024/fiddlerauditions-nrpky/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20232024/wrong-gfw6d",
+    "new": "/shows/2023-2024/wrong/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20212022/covidprotocols-j2l2r",
+    "new": "/shows/2021-2022/covidprotocols/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20232024/fiddlerauditions",
+    "new": "/shows/2023-2024/fiddlerauditions/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/summer24",
+    "new": "/news/summer24/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20232024/mouseauditions",
+    "new": "/shows/2023-2024/mouseauditions/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20242025/oneman",
+    "new": "/shows/2024-2025/oneman/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20242025/mousetrap",
+    "new": "/shows/2024-2025/mousetrap/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20242025/fiddler",
+    "new": "/shows/2024-2025/fiddler/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20242025/oneman-4w9jr",
+    "new": "/shows/2024-2025/oneman/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20242025/curious",
+    "new": "/shows/2024-2025/curious/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20242025/curious-y7xjc",
+    "new": "/shows/2024-2025/curious/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20242025/bug",
+    "new": "/shows/2024-2025/bug/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20242025/rocky",
+    "new": "/shows/2024-2025/rocky/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20232024/wrong",
+    "new": "/shows/2023-2024/wrong/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20232024/misery",
+    "new": "/shows/2023-2024/misery/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20232024/rudolph",
+    "new": "/shows/2023-2024/rudolph/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20232024/dollshouse2",
+    "new": "/shows/2023-2024/dollshouse2/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20232024/rent",
+    "new": "/shows/2023-2024/rent/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/board/em",
+    "new": "/news/board/em/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/board/kay",
+    "new": "/news/board/kay/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/board/sam",
+    "new": "/news/board/sam/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/board/trevor",
+    "new": "/news/board/trevor/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20232024/almostmaine",
+    "new": "/shows/2023-2024/almostmaine/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20232024/mississippi",
+    "new": "/shows/2023-2024/mississippi/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/2018/montreal",
+    "new": "/news/2018/montreal/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20252026/productionteam",
+    "new": "/shows/2025-2026/productionteam/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20252026/springawakeningaudition-gxgle",
+    "new": "/shows/2025-2026/springawakeningaudition-gxgle/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/2021/now-hiring-education-director-eyg5f-wwwl7",
+    "new": "/news/2021/now-hiring-education-director-eyg5f-wwwl7/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20232024/springclasses2024-g3njx-fmnt9-ddk2",
+    "new": "/shows/2023-2024/springclasses2024/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20222023/lion-br6d8-984h5",
+    "new": "/shows/2022-2023/lion/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20252026/directors",
+    "new": "/shows/2025-2026/directors/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/2021/now-hiring-education-director-eyg5f",
+    "new": "/news/2021/now-hiring-education-director-eyg5f/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/shipwrecked-3ywjl",
+    "new": "/news/2018/shipwrecked-3ywjl/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20232024/guvnor",
+    "new": "/shows/2023-2024/guvnor/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/2018/shipwrecked",
+    "new": "/news/2018/shipwrecked/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20232024/findingnemokids-g3njx",
+    "new": "/shows/2023-2024/findingnemokids/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20232024/deltaauditions",
+    "new": "/shows/2023-2024/deltaauditions/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/2018/offtheshelfempire",
+    "new": "/news/2018/offtheshelfempire/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20242025/dog",
+    "new": "/shows/2024-2025/dog/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20232024/audmaine",
+    "new": "/shows/2023-2024/audmaine/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20232024/fiddlerauditions-nf9gf",
+    "new": "/shows/2023-2024/fiddlerauditions/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/2022/spring-education-2022-bgrgt-267bt-xse3d-sgdlr-ajmyl",
+    "new": "/news/2022/spring-education-2022-bgrgt-267bt-xse3d-sgdlr-ajmyl/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20232024/rudolphjr",
+    "new": "/shows/2023-2024/rudolphjr/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/2022annualfund-gf5fk",
+    "new": "/news/2022annualfund-gf5fk/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2025/knockemdead",
+    "new": "/news/2025/knockemdead/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2022/kaleidoscope-page",
+    "new": "/news/2022/kaleidoscope-page/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/murdermystery2024",
+    "new": "/news/2019/murdermystery2024/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20232024/audmisery-4479k-ftkay-eg24m",
+    "new": "/shows/2023-2024/audmisery-4479k-ftkay/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/2018/offtheshelfrevolution-6xwxa-24bb7",
+    "new": "/news/2018/offtheshelfrevolution-6xwxa-24bb7/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/offtheshelfrevolution-6xwxa",
+    "new": "/news/2018/offtheshelfrevolution-6xwxa/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/summercamppoppins-rpwsh-6pgye",
+    "new": "/news/2019/summercamppoppins-rpwsh-6pgye/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20232024/audmisery-4479k-ftkay",
+    "new": "/shows/2023-2024/audmisery-4479k-ftkay/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20222023/steel",
+    "new": "/shows/2022-2023/steel/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20222023/murder",
+    "new": "/shows/2022-2023/murder/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20232024/audmisery-4479k",
+    "new": "/shows/2023-2024/audmisery/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20222023/xmasstory",
+    "new": "/shows/2022-2023/xmasstory/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20222023/poboy",
+    "new": "/shows/2022-2023/poboy/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20222023/rock",
+    "new": "/shows/2022-2023/rock/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20222023/significant",
+    "new": "/shows/2022-2023/significant/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/2022/spring-education-2022-bgrgt-267bt-xse3d-sgdlr",
+    "new": "/news/2022/spring-education-2022-bgrgt-267bt-xse3d-sgdlr/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20222023/shawshank",
+    "new": "/shows/2022-2023/shawshank/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20232024/fiddlerauditions-nrpky-twrnx",
+    "new": "/shows/2023-2024/fiddlerauditions-nrpky-twrnx/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20222023/lion-br6d8-984h5-czra9-z26wf",
+    "new": "/shows/2022-2023/lion/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/2019/murdermystery2024-77bfe",
+    "new": "/news/2019/murdermystery2024-77bfe/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2021/russell-5tgd7-smmxm",
+    "new": "/news/2021/russell-5tgd7-smmxm/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2021/russell-5tgd7-fbr6k",
+    "new": "/news/2021/russell-5tgd7-fbr6k/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2021/russell-5tgd7",
+    "new": "/news/2021/russell-5tgd7/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2021/russell-wgwef",
+    "new": "/news/2021/russell-wgwef/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20232024/audmisery",
+    "new": "/shows/2023-2024/audmisery/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20222023/lion-br6d8-984h5-czra9",
+    "new": "/shows/2022-2023/lion/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/merchandise",
+    "new": "/news/merchandise/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2025/grab-dinner-at-harbor-lights",
+    "new": "/news/2025/grab-dinner-at-harbor-lights/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20222023/significantaudition-rrpga",
+    "new": "/shows/2022-2023/significantaudition-rrpga/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20242025/murdermerlot",
+    "new": "/shows/2024-2025/murdermerlot/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/2022/spring-education-2022-bgrgt-267bt-xse3d",
+    "new": "/news/2022/spring-education-2022-bgrgt-267bt-xse3d/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2022/offshelf1-7wyr7-f8j4h-f4k43",
+    "new": "/news/2022/offshelf1-7wyr7-f8j4h-f4k43/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/fools-play-improv-at-tlt-gwn7e-yfh46",
+    "new": "/news/2016/fools-play-improv-at-tlt-gwn7e-yfh46/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2023/summer-camps-2023",
+    "new": "/news/2023/summer-camps-2023/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/inclement-weather-information",
+    "new": "/news/2019/inclement-weather-information/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20232024/fiddlerauditions-nrpky-pxjk7",
+    "new": "/shows/2023-2024/fiddlerauditions-nrpky/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/fiddlerjr",
+    "new": "/news/fiddlerjr/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2022/offshelf1-7wyr7-f8j4h",
+    "new": "/news/2022/offshelf1-7wyr7-f8j4h/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2023/spring-break-camp-2023-skills-break-camp",
+    "new": "/news/2023/spring-break-camp-2023-skills-break-camp/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20222023/significantaudition-r2zm9",
+    "new": "/shows/2022-2023/significantaudition/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/2022/offshelf1-7wyr7",
+    "new": "/news/2022/offshelf1-7wyr7/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/fools-play-improv-at-tlt-gwn7e",
+    "new": "/news/2016/fools-play-improv-at-tlt-gwn7e/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2022/spring-education-2022-bgrgt-267bt",
+    "new": "/news/2022/spring-education-2022-bgrgt-267bt/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20222023/wintercamp",
+    "new": "/shows/2022-2023/wintercamp/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20222023/significantaudition",
+    "new": "/shows/2022-2023/significantaudition/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20222023/rockauditions",
+    "new": "/shows/2022-2023/rockauditions/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/2022/winter-break-2022-a-year-with-frog-and-toad",
+    "new": "/news/2022/winter-break-2022-a-year-with-frog-and-toad/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20212022/covidprotocols",
+    "new": "/shows/2021-2022/covidprotocols/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20222023/poboyaud",
+    "new": "/shows/2022-2023/poboyaud/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/2022/ots2",
+    "new": "/news/2022/ots2/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2022/scholarship-application",
+    "new": "/news/2022/scholarship-application/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2022/offshelf1",
+    "new": "/news/2022/offshelf1/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20212022/terms",
+    "new": "/shows/2021-2022/terms/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20212022/clue",
+    "new": "/shows/2021-2022/clue/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20212022/clue-rhe7l",
+    "new": "/shows/2021-2022/clue/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20212022/clue-633y7",
+    "new": "/shows/2021-2022/clue/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20212022/clue-anzln-g52ct",
+    "new": "/shows/2021-2022/clue-anzln/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/2021/russell",
+    "new": "/news/2021/russell/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2021/ballinger",
+    "new": "/news/2021/ballinger/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20212022/clue-anzln-g52ct-dwpf6",
+    "new": "/shows/2021-2022/clue-anzln/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20212022/clue-anzln",
+    "new": "/shows/2021-2022/clue-anzln/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/kaleidoscope-registration",
+    "new": "/news/kaleidoscope-registration/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2022/spring-education-2022-bgrgt",
+    "new": "/news/2022/spring-education-2022-bgrgt/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20222023/xmasauditions",
+    "new": "/shows/2022-2023/xmasauditions/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20222023/lion-br6d8",
+    "new": "/shows/2022-2023/lion/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20222023/lion",
+    "new": "/shows/2022-2023/lion/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/2022/season-2020-2021",
+    "new": "/news/2022/season-2020-2021/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20222023/seasontix",
+    "new": "/shows/2022-2023/seasontix/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20222023/steelaud",
+    "new": "/shows/2022-2023/steelaud/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20212022/cryitout",
+    "new": "/shows/2021-2022/cryitout/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20212022/seasontickets",
+    "new": "/shows/2021-2022/seasontickets/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20212022/june19",
+    "new": "/shows/2021-2022/june19/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20212022/alltogethernow",
+    "new": "/shows/2021-2022/alltogethernow/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/2022/spring-education-2022",
+    "new": "/news/2022/spring-education-2022/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20212022/auditionsclue",
+    "new": "/shows/2021-2022/auditionsclue/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/2019/summercamppoppins-rpwsh-dkt88",
+    "new": "/news/2019/summercamppoppins-rpwsh-dkt88/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2022/summercamp",
+    "new": "/news/2022/summercamp/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/summercamppoppins-rpwsh",
+    "new": "/news/2019/summercamppoppins-rpwsh/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2122/offtheshelfboudica",
+    "new": "/news/2122/offtheshelfboudica/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20212022/theguys",
+    "new": "/shows/2021-2022/theguys/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20212022/auditionsoz-bpk42",
+    "new": "/shows/2021-2022/auditionsoz/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20212022/auditionssky-jxcgy",
+    "new": "/shows/2021-2022/auditionssky-jxcgy/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/2018/offtheshelfrevolution-7lpkw-eydma-tfp5d-j22jm",
+    "new": "/news/2018/offtheshelfrevolution-7lpkw-eydma-tfp5d-j22jm/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20212022/auditionsoz",
+    "new": "/shows/2021-2022/auditionsoz/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/2021/falled-lc9tl",
+    "new": "/news/2021/falled-lc9tl/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2021/summerallages",
+    "new": "/news/2021/summerallages/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/offtheshelfrevolution-7lpkw-eydma-tfp5d",
+    "new": "/news/2018/offtheshelfrevolution-7lpkw-eydma-tfp5d/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/summercamppoppins-rpwsh-jzptm",
+    "new": "/news/2019/summercamppoppins-rpwsh-jzptm/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/spacies",
+    "new": "/news/2019/spacies/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/choruslineaudition-rr6em",
+    "new": "/news/2019/choruslineaudition-rr6em/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2020/catmates2021",
+    "new": "/news/2020/catmates2021/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20212022/alltogetheraud",
+    "new": "/shows/2021-2022/alltogetheraud/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/2020/skin-nemtj",
+    "new": "/news/2020/skin-nemtj/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20212022/auditionssky",
+    "new": "/shows/2021-2022/auditionssky/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/2021/summercamp",
+    "new": "/news/2021/summercamp/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2021/falled",
+    "new": "/news/2021/falled/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20212022/corndog",
+    "new": "/shows/2021-2022/corndog/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/2021/now-hiring-education-director",
+    "new": "/news/2021/now-hiring-education-director/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2021/kremer",
+    "new": "/news/2021/kremer/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2021/valenzuela",
+    "new": "/news/2021/valenzuela/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2021/hayes",
+    "new": "/news/2021/hayes/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2021/clausell",
+    "new": "/news/2021/clausell/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2021/tlt-wins-national-award",
+    "new": "/news/2021/tlt-wins-national-award/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20222023/steelaud-8al6z",
+    "new": "/shows/2022-2023/steelaud/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/2020/minidoka",
+    "new": "/news/2020/minidoka/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/covid19-38xd9",
+    "new": "/news/2019/covid19-38xd9/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/castmatesjcs",
+    "new": "/news/2019/castmatesjcs/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/spacies-4kzgl",
+    "new": "/news/2019/spacies-4kzgl/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2021/rewildaudition",
+    "new": "/news/2021/rewildaudition/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2020/falladult-c2zcp-kpdjh",
+    "new": "/news/2020/falladult-c2zcp-kpdjh/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2021/springbreak",
+    "new": "/news/2021/springbreak/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2021/springclasses",
+    "new": "/news/2021/springclasses/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/castmatesvanya-z6797-yd4xh",
+    "new": "/news/2019/castmatesvanya-z6797-yd4xh/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2020/skin",
+    "new": "/news/2020/skin/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2020/minidoka-tyjt6",
+    "new": "/news/2020/minidoka-tyjt6/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2020/minidoka-7wetl",
+    "new": "/news/2020/minidoka-7wetl/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2020/hanukkahauditions",
+    "new": "/news/2020/hanukkahauditions/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/castmatesvanya-z6797",
+    "new": "/news/2019/castmatesvanya-z6797/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2020/finalassignment-r74ht",
+    "new": "/news/2020/finalassignment-r74ht/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/summercamppoppins-rpwsh-dznrc",
+    "new": "/news/2019/summercamppoppins-rpwsh-dznrc/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/castmatesvanya",
+    "new": "/news/2019/castmatesvanya/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2020/annualfund",
+    "new": "/news/2020/annualfund/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2020/summerweek6",
+    "new": "/news/2020/summerweek6/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/castmates-54bgg",
+    "new": "/news/2019/castmates-54bgg/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/gala",
+    "new": "/news/2019/gala/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/annie-katica-green",
+    "new": "/news/2017/annie-katica-green/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2020/falladult-c2zcp",
+    "new": "/news/2020/falladult-c2zcp/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2020/pageauditions",
+    "new": "/news/2020/pageauditions/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/castmatesgypsy-lalkt",
+    "new": "/news/2019/castmatesgypsy-lalkt/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/castmatesgypsy",
+    "new": "/news/2019/castmatesgypsy/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/castmatesmice",
+    "new": "/news/2019/castmatesmice/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/castmatessep25-prpec",
+    "new": "/news/2019/castmatessep25-prpec/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/castmatessep25",
+    "new": "/news/2019/castmatessep25/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2020/finalassignment",
+    "new": "/news/2020/finalassignment/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/castmatescalendargirls",
+    "new": "/news/2019/castmatescalendargirls/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2020/falladult-9ygrj",
+    "new": "/news/2020/falladult-9ygrj/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2020postponed",
+    "new": "/news/2020postponed/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2020/falladult",
+    "new": "/news/2020/falladult/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2020/fallyouth",
+    "new": "/news/2020/fallyouth/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/castmatesdollshouse-5mj7x",
+    "new": "/news/2019/castmatesdollshouse-5mj7x/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/castmatesdollshouse",
+    "new": "/news/2019/castmatesdollshouse/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/jedi",
+    "new": "/news/2019/jedi/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/george-mcclure-md",
+    "new": "/news/2015/george-mcclure-md/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/castmateslaura",
+    "new": "/news/2019/castmateslaura/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/annualfunddrive-4y34r",
+    "new": "/news/2017/annualfunddrive-4y34r/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/castmates-54bgg-ltef7",
+    "new": "/news/2019/castmates-54bgg-ltef7/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/tania",
+    "new": "/news/2015/tania/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/jeanette",
+    "new": "/news/2015/jeanette/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/martin",
+    "new": "/news/2015/martin/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20192020/calendargirls",
+    "new": "/shows/2019-2020/calendargirls/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20192020/evildead",
+    "new": "/shows/2019-2020/evildead/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/2019/choruslineaudition",
+    "new": "/news/2019/choruslineaudition/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/blm",
+    "new": "/news/2019/blm/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20192020/holmes",
+    "new": "/shows/2019-2020/holmes/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20192020/holmes-gaf4k",
+    "new": "/shows/2019-2020/holmes/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20192020/shattering",
+    "new": "/shows/2019-2020/shattering/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20192020/chorusline",
+    "new": "/shows/2019-2020/chorusline/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20192020/chorusline-fnlh3",
+    "new": "/shows/2019-2020/chorusline/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20192020/chorusline-fnlh3-akhpz",
+    "new": "/shows/2019-2020/chorusline-fnlh3-akhpz/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/2020/summersupernews",
+    "new": "/news/2020/summersupernews/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/castmates",
+    "new": "/news/2019/castmates/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/muhgrogvirtual",
+    "new": "/news/2019/muhgrogvirtual/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/qawithtlt-84f9e",
+    "new": "/news/2019/qawithtlt-84f9e/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/qawithtlt",
+    "new": "/news/2019/qawithtlt/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2020/summerweek1",
+    "new": "/news/2020/summerweek1/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2020/summerweek2",
+    "new": "/news/2020/summerweek2/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2020/summerweek4",
+    "new": "/news/2020/summerweek4/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2020/summerweek5",
+    "new": "/news/2020/summerweek5/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2020/summerweek6-en8yw",
+    "new": "/news/2020/summerweek6-en8yw/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2020/summerweek8",
+    "new": "/news/2020/summerweek8/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/robinhood",
+    "new": "/news/2019/robinhood/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/stayhomemonologues-hentd",
+    "new": "/news/2019/stayhomemonologues-hentd/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/tacomacreates",
+    "new": "/news/2019/tacomacreates/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/stayhomeadultmono",
+    "new": "/news/2019/stayhomeadultmono/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/stayhometap",
+    "new": "/news/2019/stayhometap/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/stayhomemonologues",
+    "new": "/news/2019/stayhomemonologues/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/covid19",
+    "new": "/news/2019/covid19/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/foulplay",
+    "new": "/news/2019/foulplay/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/wsctaboard",
+    "new": "/news/2019/wsctaboard/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/termsaudition-8fkje",
+    "new": "/news/2019/termsaudition-8fkje/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/laramie10",
+    "new": "/news/2019/laramie10/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/muhgrog157158-fjne9",
+    "new": "/news/2019/muhgrog157158-fjne9/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/horsin",
+    "new": "/news/2019/horsin/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/grittyprivate",
+    "new": "/news/2019/grittyprivate/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/springeducation-73prh-t9ly4-645bw-espsf",
+    "new": "/news/2018/springeducation-73prh-t9ly4-645bw-espsf/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/wintered",
+    "new": "/news/2019/wintered/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/muhgrog157158",
+    "new": "/news/2019/muhgrog157158/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/fuddy-dha7r",
+    "new": "/news/2019/fuddy-dha7r/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/termsaudition",
+    "new": "/news/2019/termsaudition/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/fuddy",
+    "new": "/news/2019/fuddy/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/shatteringauditions-5n88x",
+    "new": "/news/2019/shatteringauditions-5n88x/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/murderbymerlot-xgbbm-sk9e2",
+    "new": "/news/2018/murderbymerlot-xgbbm-sk9e2/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/offtheshelfrevolution-7lpkw-eydma",
+    "new": "/news/2018/offtheshelfrevolution-7lpkw-eydma/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/holmesauditions",
+    "new": "/news/2019/holmesauditions/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/holmesauditions-nf2bd",
+    "new": "/news/2019/holmesauditions-nf2bd/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/springeducation-73prh-kw3jp",
+    "new": "/news/2018/springeducation-73prh-kw3jp/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/donationrequest",
+    "new": "/news/donationrequest/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/randy-clark-dbs3d",
+    "new": "/news/2015/randy-clark-dbs3d/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/season101",
+    "new": "/news/2019/season101/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/seussicalcamp",
+    "new": "/news/2019/seussicalcamp/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/fotoloose",
+    "new": "/news/2019/fotoloose/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/marypoppins",
+    "new": "/news/2019/marypoppins/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/pillowmannationals",
+    "new": "/news/2019/pillowmannationals/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/pillowmanfestival",
+    "new": "/news/2019/pillowmanfestival/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/jennyhubbard",
+    "new": "/news/2017/jennyhubbard/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/springeducation-73prh-t9ly4-645bw-jww8t",
+    "new": "/news/2018/springeducation-73prh-t9ly4-645bw-jww8t/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/springeducation-73prh-t9ly4-645bw-x768b-9rkry",
+    "new": "/news/2018/springeducation-73prh-t9ly4-645bw-x768b-9rkry/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/broadwayolympia",
+    "new": "/news/2018/broadwayolympia/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/100seasongala",
+    "new": "/news/2018/100seasongala/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/offtheshelfrevolution",
+    "new": "/news/2018/offtheshelfrevolution/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/mulanjr",
+    "new": "/news/2018/mulanjr/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/mulanjr-hh87h",
+    "new": "/news/2018/mulanjr-hh87h/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20182019/foreigner",
+    "new": "/shows/2018-2019/foreigner/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20182019/bellbookcandle",
+    "new": "/shows/2018-2019/bellbookcandle/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20182019/scrooge",
+    "new": "/shows/2018-2019/scrooge/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20182019/dollshouse",
+    "new": "/shows/2018-2019/dollshouse/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20182019/nightmusic",
+    "new": "/shows/2018-2019/nightmusic/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20182019/laura",
+    "new": "/shows/2018-2019/laura/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/20182019/hayfever",
+    "new": "/shows/2018-2019/hayfever/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/2019/grittyapril",
+    "new": "/news/2019/grittyapril/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/muhgrog-t3kr3",
+    "new": "/news/2019/muhgrog-t3kr3/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20182019/sophie",
+    "new": "/shows/2018-2019/sophie/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/2018/calendarauditions",
+    "new": "/news/2018/calendarauditions/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/muhgrog",
+    "new": "/news/2019/muhgrog/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/evildeadauditions",
+    "new": "/news/2019/evildeadauditions/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/honey-a76cy-3nefp",
+    "new": "/news/2017/honey-a76cy-3nefp/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/100seasongala-3mk7k",
+    "new": "/news/2018/100seasongala-3mk7k/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/cyranproductions",
+    "new": "/news/2018/cyranproductions/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/offtheshelfrevolution-gjkhz",
+    "new": "/news/2018/offtheshelfrevolution-gjkhz/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/springeducation-kndsr",
+    "new": "/news/2019/springeducation-kndsr/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/summercampseuss",
+    "new": "/news/2019/summercampseuss/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/summercamppoppins",
+    "new": "/news/2019/summercamppoppins/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/offtheshelfrevolution-7lpkw",
+    "new": "/news/2018/offtheshelfrevolution-7lpkw/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/springeducation-73prh-t9ly4-645bw-x768b",
+    "new": "/news/2018/springeducation-73prh-t9ly4-645bw-x768b/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/murderbymerlot-xgbbm",
+    "new": "/news/2018/murderbymerlot-xgbbm/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/lauraauditions-af84x",
+    "new": "/news/2018/lauraauditions-af84x/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/365days",
+    "new": "/news/2016/365days/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/summercamppoppins-tb7p2",
+    "new": "/news/2019/summercamppoppins-tb7p2/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/annualfunddrive",
+    "new": "/news/2017/annualfunddrive/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/legally-blond-jr",
+    "new": "/news/2017/legally-blond-jr/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/98th-season-opening-gala-and-silent-auction-ewp7l",
+    "new": "/news/2016/98th-season-opening-gala-and-silent-auction-ewp7l/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/the-underpants-5ypj7",
+    "new": "/news/2016/the-underpants-5ypj7/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/the-underpants-5ypj7-yzws8",
+    "new": "/news/2016/the-underpants-5ypj7-yzws8/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/the-underpants-5ypj7-em9m8",
+    "new": "/news/2016/the-underpants-5ypj7-em9m8/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/the-underpants-5ypj7-em9m8-l4mjh",
+    "new": "/news/2016/the-underpants-5ypj7-em9m8-l4mjh/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/the-underpants-5ypj7-em9m8-l4mjh-y6c62",
+    "new": "/news/2016/the-underpants-5ypj7-em9m8-l4mjh-y6c62/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/the-underpants-5ypj7-em9m8-l4mjh-y6c62-hkpgb",
+    "new": "/news/2016/the-underpants-5ypj7-em9m8-l4mjh-y6c62-hkpgb/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/the-underpants-5ypj7-em9m8-l4mjh-y6c62-hkpgb-86s8n",
+    "new": "/news/2016/the-underpants-5ypj7-em9m8-l4mjh-y6c62-hkpgb-86s8n/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/auditions-for-blithe-spirit",
+    "new": "/news/2017/auditions-for-blithe-spirit/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/auditions-for-rumors",
+    "new": "/news/2017/auditions-for-rumors/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/springeducation",
+    "new": "/news/2018/springeducation/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/after-school-tlt-dracula-elpss",
+    "new": "/news/2016/after-school-tlt-dracula-elpss/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/agentandtheactor",
+    "new": "/news/2017/agentandtheactor/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/summerfootloose",
+    "new": "/news/2019/summerfootloose/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/the-death-of-dr-pepper-a-murder-mystery-dinner",
+    "new": "/news/2017/the-death-of-dr-pepper-a-murder-mystery-dinner/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/gritty-city-sirens-present-boobtube-62hcx",
+    "new": "/news/2017/gritty-city-sirens-present-boobtube-62hcx/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/offtheshelfmeasure",
+    "new": "/news/2018/offtheshelfmeasure/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/murderbymerlot",
+    "new": "/news/2018/murderbymerlot/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/condotokillfor",
+    "new": "/news/2018/condotokillfor/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/gritty-city-sirens-present-boobtube",
+    "new": "/news/2017/gritty-city-sirens-present-boobtube/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/deathbyvalentine",
+    "new": "/news/2018/deathbyvalentine/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/springeducation-73prh-t9ly4",
+    "new": "/news/2018/springeducation-73prh-t9ly4/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/blueforge",
+    "new": "/news/2019/blueforge/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/second-samuel-festival-performances",
+    "new": "/news/2017/second-samuel-festival-performances/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/honey-a76cy",
+    "new": "/news/2017/honey-a76cy/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2019/sophieauditions",
+    "new": "/news/2019/sophieauditions/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/veteransdayproject",
+    "new": "/news/2018/veteransdayproject/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/condotokillfor-9gb5f",
+    "new": "/news/2018/condotokillfor-9gb5f/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/cyrano-de-burger-shack-a-clubtlt-summer-production-frlk2-z29c7",
+    "new": "/news/2017/cyrano-de-burger-shack-a-clubtlt-summer-production-frlk2-z29c7/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/auditions-for-macbeth",
+    "new": "/news/2018/auditions-for-macbeth/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/honey-a76cy-epksn",
+    "new": "/news/2017/honey-a76cy-epksn/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/honey-a76cy-3nefp-58mtg",
+    "new": "/news/2017/honey-a76cy-3nefp-58mtg/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/club-tlt-spring-recital",
+    "new": "/news/2017/club-tlt-spring-recital/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/annual-fund-drive",
+    "new": "/news/2016/annual-fund-drive/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/offtheshelfpeterpan",
+    "new": "/news/2018/offtheshelfpeterpan/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/empathos",
+    "new": "/news/2017/empathos/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/springeducation-73prh-t9ly4-645bw",
+    "new": "/news/2018/springeducation-73prh-t9ly4-645bw/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/dollshouseaudition-jpanj",
+    "new": "/news/2018/dollshouseaudition-jpanj/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/parking",
+    "new": "/news/2016/parking/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/auditionspillow",
+    "new": "/news/2017/auditionspillow/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/dollshouseaudition",
+    "new": "/news/2018/dollshouseaudition/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/lauraauditions",
+    "new": "/news/2018/lauraauditions/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/wintereducation2018",
+    "new": "/news/2016/wintereducation2018/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/fade",
+    "new": "/news/2017/fade/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/grittycityvarie",
+    "new": "/news/2018/grittycityvarie/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/grab-a-seat-and-enjoy",
+    "new": "/news/2018/grab-a-seat-and-enjoy/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/muhgrog-hm4j8-7zmbm",
+    "new": "/news/2018/muhgrog-hm4j8-7zmbm/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/springeducation-73prh",
+    "new": "/news/2018/springeducation-73prh/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/three-one-acts-lemonade-the-cat-connection-second-chance",
+    "new": "/news/2016/three-one-acts-lemonade-the-cat-connection-second-chance/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/auditions-for-jcs",
+    "new": "/news/2017/auditions-for-jcs/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/98th-season-opening-gala-and-silent-auction",
+    "new": "/news/2016/98th-season-opening-gala-and-silent-auction/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/the-underpants",
+    "new": "/news/2016/the-underpants/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/miracle-on-34th-street-auditions",
+    "new": "/news/2016/miracle-on-34th-street-auditions/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/murder-is-served-a-murder-mystery-dinner",
+    "new": "/news/2016/murder-is-served-a-murder-mystery-dinner/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/muhgrog",
+    "new": "/news/2018/muhgrog/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/dracula",
+    "new": "/news/2016/dracula/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/miracle-on-34th-street",
+    "new": "/news/2016/miracle-on-34th-street/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/of-mice-and-men",
+    "new": "/news/2016/of-mice-and-men/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/gypsy",
+    "new": "/news/2016/gypsy/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/exit-laughing",
+    "new": "/news/2016/exit-laughing/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/the-man-who-shot-liberty-valance-1",
+    "new": "/news/2016/the-man-who-shot-liberty-valance-1/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/after-school-tlt-hansel-gretel",
+    "new": "/news/2017/after-school-tlt-hansel-gretel/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/cyrano-de-burger-shack-a-clubtlt-summer-production",
+    "new": "/news/2017/cyrano-de-burger-shack-a-clubtlt-summer-production/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/stop-kiss-presented-by-found-space-productions",
+    "new": "/news/2016/stop-kiss-presented-by-found-space-productions/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/after-school-tlt-dracula",
+    "new": "/news/2016/after-school-tlt-dracula/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/cyrano-de-burger-shack-a-clubtlt-summer-production-frlk2",
+    "new": "/news/2017/cyrano-de-burger-shack-a-clubtlt-summer-production-frlk2/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/high-school-musical",
+    "new": "/news/2016/high-school-musical/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/mrs-smith-goes-to-washington",
+    "new": "/news/2017/mrs-smith-goes-to-washington/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/the-last-escape-a-puzzle-room",
+    "new": "/news/2016/the-last-escape-a-puzzle-room/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/summercampmulan",
+    "new": "/news/2018/summercampmulan/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/dracula-auditions",
+    "new": "/news/2016/dracula-auditions/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/like-you-like-it-presented-by-clubtlt",
+    "new": "/news/2016/like-you-like-it-presented-by-clubtlt/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/the-incredible-undersea-trial-of-joseph-p-lawnboy",
+    "new": "/news/2017/the-incredible-undersea-trial-of-joseph-p-lawnboy/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/98th-season-tickets",
+    "new": "/news/2016/98th-season-tickets/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/peter-pan-jr",
+    "new": "/news/2017/peter-pan-jr/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/the-fortune-teller-presented-by-opera-elect",
+    "new": "/news/2016/the-fortune-teller-presented-by-opera-elect/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/aladdin-jr",
+    "new": "/news/2016/aladdin-jr/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/a-benefit-for-orlando",
+    "new": "/news/2016/a-benefit-for-orlando/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/the-underpants-auditions",
+    "new": "/news/2016/the-underpants-auditions/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/a-piece-of-my-heart",
+    "new": "/news/2016/a-piece-of-my-heart/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/the-ozzie-fuhrmann-swing-band",
+    "new": "/news/2016/the-ozzie-fuhrmann-swing-band/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/auditions-for-seussical",
+    "new": "/news/2017/auditions-for-seussical/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/love-loss-and-what-i-wore",
+    "new": "/news/2017/love-loss-and-what-i-wore/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/boeing-boeing",
+    "new": "/news/2015/boeing-boeing/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/rabbit-hole",
+    "new": "/news/2015/rabbit-hole/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/a-christmas-story",
+    "new": "/news/2015/a-christmas-story/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/second-samuel",
+    "new": "/news/2015/second-samuel/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/the-last-night-of-ballyhoo",
+    "new": "/news/2015/the-last-night-of-ballyhoo/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/of-mice-and-men-auditions",
+    "new": "/news/2016/of-mice-and-men-auditions/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/vanya-sonia-masha-and-spike",
+    "new": "/news/2015/vanya-sonia-masha-and-spike/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/audition-master-class-with-kip-niven",
+    "new": "/news/2017/audition-master-class-with-kip-niven/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/auditions-for-exit-laughing",
+    "new": "/news/2017/auditions-for-exit-laughing/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/gypsy-auditions",
+    "new": "/news/2016/gypsy-auditions/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/smokey-joes-cafe",
+    "new": "/news/2015/smokey-joes-cafe/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/gritty-city-sirens",
+    "new": "/news/2016/gritty-city-sirens/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/birds-from-the-thicket",
+    "new": "/news/2016/birds-from-the-thicket/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/noises-off",
+    "new": "/news/2016/noises-off/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/summer-camp-2016-aladdin",
+    "new": "/news/2016/summer-camp-2016-aladdin/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/summer-camp-2016-high-school-musical",
+    "new": "/news/2016/summer-camp-2016-high-school-musical/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/fools-play-improv-at-tlt",
+    "new": "/news/2016/fools-play-improv-at-tlt/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/the-scarlett",
+    "new": "/news/2016/the-scarlett/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/the-underpants-5ypj7-em9m8-jfy3x",
+    "new": "/news/2016/the-underpants-5ypj7-em9m8-jfy3x/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/after-school-tlt-spring-2016",
+    "new": "/news/2016/after-school-tlt-spring-2016/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/top-girls",
+    "new": "/news/2016/top-girls/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/grittycityboobtubeseason2",
+    "new": "/news/2018/grittycityboobtubeseason2/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/summer-camp-2016",
+    "new": "/news/2016/summer-camp-2016/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/scroogeaudition",
+    "new": "/news/2018/scroogeaudition/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/city-line-the-last-night-of-ballyhoo",
+    "new": "/news/2016/city-line-the-last-night-of-ballyhoo/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/lit-aloud-an-off-the-shelf-event",
+    "new": "/news/2016/lit-aloud-an-off-the-shelf-event/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/offtheshelfbeverly",
+    "new": "/news/2016/offtheshelfbeverly/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/honeymoon-from-hell",
+    "new": "/news/2017/honeymoon-from-hell/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/honey",
+    "new": "/news/2017/honey/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/auditionsbellbookcandle",
+    "new": "/news/2018/auditionsbellbookcandle/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/auditionsforeigner",
+    "new": "/news/2018/auditionsforeigner/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/auditionsveteransday",
+    "new": "/news/2018/auditionsveteransday/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/vanya-and-sonia-and-masha-and-spike-auditions",
+    "new": "/news/2016/vanya-and-sonia-and-masha-and-spike-auditions/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/the-tenth-muse-off-the-shelf",
+    "new": "/news/2016/the-tenth-muse-off-the-shelf/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/after-school-tlt-robin-hood",
+    "new": "/news/2016/after-school-tlt-robin-hood/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/camp-tlt-winter-2016",
+    "new": "/news/2015/camp-tlt-winter-2016/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2018/muhgrog-hm4j8",
+    "new": "/news/2018/muhgrog-hm4j8/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/city-line-interview-a-christmas-story",
+    "new": "/news/2015/city-line-interview-a-christmas-story/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/murder-on-the-movie-set",
+    "new": "/news/2015/murder-on-the-movie-set/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/the-last-night-of-ballyhoo-auditions",
+    "new": "/news/2015/the-last-night-of-ballyhoo-auditions/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/education-program",
+    "new": "/news/2015/education-program/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/auditions-for-lesser-god",
+    "new": "/news/2017/auditions-for-lesser-god/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/city-line-interview",
+    "new": "/news/2015/city-line-interview/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/fred-meyer-community-rewards-helps-tlt",
+    "new": "/news/2015/fred-meyer-community-rewards-helps-tlt/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/c-ellen-peters",
+    "new": "/news/2015/c-ellen-peters/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/donna-kundson",
+    "new": "/news/2015/donna-kundson/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/a-few-good-men",
+    "new": "/news/2015/a-few-good-men/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/oliver-1",
+    "new": "/news/2015/oliver-1/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/katherine-davis",
+    "new": "/news/2015/katherine-davis/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/heidi-walworth-horn",
+    "new": "/news/2015/heidi-walworth-horn/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/tomorrow-tomorrow",
+    "new": "/news/2015/tomorrow-tomorrow/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/97th-season-opening-gala",
+    "new": "/news/2015/97th-season-opening-gala/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/5/11/the-music-man-junior",
+    "new": "/news/2015/5/11/the-music-man-junior/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/second-samuel-auditions",
+    "new": "/news/2015/second-samuel-auditions/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/the-legend-of-sleepy-hollow",
+    "new": "/news/2015/the-legend-of-sleepy-hollow/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/a-day-in-the-death-of-joe",
+    "new": "/news/2016/a-day-in-the-death-of-joe/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/rabbit-hole-auditions",
+    "new": "/news/2015/rabbit-hole-auditions/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/amazon-smile",
+    "new": "/news/2015/amazon-smile/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/20212022/seasontix",
+    "new": "/shows/2021-2022/seasontix/",
+    "note": "show -> custom post type"
+  },
+  {
+    "old": "/blog/2015/beauty-and-the-beast-jr-performances",
+    "new": "/news/2015/beauty-and-the-beast-jr-performances/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/97th-season-auditions-1",
+    "new": "/news/2015/97th-season-auditions-1/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/ouroboros-shadow-pictures-presents-the-history-of-waking-up",
+    "new": "/news/2015/ouroboros-shadow-pictures-presents-the-history-of-waking-up/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/all-the-great-books",
+    "new": "/news/2015/all-the-great-books/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/smokey-joes-cafe-auditions",
+    "new": "/news/2015/smokey-joes-cafe-auditions/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/club-tlt",
+    "new": "/news/2015/club-tlt/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/stay-cool-at-tlt",
+    "new": "/news/2015/stay-cool-at-tlt/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/a-midsummer-nights-dream",
+    "new": "/news/2015/a-midsummer-nights-dream/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/cabaret-pictures-1",
+    "new": "/news/2015/cabaret-pictures-1/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/dial-m-for-murder",
+    "new": "/news/2015/dial-m-for-murder/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/scrooge-the-musical",
+    "new": "/news/2015/scrooge-the-musical/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/the-great-gatsby",
+    "new": "/news/2015/the-great-gatsby/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/picasso-at-the-lapin-agile",
+    "new": "/news/2015/picasso-at-the-lapin-agile/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/the-fox-on-the-fairway",
+    "new": "/news/2015/the-fox-on-the-fairway/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/the-mystery-of-edwin-drood",
+    "new": "/news/2015/the-mystery-of-edwin-drood/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/cabaret",
+    "new": "/news/2015/cabaret/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/2012-2013",
+    "new": "/news/2015/2012-2013/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/2011-2012",
+    "new": "/news/2015/2011-2012/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/2010-2011",
+    "new": "/news/2015/2010-2011/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/managing-artistic-director",
+    "new": "/news/2015/managing-artistic-director/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/technical-director",
+    "new": "/news/2015/technical-director/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/office-manager-373ag",
+    "new": "/news/2015/office-manager-373ag/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/office-manager-lyb47",
+    "new": "/news/2015/office-manager-lyb47/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/micheal-ohara",
+    "new": "/news/2015/micheal-ohara/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/randy-clark",
+    "new": "/news/2015/randy-clark/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/jen-niehaus-rivers",
+    "new": "/news/2015/jen-niehaus-rivers/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/2000-2010",
+    "new": "/news/2015/2000-2010/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/1990-2000",
+    "new": "/news/2015/1990-2000/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/1980-1990",
+    "new": "/news/2015/1980-1990/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/1970-1980",
+    "new": "/news/2015/1970-1980/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/1960-1970",
+    "new": "/news/2015/1960-1970/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/1950-1960",
+    "new": "/news/2015/1950-1960/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/1940-1950",
+    "new": "/news/2015/1940-1950/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/1930-1940",
+    "new": "/news/2015/1930-1940/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/1918-1930",
+    "new": "/news/2015/1918-1930/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/the-buddy-holly-story",
+    "new": "/news/2015/the-buddy-holly-story/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/5/11/the-ceremony-of-innocence",
+    "new": "/news/2015/5/11/the-ceremony-of-innocence/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/summer-camp",
+    "new": "/news/2015/summer-camp/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/the-night-of-the-iguana",
+    "new": "/news/2015/the-night-of-the-iguana/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/97th-season-auditions",
+    "new": "/news/2015/97th-season-auditions/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/5/11/beauty-and-the-beast-jr",
+    "new": "/news/2015/5/11/beauty-and-the-beast-jr/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/5/11/97th-season-announced",
+    "new": "/news/2015/5/11/97th-season-announced/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2017/annualfunddrive-fpemm",
+    "new": "/news/2017/annualfunddrive-fpemm/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2016/fools-play-improv-at-tlt-h6azh",
+    "new": "/news/2016/fools-play-improv-at-tlt-h6azh/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/lily",
+    "new": "/news/2015/lily/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/nick",
+    "new": "/news/2015/nick/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/moonlight-and-magnolias",
+    "new": "/news/2015/moonlight-and-magnolias/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/office-manager-373ag-9pnef-aclg5",
+    "new": "/news/2015/office-manager-373ag-9pnef-aclg5/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/bye-bye-birdie",
+    "new": "/news/2015/bye-bye-birdie/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/office-manager-373ag-9pnef-aclg5-p78cz",
+    "new": "/news/2015/office-manager-373ag-9pnef-aclg5-p78cz/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/chapter-two",
+    "new": "/news/2015/chapter-two/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/to-kill-a-mockingbird",
+    "new": "/news/2015/to-kill-a-mockingbird/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/monique",
+    "new": "/news/monique/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/its-a-wonderful-life",
+    "new": "/news/2015/its-a-wonderful-life/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/the-weir",
+    "new": "/news/2015/the-weir/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/steele-magnolias",
+    "new": "/news/2015/steele-magnolias/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/the-complete-works-of-william-shakespeare-abridged-revised",
+    "new": "/news/2015/the-complete-works-of-william-shakespeare-abridged-revised/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/hembree",
+    "new": "/news/2015/hembree/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/office-manager-373ag-9pnef-aclg5-6l825",
+    "new": "/news/2015/office-manager-373ag-9pnef-aclg5-6l825/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/2015/office-manager-373ag-9pnef-aclg5-6l825-l9egj",
+    "new": "/news/2015/office-manager-373ag-9pnef-aclg5-6l825-l9egj/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/teagan",
+    "new": "/news/teagan/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/category/Education+Program",
+    "new": "/news/category/Education+Program/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/category/Other+Theatre+Shows",
+    "new": "/news/category/Other+Theatre+Shows/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/category/Other+Shows",
+    "new": "/news/category/Other+Shows/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/category/Staff",
+    "new": "/news/category/Staff/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/category/DEI",
+    "new": "/news/category/DEI/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/category/Historical+Shows",
+    "new": "/news/category/Historical+Shows/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/category/Now+Playing",
+    "new": "/news/category/Now+Playing/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/category/98th+Season",
+    "new": "/news/category/98th+Season/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/category/95th+Season",
+    "new": "/news/category/95th+Season/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/category/Board",
+    "new": "/news/category/Board/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/category/Jobs",
+    "new": "/news/category/Jobs/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/category/Off+the+Shelf",
+    "new": "/news/category/Off+the+Shelf/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/category/Main",
+    "new": "/news/category/Main/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/category/96th+Season",
+    "new": "/news/category/96th+Season/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/category/Auditions",
+    "new": "/news/category/Auditions/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/category/Sticky",
+    "new": "/news/category/Sticky/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/category/Press",
+    "new": "/news/category/Press/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/tag/1970-1980",
+    "new": "/news/tag/1970-1980/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/tag/2012-2013",
+    "new": "/news/tag/2012-2013/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/tag/2018-2019",
+    "new": "/news/tag/2018-2019/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/tag/2015-2016",
+    "new": "/news/tag/2015-2016/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/tag/1960-1970",
+    "new": "/news/tag/1960-1970/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/tag/1950-1960",
+    "new": "/news/tag/1950-1960/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/tag/Donation+Request",
+    "new": "/news/tag/Donation+Request/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/tag/Second+Samuel+1516",
+    "new": "/news/tag/Second+Samuel+1516/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/tag/2010-2020",
+    "new": "/news/tag/2010-2020/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/tag/2016-2017",
+    "new": "/news/tag/2016-2017/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/tag/Caberet1415",
+    "new": "/news/tag/Caberet1415/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/tag/2025-2026",
+    "new": "/news/tag/2025-2026/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/tag/1980-1990",
+    "new": "/news/tag/1980-1990/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/tag/2022-2023",
+    "new": "/news/tag/2022-2023/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/tag/2023-2024",
+    "new": "/news/tag/2023-2024/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/tag/2020-2021",
+    "new": "/news/tag/2020-2021/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/tag/1918-1930",
+    "new": "/news/tag/1918-1930/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/tag/2013-2014",
+    "new": "/news/tag/2013-2014/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/tag/2010-2011",
+    "new": "/news/tag/2010-2011/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/tag/City+Line",
+    "new": "/news/tag/City+Line/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/tag/2021-2022",
+    "new": "/news/tag/2021-2022/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/tag/1990-2000",
+    "new": "/news/tag/1990-2000/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/tag/2024-2025",
+    "new": "/news/tag/2024-2025/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/tag/1940-1950",
+    "new": "/news/tag/1940-1950/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/tag/2000-2010",
+    "new": "/news/tag/2000-2010/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/tag/2011-2012",
+    "new": "/news/tag/2011-2012/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/tag/2014-2015",
+    "new": "/news/tag/2014-2015/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/tag/ChristmasStory1516",
+    "new": "/news/tag/ChristmasStory1516/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/tag/2017-2018",
+    "new": "/news/tag/2017-2018/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/tag/SmokeyJoesCafe1516",
+    "new": "/news/tag/SmokeyJoesCafe1516/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/tag/2019-2020",
+    "new": "/news/tag/2019-2020/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/blog/tag/1930-1940",
+    "new": "/news/tag/1930-1940/",
+    "note": "blog post -> news"
+  },
+  {
+    "old": "/cover",
+    "new": "/",
+    "note": "core page"
+  },
+  {
+    "old": "/ticketinfo",
+    "new": "/tickets/",
+    "note": "core page"
+  },
+  {
+    "old": "/volunteer",
+    "new": "/get-involved/volunteer/",
+    "note": "core page"
+  },
+  {
+    "old": "/history",
+    "new": "/about/history/",
+    "note": "core page"
+  },
+  {
+    "old": "/education",
+    "new": "/education/",
+    "note": "core page"
+  },
+  {
+    "old": "/auditions",
+    "new": "/get-involved/auditions/",
+    "note": "core page"
+  },
+  {
+    "old": "/home",
+    "new": "/",
+    "note": "core page"
+  },
+  {
+    "old": "/contact",
+    "new": "/contact/",
+    "note": "core page"
+  },
+  {
+    "old": "/off-the-shelf",
+    "new": "/programs/off-the-shelf/",
+    "note": "core page"
+  },
+  {
+    "old": "/board-and-staff",
+    "new": "/about/board-and-staff/",
+    "note": "core page"
+  },
+  {
+    "old": "/job-openings",
+    "new": "/about/jobs/",
+    "note": "core page"
+  },
+  {
+    "old": "/clubtlt",
+    "new": "/get-involved/club-tlt/",
+    "note": "core page"
+  },
+  {
+    "old": "/recorded-programs",
+    "new": "/programs/recorded/",
+    "note": "core page"
+  },
+  {
+    "old": "/press",
+    "new": "/about/press/",
+    "note": "core page"
+  },
+  {
+    "old": "/students-on-stage",
+    "new": "/programs/students-on-stage/",
+    "note": "core page"
+  },
+  {
+    "old": "/flush",
+    "new": "/programs/flush/",
+    "note": "core page"
+  },
+  {
+    "old": "/parking-information",
+    "new": "/visit/parking/",
+    "note": "core page"
+  }
+]

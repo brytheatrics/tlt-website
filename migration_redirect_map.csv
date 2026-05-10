@@ -1,0 +1,594 @@
+decision,category,old_url,new_url,real_name_from_note,title,cancelled
+keep,board profile,/blog/board/kay,/team/kay-meier/,,"KAY MEIER, SECRETARY",False
+keep,board profile,/blog/board/kay-emp99,/team/judy-zerzan-thul/,,JUDY ZERZAN-THUL,False
+keep,board profile,/blog/board/kay-njsdj,/team/athena-hitson/,,"ATHENA HITSON, CO-TREASURER",False
+keep,board profile,/blog/board/kay-rdzag,/team/libby-lindstrom/,,LIBBY LINDSTROM,False
+keep,board profile,/blog/board/leah,/team/leah-hole-marshall/,,LEAH HOLE-MARSHALL,False
+keep,board profile,/blog/board/trevor,/team/trevor-owens/,,"TREVOR OWENS, CO-TREASURER",False
+keep,category index,/blog/category/95th+Season,/news/category/95th-season/,for,95th Season — Blog,False
+keep,category index,/blog/category/96th+Season,/news/category/96th-season/,for,96th Season — Blog,False
+keep,category index,/blog/category/Board,/news/category/board/,,Board — Blog,False
+keep,category index,/blog/category/Education+Program,/news/category/education-program/,,Education Program — Blog,False
+keep,category index,/blog/category/Historical+Shows,/news/category/historical-shows/,2012-2013,Historical Shows — Blog,False
+keep,category index,/blog/category/Jobs,/news/category/jobs/,,Jobs — Blog,False
+keep,category index,/blog/category/Off+the+Shelf,/news/category/off-the-shelf/,,Off the Shelf — Blog,False
+keep,category index,/blog/category/Press,/news/category/press/,,Press — Blog,False
+keep,category index,/blog/category/Staff,/news/category/staff/,,Staff — Blog,False
+keep,core,/auditions,/auditions,,Auditions,False
+keep,core,/blog,/news/,,,False
+keep,core,/board-and-staff,/board-and-staff,,Board of Directors & Staff,False
+keep,core,/clubtlt,/clubtlt,,ClubTLT,False
+keep,core,/contact,/contact,,Contact & Transportation,False
+keep,core,/cover,/,,Tacoma Little Theatre,False
+keep,core,/education,/education,,About the Program,False
+keep,core,/flush,/flush,,Flush Campaign,False
+keep,core,/history,/history,,History,False
+keep,core,/home,/,,Home,False
+keep,core,/job-openings,/job-openings,,Job Openings,False
+keep,core,/off-the-shelf,/off-the-shelf,,OFF THE SHELF,False
+keep,core,/parking-information,/parking-information,,Parking Information,False
+keep,core,/press,/press,,Press,False
+keep,core,/recorded-programs,/recorded-programs,,Recorded Programs,False
+keep,core,/students-on-stage,/students-on-stage,,STUDENTS ON STAGE,False
+keep,core,/ticketinfo,/ticketinfo,,Ticket Information & Policies,False
+keep,core,/volunteer,/volunteer,,Volunteer,False
+keep,decade page,/blog/2015/1918-1930,/shows/legacy/1918-1930/,,1918-1930,False
+keep,decade page,/blog/2015/1930-1940,/shows/legacy/1930-1940/,,1930-1940,False
+keep,decade page,/blog/2015/1940-1950,/shows/legacy/1940-1950/,,1940-1950,False
+keep,decade page,/blog/2015/1950-1960,/shows/legacy/1950-1960/,,1950-1960,False
+keep,decade page,/blog/2015/1960-1970,/shows/legacy/1960-1970/,,1960-1970,False
+keep,decade page,/blog/2015/1970-1980,/shows/legacy/1970-1980/,,1970-1980,False
+keep,decade page,/blog/2015/1980-1990,/shows/legacy/1980-1990/,,1980-1990,False
+keep,decade page,/blog/2015/1990-2000,/shows/legacy/1990-2000/,,1990-2000,False
+keep,decade page,/blog/2015/2000-2010,/shows/legacy/2000-2010/,,2000-2010,False
+keep,decade page,/blog/2015/2010-2011,/shows/legacy/2010-2011/,,2010-2011,False
+keep,decade page,/blog/2015/2011-2012,/shows/legacy/2011-2012/,,2011-2012,False
+keep,decade page,/blog/2015/2012-2013,/shows/legacy/2012-2013/,,2012-2013,False
+keep,modern_show,/blog/20182019/bellbookcandle,/shows/2018-2019/bell-book-and-candle-page/,Bell book and candle page,"Bell, Book and Candle",False
+keep,modern_show,/blog/20182019/dollshouse,/shows/2018-2019/a-dolls-house-page/,a doll's house page,A Doll's House,False
+keep,modern_show,/blog/20182019/foreigner,/shows/2018-2019/foreigner-page/,foreigner page,The Foreigner,False
+keep,modern_show,/blog/20182019/hayfever,/shows/2018-2019/hay-fever-page/,hay fever page,Hay Fever,False
+keep,modern_show,/blog/20182019/laura,/shows/2018-2019/laura-page/,laura page,Laura,False
+keep,modern_show,/blog/20182019/nightmusic,/shows/2018-2019/a-little-night-music-page/,a little night music page,A Little Night Music,False
+keep,modern_show,/blog/20182019/scrooge,/shows/2018-2019/scrooge-the-musical-page/,Scrooge the musical page,Scrooge!  The Musical,False
+keep,modern_show,/blog/20182019/sophie,/shows/2018-2019/sophie-page/,Sophie page,Sophie,False
+keep,modern_show,/blog/20192020/calendargirls,/shows/2019-2020/calendar-girls-page/,Calendar girls page,Calendar Girls,False
+keep,modern_show,/blog/20192020/chorusline,/shows/2019-2020/a-chorus-line-page/,A chorus line page,A CHORUS LINE,False
+keep,modern_show,/blog/20192020/chorusline-fnlh3,/shows/2019-2020/terms-of-endearment-page/,Terms of endearment page,TERMS OF ENDEARMENT,True
+keep,modern_show,/blog/20192020/chorusline-fnlh3-akhpz,/shows/2019-2020/manchurian-candidate-page/,manchurian candidate page,THE MANCHURIAN CANDIDATE,True
+keep,modern_show,/blog/20192020/evildead,/shows/2019-2020/evil-dead-page/,Evil dead page,Evil Dead: The Musical,False
+keep,modern_show,/blog/20192020/holmes,/shows/2019-2020/holmes-for-the-holidays-page/,holmes for the holidays page,Holmes for the Holidays,False
+keep,modern_show,/blog/20192020/holmes-gaf4k,/shows/2019-2020/twas-the-night-before-christmas-page/,Twas the night before christmas page,'Twas the Night Before Christmas,False
+keep,modern_show,/blog/20192020/shattering,/shows/2019-2020/shattering-page/,Shattering page,Shattering,False
+keep,modern_show,/blog/20212022/clue,/shows/2021-2022/clue-page/,Clue Page,Clue: On Stage,False
+keep,modern_show,/blog/20212022/clue-633y7,/shows/2021-2022/a-chorus-line-page/,A chorus line page,A Chorus Line,False
+keep,modern_show,/blog/20212022/clue-anzln,/shows/2021-2022/silent-sky-page/,Silent sky page,Silent Sky,False
+keep,modern_show,/blog/20212022/clue-anzln-g52ct,/shows/2021-2022/happiest-song-plays-last-page/,happiest song plays last page,The Happiest Song Plays Last,False
+keep,modern_show,/blog/20212022/clue-anzln-g52ct-dwpf6,/shows/2021-2022/luck-of-the-irish-page/,luck of the irish page,The Luck of the Irish,False
+keep,modern_show,/blog/20212022/clue-rhe7l,/shows/2021-2022/wizard-of-oz-page/,Wizard of oz page,The Wizard of OZ,False
+keep,modern_show,/blog/20212022/terms,/shows/2021-2022/terms-of-endearment-page/,Terms of Endearment Page,Terms of Endearment,False
+keep,modern_show,/blog/20222023/murder,/shows/2022-2023/murder-on-the-orient-express/,,Murder on the Orient Express,False
+keep,modern_show,/blog/20222023/poboy,/shows/2022-2023/po-boy-tango/,,Po Boy Tango,False
+keep,modern_show,/blog/20222023/rock,/shows/2022-2023/rock-of-ages/,,Rock of Ages,False
+keep,modern_show,/blog/20222023/seasontix,/shows/2022-2023/2026-2027-season-tickets/,,2026-2027 SEASON TICKETS,False
+keep,modern_show,/blog/20222023/shawshank,/shows/2022-2023/the-shawshank-redemption/,,The Shawshank Redemption,False
+keep,modern_show,/blog/20222023/significant,/shows/2022-2023/significant-other/,,Significant Other,False
+keep,modern_show,/blog/20222023/steel,/shows/2022-2023/steel-magnolias/,,Steel Magnolias,False
+keep,modern_show,/blog/20222023/xmasstory,/shows/2022-2023/a-christmas-story/,,A Christmas Story,False
+keep,modern_show,/blog/20232024/almostmaine,/shows/2023-2024/almost-maine/,,"ALMOST, MAINE",False
+keep,modern_show,/blog/20232024/dollshouse2,/shows/2023-2024/a-dolls-house-part-2/,,"A DOLL'S HOUSE, PART 2",False
+keep,modern_show,/blog/20232024/misery,/shows/2023-2024/misery/,,MISERY,False
+keep,modern_show,/blog/20232024/mississippi,/shows/2023-2024/from-the-mississippi-delta/,,FROM THE MISSISSIPPI DELTA,False
+keep,modern_show,/blog/20232024/rent,/shows/2023-2024/rent/,,RENT,False
+keep,modern_show,/blog/20232024/rudolph,/shows/2023-2024/rudolph-the-red-nosed-reindeer/,,RUDOLPH THE RED-NOSED REINDEER,False
+keep,modern_show,/blog/20232024/wrong,/shows/2023-2024/the-play-that-goes-wrong/,,THE PLAY THAT GOES WRONG,False
+keep,modern_show,/blog/20242025/bug,/shows/2024-2025/bug/,,BUG,False
+keep,modern_show,/blog/20242025/curious,/shows/2024-2025/the-curious-incident-of-the-dog-in-the-night-time/,,THE CURIOUS INCIDENT OF THE DOG IN THE NIGHT-TIME,False
+keep,modern_show,/blog/20242025/curious-y7xjc,/shows/2024-2025/lorca-in-a-green-dress/,,LORCA IN A GREEN DRESS,False
+keep,modern_show,/blog/20242025/fiddler,/shows/2024-2025/fiddler-on-the-roof/,,FIDDLER ON THE ROOF,False
+keep,modern_show,/blog/20242025/mousetrap,/shows/2024-2025/the-mousetrap/,,THE MOUSETRAP,False
+keep,modern_show,/blog/20242025/oneman,/shows/2024-2025/one-man-two-guvnors/,,"ONE MAN, TWO GUVNORS",False
+keep,modern_show,/blog/20242025/oneman-4w9jr,/shows/2024-2025/put-in-dont-know-however-this-is-only-because-we-are-doing-this-show-again-in-december-and-may-want-this-to-copy-and-paste-content/,Put in don't know. However this is only because we are doing this show again in December and may want this to copy and paste content,A CHRISTMAS CAROL STARRING ALLEN FITZPATRICK,False
+keep,modern_show,/blog/20242025/rocky,/shows/2024-2025/rocky/,,ROCKY,False
+keep,modern_show,/blog/20252026/bedroom,/shows/2025-2026/bedroom-farce/,,BEDROOM FARCE,False
+keep,modern_show,/blog/20252026/davinci,/shows/2025-2026/the-da-vinci-code/,,THE DA VINCI CODE,False
+keep,modern_show,/blog/20252026/matilda,/shows/2025-2026/matilda/,,MATILDA,False
+keep,modern_show,/blog/20252026/productionteam,/shows/2025-2026/now-hiring-production-team-members-for-2026-2027/,,NOW HIRING-PRODUCTION TEAM MEMBERS FOR 2026-2027,False
+keep,modern_show,/blog/20252026/sotto,/shows/2025-2026/sotto-voce/,,SOTTO VOCE,False
+keep,modern_show,/blog/20252026/spring,/shows/2025-2026/spring-awakening/,,SPRING AWAKENING,False
+keep,modern_show,/blog/20252026/spring-bpb9w,/shows/2025-2026/the-mountaintop/,,THE MOUNTAINTOP,False
+keep,modern_show,/blog/20252026/summercamp,/shows/2025-2026/depending-on-when-the-site-is-launched-we-may-just-need-this-info/,Depending on when the site is launched we may just need this info,Summer Camp @ TLT,False
+keep,modern_show,/blog/20252026/timemachine,/shows/2025-2026/the-time-machine/,,THE TIME MACHINE,False
+keep,old show/news,/blog/2015/a-christmas-story,/shows/legacy/a-christmas-story/,A christmas story,A Christmas Story,False
+keep,old show/news,/blog/2015/a-midsummer-nights-dream,/shows/legacy/a-midsummer-nights-dream/,a midsummer nights dream,A Midsummer Night's Dream,False
+keep,old show/news,/blog/2015/amazon-smile,/shows/legacy/amazon-smile/,,Amazon Smile,False
+keep,old show/news,/blog/2015/boeing-boeing,/shows/legacy/boeing-boeing/,Boeing Boeing,Boeing Boeing,False
+keep,old show/news,/blog/2015/bye-bye-birdie,/shows/legacy/bye-bye-birdie/,bye bye birdie,Bye Bye Birdie,False
+keep,old show/news,/blog/2015/cabaret,/shows/legacy/cabaret/,Cabaret,Cabaret,False
+keep,old show/news,/blog/2015/cabaret-pictures-1,/shows/legacy/cabaret-pictures/,,Cabaret Pictures,False
+keep,old show/news,/blog/2015/chapter-two,/shows/legacy/chapter-two/,Chapter two,Chapter Two,False
+keep,old show/news,/blog/2015/dial-m-for-murder,/shows/legacy/dial-m-for-murder/,Dial M for murder,"Dial ""M"" For Murder",False
+keep,old show/news,/blog/2015/fred-meyer-community-rewards-helps-tlt,/shows/legacy/fred-meyer-community-rewards/,,Fred Meyer Community Rewards,False
+keep,old show/news,/blog/2015/its-a-wonderful-life,/shows/legacy/its-a-wonderful-life/,Its a wonderful life,It's a Wonderful Life,False
+keep,old show/news,/blog/2015/managing-artistic-director,/team/current-managing-artistic-director-links-says-it-is-from-2015/,"Current managing artistic director, links says it is from 2015","Chris Serface, Managing Artistic Director",False
+keep,old show/news,/blog/2015/moonlight-and-magnolias,/shows/legacy/moonlight-and-magnolias/,Moonlight and magnolias,Moonlight and Magnolias,False
+keep,old show/news,/blog/2015/nick,/team/current-ed-director/,Current ed director,"NICK FITZGERALD, EDUCATION DIRECTOR",False
+keep,old show/news,/blog/2015/office-manager-373ag-9pnef-aclg5,/team/current-lead-carpenter/,Current Lead Carpenter,"FRANK ROBERTS, LEAD CARPENTER",False
+keep,old show/news,/blog/2015/office-manager-373ag-9pnef-aclg5-6l825,/team/current-box-office-lead/,current box office lead,"EMMA DELOYE, BOX OFFICE Lead",False
+keep,old show/news,/blog/2015/office-manager-373ag-9pnef-aclg5-p78cz,/team/current-shop-technician/,Current Shop Technician,"THOMAS ROBINSON, SHOP TECHNICIAN",False
+keep,old show/news,/blog/2015/office-manager-lyb47,/team/current-development-director/,Current Development director,"DIANA GEORGE, DEVELOPMENT DIRECTOR",False
+keep,old show/news,/blog/2015/picasso-at-the-lapin-agile,/shows/legacy/picasso-at-the-lapin-agile/,Picasso at the lapin agile,Picasso at the Lapin Agile,False
+keep,old show/news,/blog/2015/rabbit-hole,/shows/legacy/rabbit-hole/,Rabbit hole,Rabbit Hole,False
+keep,old show/news,/blog/2015/scrooge-the-musical,/shows/legacy/scrooge/,Scrooge,Scrooge! The Musical,False
+keep,old show/news,/blog/2015/second-samuel,/shows/legacy/second-samuel/,Second Samuel,Second Samuel,False
+keep,old show/news,/blog/2015/smokey-joes-cafe,/shows/legacy/smokey-joes-cafe/,Smokey joes cafe,Smokey Joe's Cafe,False
+keep,old show/news,/blog/2015/steele-magnolias,/shows/legacy/steel-magnolias/,Steel Magnolias,Steel Magnolias,False
+keep,old show/news,/blog/2015/tania,/shows/legacy/maria-tania-bandes-b-weingarden/,,"MARIA-TANIA BANDES B. WEINGARDEN, PRESIDENT",False
+keep,old show/news,/blog/2015/technical-director,/team/me-current-technical-director/,"Me, current Technical director","BLAKE R. YORK, TECHNICAL DIRECTOR",False
+keep,old show/news,/blog/2015/the-complete-works-of-william-shakespeare-abridged-revised,/shows/legacy/complete-works-of/,complete works of,The Complete Works of William Shakespeare Abridged Revised,False
+keep,old show/news,/blog/2015/the-fox-on-the-fairway,/shows/legacy/fox-on-the-fairway/,fox on the fairway,The Fox on the Fairway,False
+keep,old show/news,/blog/2015/the-great-gatsby,/shows/legacy/great-gatsby/,great gatsby,The Great Gatsby,False
+keep,old show/news,/blog/2015/the-last-night-of-ballyhoo,/shows/legacy/last-night-of-ballyhoo/,last night of ballyhoo,The Last Night of Ballyhoo,False
+keep,old show/news,/blog/2015/the-weir,/shows/legacy/weir/,weir,The Weir,False
+keep,old show/news,/blog/2015/to-kill-a-mockingbird,/shows/legacy/to-kill-a-mockingbird/,To kill a mockingbird,To Kill a Mockingbird,False
+keep,old show/news,/blog/2015/vanya-sonia-masha-and-spike,/shows/legacy/vanya-and-sonia-and-masha-and-spike/,vanya and sonia and masha and spike,Vanya and Sonia and Masha and Spike,False
+keep,old show/news,/blog/2016/dracula,/shows/legacy/dracula/,Dracula,Dracula,False
+keep,old show/news,/blog/2016/exit-laughing,/shows/legacy/exit-laughing/,Exit laughing,Exit Laughing,False
+keep,old show/news,/blog/2016/gypsy,/shows/legacy/gypsy/,Gypsy,Gypsy,False
+keep,old show/news,/blog/2016/miracle-on-34th-street,/shows/legacy/miracle-on-34th-street/,Miracle on 34th street,Miracle on 34th Street,False
+keep,old show/news,/blog/2016/of-mice-and-men,/shows/legacy/mice-and-men/,mice and men,Of Mice and Men,False
+keep,old show/news,/blog/2016/parking,/shows/legacy/parking/,,Parking,False
+keep,old show/news,/blog/2016/the-man-who-shot-liberty-valance-1,/shows/legacy/man-who-shot-liberty-valance/,man who shot liberty valance,The Man Who Shot Liberty Valance,False
+keep,old show/news,/blog/2016/the-underpants,/shows/legacy/underpants/,underpants,The Underpants,False
+keep,old show/news,/blog/2016/the-underpants-5ypj7,/shows/legacy/rumors/,Rumors,Rumors,False
+keep,old show/news,/blog/2016/the-underpants-5ypj7-em9m8,/shows/legacy/seussical/,seussical,Seussical,False
+keep,old show/news,/blog/2016/the-underpants-5ypj7-em9m8-l4mjh,/shows/legacy/children-of-a-lesser-god/,Children of a lesser god,Children of a Lesser God,False
+keep,old show/news,/blog/2016/the-underpants-5ypj7-em9m8-l4mjh-y6c62,/shows/legacy/jesus-christ-superstar/,Jesus Christ Superstar,JESUS CHRIST SUPERSTAR,False
+keep,old show/news,/blog/2016/the-underpants-5ypj7-em9m8-l4mjh-y6c62-hkpgb,/shows/legacy/pillowman/,Pillowman,The Pillowman,False
+keep,old show/news,/blog/2016/the-underpants-5ypj7-em9m8-l4mjh-y6c62-hkpgb-86s8n,/shows/legacy/macbeth/,Macbeth,Macbeth,False
+keep,old show/news,/blog/2016/the-underpants-5ypj7-yzws8,/shows/legacy/blithe-spirit/,Blithe spirit,Blithe Spirit,False
+keep,old show/news,/blog/2021/russell-5tgd7-fbr6k,/shows/legacy/jalen-c-penn/,,JALEN C. PENN,False
+keep,old show/news,/blog/2021/russell-wgwef,/shows/legacy/ashley-young/,,ASHLEY YOUNG,False
+keep,old show/news,/blog/2021/tlt-wins-national-award,/shows/legacy/tlt-wins-national-award/,,TLT WINS NATIONAL AWARD,False
+keep,old show/news,/blog/2021/valenzuela,/team/board-member-current-2026-may-need-to-merge/,Board member current 2026. may need to merge,"MARIA VALENZUELA, VICE PRESIDENT",False
+keep,uncategorized,/blog/2022/scholarship-application,/shows/legacy/is-there-actually-a-link-that-people-can-use-for-scholarships-or-is-this-it/,"Is there actually a link that people can use for scholarships, or is this it?",Scholarship Application - All Programs,False
+keep,uncategorized,/blog/2022/season-2020-2021,/shows/legacy/this-is-the-and-i-believe-only-page-for-the-20-21/,This is the  (and I believe only page for the 20-21,SEASON 2020-2021,False
+keep,uncategorized,/blog/2025/grab-dinner-at-harbor-lights,/shows/legacy/grab-dinner-at-harbor-lights/,,GRAB DINNER AT HARBOR LIGHTS!,False
+keep,uncategorized,/blog/donationrequest,/news/donationrequest/,,REQUEST AN AUCTION DONATION,False
+keep,uncategorized,/blog/monique,/news/monique/,Current Production manager (but by the time we make this site she will be gone,"MONIQUE OTTER-JOHNSON, PRODUCTION MANAGER",False
+keep,uncategorized,/blog/tag/1918-1930,/seasons/1918-1930/,1918-1930,1918-1930 — Blog,False
+keep,uncategorized,/blog/tag/1930-1940,/seasons/1930-1940/,1930-40,1930-1940 — Blog,False
+keep,uncategorized,/blog/tag/1940-1950,/seasons/1940-1950/,1940-1950,1940-1950 — Blog,False
+keep,uncategorized,/blog/tag/1950-1960,/seasons/1950-1960/,50-60,1950-1960 — Blog,False
+keep,uncategorized,/blog/tag/1960-1970,/seasons/1960-1970/,60-70,1960-1970 — Blog,False
+keep,uncategorized,/blog/tag/1970-1980,/seasons/1970-1980/,Shows from 1970-80,1970-1980 — Blog,False
+keep,uncategorized,/blog/tag/1980-1990,/seasons/1980-1990/,80-90,1980-1990 — Blog,False
+keep,uncategorized,/blog/tag/1990-2000,/seasons/1990-2000/,1990-2000,1990-2000 — Blog,False
+keep,uncategorized,/blog/tag/2000-2010,/seasons/2000-2010/,2000-2010,2000-2010 — Blog,False
+keep,uncategorized,/blog/tag/2010-2011,/seasons/2010-2011/,2010-11  shows,2010-2011 — Blog,False
+keep,uncategorized,/blog/tag/2010-2020,/seasons/2010-2020/,2012-2013  shows,2010-2020 — Blog,False
+keep,uncategorized,/blog/tag/2011-2012,/seasons/2011-2012/,2011-12  shows,2011-2012 — Blog,False
+keep,uncategorized,/blog/tag/2012-2013,/seasons/2012-2013/,2012-2013 shows,2012-2013 — Blog,False
+keep,uncategorized,/blog/tag/2013-2014,/seasons/2013-2014/,2014-15  shows,2013-2014 — Blog,False
+keep,uncategorized,/blog/tag/2014-2015,/seasons/2014-2015/,2014-15  shows,2014-2015 — Blog,False
+keep,uncategorized,/blog/tag/2015-2016,/seasons/2015-2016/,2015-16 show,2015-2016 — Blog,False
+keep,uncategorized,/blog/tag/2016-2017,/seasons/2016-2017/,underpants,2016-2017 — Blog,False
+keep,uncategorized,/blog/tag/2017-2018,/seasons/2017-2018/,Rumors,2017-2018 — Blog,False
+keep,uncategorized,/blog/tag/2018-2019,/seasons/2018-2019/,2018-19  show,2018-2019 — Blog,False
+keep,uncategorized,/blog/tag/2019-2020,/seasons/2019-2020/,Calendar girls,2019-2020 — Blog,False
+keep,uncategorized,/blog/tag/2020-2021,/seasons/2020-2021/,,2020-2021 — Blog,False
+keep,uncategorized,/blog/tag/2021-2022,/seasons/2021-2022/,Terms of endearment,2021-2022 — Blog,False
+keep,uncategorized,/blog/tag/2022-2023,/seasons/2022-2023/,Steel Magnolias,2022-2023 — Blog,False
+keep,uncategorized,/blog/tag/2023-2024,/seasons/2023-2024/,play that goes wrong,2023-2024 — Blog,False
+keep,uncategorized,/blog/tag/2024-2025,/seasons/2024-2025/,One man two guvnors,2024-2025 — Blog,False
+keep,uncategorized,/blog/tag/2025-2026,/seasons/2025-2026/,da vinci code,2025-2026 — Blog,False
+keep,uncategorized,/blog/tag/Caberet1415,/shows/legacy/cabaret/,Cabaret,Caberet1415 — Blog,False
+keep,uncategorized,/blog/tag/ChristmasStory1516,/shows/legacy/a-christmas-story/,A christmas story,ChristmasStory1516 — Blog,False
+keep,uncategorized,/blog/tag/Donation+Request,/shows/legacy/saw-a-duplicate-of-this-earlier/,Saw a duplicate of this earlier,Donation Request — Blog,False
+keep,uncategorized,/blog/tag/Second+Samuel+1516,/shows/legacy/second-samuel/,Second Samuel,Second Samuel 1516 — Blog,False
+keep,uncategorized,/blog/tag/SmokeyJoesCafe1516,/shows/legacy/smokey-joes-cafe/,Smokey joes cafe,SmokeyJoesCafe1516 — Blog,False
+keep,uncategorized,/blog/teagan,/news/teagan/,,"TEAGAN MCMONAGLE, BOX OFFICE/SHOP",False
+trash,ClubTLT,/blog/2015/club-tlt,/club-tlt/,,Club TLT,False
+trash,ClubTLT,/blog/2016/like-you-like-it-presented-by-clubtlt,/club-tlt/,,LIKE YOU LIKE IT-Presented by ClubTLT,False
+trash,ClubTLT,/blog/2017/club-tlt-spring-recital,/club-tlt/,,CLUB TLT SPRING SHOWCASE,False
+trash,ClubTLT,/blog/2017/cyrano-de-burger-shack-a-clubtlt-summer-production,/club-tlt/,,I HATE SHAKESPEARE,False
+trash,ClubTLT,/blog/2017/cyrano-de-burger-shack-a-clubtlt-summer-production-frlk2,/club-tlt/,,CYRANO DE BURGERSHACK - A CLUBTLT SHOW,False
+trash,ClubTLT,/blog/2017/cyrano-de-burger-shack-a-clubtlt-summer-production-frlk2-z29c7,/club-tlt/,,YEARBOOK & OTHER SCENES- A CLUBTLT SHOW,False
+trash,audition post,/blog/2015/97th-season-auditions,/auditions/,,97th Season Auditions,False
+trash,audition post,/blog/2015/97th-season-auditions-1,/auditions/,,97th Season Audition Dates Announced,False
+trash,audition post,/blog/2015/rabbit-hole-auditions,/auditions/,,Rabbit Hole Auditions,False
+trash,audition post,/blog/2015/second-samuel-auditions,/auditions/,,SECOND SAMUEL AUDITIONS,False
+trash,audition post,/blog/2015/smokey-joes-cafe-auditions,/auditions/,,Smokey Joe's Café Auditions,False
+trash,audition post,/blog/2015/the-last-night-of-ballyhoo-auditions,/auditions/,,THE LAST NIGHT OF BALLYHOO Auditions,False
+trash,audition post,/blog/2016/dracula-auditions,/auditions/,,DRACULA AUDITIONS,False
+trash,audition post,/blog/2016/gypsy-auditions,/auditions/,,GYPSY AUDITIONS,False
+trash,audition post,/blog/2016/miracle-on-34th-street-auditions,/auditions/,,MIRACLE ON 34TH STREET AUDITIONS,False
+trash,audition post,/blog/2016/of-mice-and-men-auditions,/auditions/,,OF MICE AND MEN AUDITIONS,False
+trash,audition post,/blog/2016/the-underpants-auditions,/auditions/,,The Underpants Auditions,False
+trash,audition post,/blog/2016/vanya-and-sonia-and-masha-and-spike-auditions,/auditions/,,Vanya and Sonia and Masha and Spike Auditions,False
+trash,audition post,/blog/2017/audition-master-class-with-kip-niven,/auditions/,,AUDITION MASTER CLASS WITH KIP NIVEN,False
+trash,audition post,/blog/2017/auditions-for-blithe-spirit,/auditions/,,Auditions for BLITHE SPIRIT,False
+trash,audition post,/blog/2017/auditions-for-exit-laughing,/auditions/,,Auditions for THE MAN WHO SHOT LIBERTY VALANCE,False
+trash,audition post,/blog/2017/auditions-for-jcs,/auditions/,,Auditions for JESUS CHRIST SUPERSTAR,False
+trash,audition post,/blog/2017/auditions-for-lesser-god,/auditions/,,Auditions for CHILDREN OF A LESSER GOD,False
+trash,audition post,/blog/2017/auditions-for-rumors,/auditions/,,Auditions for RUMORS,False
+trash,audition post,/blog/2017/auditions-for-seussical,/auditions/,,Auditions for SEUSSICAL,False
+trash,audition post,/blog/2017/auditionspillow,/auditions/,,Auditions for THE PILLOWMAN,False
+trash,audition post,/blog/2018/auditions-for-macbeth,/auditions/,,Auditions for MACBETH,False
+trash,audition post,/blog/2018/auditionsbellbookcandle,/auditions/,,"Auditions for BELL, BOOK AND CANDLE",False
+trash,audition post,/blog/2018/auditionsforeigner,/auditions/,,Auditions for THE FOREIGNER,False
+trash,audition post,/blog/2018/auditionsveteransday,/auditions/,,Auditions for THE VETERANS DAY PROJECT,False
+trash,audition post,/blog/2018/calendarauditions,/auditions/,,Auditions for CALENDAR GIRLS,False
+trash,audition post,/blog/2018/dollshouseaudition,/auditions/,,Auditions for A DOLL'S HOUSE,False
+trash,audition post,/blog/2018/dollshouseaudition-jpanj,/auditions/,,Auditions for A LITTLE NIGHT MUSIC,False
+trash,audition post,/blog/2018/lauraauditions,/auditions/,,Auditions for LAURA,False
+trash,audition post,/blog/2018/lauraauditions-af84x,/auditions/,,Auditions for HAY FEVER,False
+trash,audition post,/blog/2018/scroogeaudition,/auditions/,,Auditions for SCROOGE,False
+trash,audition post,/blog/2019/choruslineaudition,/auditions/,,Auditions for A CHORUS LINE,False
+trash,audition post,/blog/2019/choruslineaudition-rr6em,/auditions/,,Auditions for A CHORUS LINE Remount,False
+trash,audition post,/blog/2019/evildeadauditions,/auditions/,,Auditions for EVIL DEAD: THE MUSICAL,False
+trash,audition post,/blog/2019/holmesauditions,/auditions/,,Auditions for HOLMES FOR THE HOLIDAYS,False
+trash,audition post,/blog/2019/holmesauditions-nf2bd,/auditions/,,Auditions for 'TWAS THE NIGHT BEFORE CHRISTMAS,False
+trash,audition post,/blog/2019/shatteringauditions-5n88x,/auditions/,,Auditions for SHATTERING,False
+trash,audition post,/blog/2019/sophieauditions,/auditions/,,Auditions for SOPHIE,False
+trash,audition post,/blog/2019/termsaudition,/auditions/,,Auditions for TERMS OF ENDEARMENT,False
+trash,audition post,/blog/2019/termsaudition-8fkje,/auditions/,,Auditions for THE MANCHURIAN CANDIDATE,False
+trash,audition post,/blog/2020/hanukkahauditions,/auditions/,,Auditions for HANUKKAH LIGHTS IN THE BIG SKY (VIRTUAL READING),False
+trash,audition post,/blog/2020/pageauditions,/auditions/,,"Auditions for SKIN & BUENAS NOCHES, MAMA (PAGE TO SCREEN READINGS)",False
+trash,audition post,/blog/2021/rewildaudition,/auditions/,,Auditions for ReWild (PAGE TO SCREEN READING),False
+trash,audition post,/blog/springawakeningauditioninfo,/auditions/,,SPRING AWAKENING AUDITION INFORMATION,False
+trash,board profile,/blog/board/em,/news/,,EM PIRO,False
+trash,board profile,/blog/board/sam,/news/,,SAM IZENMAN,False
+trash,category index,/blog/category/98th+Season,/news/,,98th Season — Blog,False
+trash,category index,/blog/category/Auditions,/news/,,Auditions — Blog,False
+trash,category index,/blog/category/DEI,/news/,Do we have a dei section on the page or is this just an old post?,DEI — Blog,False
+trash,category index,/blog/category/Main,/news/,,Main — Blog,False
+trash,category index,/blog/category/Now+Playing,/news/,,Now Playing — Blog,False
+trash,category index,/blog/category/Other+Shows,/news/,,Other Shows — Blog,False
+trash,category index,/blog/category/Other+Theatre+Shows,/news/,,Other Theatre Shows — Blog,False
+trash,category index,/blog/category/Sticky,/news/,,Sticky — Blog,False
+trash,covid notice,/blog/2019/covid19,/news/,,COVID-19 (Coronavirus) Update,False
+trash,covid notice,/blog/2019/covid19-38xd9,/news/,,COVID-19 (Coronavirus) Update,False
+trash,covid notice,/blog/2022/steelcovid,/news/,,STEEL MAGNOLIAS POSTPONEMENT,False
+trash,education event,/blog/2015/5/11/beauty-and-the-beast-jr,/education/,,Beauty and the Beast Jr.,False
+trash,education event,/blog/2015/beauty-and-the-beast-jr-performances,/education/,,"SUMMER 2015-BEAUTY AND THE BEAST, JR",False
+trash,education event,/blog/2015/camp-tlt-winter-2016,/education/,,After School @ TLT - Winter 2016,False
+trash,education event,/blog/2015/summer-camp,/education/,,Summer Camp 2015,False
+trash,education event,/blog/2016/aladdin-jr,/education/,,"ALADDIN, JR.",False
+trash,education event,/blog/2016/summer-camp-2016,/education/,,Summer Camp 2016,False
+trash,education event,/blog/2016/summer-camp-2016-aladdin,/education/,,Summer Camp 2016 - Aladdin(SESSION FULL),False
+trash,education event,/blog/2016/summer-camp-2016-high-school-musical,/education/,,Summer Camp 2016 - High School Musical,False
+trash,education event,/blog/2017/legally-blond-jr,/education/,,Legally BlondE Jr,False
+trash,education event,/blog/2017/peter-pan-jr,/education/,,PETER PAN JR,False
+trash,education event,/blog/2018/mulanjr,/education/,,MULAN JR,False
+trash,education event,/blog/2018/mulanjr-hh87h,/education/,,HAIRSPRAY JR,False
+trash,education event,/blog/2018/summercampmulan,/education/,,"Summer Camp 2018 - MULAN, JR.-CLASS FULL",False
+trash,education event,/blog/2019/seussicalcamp,/education/,,SEUSSICAL Performances,False
+trash,education event,/blog/2019/summercamppoppins,/education/,,"SUMMER CAMP 2019 - MARY POPPINS, JR.-SESSION FULL",False
+trash,education event,/blog/2019/summercamppoppins-rpwsh,/education/,,"SPRING BREAK CAMP - WILLY WONKA, JR!",False
+trash,education event,/blog/2019/summercamppoppins-rpwsh-6pgye,/education/,,WINTER BREAK CAMP: RUDOLPH THE RED-NOSED-REINDEER Jr.,False
+trash,education event,/blog/2019/summercamppoppins-rpwsh-dkt88,/education/,,"WILLY WONKA, JR PERFORMANCES",False
+trash,education event,/blog/2019/summercamppoppins-rpwsh-dznrc,/education/,,WINTER BREAK CAMP - A SEUSSIFIED CHRISTMAS CAROL,False
+trash,education event,/blog/2019/summercamppoppins-rpwsh-jzptm,/education/,,WINTER BREAK CAMP - THE WIZARD OF OZ! (YPE),False
+trash,education event,/blog/2019/summercamppoppins-tb7p2,/education/,,3 DAY COLLEGE AUDITION AND PREP INTENSIVE,False
+trash,education event,/blog/2019/summercampseuss,/education/,,Summer Camp 2019 - SEUSSICAL!-SESSION FULL,False
+trash,education event,/blog/2020/fallyouth,/education/,,FALL YOUTH EDUCATION,False
+trash,education event,/blog/2021/springclasses,/education/,,SPRING EDUCATION YOUTH & ADULT,False
+trash,education event,/blog/2021/summercamp,/education/,,SUMMER CAMP 2021,False
+trash,education event,/blog/2022/summercamp,/education/,,SUMMER CAMP 2022,False
+trash,education event,/blog/2023/spring-break-camp-2023-skills-break-camp,/education/,,Spring Break Camp 2023: Skills Break Camp,False
+trash,education event,/blog/2023/summer-camps-2023,/education/,,Summer Camps: 2023,False
+trash,education event,/blog/25fallclasses,/education/,,Fall Education @ TLT,False
+trash,education event,/blog/25fallclasses-2kptp,/education/,,Winter Education @ TLT,False
+trash,education event,/blog/fiddlerjr,/education/,,"WINTER BREAK CAMP: FIDDLER ON THE ROOF, JR",False
+trash,fundraising,/blog/2015/97th-season-opening-gala,/donate/,,97th Season Opening Gala,False
+trash,fundraising,/blog/2016/98th-season-opening-gala-and-silent-auction,/donate/,,98TH SEASON OPENING GALA AND SILENT AUCTION,False
+trash,fundraising,/blog/2016/98th-season-opening-gala-and-silent-auction-ewp7l,/donate/,,99TH SEASON OPENING GALA AND SILENT AUCTION,False
+trash,fundraising,/blog/2016/annual-fund-drive,/donate/,,ANNUAL FUND DRIVE,False
+trash,fundraising,/blog/2017/annualfunddrive,/donate/,,ANNUAL FUND DRIVE,False
+trash,fundraising,/blog/2017/annualfunddrive-4y34r,/donate/,,2019 ANNUAL FUND DRIVE,False
+trash,fundraising,/blog/2017/annualfunddrive-fpemm,/donate/,,2018-2019 ANNUAL FUND DRIVE,False
+trash,fundraising,/blog/2018/100seasongala,/donate/,,100TH SEASON OPENING GALA AND SILENT AUCTION,False
+trash,fundraising,/blog/2018/100seasongala-3mk7k,/donate/,,100 YEARS OF TLT - A CELEBRATION,False
+trash,fundraising,/blog/2019/gala,/donate/,,101ST SEASON OPENING GALA AND SILENT AUCTION,False
+trash,fundraising,/blog/2020/annualfund,/donate/,,2020 ANNUAL FUND DRIVE,False
+trash,fundraising,/blog/2022annualfund,/donate/,,2022 ANNUAL FUND DRIVE,False
+trash,fundraising,/blog/2022annualfund-gf5fk,/donate/,,2023 ANNUAL FUND DRIVE,False
+trash,modern_show,/blog/20212022/alltogetheraud,/news/,,Auditions for ALL TOGETHER NOW,False
+trash,modern_show,/blog/20212022/alltogethernow,/news/,,ALL TOGETHER NOW-A Benefit Concert,False
+trash,modern_show,/blog/20212022/auditionsclue,/auditions/,,Auditions for CLUE,False
+trash,modern_show,/blog/20212022/auditionsoz,/auditions/,,Auditions for THE WIZARD OF OZ,False
+trash,modern_show,/blog/20212022/auditionsoz-bpk42,/auditions/,,Auditions for THE LUCK OF THE IRISH,False
+trash,modern_show,/blog/20212022/auditionssky,/auditions/,,Auditions for SILENT SKY,False
+trash,modern_show,/blog/20212022/auditionssky-jxcgy,/auditions/,,Auditions for THE HAPPIEST SONG PLAYS LAST,False
+trash,modern_show,/blog/20212022/corndog,/news/,,CORN DOG: A NEW MUSICAL,False
+trash,modern_show,/blog/20212022/covidprotocols,/news/,,COVID-19 PROTOCOLS,False
+trash,modern_show,/blog/20212022/covidprotocols-j2l2r,/news/,,COVID-19 PROTOCOLS UPDATED 11/06/2022,False
+trash,modern_show,/blog/20212022/cryitout,/news/,,CRY IT OUT - An Off the Shelf reading,False
+trash,modern_show,/blog/20212022/june19,/news/,,JUNETEENTH CELEBRATION,False
+trash,modern_show,/blog/20212022/seasontickets,/news/,,SEASON #103 - THE START OF SOMETHING NEW,False
+trash,modern_show,/blog/20212022/seasontix,/news/,,Season Tickets,False
+trash,modern_show,/blog/20212022/theguys,/news/,,The Guys,False
+trash,modern_show,/blog/20222023/lion,/news/,,"SUMMER CAMP PERFORMANCE - THE LION KING, JR",False
+trash,modern_show,/blog/20222023/lion-br6d8,/news/,,SUMMER CAMP PERFORMANCE - FREAKY FRIDAY,False
+trash,modern_show,/blog/20222023/lion-br6d8-984h5,/news/,,"SUMMER CAMP PERFORMANCE - THE LITTLE MERMAID, JR",False
+trash,modern_show,/blog/20222023/lion-br6d8-984h5-czra9,/news/,,"SUMMER CAMP PERFORMANCE - SCHOOLHOUSE ROCK, JR",False
+trash,modern_show,/blog/20222023/lion-br6d8-984h5-czra9-z26wf,/news/,,SUMMER CAMP PERFORMANCE - THE ADDAMS FAMILY,False
+trash,modern_show,/blog/20222023/poboyaud,/news/,,Auditions for PO BOY TANGO,False
+trash,modern_show,/blog/20222023/rockauditions,/auditions/,,Auditions for ROCK OF AGES,False
+trash,modern_show,/blog/20222023/significantaudition,/auditions/,,Auditions for SIGNIFICANT OTHER,False
+trash,modern_show,/blog/20222023/significantaudition-r2zm9,/auditions/,,Auditions for THE SHAWSHANK REDEMPTION,False
+trash,modern_show,/blog/20222023/significantaudition-rrpga,/auditions/,,Auditions for THE PLAY THAT GOES WRONG,False
+trash,modern_show,/blog/20222023/steelaud,/news/,,Auditions for STEEL MAGNOLIAS,False
+trash,modern_show,/blog/20222023/steelaud-8al6z,/news/,,Auditions for MURDER ON THE ORIENT EXPRESS,False
+trash,modern_show,/blog/20222023/wintercamp,/news/,,A YEAR WITH FROG AND TOAD PERFORMANCES,False
+trash,modern_show,/blog/20222023/xmasauditions,/auditions/,,Auditions for A CHRISTMAS STORY,False
+trash,modern_show,/blog/20232024/audmaine,/news/,,"Auditions for ALMOST, MAINE",False
+trash,modern_show,/blog/20232024/audmisery,/news/,,Auditions for MISERY,False
+trash,modern_show,/blog/20232024/audmisery-4479k,/news/,,Auditions for RUDOLPH THE RED-NOSED REINDEER,False
+trash,modern_show,/blog/20232024/audmisery-4479k-ftkay,/news/,,"Auditions for A DOLL'S HOUSE, PART 2",False
+trash,modern_show,/blog/20232024/audmisery-4479k-ftkay-eg24m,/news/,,Auditions for RENT,False
+trash,modern_show,/blog/20232024/danceharry,/news/,,MUSICAL THEATRE DANCE WORKSHOPS!,False
+trash,modern_show,/blog/20232024/deltaauditions,/auditions/,,Auditions for FROM THE MISSISSIPPI DELTA,False
+trash,modern_show,/blog/20232024/fiddlerauditions,/auditions/,,Auditions for FIDDLER ON THE ROOF,False
+trash,modern_show,/blog/20232024/fiddlerauditions-nf9gf,/auditions/,,Auditions for THE CURIOUS INCIDENT OF THE DOG IN THE NIGHT-TIME,False
+trash,modern_show,/blog/20232024/fiddlerauditions-nrpky,/auditions/,,Auditions for LORCA IN A GREEN DRESS,False
+trash,modern_show,/blog/20232024/fiddlerauditions-nrpky-pxjk7,/auditions/,,Auditions for ROCKY,False
+trash,modern_show,/blog/20232024/fiddlerauditions-nrpky-twrnx,/auditions/,,Auditions for BUG,False
+trash,modern_show,/blog/20232024/findingnemokids-g3njx,/news/,,"Spring Break Camp 2024: Finding Nemo Kids, and Classes for Teens",False
+trash,modern_show,/blog/20232024/guvnor,/news/,,"Auditions for ONE MAN, TWO GUVNORS",False
+trash,modern_show,/blog/20232024/mouseauditions,/auditions/,,Auditions for THE MOUSETRAP,False
+trash,modern_show,/blog/20232024/rudolphjr,/news/,,"WINTER CAMP PERFORMANCE - RUDOLPH THE RED-NOSED REINDEER, JR",False
+trash,modern_show,/blog/20232024/springclasses2024-g3njx-fmnt9-ddk2,/news/,,Spring Classes begin May 6th!,False
+trash,modern_show,/blog/20232024/wrong-gfw6d,/news/,,THE PLAY THAT GOES WRONG BENEFIT PERFORMANCE SEPT 28TH!,False
+trash,modern_show,/blog/20242025/dog,/news/,,DOG SEES GOD- An Off the Shelf reading,False
+trash,modern_show,/blog/20242025/murdermerlot,/news/,,MURDER BY MERLOT-A MURDER MYSTERY DINNER,False
+trash,modern_show,/blog/20242025/oneman-4w9jr-89y5p,/news/,,TAKHOMAWAY presented by University of Washington Tacoma,False
+trash,modern_show,/blog/20252026/bedauditions,/auditions/,,Auditions for BEDROOM FARCE,False
+trash,modern_show,/blog/20252026/davinciaudition,/auditions/,,Auditions for THE DA VINCI CODE,False
+trash,modern_show,/blog/20252026/davinciaudition-fd3g3,/auditions/,,Auditions for MATILDA THE MUSICAL,False
+trash,modern_show,/blog/20252026/davinciaudition-fd3g3-msre8,/auditions/,,Auditions for THE TIME MACHINE,False
+trash,modern_show,/blog/20252026/directors,/news/,,NOW HIRING-STAGE DIRECTORS FOR 2026-2027,False
+trash,modern_show,/blog/20252026/otshijinx,/news/,,HIJINX & SUE-An Off the Shelf reading,False
+trash,modern_show,/blog/20252026/otsmetamorphoses,/news/,,METAMORPHOSES-An Off the Shelf reading,False
+trash,modern_show,/blog/20252026/sottoaud,/news/,,Auditions for SOTTO VOCE,False
+trash,modern_show,/blog/20252026/springawakeningaudition,/auditions/,,Auditions for SPRING AWAKENING,False
+trash,modern_show,/blog/20252026/springawakeningaudition-gxgle,/auditions/,,Auditions for THE MOUNTAINTOP,False
+trash,modern_show,/blog/20252026/springclass,/news/,,Spring Education @ TLT,False
+trash,old show/news,/blog/2015/5/11/97th-season-announced,/news/,,97th Season Announced,False
+trash,old show/news,/blog/2015/5/11/the-ceremony-of-innocence,/news/,,The Ceremony of Innocence,False
+trash,old show/news,/blog/2015/5/11/the-music-man-junior,/news/,,The Music Man Junior,False
+trash,old show/news,/blog/2015/a-few-good-men,/news/,,A COMEDY OF ERRORS,False
+trash,old show/news,/blog/2015/all-the-great-books,/news/,,All the Great Books,False
+trash,old show/news,/blog/2015/c-ellen-peters,/news/,,C. Ellen Peters,False
+trash,old show/news,/blog/2015/city-line-interview,/about/press/,"Old cityline, is this only stored here?",City Line - BOEING BOEING,False
+trash,old show/news,/blog/2015/city-line-interview-a-christmas-story,/about/press/,"Old cityline, is this only stored here?",City Line - A Christmas Story,False
+trash,old show/news,/blog/2015/donna-kundson,/news/,,DONNA KNUDSON,False
+trash,old show/news,/blog/2015/education-program,/news/,,Education Program,False
+trash,old show/news,/blog/2015/george-mcclure-md,/news/,,"GEORGE MCCLURE, MD",False
+trash,old show/news,/blog/2015/heidi-walworth-horn,/news/,,HEIDI WALWORTH-HORN,False
+trash,old show/news,/blog/2015/hembree,/news/,,"ADRIA HEMBREE, OFFICE/COMMUNICATIONS MANAGER",False
+trash,old show/news,/blog/2015/jeanette,/news/,,Jeanette Sanchez-Izenman,False
+trash,old show/news,/blog/2015/jen-niehaus-rivers,/news/,,JEN NIEHAUS-RIVERS,False
+trash,old show/news,/blog/2015/katherine-davis,/news/,,"Katherine Davis, Treasurer",False
+trash,old show/news,/blog/2015/lily,/news/,,"LILY OELLERICH, PRODUCTION MANAGER",False
+trash,old show/news,/blog/2015/martin,/news/,,MARTIN GOLDSMITH,False
+trash,old show/news,/blog/2015/micheal-ohara,/news/,,Micheal O'Hara,False
+trash,old show/news,/blog/2015/murder-on-the-movie-set,/news/,,Murder on the Movie Set,False
+trash,old show/news,/blog/2015/office-manager-373ag,/news/,,"NENA CURLEY, PRODUCTION MANAGER & EDUCATION MANAGER",False
+trash,old show/news,/blog/2015/office-manager-373ag-9pnef-aclg5-6l825-l9egj,/news/,,"CASEY BROWN, BOX OFFICE",False
+trash,old show/news,/blog/2015/oliver-1,/news/,,OTHER LOCAL PERFORMANCES,False
+trash,old show/news,/blog/2015/ouroboros-shadow-pictures-presents-the-history-of-waking-up,/news/,,Ouroboros Shadow Pictures Presents: THE HISTORY OF WAKING UP,False
+trash,old show/news,/blog/2015/randy-clark,/news/,,RANDY CLARK,False
+trash,old show/news,/blog/2015/randy-clark-dbs3d,/news/,,AYA HASHIGUCHI CLARK,False
+trash,old show/news,/blog/2015/stay-cool-at-tlt,/news/,,Stay Cool At TLT!,False
+trash,old show/news,/blog/2015/the-buddy-holly-story,/news/,,The Buddy Holly Story,False
+trash,old show/news,/blog/2015/the-legend-of-sleepy-hollow,/news/,,THE LEGEND OF SLEEPY HOLLOW,False
+trash,old show/news,/blog/2015/the-mystery-of-edwin-drood,/news/,,The Mystery of Edwin Drood,False
+trash,old show/news,/blog/2015/the-night-of-the-iguana,/news/,,AGNES OF GOD,False
+trash,old show/news,/blog/2015/tomorrow-tomorrow,/news/,,"Tomorrow, Tomorrow",False
+trash,old show/news,/blog/2016/365days,/news/,,Toy Boat Theatre and UWT,False
+trash,old show/news,/blog/2016/a-benefit-for-orlando,/news/,,A BENEFIT FOR ORLANDO,False
+trash,old show/news,/blog/2016/a-day-in-the-death-of-joe,/news/,,A DAY IN THE DEATH OF JOE,False
+trash,old show/news,/blog/2016/a-piece-of-my-heart,/news/,,THE PAJAMA GAME,False
+trash,old show/news,/blog/2016/after-school-tlt-dracula,/news/,,After School @ TLT: Dracula,False
+trash,old show/news,/blog/2016/after-school-tlt-dracula-elpss,/news/,,Fall Education   @ TLT,False
+trash,old show/news,/blog/2016/after-school-tlt-robin-hood,/news/,,AFTER SCHOOL @ TLT: ROBIN HOOD,False
+trash,old show/news,/blog/2016/after-school-tlt-spring-2016,/news/,,After School @TLT - Spring 2016,False
+trash,old show/news,/blog/2016/birds-from-the-thicket,/news/,,BIRDS FROM THE THICKET,False
+trash,old show/news,/blog/2016/city-line-the-last-night-of-ballyhoo,/about/press/,"Old cityline, is this only stored here?",City Line - The Last Night of Ballyhoo,False
+trash,old show/news,/blog/2016/fools-play-improv-at-tlt,/news/,,FOOLS PLAY IMPROV AT TLT,False
+trash,old show/news,/blog/2016/fools-play-improv-at-tlt-gwn7e,/news/,,BOY SMOOCHES IMPROV AT TLT,False
+trash,old show/news,/blog/2016/fools-play-improv-at-tlt-gwn7e-yfh46,/news/,,BOY SMOOCHES IMPROV AT TLT,False
+trash,old show/news,/blog/2016/fools-play-improv-at-tlt-h6azh,/news/,,FOOLS PLAY IMPROV AT TLT,False
+trash,old show/news,/blog/2016/gritty-city-sirens,/news/,,Gritty City Sirens,False
+trash,old show/news,/blog/2016/high-school-musical,/news/,,HIGH SCHOOL MUSICAL,False
+trash,old show/news,/blog/2016/lit-aloud-an-off-the-shelf-event,/news/,,LIT ALOUD-AN OFF THE SHELF EVENT,False
+trash,old show/news,/blog/2016/murder-is-served-a-murder-mystery-dinner,/news/,,MURDER IS SERVED-A MURDER MYSTERY DINNER,False
+trash,old show/news,/blog/2016/noises-off,/news/,,HEATHERS,False
+trash,old show/news,/blog/2016/offtheshelfbeverly,/news/,,MY HUSBAND LIKED BEVERLY BETTER - AN OFF THE SHELF READING,False
+trash,old show/news,/blog/2016/stop-kiss-presented-by-found-space-productions,/news/,,STOP KISS-Presented by Found Space Productions,False
+trash,old show/news,/blog/2016/tacoma-arts-month,/news/,,TACOMA ARTS MONTH,False
+trash,old show/news,/blog/2016/the-fortune-teller-presented-by-opera-elect,/news/,,THE FORTUNE TELLER-Presented by Opera Elect,False
+trash,old show/news,/blog/2016/the-last-escape-a-puzzle-room,/news/,,THE LAST ESCAPE-A Puzzle Room,False
+trash,old show/news,/blog/2016/the-ozzie-fuhrmann-swing-band,/news/,,THE OZZIE FUHRMANN SWING BAND,False
+trash,old show/news,/blog/2016/the-scarlett,/news/,,BEEHIVE: THE 60’S MUSICAL,False
+trash,old show/news,/blog/2016/the-tenth-muse-off-the-shelf,/news/,,The Tenth Muse - Off the Shelf,False
+trash,old show/news,/blog/2016/the-underpants-5ypj7-em9m8-jfy3x,/news/,,LAST CALL COMEDY SHOWCASE,False
+trash,old show/news,/blog/2016/three-one-acts-lemonade-the-cat-connection-second-chance,/news/,,"THREE ONE ACTS: LEMONADE, THE CAT CONNECTION & SECOND CHANCE",False
+trash,old show/news,/blog/2016/top-girls,/news/,,Top Girls,False
+trash,old show/news,/blog/2016/wintereducation2018,/news/,,Winter Education @ TLT,False
+trash,old show/news,/blog/2017/after-school-tlt-hansel-gretel,/news/,,After School @ TLT - Hansel & Gretel,False
+trash,old show/news,/blog/2017/agentandtheactor,/news/,,AUDITION WORKSHOP - THE ACTOR AND THE AGENT,False
+trash,old show/news,/blog/2017/annie-katica-green,/news/,,Annie Katica Green,False
+trash,old show/news,/blog/2017/empathos,/news/,,THE ART OF REMEMBERING & MOUNTAIN LANGUAGE - An Off the Shelf reading,False
+trash,old show/news,/blog/2017/fade,/news/,,FADE - An Off the Shelf reading,False
+trash,old show/news,/blog/2017/gritty-city-sirens-present-boobtube,/news/,,GRITTY CITY SIRENS PRESENT BOOBTUBE,False
+trash,old show/news,/blog/2017/gritty-city-sirens-present-boobtube-62hcx,/news/,,GRITTY CITY SIRENS AND TUSH PRESENT POLYGLAMOROUS,False
+trash,old show/news,/blog/2017/honey,/news/,,A TASTE OF HONEY - An Off the Shelf reading,False
+trash,old show/news,/blog/2017/honey-a76cy,/news/,,THE SISTERS ROSENSWEIG - An Off the Shelf reading,False
+trash,old show/news,/blog/2017/honey-a76cy-3nefp,/news/,,THE FAWN AND THE BLACK OAK - An Off the Shelf reading,False
+trash,old show/news,/blog/2017/honey-a76cy-3nefp-58mtg,/news/,,BUILDING THE WALL - An Off the Shelf reading,False
+trash,old show/news,/blog/2017/honey-a76cy-epksn,/news/,,HURLYBURLY - An Off the Shelf reading,False
+trash,old show/news,/blog/2017/honeymoon-from-hell,/news/,,HONEYMOON FROM HELL - A MURDER MYSTERY DINNER,False
+trash,old show/news,/blog/2017/jennyhubbard,/news/,,Jenny Hubbard,False
+trash,old show/news,/blog/2017/love-loss-and-what-i-wore,/news/,,"LOVE, LOSS, AND WHAT I WORE",False
+trash,old show/news,/blog/2017/mrs-smith-goes-to-washington,/news/,,MRS. SMITH GOES TO WASHINGTON,False
+trash,old show/news,/blog/2017/second-samuel-festival-performances,/news/,,SECOND SAMUEL - FESTIVAL PERFORMANCE,False
+trash,old show/news,/blog/2017/the-death-of-dr-pepper-a-murder-mystery-dinner,/news/,,THE DEATH OF DR. PEPPER-A MURDER MYSTERY DINNER,False
+trash,old show/news,/blog/2017/the-incredible-undersea-trial-of-joseph-p-lawnboy,/news/,,THE INCREDIBLE UNDERSEA TRIAL OF JOSEPH P. LAWNBOY,False
+trash,old show/news,/blog/2018/broadwayolympia,/news/,,MATILDA,False
+trash,old show/news,/blog/2018/condotokillfor,/news/,,A CONDO TO KILL FOR - A MURDER MYSTERY DINNER,False
+trash,old show/news,/blog/2018/condotokillfor-9gb5f,/news/,,FATAL FOOTBALL FEVER - A MURDER MYSTERY DINNER,False
+trash,old show/news,/blog/2018/cyranproductions,/news/,,CYRANO deBURGERSHACK - A CLUBTLT PRODUCTION,False
+trash,old show/news,/blog/2018/deathbyvalentine,/news/,,DEATH BY VALENTINE - A MURDER MYSTERY DINNER,False
+trash,old show/news,/blog/2018/grab-a-seat-and-enjoy,/news/,,GRAB A SEAT AND ENJOY,False
+trash,old show/news,/blog/2018/grittycityboobtubeseason2,/news/,,GRITTY CITY SIRENS PRESENT BoobTube Season 2,False
+trash,old show/news,/blog/2018/grittycityvarie,/news/,,GRITTY CITY SIRENS PRESENT VARIETEASE,False
+trash,old show/news,/blog/2018/montreal,/news/,,MONTREAL- An Off the Shelf reading,False
+trash,old show/news,/blog/2018/muhgrog,/news/,,MUH GROG ZOO,False
+trash,old show/news,/blog/2018/muhgrog-hm4j8,/news/,,MUH GROG ZOO - Words 147 & 148,False
+trash,old show/news,/blog/2018/muhgrog-hm4j8-7zmbm,/news/,,MUH GROG ZOO - Words 149 & 150,False
+trash,old show/news,/blog/2018/murderbymerlot,/news/,,MURDER BY MERLOT - A MURDER MYSTERY DINNER,False
+trash,old show/news,/blog/2018/murderbymerlot-xgbbm,/news/,,MOBBED UP FOR MURDER - A MURDER MYSTERY DINNER,False
+trash,old show/news,/blog/2018/murderbymerlot-xgbbm-sk9e2,/news/,,ON STAGE FOR MURDER - A MURDER MYSTERY DINNER,False
+trash,old show/news,/blog/2018/offtheshelfempire,/news/,,EMPIRE OF VENUS - An Off the Shelf reading,False
+trash,old show/news,/blog/2018/offtheshelfmeasure,/news/,,MEASURE FOR MEASURE - An Off the Shelf reading,False
+trash,old show/news,/blog/2018/offtheshelfpeterpan,/news/,,FOR PETER PAN ON HER 70TH BIRTHDAY - An Off the Shelf reading,False
+trash,old show/news,/blog/2018/offtheshelfrevolution,/news/,,THE REVOLUTIONISTS - An Off the Shelf reading,False
+trash,old show/news,/blog/2018/offtheshelfrevolution-6xwxa,/news/,,A MOON FOR THE MISBEGOTTEN - An Off the Shelf reading,False
+trash,old show/news,/blog/2018/offtheshelfrevolution-6xwxa-24bb7,/news/,,PIE & TEA WITH TLT - An Open House with the TLT Board,False
+trash,old show/news,/blog/2018/offtheshelfrevolution-7lpkw,/news/,,BOOTLEG - An Off the Shelf reading,False
+trash,old show/news,/blog/2018/offtheshelfrevolution-7lpkw-eydma,/news/,,OUTSIDE MULLINGAR - An Off the Shelf reading,False
+trash,old show/news,/blog/2018/offtheshelfrevolution-7lpkw-eydma-tfp5d,/news/,,AUTONOMOUS - An Off the Shelf reading,False
+trash,old show/news,/blog/2018/offtheshelfrevolution-7lpkw-eydma-tfp5d-j22jm,/news/,,ON A NOTE OF TRIUMPH - An Off the Shelf reading,False
+trash,old show/news,/blog/2018/offtheshelfrevolution-gjkhz,/news/,,MRS. PACKARD - An Off the Shelf reading,False
+trash,old show/news,/blog/2018/sexiest,/news/,,AMERICA'S SEXIEST COUPLE- An Off the Shelf reading,False
+trash,old show/news,/blog/2018/sexiest-9glhh,/news/,,THE MOORS - An Off the Shelf reading,False
+trash,old show/news,/blog/2018/shipwrecked,/news/,,SHIPWRECKED! - An Off the Shelf reading,False
+trash,old show/news,/blog/2018/shipwrecked-3ywjl,/news/,,ELEEMOSYNARY- An Off the Shelf reading,False
+trash,old show/news,/blog/2018/springeducation,/news/,,Spring Education  @  TLT,False
+trash,old show/news,/blog/2018/springeducation-73prh,/news/,,Fall Education  @  TLT,False
+trash,old show/news,/blog/2018/springeducation-73prh-kw3jp,/news/,,Fall Youth Education @  TLT,False
+trash,old show/news,/blog/2018/springeducation-73prh-t9ly4,/news/,,Winter Education  @  TLT,False
+trash,old show/news,/blog/2018/springeducation-73prh-t9ly4-645bw,/news/,,Adult Education  @  TLT,False
+trash,old show/news,/blog/2018/springeducation-73prh-t9ly4-645bw-espsf,/news/,,Adult Winter Education  @  TLT,False
+trash,old show/news,/blog/2018/springeducation-73prh-t9ly4-645bw-jww8t,/news/,,ADULT AUDITION WORKSHOP,False
+trash,old show/news,/blog/2018/springeducation-73prh-t9ly4-645bw-x768b,/news/,,Adult Education  @  TLT,False
+trash,old show/news,/blog/2018/springeducation-73prh-t9ly4-645bw-x768b-9rkry,/news/,,ADULT IMPROV WORKSHOP,False
+trash,old show/news,/blog/2018/veteransdayproject,/news/,,THE VETERANS DAY PROJECT,False
+trash,old show/news,/blog/2019/blm,/news/,,BLACK LIVES MATTER,False
+trash,old show/news,/blog/2019/blueforge,/news/,,BLUE FORGE GROUP,False
+trash,old show/news,/blog/2019/castmates,/news/,,CASTMATES-SECOND SAMUEL REUNION,False
+trash,old show/news,/blog/2019/castmates-54bgg,/news/,,CASTMATES-THE PILLOWMAN PART 2,False
+trash,old show/news,/blog/2019/castmates-54bgg-ltef7,/news/,,CASTMATES-EXIT LAUGHING,False
+trash,old show/news,/blog/2019/castmatescalendargirls,/news/,,CASTMATES-CALENDAR GIRLS,False
+trash,old show/news,/blog/2019/castmatesdollshouse,/news/,,CASTMATES-A DOLL'S HOUSE,False
+trash,old show/news,/blog/2019/castmatesdollshouse-5mj7x,/news/,,CASTMATES-SMOKEY JOE'S CAFE,False
+trash,old show/news,/blog/2019/castmatesgypsy,/news/,,CASTMATES-GYPSY,False
+trash,old show/news,/blog/2019/castmatesgypsy-lalkt,/news/,,CASTMATES-THE FOREIGNER,False
+trash,old show/news,/blog/2019/castmatesjcs,/news/,,CASTMATES-JESUS CHRIST SUPERSTAR,False
+trash,old show/news,/blog/2019/castmateslaura,/news/,,CASTMATES-LAURA,False
+trash,old show/news,/blog/2019/castmatesmice,/news/,,CASTMATES-OF MICE AND MEN,False
+trash,old show/news,/blog/2019/castmatessep25,/news/,,CASTMATES-TLT'S SET & LIGHTING DESIGNERS,False
+trash,old show/news,/blog/2019/castmatessep25-prpec,/news/,,"CASTMATES-BELL, BOOK & CANDLE",False
+trash,old show/news,/blog/2019/castmatesvanya,/news/,,CASTMATES-RABBIT HOLE,False
+trash,old show/news,/blog/2019/castmatesvanya-z6797,/news/,,CASTMATES-A CHRISTMAS STORY (2015),False
+trash,old show/news,/blog/2019/castmatesvanya-z6797-yd4xh,/news/,,CASTMATES-SCROOGE (2018),False
+trash,old show/news,/blog/2019/fotoloose,/news/,,FOOTLOOSE-Performances,False
+trash,old show/news,/blog/2019/foulplay,/news/,,FOUL PLAY ON THE  SPEEDWAY - A MURDER MYSTERY DINNER,False
+trash,old show/news,/blog/2019/fuddy,/news/,,FUDDY MEERS - An Off the Shelf reading,False
+trash,old show/news,/blog/2019/fuddy-dha7r,/news/,,4000 DAYS - An Off the Shelf reading,False
+trash,old show/news,/blog/2019/grittyapril,/news/,,GRITTY CITY SIRENS PRESENT: WET,False
+trash,old show/news,/blog/2019/grittyprivate,/news/,,GRITTY CITY SIRENS PRESENT: PRIVATE MOMENTS,False
+trash,old show/news,/blog/2019/horsin,/news/,,HORSIN' AROUND WITH MURDER - A MURDER MYSTERY DINNER,False
+trash,old show/news,/blog/2019/inclement-weather-information,/news/,,PERFORMANCE INFORMATION UPDATE AS OF 12/31/21,False
+trash,old show/news,/blog/2019/inclement-weather-information-xpp5l,/news/,,INCLEMENT WEATHER INFORMATION AS OF 2/8/25,False
+trash,old show/news,/blog/2019/jedi,/news/,,"A Conversation on Diversity, Equity & Inclusion in Tacoma's Theatre Community",False
+trash,old show/news,/blog/2019/laramie10,/news/,,THE LARAMIE PROJECT: 10 YEARS LATER - An Off the Shelf reading,False
+trash,old show/news,/blog/2019/marypoppins,/news/,,"MARY POPPINS, JR-Performances",False
+trash,old show/news,/blog/2019/muhgrog,/news/,,MUH GROG ZOO - Words 153 & 154,False
+trash,old show/news,/blog/2019/muhgrog-t3kr3,/news/,,MUH GROG ZOO - Words 155 & 156,False
+trash,old show/news,/blog/2019/muhgrog157158,/news/,,MUH GROG ZOO - Words 157 & 158,False
+trash,old show/news,/blog/2019/muhgrog157158-fjne9,/news/,,COMMUNITY THEATRE TOWN HALL,False
+trash,old show/news,/blog/2019/muhgrogvirtual,/news/,,MUH GROG ZOO - VIRTUAL SHOW #7,False
+trash,old show/news,/blog/2019/murdermystery2024,/news/,,DYING FOR CHOCOLATE-A MURDER MYSTERY DINNER,False
+trash,old show/news,/blog/2019/murdermystery2024-77bfe,/news/,,A MEDLEY FOR MURDER-A MURDER MYSTERY DINNER,False
+trash,old show/news,/blog/2019/pillowmanfestival,/news/,,THE PILLOWMAN - FESTIVAL PERFORMANCE,False
+trash,old show/news,/blog/2019/pillowmannationals,/news/,,TLT HEADING TO NATIONAL FESTIVAL,False
+trash,old show/news,/blog/2019/qawithtlt,/news/,,Q & A WITH TLT MAY 22!,False
+trash,old show/news,/blog/2019/qawithtlt-84f9e,/news/,,Q & A WITH TLT MAY 29!,False
+trash,old show/news,/blog/2019/robinhood,/news/,,THE LEGEND OF ROBIN HOOD,False
+trash,old show/news,/blog/2019/season101,/news/,,2019-2020 SEASON #101 - A SEASON OF FIRSTS,False
+trash,old show/news,/blog/2019/spacies,/news/,,SPACIES - TACOMA'S ORIGINAL SPACE RADIO SERIAL,False
+trash,old show/news,/blog/2019/spacies-4kzgl,/news/,,A SEUSSIFIED CHRISTMAS CAROL,False
+trash,old show/news,/blog/2019/springeducation-kndsr,/news/,,Spring Education  @  TLT,False
+trash,old show/news,/blog/2019/stayhomeadultmono,/news/,,ADULT MONOLOGUE CLASS AT HOME WITH TLT,False
+trash,old show/news,/blog/2019/stayhomemonologues,/news/,,MONOLOGUE CLASSES DURING STAY HOME,False
+trash,old show/news,/blog/2019/stayhomemonologues-hentd,/news/,,ONLINE SCENE CLASSES DURING STAY HOME,False
+trash,old show/news,/blog/2019/stayhometap,/news/,,TAP AND STRETCH AT HOME WITH TLT,False
+trash,old show/news,/blog/2019/summerfootloose,/news/,,SUMMER CLUB TLT - FOOTLOOSE: THE MUSICAL,False
+trash,old show/news,/blog/2019/tacomacreates,/news/,,TLT AND TACOMA CREATES NEED YOUR HELP,False
+trash,old show/news,/blog/2019/wintered,/news/,,Youth Winter Education @  TLT,False
+trash,old show/news,/blog/2019/wsctaboard,/news/,,WSCTA/AACT BOARD DEVELOPMENT WORKSHOP FOR THEATRES,False
+trash,old show/news,/blog/2020/catmates2021,/news/,,CASTMATES-THE YOUNG ACTORS (WITH A FEW ADULTS) OF TLT’S MAINSTAGE SHOWS,False
+trash,old show/news,/blog/2020/falladult,/news/,,FALL ADULT EDUCATION,False
+trash,old show/news,/blog/2020/falladult-9ygrj,/news/,,PAGE TO SCREEN,False
+trash,old show/news,/blog/2020/falladult-c2zcp,/news/,,FALL EDUCATION YOUTH & ADULT,False
+trash,old show/news,/blog/2020/falladult-c2zcp-kpdjh,/news/,,WINTER EDUCATION YOUTH & ADULT,False
+trash,old show/news,/blog/2020/finalassignment,/news/,,THE FINAL ASSIGNMENT - A PAGE TO SCREEN EVENT,False
+trash,old show/news,/blog/2020/finalassignment-r74ht,/news/,,BUENAS NOCHES MAMá - A PAGE TO SCREEN EVENT,False
+trash,old show/news,/blog/2020/minidoka,/news/,,A MINIDOKA CHRISTMAS - A TLT HOLIDAY READING,False
+trash,old show/news,/blog/2020/minidoka-7wetl,/news/,,WASHINGTON IRVING'S OLD CHRISTMAS - A TLT HOLIDAY READING,False
+trash,old show/news,/blog/2020/minidoka-tyjt6,/news/,,HANUKKAH LIGHTS IN THE BIG SKY - A TLT HOLIDAY READING,False
+trash,old show/news,/blog/2020/skin,/news/,,SKIN - A PAGE TO SCREEN EVENT,False
+trash,old show/news,/blog/2020/skin-nemtj,/news/,,REWILD - A PAGE TO SCREEN EVENT,False
+trash,old show/news,/blog/2020/summersupernews,/news/,,Summer Camp 2020 - SUPER HAPPY AWESOME NEWS,False
+trash,old show/news,/blog/2020/summerweek1,/news/,,Summer Camp 2020-Week 1 June 22-June 26,False
+trash,old show/news,/blog/2020/summerweek2,/news/,,Summer Camp 2020-Week 2 June 29-July 3,False
+trash,old show/news,/blog/2020/summerweek4,/news/,,Summer Camp 2020-Week 4 July 13-July 17,False
+trash,old show/news,/blog/2020/summerweek5,/news/,,Summer Camp 2020-Week 5 July 20-July 24,False
+trash,old show/news,/blog/2020/summerweek6,/news/,,Summer Camp 2020-Week 6 July 27-July 31,False
+trash,old show/news,/blog/2020/summerweek6-en8yw,/news/,,Summer Camp 2020-Week 7 August 3-August 7,False
+trash,old show/news,/blog/2020/summerweek8,/news/,,Summer Camp 2020-Week 8 August 10-August 14,False
+trash,old show/news,/blog/2021/ballinger,/news/,,"BRENDA BALLINGER, TREASURER",False
+trash,old show/news,/blog/2021/clausell,/news/,,ERIC CLAUSELL,False
+trash,old show/news,/blog/2021/falled,/news/,,FALL EDUCATION,False
+trash,old show/news,/blog/2021/falled-lc9tl,/news/,,WINTER EDUCATION,False
+trash,old show/news,/blog/2021/hayes,/news/,,PAMELA ROZA HAYES,False
+trash,old show/news,/blog/2021/kremer,/news/,,BLAKE KREMER,False
+trash,old show/news,/blog/2021/now-hiring-education-director,/news/,,NOW HIRING-EDUCATION DIRECTOR,False
+trash,old show/news,/blog/2021/now-hiring-education-director-eyg5f,/news/,,NOW HIRING-EDUCATION DIRECTOR,False
+trash,old show/news,/blog/2021/now-hiring-education-director-eyg5f-wwwl7,/news/,,NOW HIRING-STAGE TECHNICIAN,False
+trash,old show/news,/blog/2021/russell,/news/,,STACIA RUSSELL,False
+trash,old show/news,/blog/2021/russell-5tgd7,/news/,,CHANDLER THOMAS,False
+trash,old show/news,/blog/2021/russell-5tgd7-smmxm,/news/,,RUSSELL CAMPBELL,False
+trash,old show/news,/blog/2021/springbreak,/news/,,SPRING BREAK CAMP - LEFT TO OUR OWN DEVICES,False
+trash,old show/news,/blog/2021/summerallages,/news/,,ALL AGES SUMMER EDUCATION,False
+trash,season tickets,/blog/2016/98th-season-tickets,/tickets/,,98th Season Tickets,False
+trash,special event,/blog/2022/kaleidoscope-page,/news/,,KALEIDOSCOPE,False
+trash,special event,/blog/kaleidoscope-registration,/news/,,KALEIDOSCOPE REGISTRATION FORM,False
+trash,uncategorized,/blog/2020postponed,/news/,,SEASON TICKETS,False
+trash,uncategorized,/blog/2022/offshelf1,/news/,,SONNETS FOR AN OLD CENTURY - An Off the Shelf reading,False
+trash,uncategorized,/blog/2022/offshelf1-7wyr7,/news/,,MEN OF TORTUGA - An Off the Shelf reading,False
+trash,uncategorized,/blog/2022/offshelf1-7wyr7-f8j4h,/news/,,BOSTON MARRIAGE - An Off the Shelf reading,False
+trash,uncategorized,/blog/2022/offshelf1-7wyr7-f8j4h-f4k43,/news/,,THE TROJAN WOMEN - An Off the Shelf reading,False
+trash,uncategorized,/blog/2022/ots2,/news/,,AMONG MANY WORLDS - An Off the Shelf reading,False
+trash,uncategorized,/blog/2022/spring-education-2022,/news/,,Spring Education 2022,False
+trash,uncategorized,/blog/2022/spring-education-2022-bgrgt,/news/,,Fall Education 2022,False
+trash,uncategorized,/blog/2022/spring-education-2022-bgrgt-267bt,/news/,,Winter Education 2023,False
+trash,uncategorized,/blog/2022/spring-education-2022-bgrgt-267bt-xse3d,/news/,,Spring Classes 2023,False
+trash,uncategorized,/blog/2022/spring-education-2022-bgrgt-267bt-xse3d-sgdlr,/news/,,Fall Classes 2023,False
+trash,uncategorized,/blog/2022/spring-education-2022-bgrgt-267bt-xse3d-sgdlr-ajmyl,/news/,,Winter Classes 2024,False
+trash,uncategorized,/blog/2022/spring-education-2022-bgrgt-267bt-xse3d-sgdlr-ajmyl-s5bfx,/news/,,Winter Classes 2025!,False
+trash,uncategorized,/blog/2022/winter-break-2022-a-year-with-frog-and-toad,/news/,,Winter Break 2022: A Year with Frog and Toad!,False
+trash,uncategorized,/blog/2025/knockemdead,/news/,,KNOCK 'EM DEAD-A MURDER MYSTERY DINNER,False
+trash,uncategorized,/blog/2025/revenge,/news/,,REVENGE AT THE REUNION-A MURDER MYSTERY DINNER,False
+trash,uncategorized,/blog/2025/revenge-s2keg,/news/,,THE GOLDEN BALL MURDER-A MURDER MYSTERY DINNER,False
+trash,uncategorized,/blog/2122/offtheshelfboudica,/news/,,BOUDICA - An Off the Shelf reading,False
+trash,uncategorized,/blog/asyou,/news/,,AS YOU LIKE IT-A SUMMER CAMP AT TLT PERFORMANCE,False
+trash,uncategorized,/blog/hadesteen,/news/,,HADESTOWN: TEEN EDITION-A SUMMER CAMP AT TLT PERFORMANCE,False
+trash,uncategorized,/blog/merchandise,/news/,,GIVE THE GIFT OF TLT!,False
+trash,uncategorized,/blog/summer24,/news/,,SUMMER CAMP PERFORMANCES,False
+trash,uncategorized,/blog/summer24-g2226,/news/,,"DEAR EDWINA, JR!-A SUMMER CAMP AT TLT PERFORMANCE",False
+trash,uncategorized,/blog/tag/City+Line,/news/,"Old cityline, is this only stored here?",City Line — Blog,False

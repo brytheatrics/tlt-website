@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>TLT Migration Triage</title>
+<style>
+  :root {
+    --keep: #2e7d32;       /* green */
+    --maybe: #ef6c00;      /* amber */
+    --trash: #c62828;      /* red */
+    --bg: #f4f4f4;
+    --panel: #fff;
+    --line: #e0e0e0;
+    --text: #222;
+    --muted: #666;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    height: 100vh;
+  }
+
+  /* Top bar */
+  header {
+    background: #1a1a1a; color: #fff;
+    padding: 0.6rem 1rem;
+    display: flex; align-items: center; gap: 1rem;
+    border-bottom: 1px solid #000;
+  }
+  header h1 { font-size: 1.05rem; margin: 0; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+  header .stats { display: flex; gap: 1.25rem; font-size: 0.85rem; }
+  header .stats span b { font-weight: 700; }
+  header .stats .keep b { color: #66bb6a; }
+  header .stats .maybe b { color: #ffa726; }
+  header .stats .trash b { color: #ef5350; }
+  header .stats .undecided b { color: #aaa; }
+  header select {
+    background: #2a2a2a; color: #fff; border: 1px solid #444;
+    padding: 0.35rem 0.5rem; border-radius: 4px; font-size: 0.85rem;
+  }
+  header input[type=text] {
+    background: #2a2a2a; color: #fff; border: 1px solid #444;
+    padding: 0.35rem 0.5rem; border-radius: 4px; font-size: 0.85rem;
+    min-width: 220px;
+  }
+  header button {
+    background: #444; color: #fff; border: 1px solid #555;
+    padding: 0.35rem 0.75rem; border-radius: 4px; font-size: 0.85rem;
+    cursor: pointer;
+  }
+  header button:hover { background: #555; }
+  header .spacer { flex: 1; }
+
+  /* Layout */
+  main {
+    display: grid;
+    grid-template-columns: 320px 1fr 360px;
+    overflow: hidden;
+  }
+
+  /* Left: list */
+  .list-pane {
+    background: var(--panel);
+    border-right: 1px solid var(--line);
+    overflow-y: auto;
+  }
+  .list-item {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--line);
+    cursor: pointer;
+    display: grid;
+    grid-template-columns: 8px 1fr;
+    gap: 0.5rem;
+    align-items: start;
+  }
+  .list-item:hover { background: #f9f9f9; }
+  .list-item.active { background: #e3f2fd; }
+  .list-item .dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; margin-top: 4px; }
+  .list-item.keep .dot { background: var(--keep); }
+  .list-item.maybe .dot { background: var(--maybe); }
+  .list-item.trash .dot { background: var(--trash); }
+  .list-item .url-text {
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    word-break: break-all;
+    margin-bottom: 0.15rem;
+  }
+  .list-item .title { font-size: 0.85rem; font-weight: 600; line-height: 1.2; }
+  .list-item .cat-pill {
+    display: inline-block;
+    background: #ececec; color: #555;
+    font-size: 0.65rem; padding: 1px 6px; border-radius: 8px;
+    margin-top: 0.2rem; text-transform: uppercase; letter-spacing: 0.03em;
+  }
+
+  /* Center: iframe */
+  .preview-pane {
+    background: #ddd;
+    overflow: hidden;
+    position: relative;
+    display: flex; flex-direction: column;
+  }
+  .preview-toolbar {
+    background: #2a2a2a; color: #ccc;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.75rem;
+    display: flex; align-items: center; gap: 0.75rem;
+    font-family: ui-monospace, monospace;
+  }
+  .preview-toolbar a { color: #66bcff; }
+  .preview-toolbar .word-count { margin-left: auto; }
+  .preview-frame { flex: 1; border: none; background: #fff; }
+
+  /* Right: decision */
+  .decision-pane {
+    background: var(--panel);
+    border-left: 1px solid var(--line);
+    padding: 1rem;
+    overflow-y: auto;
+    display: flex; flex-direction: column;
+    gap: 1rem;
+  }
+  .decision-pane h2 { font-size: 1rem; margin: 0; line-height: 1.3; }
+  .meta-row { font-size: 0.8rem; color: var(--muted); }
+  .meta-row b { color: var(--text); font-weight: 600; }
+  .desc { font-size: 0.85rem; line-height: 1.45; max-height: 8em; overflow-y: auto; padding: 0.5rem; background: #f9f9f9; border-radius: 4px; }
+  .suggested { font-size: 0.8rem; color: var(--muted); font-style: italic; }
+
+  .btn-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; }
+  .dec-btn {
+    padding: 0.75rem 0.4rem;
+    border: 2px solid var(--line);
+    background: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.8rem;
+    line-height: 1.1;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    transition: all 0.15s;
+  }
+  .dec-btn:hover { border-color: #999; }
+  .dec-btn.keep.active { background: var(--keep); color: #fff; border-color: var(--keep); }
+  .dec-btn.maybe.active { background: var(--maybe); color: #fff; border-color: var(--maybe); }
+  .dec-btn.trash.active { background: var(--trash); color: #fff; border-color: var(--trash); }
+  .dec-btn .shortcut { display: block; font-size: 0.65rem; opacity: 0.7; font-weight: 400; margin-top: 0.15rem; }
+
+  textarea.note {
+    width: 100%; min-height: 8em;
+    border: 1px solid var(--line);
+    padding: 0.6rem;
+    font-family: inherit;
+    font-size: 0.9rem;
+    border-radius: 4px;
+    resize: vertical;
+  }
+  textarea.note:focus { outline: 2px solid #2196f3; border-color: #2196f3; }
+  .save-status {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-align: right;
+    min-height: 1em;
+  }
+  .nav-row { display: flex; justify-content: space-between; gap: 0.5rem; }
+  .nav-btn {
+    flex: 1;
+    padding: 0.6rem;
+    background: #f0f0f0;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+  .nav-btn:hover { background: #e0e0e0; }
+
+  .help {
+    margin-top: auto;
+    background: #f5f5f5;
+    padding: 0.75rem;
+    font-size: 0.75rem;
+    color: var(--muted);
+    border-radius: 4px;
+    line-height: 1.5;
+  }
+  .help kbd {
+    background: #fff; border: 1px solid #ccc;
+    border-radius: 3px; padding: 0 5px;
+    font-family: ui-monospace, monospace; font-size: 0.7rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>TLT Migration Triage</h1>
+  <select id="filter-cat">
+    <option value="">All categories</option>
+  </select>
+  <select id="filter-status">
+    <option value="">All statuses</option>
+    <option value="undecided">Undecided</option>
+    <option value="keep">Keep</option>
+    <option value="maybe">Don't know</option>
+    <option value="trash">Most likely trash</option>
+  </select>
+  <input type="text" id="filter-search" placeholder="Search title or URL...">
+  <div class="spacer"></div>
+  <div class="stats">
+    <span class="keep">Keep <b id="ct-keep">0</b></span>
+    <span class="maybe">Don't know <b id="ct-maybe">0</b></span>
+    <span class="trash">Trash <b id="ct-trash">0</b></span>
+    <span class="undecided"><b id="ct-undecided">0</b> undecided</span>
+    <span>/ <b id="ct-total">0</b></span>
+  </div>
+  <button id="export-btn">Export</button>
+</header>
+
+<main>
+  <div class="list-pane" id="list-pane"></div>
+
+  <div class="preview-pane">
+    <div class="preview-toolbar">
+      <span id="preview-url">—</span>
+      <a id="preview-live" href="#" target="_blank">Open live ↗</a>
+      <span class="word-count" id="preview-words"></span>
+    </div>
+    <iframe class="preview-frame" id="preview-frame" src="about:blank"></iframe>
+  </div>
+
+  <div class="decision-pane" id="decision-pane">
+    <h2 id="d-title">Pick a page from the list</h2>
+    <div class="meta-row"><b>URL:</b> <span id="d-url">—</span></div>
+    <div class="meta-row"><b>Category:</b> <span id="d-cat">—</span></div>
+    <div class="suggested" id="d-suggested"></div>
+    <div class="desc" id="d-desc">—</div>
+
+    <div class="btn-row">
+      <button class="dec-btn keep" data-decision="keep">Keep<span class="shortcut">[1]</span></button>
+      <button class="dec-btn maybe" data-decision="maybe">Don't know<span class="shortcut">[2]</span></button>
+      <button class="dec-btn trash" data-decision="trash">Most likely trash<span class="shortcut">[3]</span></button>
+    </div>
+
+    <label style="font-size:0.85rem;font-weight:600">Notes (saved automatically)</label>
+    <textarea class="note" id="d-note" placeholder="Type any context here. Claude will read this when planning the migration."></textarea>
+    <div class="save-status" id="save-status"></div>
+
+    <div class="nav-row">
+      <button class="nav-btn" id="prev-btn">← Previous</button>
+      <button class="nav-btn" id="next-btn">Next →</button>
+    </div>
+
+    <div class="help">
+      <b>Shortcuts:</b><br>
+      <kbd>1</kbd> Keep · <kbd>2</kbd> Don't know · <kbd>3</kbd> Trash<br>
+      <kbd>↑</kbd>/<kbd>↓</kbd> Navigate · <kbd>n</kbd> Focus notes<br>
+      <kbd>Esc</kbd> Unfocus notes
+    </div>
+  </div>
+</main>
+
+<script>
+let candidates = [];
+let filtered = [];
+let currentIdx = -1;
+let saveTimer = null;
+
+async function loadCandidates() {
+  const r = await fetch('/api/candidates');
+  candidates = await r.json();
+  populateCategoryFilter();
+  applyFilter();
+  if (filtered.length) selectIdx(0);
+}
+
+function populateCategoryFilter() {
+  const cats = [...new Set(candidates.map(c => c.category))].sort();
+  const sel = document.getElementById('filter-cat');
+  for (const c of cats) {
+    const opt = document.createElement('option');
+    opt.value = c; opt.textContent = c;
+    sel.appendChild(opt);
+  }
+}
+
+function applyFilter() {
+  const cat = document.getElementById('filter-cat').value;
+  const status = document.getElementById('filter-status').value;
+  const q = document.getElementById('filter-search').value.toLowerCase();
+  filtered = candidates.filter(c => {
+    if (cat && c.category !== cat) return false;
+    if (status === 'undecided' && c.decision) return false;
+    if (status && status !== 'undecided' && c.decision !== status) return false;
+    if (q && !((c.title||'').toLowerCase().includes(q) || (c.url||'').toLowerCase().includes(q))) return false;
+    return true;
+  });
+  renderList();
+  updateStats();
+}
+
+function renderList() {
+  const pane = document.getElementById('list-pane');
+  pane.innerHTML = '';
+  filtered.forEach((c, i) => {
+    const div = document.createElement('div');
+    div.className = 'list-item' + (c.decision ? ' '+c.decision : '') + (i === currentIdx ? ' active' : '');
+    div.innerHTML = `
+      <div class="dot"></div>
+      <div>
+        <div class="url-text">${c.path}</div>
+        <div class="title">${escapeHtml(c.title || '(untitled)')}</div>
+        <span class="cat-pill">${c.category}</span>
+      </div>`;
+    div.onclick = () => selectIdx(i);
+    pane.appendChild(div);
+  });
+}
+
+function escapeHtml(s) { return s.replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function updateStats() {
+  let k=0,m=0,t=0,u=0;
+  for (const c of candidates) {
+    if (c.decision === 'keep') k++;
+    else if (c.decision === 'maybe') m++;
+    else if (c.decision === 'trash') t++;
+    else u++;
+  }
+  document.getElementById('ct-keep').textContent = k;
+  document.getElementById('ct-maybe').textContent = m;
+  document.getElementById('ct-trash').textContent = t;
+  document.getElementById('ct-undecided').textContent = u;
+  document.getElementById('ct-total').textContent = candidates.length;
+}
+
+function selectIdx(i) {
+  if (i < 0 || i >= filtered.length) return;
+  currentIdx = i;
+  const c = filtered[i];
+  document.getElementById('d-title').textContent = c.title || '(untitled)';
+  document.getElementById('d-url').textContent = c.path;
+  document.getElementById('d-cat').textContent = c.category;
+  document.getElementById('d-desc').textContent = c.desc || '(no description)';
+  document.getElementById('d-suggested').textContent = c.suggested_action || '';
+  document.getElementById('d-note').value = c.note || '';
+
+  document.querySelectorAll('.dec-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.decision === c.decision);
+  });
+
+  document.getElementById('preview-url').textContent = c.local_html || '(not scraped locally)';
+  document.getElementById('preview-live').href = c.url;
+  document.getElementById('preview-words').textContent = c.word_count ? c.word_count + ' words' : '';
+  const frame = document.getElementById('preview-frame');
+  if (c.local_html) {
+    frame.src = '/preview/' + c.local_html;
+  } else {
+    frame.src = 'about:blank';
+  }
+
+  // Scroll the active list item into view
+  const items = document.querySelectorAll('.list-pane .list-item');
+  items.forEach((it,idx) => it.classList.toggle('active', idx === i));
+  if (items[i]) items[i].scrollIntoView({block: 'nearest'});
+}
+
+async function setDecision(decision) {
+  if (currentIdx < 0) return;
+  const c = filtered[currentIdx];
+  c.decision = decision;
+  // Update master list
+  const m = candidates.find(x => x.url === c.url);
+  if (m) m.decision = decision;
+  await fetch('/api/decision', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({url: c.url, decision: decision})
+  });
+  showSaved();
+  renderList();
+  updateStats();
+  // Auto-advance to next undecided in current filter; if none, just go to next
+  let nextIdx = currentIdx + 1;
+  // Skip already-decided items so you blast through quickly
+  while (nextIdx < filtered.length && filtered[nextIdx].decision) nextIdx++;
+  if (nextIdx >= filtered.length) nextIdx = currentIdx + 1; // fall back to plain next
+  if (nextIdx < filtered.length) selectIdx(nextIdx);
+}
+
+function saveNote() {
+  if (currentIdx < 0) return;
+  const c = filtered[currentIdx];
+  const note = document.getElementById('d-note').value;
+  c.note = note;
+  const m = candidates.find(x => x.url === c.url);
+  if (m) m.note = note;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async () => {
+    await fetch('/api/decision', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({url: c.url, note: note})
+    });
+    showSaved();
+  }, 350);
+}
+
+function showSaved() {
+  const el = document.getElementById('save-status');
+  el.textContent = '✓ saved';
+  setTimeout(() => { el.textContent = ''; }, 1500);
+}
+
+// Wire it up
+document.getElementById('filter-cat').onchange = applyFilter;
+document.getElementById('filter-status').onchange = applyFilter;
+document.getElementById('filter-search').oninput = applyFilter;
+document.getElementById('prev-btn').onclick = () => selectIdx(currentIdx - 1);
+document.getElementById('next-btn').onclick = () => selectIdx(currentIdx + 1);
+document.querySelectorAll('.dec-btn').forEach(b => {
+  b.onclick = () => setDecision(b.dataset.decision);
+});
+document.getElementById('d-note').oninput = saveNote;
+document.getElementById('export-btn').onclick = async () => {
+  const r = await fetch('/api/export');
+  const d = await r.json();
+  const blob = new Blob([JSON.stringify(d,null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'tlt_decisions.json';
+  a.click();
+};
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  const ae = document.activeElement;
+  if (ae && (ae.tagName === 'TEXTAREA' || ae.tagName === 'INPUT')) {
+    if (e.key === 'Escape') ae.blur();
+    return;
+  }
+  if (e.key === '1') { setDecision('keep'); }
+  else if (e.key === '2') { setDecision('maybe'); }
+  else if (e.key === '3') { setDecision('trash'); }
+  else if (e.key === 'ArrowDown' || e.key === 'j') { e.preventDefault(); selectIdx(currentIdx + 1); }
+  else if (e.key === 'ArrowUp' || e.key === 'k') { e.preventDefault(); selectIdx(currentIdx - 1); }
+  else if (e.key === 'n') { e.preventDefault(); document.getElementById('d-note').focus(); }
+});
+
+loadCandidates();
+</script>
+
+</body>
+</html>
