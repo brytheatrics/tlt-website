@@ -40,7 +40,20 @@ New-Item -ItemType Junction -Path "mockup" -Target "C:\Users\blake\My Drive (bla
 ```
 
 ### 5. Restore the Local WordPress site
-In Local app → Connect to Cloud Backup → Google Drive → restore the TLT site backup.
+In Local app → Connect to Cloud Backup → Google Drive → restore the TLT site backup. (Or use a manual zip export from Local on the other computer if Cloud Backups is being flaky.)
+
+### 5b. Junction the live theme + plugin to the git-tracked source
+After Local is up, replace the live theme/plugin folders with junctions to the dev folder. This way every git pull instantly updates the live site — no copy step ever needed.
+
+```powershell
+$dev = if (Test-Path "C:\Users\blake\dev\tlt-website") { "C:\Users\blake\dev\tlt-website" } else { "C:\Users\blake\dev\TLT_Website" }
+$liveTheme = "C:\Users\blake\Local Sites\tlt\app\public\wp-content\themes\tlt"
+$livePlugin = "C:\Users\blake\Local Sites\tlt\app\public\wp-content\plugins\tlt-post-types"
+Remove-Item $liveTheme -Recurse -Force
+Remove-Item $livePlugin -Recurse -Force
+New-Item -ItemType Junction -Path $liveTheme -Target "$dev\wordpress\themes\tlt" | Out-Null
+New-Item -ItemType Junction -Path $livePlugin -Target "$dev\wordpress\plugins\tlt-post-types" | Out-Null
+```
 
 ### 6. Restore Claude memory
 The Claude memory folder is at `_claude_memory/` in the repo. Symlink the Claude config to point at it:
