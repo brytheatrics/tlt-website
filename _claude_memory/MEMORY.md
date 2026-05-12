@@ -10,3 +10,4 @@
 - [Conditional splash page](project_splash_conditional.md) — Future task: only show /splash/ when current show has photos; else redirect / → /home/
 - [Design inspiration: theatre sites](reference_design_inspiration.md) — Centaur, National Theatre, Ford's, Southern Futures CPA + treatment notes
 - [Homepage numbered-section concern](project_homepage_section_uX.md) — Numbered sections nice visually but burdensome for day-to-day editor; revisit later
+- [DB changes via committed scripts](reference_db_changes_via_scripts.md) — Always save DB-mutating code as a script in `wordpress/import/` and commit it, so it can run on either computer; never just inline SQL
