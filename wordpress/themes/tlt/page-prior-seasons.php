@@ -126,6 +126,14 @@ get_header(); ?>
       }
       wp_reset_postdata();
   }
+  // Dedupe by title (some decades have multiple migrated copies in the DB)
+  $seen_titles = [];
+  $decade_posts = array_values( array_filter( $decade_posts, function ( $p ) use ( &$seen_titles ) {
+      $t = trim( $p['title'] );
+      if ( isset( $seen_titles[ $t ] ) ) return false;
+      $seen_titles[ $t ] = true;
+      return true;
+  } ) );
   // Sort decades DESC by start year
   usort( $decade_posts, function ( $a, $b ) {
       preg_match( '/^(\d{4})/', $a['title'], $aa );

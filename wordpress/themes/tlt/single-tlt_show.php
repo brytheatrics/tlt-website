@@ -17,6 +17,8 @@ while ( have_posts() ) : the_post();
     $program   = get_post_meta( get_the_ID(), 'show_program_pdf_url', true );
     $cancelled = get_post_meta( get_the_ID(), 'show_cancelled', true );
     $img       = tlt_show_image_url( get_the_ID(), 'full' );
+    $videos_raw = get_post_meta( get_the_ID(), 'show_video_urls', true );
+    $videos    = $videos_raw ? array_filter( array_map( 'trim', explode( ',', $videos_raw ) ) ) : [];
 ?>
 
 <article class="show-detail">
@@ -38,7 +40,75 @@ while ( have_posts() ) : the_post();
         </p>
 
         <div class="show-content">
-          <?php the_content(); ?>
+          <?php
+            // Body content arrives from the original scrape and almost always contains:
+            //   - a duplicate of the poster image (we already render it in .poster above)
+            //   - "Directed by …", "Musically Directed by …", "Choreographed by …" paragraphs
+            //     which we already render in .credits
+            // Strip them before applying content filters so they don't appear twice.
+            $body = get_the_content();
+
+            // 1) Drop the first figure / linked-image / bare <img> — that's the duplicate poster.
+            $body = preg_replace( '/<figure[^>]*>.*?<\/figure>/s', '', $body, 1, $cnt );
+            if ( ! $cnt ) $body = preg_replace( '/<a[^>]*>\s*<img[^>]+>\s*<\/a>/s', '', $body, 1, $cnt );
+            if ( ! $cnt ) $body = preg_replace( '/<img[^>]+>/', '', $body, 1 );
+
+            // 2) Drop credit paragraphs we already show in .credits above. Each pattern matches
+            //    a <p>...</p> whose visible text starts with the credit phrase, optionally with
+            //    a <br> on the next line.
+            foreach ( [ 'Directed by', 'Musically Directed by', 'Music(?:al)? Direction by', 'Choreographed by', 'Co-Directed by' ] as $phrase ) {
+                $body = preg_replace( '#<p[^>]*>\s*(?:<[^>]+>)*\s*' . $phrase . '\b[^<]*(?:<br\s*/?>[^<]*)?\s*</p>#i', '', $body );
+            }
+
+            // 2b) If we're going to render our own video embeds (from show_video_urls meta),
+            //     strip any iframes (and Squarespace embed-block wrappers) from the body so
+            //     videos don't show up twice.
+            if ( ! empty( $videos ) ) {
+                $body = preg_replace( '#<div[^>]*class="[^"]*website-component-block embed-block[^"]*"[^>]*>.*?</div>\s*</div>\s*</div>\s*</div>#s', '', $body );
+                $body = preg_replace( '#<div[^>]*class="[^"]*embed-block[^"]*"[^>]*>.*?</div>#s', '', $body );
+                $body = preg_replace( '#<iframe\b[^>]*>.*?</iframe>#s', '', $body );
+            }
+
+            // 2c) Content-warning blocks (e.g. "Bug is recommended for mature audiences…",
+            //     "Please be advised that this show contains…") were wrapped by Squarespace
+            //     in <h2><strong> or <p><strong><em>, rendering them huge and bold. Demote any
+            //     such block to a plain <p> so it reads as normal body text.
+            $warning_kw = '(?:recommended|please be advised|this (?:show|production) contains|contains:|warning:|advisory)';
+            $body = preg_replace_callback(
+                '#<(h[1-6]|p)([^>]*)>(.*?)</\1>#is',
+                function ( $m ) use ( $warning_kw ) {
+                    $tag = $m[1]; $inner = $m[3];
+                    $plain = wp_strip_all_tags( $inner );
+                    if ( ! preg_match( '/' . $warning_kw . '/i', $plain ) ) return $m[0];
+                    // Strip inline emphasis wrappers
+                    $inner = preg_replace( '#</?(?:strong|em|b|i)\b[^>]*>#i', '', $inner );
+                    // Always emit as plain <p>
+                    return '<p>' . $inner . '</p>';
+                },
+                $body
+            );
+
+            // 3) Drop inline program-PDF link paragraphs — the .actions row below already
+            //    renders a "View Program" button from show_program_pdf_url meta. Match a <p>
+            //    whose only meaningful content is an <a href="*.pdf"> whose visible text is
+            //    "Program" / "View Program" / "View Program (PDF)" / "PROGRAM" — allowing
+            //    <strong>/<em>/etc wrappers in any position (inside or outside the anchor).
+            $body = preg_replace(
+                '#<p[^>]*>\s*' .
+                '(?:<(?:strong|em|b|i)[^>]*>\s*)*' .          // optional bold/em wrapping the anchor
+                '<a[^>]+href="[^"]+\.pdf[^"]*"[^>]*>' .
+                '\s*(?:<(?:strong|em|b|i)[^>]*>\s*)*' .       // optional bold/em wrapping the link text
+                '(?:View\s+)?Program(?:\s*\(PDF\))?' .
+                '\s*(?:</(?:strong|em|b|i)>\s*)*' .
+                '</a>\s*' .
+                '(?:</(?:strong|em|b|i)>\s*)*' .              // close any outer wrap
+                '</p>#i',
+                '',
+                $body
+            );
+
+            echo apply_filters( 'the_content', $body );
+          ?>
         </div>
 
         <?php if ( $run_time || $age ) : ?>
@@ -58,8 +128,21 @@ while ( have_posts() ) : the_post();
           <?php endif; ?>
           <?php if ( $program ) : ?>
             <a href="<?php echo esc_url( $program ); ?>" class="btn btn-primary" style="background:transparent;color:var(--color-accent);border:2px solid var(--color-accent)">View Program</a>
+          <?php else : ?>
+            <a href="#" class="btn btn-primary" style="background:transparent;color:var(--color-muted);border:2px solid var(--color-muted);cursor:not-allowed" title="Program PDF not yet linked — coming soon" onclick="event.preventDefault()">View Program</a>
           <?php endif; ?>
         </p>
+
+        <?php if ( ! empty( $videos ) ) : ?>
+          <div class="show-videos" style="margin-top:2rem">
+            <h3 style="margin-bottom:0.75rem"><?php echo count( $videos ) > 1 ? 'Videos' : 'Video'; ?></h3>
+            <?php foreach ( $videos as $v ) : ?>
+              <div class="video-wrap" style="margin-bottom:1rem">
+                <iframe src="<?php echo esc_url( $v ); ?>" allow="autoplay; fullscreen" allowfullscreen frameborder="0" style="width:100%; aspect-ratio:16/9; height:auto"></iframe>
+              </div>
+            <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
       </div>
     </div>
   </div>

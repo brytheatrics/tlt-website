@@ -81,9 +81,11 @@ if ( empty( $photo_urls ) ) {
       <a href="https://www.youtube.com/channel/UCIdbR2k-vM3vKSOSn_hbr9A" target="_blank" rel="noopener" class="splash-social splash-social-yt" aria-label="YouTube">
         <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
       </a>
-      <?php if ( $tix ) : ?>
-        <a href="<?php echo esc_url( $tix ); ?>" target="_blank" rel="noopener" class="btn">Buy Tickets</a>
-      <?php endif; ?>
+      <?php
+        // Default to TLT's Ludus storefront if this show doesn't have a specific ticket URL set yet.
+        $tix_url = $tix ?: 'https://tlt.ludus.com/';
+      ?>
+      <a href="<?php echo esc_url( $tix_url ); ?>" target="_blank" rel="noopener" class="btn">Buy Tickets</a>
       <a href="<?php echo esc_url( home_url( '/home/' ) ); ?>" class="btn">Continue to TLT's Webpage</a>
     </div>
   </div>

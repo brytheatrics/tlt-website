@@ -7,3 +7,6 @@
 - [TLT Squarespace URL mangling is severe](feedback_squarespace_pattern_severe.md) — slugs bear no relationship to content (e.g. `the-underpants-5ypj7-...` is Macbeth); user notes are canonical decoder
 - [Triage notes — names reliable, dates not](feedback_triage_notes_dates.md) — trust user's notes for content identity, derive dates from page HTML
 - [Cross-computer dev workflow](reference_cross_computer_workflow.md) — git + Drive + junctions; answer "what should I do?" sync questions
+- [Conditional splash page](project_splash_conditional.md) — Future task: only show /splash/ when current show has photos; else redirect / → /home/
+- [Design inspiration: theatre sites](reference_design_inspiration.md) — Centaur, National Theatre, Ford's, Southern Futures CPA + treatment notes
+- [Homepage numbered-section concern](project_homepage_section_uX.md) — Numbered sections nice visually but burdensome for day-to-day editor; revisit later

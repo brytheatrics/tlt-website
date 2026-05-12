@@ -28,29 +28,29 @@ source,target,code,group
 /blog/2015/2010-2011,/shows/legacy/2010-2011/,301,decade page
 /blog/2015/2011-2012,/shows/legacy/2011-2012/,301,decade page
 /blog/2015/2012-2013,/shows/legacy/2012-2013/,301,decade page
-/blog/20182019/bellbookcandle,/shows/2018-2019/bell-book-and-candle-page/,301,modern_show
-/blog/20182019/dollshouse,/shows/2018-2019/a-dolls-house-page/,301,modern_show
-/blog/20182019/foreigner,/shows/2018-2019/foreigner-page/,301,modern_show
-/blog/20182019/hayfever,/shows/2018-2019/hay-fever-page/,301,modern_show
-/blog/20182019/laura,/shows/2018-2019/laura-page/,301,modern_show
-/blog/20182019/nightmusic,/shows/2018-2019/a-little-night-music-page/,301,modern_show
-/blog/20182019/scrooge,/shows/2018-2019/scrooge-the-musical-page/,301,modern_show
-/blog/20182019/sophie,/shows/2018-2019/sophie-page/,301,modern_show
-/blog/20192020/calendargirls,/shows/2019-2020/calendar-girls-page/,301,modern_show
-/blog/20192020/chorusline,/shows/2019-2020/a-chorus-line-page/,301,modern_show
-/blog/20192020/chorusline-fnlh3,/shows/2019-2020/terms-of-endearment-page/,301,modern_show
-/blog/20192020/chorusline-fnlh3-akhpz,/shows/2019-2020/manchurian-candidate-page/,301,modern_show
-/blog/20192020/evildead,/shows/2019-2020/evil-dead-page/,301,modern_show
-/blog/20192020/holmes,/shows/2019-2020/holmes-for-the-holidays-page/,301,modern_show
-/blog/20192020/holmes-gaf4k,/shows/2019-2020/twas-the-night-before-christmas-page/,301,modern_show
-/blog/20192020/shattering,/shows/2019-2020/shattering-page/,301,modern_show
-/blog/20212022/clue,/shows/2021-2022/clue-page/,301,modern_show
-/blog/20212022/clue-633y7,/shows/2021-2022/a-chorus-line-page/,301,modern_show
-/blog/20212022/clue-anzln,/shows/2021-2022/silent-sky-page/,301,modern_show
-/blog/20212022/clue-anzln-g52ct,/shows/2021-2022/happiest-song-plays-last-page/,301,modern_show
-/blog/20212022/clue-anzln-g52ct-dwpf6,/shows/2021-2022/luck-of-the-irish-page/,301,modern_show
-/blog/20212022/clue-rhe7l,/shows/2021-2022/wizard-of-oz-page/,301,modern_show
-/blog/20212022/terms,/shows/2021-2022/terms-of-endearment-page/,301,modern_show
+/blog/20182019/bellbookcandle,/shows/bell-book-and-candle/,301,modern_show
+/blog/20182019/dollshouse,/shows/a-dolls-house/,301,modern_show
+/blog/20182019/foreigner,/shows/foreigner/,301,modern_show
+/blog/20182019/hayfever,/shows/hay-fever/,301,modern_show
+/blog/20182019/laura,/shows/laura/,301,modern_show
+/blog/20182019/nightmusic,/shows/a-little-night-music/,301,modern_show
+/blog/20182019/scrooge,/shows/scrooge-the-musical/,301,modern_show
+/blog/20182019/sophie,/shows/sophie/,301,modern_show
+/blog/20192020/calendargirls,/shows/calendar-girls/,301,modern_show
+/blog/20192020/chorusline,/shows/a-chorus-line/,301,modern_show
+/blog/20192020/chorusline-fnlh3,/shows/terms-of-endearment/,301,modern_show
+/blog/20192020/chorusline-fnlh3-akhpz,/shows/manchurian-candidate/,301,modern_show
+/blog/20192020/evildead,/shows/evil-dead/,301,modern_show
+/blog/20192020/holmes,/shows/holmes-for-the-holidays/,301,modern_show
+/blog/20192020/holmes-gaf4k,/shows/twas-the-night-before-christmas/,301,modern_show
+/blog/20192020/shattering,/shows/shattering/,301,modern_show
+/blog/20212022/clue,/shows/clue/,301,modern_show
+/blog/20212022/clue-633y7,/shows/a-chorus-line/,301,modern_show
+/blog/20212022/clue-anzln,/shows/silent-sky/,301,modern_show
+/blog/20212022/clue-anzln-g52ct,/shows/happiest-song-plays-last/,301,modern_show
+/blog/20212022/clue-anzln-g52ct-dwpf6,/shows/luck-of-the-irish/,301,modern_show
+/blog/20212022/clue-rhe7l,/shows/wizard-of-oz/,301,modern_show
+/blog/20212022/terms,/shows/terms-of-endearment/,301,modern_show
 /blog/20222023/murder,/shows/2022-2023/murder-on-the-orient-express/,301,modern_show
 /blog/20222023/poboy,/shows/2022-2023/po-boy-tango/,301,modern_show
 /blog/20222023/rock,/shows/2022-2023/rock-of-ages/,301,modern_show
@@ -136,7 +136,7 @@ source,target,code,group
 /blog/2021/tlt-wins-national-award,/shows/legacy/tlt-wins-national-award/,301,old show/news
 /blog/2021/valenzuela,/team/board-member-current-2026-may-need-to-merge/,301,old show/news
 /blog/2022/scholarship-application,/shows/legacy/is-there-actually-a-link-that-people-can-use-for-scholarships-or-is-this-it/,301,uncategorized
-/blog/2022/season-2020-2021,/shows/legacy/this-is-the-and-i-believe-only-page-for-the-20-21/,301,uncategorized
+/blog/2022/season-2020-2021,/shows/2020-2021-virtual-season/,301,uncategorized
 /blog/2025/grab-dinner-at-harbor-lights,/harbor-lights/,301,uncategorized
 /blog/donationrequest,/news/donationrequest/,301,uncategorized
 /blog/monique,/news/monique/,301,uncategorized

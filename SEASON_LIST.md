@@ -277,9 +277,8 @@
 - Murder by the Book  *[program PDF]*
 - The Fantasticks  *[program PDF]*
 - THE CLOWN WHO RAN AWAY  *[program PDF]*
+- Lion in Winter  *[program PDF]*  <!-- merged from typo'd "1985-1886" subheading -->
 
-## Season 68: 1985-1886
-- Lion in Winter  *[program PDF]*
 
 ## Season 67: 1984-1985
 - HAY FEVER  *[program PDF]*
@@ -300,9 +299,8 @@
 - ABIES IRISH ROSE  *[program PDF]*
 - The Glass Menagerie  *[program PDF]*
 - on golden pond  *[program PDF]*
+- APPLAUSE  *[program PDF]*  <!-- merged from typo'd "1982-1893" subheading -->
 
-## Season 65: 1982-1893
-- APPLAUSE  *[program PDF]*
 
 ## Season 64: 1981-1982
 - A THOUSAND CLOWNS  *[program PDF]*
@@ -400,9 +398,6 @@
 - Plaza Suite  *[program PDF]*
 - Gypsy  *[program PDF]*
 
-## Season 53: 1970-1972
-- A Case of Libel  *[program PDF]*
-
 ## Season 53: 1970-1971
 - The Cactus Flower  *[program PDF]*
 - Suds in Your Eye  *[program PDF]*
@@ -410,6 +405,8 @@
 - Harvey  *[program PDF]*
 - Critics Choice  *[program PDF]*
 - Damn Yankees  *[program PDF]*
+- A Case of Libel  *[program PDF]*  <!-- merged from typo'd "1970-1972" subheading -->
+
 
 ## Season 52: 1969-1970
 - The Odd Couple  *[program PDF]*
@@ -449,6 +446,12 @@
 
 ## Season 48: 1965-1966
 - The Rainmaker  *[program PDF]*
+- Love From a Stranger  *[program PDF]*  <!-- moved from Season 47 — decade post confirms 1965-66 -->
+- Dear Charles  *[program PDF]*  <!-- moved from Season 47 -->
+- A Shot in the Dark  *[program PDF]*  <!-- moved from Season 47 -->
+- DAUGHTER OF SILENCE  *[program PDF]*  <!-- moved from Season 47 -->
+- Mary Mary  *[program PDF]*  <!-- moved from Season 47 -->
+- THE MUSIC MAN  *[program PDF]*  <!-- moved from Season 47 -->
 
 ## Season 47: 1964-1965
 - GAZEBO  *[program PDF]*
@@ -458,12 +461,6 @@
 - Summer and Smoke  *[program PDF]*
 - A Thousand Clowns  *[program PDF]*
 - Anything Goes  *[program PDF]*
-- Love From a Stranger  *[program PDF]*
-- Dear Charles  *[program PDF]*
-- A Shot in the Dark  *[program PDF]*
-- DAUGHTER OF SILENCE  *[program PDF]*
-- Mary Mary  *[program PDF]*
-- THE MUSIC MAN  *[program PDF]*
 
 ## Season 46: 1963-1964
 - Roman Candle  *[program PDF]*
@@ -472,9 +469,8 @@
 - Breath of Spring  *[program PDF]*
 - Come Blow Your Horn  *[program PDF]*
 - Annie Get Your Gun  *[program PDF]*
+- A Far Country  *[program PDF]*  <!-- merged from typo'd "1963-1934" subheading -->
 
-## Season 46: 1963-1934
-- A Far Country  *[program PDF]*
 
 ## Season 45: 1962-1963
 - Operation Mad Ball  *[program PDF]*
@@ -512,7 +508,7 @@
 - Present Laughter  *[program PDF]*
 - Oklahoma  *[program PDF]*
 
-## Season 41: 1958-1958
+## Season 41: 1958-1959
 - No Time for Sergeants  *[program PDF]*
 - Inherit the Wind  *[program PDF]*
 - The Happiest Millionaire  *[program PDF]*
@@ -680,9 +676,8 @@
 - OUTWARD BOUND  *[program PDF]*
 - Die Fledermaus  *[program PDF]*
 - Three Workshop Plays lz5h  *[program PDF]*
+- Tovarich  *[program PDF]*  <!-- merged from typo'd "1940-1940" subheading -->
 
-## Season 23: 1940-1940
-- Tovarich  *[program PDF]*
 
 ## Season 22: 1939-1940
 - THE GHOST OF YANKEE DOODLE  *[program PDF]*

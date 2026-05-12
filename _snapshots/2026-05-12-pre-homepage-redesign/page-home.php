@@ -62,10 +62,9 @@ if ( $current ) :
 <?php endif; ?>
 
 <!-- Current Season -->
-<section class="block fade-in" data-section-num="01">
+<section class="block">
   <div class="container">
     <div class="section-head">
-      <div class="eyebrow"><span class="num">01</span> Onstage</div>
       <h2><?php echo esc_html( $season_term ? $season_term->name : '' ); ?> Season</h2>
       <?php
       // Tally counts for live progress text
@@ -131,13 +130,8 @@ if ( $current ) :
 </section>
 
 <!-- Education group -->
-<section class="block alt fade-in" data-section-num="02">
+<section class="block alt">
   <div class="container">
-    <div class="section-head">
-      <div class="eyebrow"><span class="num">02</span> Education</div>
-      <h2>Programs for Every Age</h2>
-      <p>Classes, camps, and youth productions — explore the craft of theatre at TLT.</p>
-    </div>
 
     <div class="feature-row">
       <div>
@@ -161,13 +155,8 @@ if ( $current ) :
 </section>
 
 <!-- Special Events group -->
-<section class="block fade-in" data-section-num="03">
+<section class="block">
   <div class="container">
-    <div class="section-head">
-      <div class="eyebrow"><span class="num">03</span> Beyond the Stage</div>
-      <h2>Special Events</h2>
-      <p>Mystery dinners, partner restaurants, and other ways to make a night of it.</p>
-    </div>
 
     <div class="feature-row">
       <div>
@@ -191,13 +180,8 @@ if ( $current ) :
 </section>
 
 <!-- Get Involved / Opportunities group -->
-<section class="block alt fade-in" data-section-num="04">
+<section class="block alt">
   <div class="container">
-    <div class="section-head">
-      <div class="eyebrow"><span class="num">04</span> Get Involved</div>
-      <h2>Join Us</h2>
-      <p>Hiring, season tickets, and other ways to be part of TLT.</p>
-    </div>
 
     <div class="feature-row">
       <div>
@@ -221,11 +205,10 @@ if ( $current ) :
 </section>
 
 <!-- Easy ways to support -->
-<section class="block fade-in" data-section-num="05">
+<section class="block">
   <div class="container">
     <div class="section-head">
-      <div class="eyebrow"><span class="num">05</span> Support</div>
-      <h2>Easy (and Free) Ways to Help TLT</h2>
+      <h2>Easy (and free) ways to support TLT!</h2>
     </div>
     <div style="display:flex;justify-content:center;gap:2rem;flex-wrap:wrap;align-items:center">
       <a href="/news/fred-meyer-community-rewards/" style="text-align:center;text-decoration:none">
@@ -237,10 +220,9 @@ if ( $current ) :
 </section>
 
 <!-- Sponsors -->
-<section class="block dark fade-in" data-section-num="06">
+<section class="block alt">
   <div class="container">
     <div class="section-head">
-      <div class="eyebrow"><span class="num">06</span> With Gratitude</div>
       <h2 style="font-size:1.3rem">Tacoma Little Theatre is honored to receive support from</h2>
     </div>
     <div style="display:flex;justify-content:center;gap:3rem;flex-wrap:wrap;align-items:center">
@@ -302,26 +284,5 @@ if ( $current ) :
     .mini-body p { font-size: 0.78rem; }
   }
 </style>
-
-<script>
-  // Scroll-fade-in for .fade-in sections. Triggers once each enters viewport (no scroll-jacking).
-  (function () {
-    const els = document.querySelectorAll('.fade-in');
-    if ( ! els.length ) return;
-    if ( ! ( 'IntersectionObserver' in window ) ) {
-      els.forEach( e => e.classList.add('is-visible') );
-      return;
-    }
-    const io = new IntersectionObserver( entries => {
-      entries.forEach( entry => {
-        if ( entry.isIntersecting ) {
-          entry.target.classList.add('is-visible');
-          io.unobserve( entry.target );
-        }
-      });
-    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' } );
-    els.forEach( e => io.observe( e ) );
-  }());
-</script>
 
 <?php get_footer(); ?>
