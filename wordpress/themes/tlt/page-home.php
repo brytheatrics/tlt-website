@@ -62,7 +62,7 @@ if ( $current ) :
 <?php endif; ?>
 
 <!-- Current Season -->
-<section class="block fade-in" data-section-num="01">
+<section class="block" data-section-num="01">
   <div class="container">
     <div class="section-head">
       <div class="eyebrow"><span class="num">01</span> Onstage</div>
@@ -131,7 +131,7 @@ if ( $current ) :
 </section>
 
 <!-- Education group -->
-<section class="block alt fade-in" data-section-num="02">
+<section class="block alt" data-section-num="02">
   <div class="container">
     <div class="section-head">
       <div class="eyebrow"><span class="num">02</span> Education</div>
@@ -161,7 +161,7 @@ if ( $current ) :
 </section>
 
 <!-- Special Events group -->
-<section class="block fade-in" data-section-num="03">
+<section class="block" data-section-num="03">
   <div class="container">
     <div class="section-head">
       <div class="eyebrow"><span class="num">03</span> Beyond the Stage</div>
@@ -191,7 +191,7 @@ if ( $current ) :
 </section>
 
 <!-- Get Involved / Opportunities group -->
-<section class="block alt fade-in" data-section-num="04">
+<section class="block alt" data-section-num="04">
   <div class="container">
     <div class="section-head">
       <div class="eyebrow"><span class="num">04</span> Get Involved</div>
@@ -221,7 +221,7 @@ if ( $current ) :
 </section>
 
 <!-- Easy ways to support -->
-<section class="block fade-in" data-section-num="05">
+<section class="block" data-section-num="05">
   <div class="container">
     <div class="section-head">
       <div class="eyebrow"><span class="num">05</span> Support</div>
@@ -237,7 +237,7 @@ if ( $current ) :
 </section>
 
 <!-- Sponsors -->
-<section class="block dark fade-in" data-section-num="06">
+<section class="block dark" data-section-num="06">
   <div class="container">
     <div class="section-head">
       <div class="eyebrow"><span class="num">06</span> With Gratitude</div>
@@ -302,26 +302,5 @@ if ( $current ) :
     .mini-body p { font-size: 0.78rem; }
   }
 </style>
-
-<script>
-  // Scroll-fade-in for .fade-in sections. Triggers once each enters viewport (no scroll-jacking).
-  (function () {
-    const els = document.querySelectorAll('.fade-in');
-    if ( ! els.length ) return;
-    if ( ! ( 'IntersectionObserver' in window ) ) {
-      els.forEach( e => e.classList.add('is-visible') );
-      return;
-    }
-    const io = new IntersectionObserver( entries => {
-      entries.forEach( entry => {
-        if ( entry.isIntersecting ) {
-          entry.target.classList.add('is-visible');
-          io.unobserve( entry.target );
-        }
-      });
-    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' } );
-    els.forEach( e => io.observe( e ) );
-  }());
-</script>
 
 <?php get_footer(); ?>
