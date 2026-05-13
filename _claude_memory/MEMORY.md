@@ -11,3 +11,13 @@
 - [Design inspiration: theatre sites](reference_design_inspiration.md) — Centaur, National Theatre, Ford's, Southern Futures CPA + treatment notes
 - [Homepage numbered-section concern](project_homepage_section_uX.md) — Numbered sections nice visually but burdensome for day-to-day editor; revisit later
 - [DB changes via committed scripts](reference_db_changes_via_scripts.md) — Always save DB-mutating code as a script in `wordpress/import/` and commit it, so it can run on either computer; never just inline SQL
+- [Architecture: NO page builder](architecture_no_page_builder.md) — Custom theme + hard templates + flex blocks + Designed Page. Elementor was rejected. Customizer exposes content only, not brand.
+- [Architecture: Date-driven content](architecture_date_driven_content.md) — Every "this needs to change at time X" task is a date field on the content. End dates required, not optional.
+- [Architecture: `tlt_show` is the workhorse](architecture_show_post_type.md) — Mainstage, Off the Shelf, Murder Mystery Dinners all use the same post type with `show_program_type` variants + optional extra fields.
+- [Architecture: Promotions universal](architecture_promotions_post_type.md) — `tlt_promotion` drives banners on multiple page types via `display_location` multiselect; auto-expires via required end_date.
+- [Future: auto-generated calendar](feature_calendar_auto.md) — `/calendar/` page pulling from show/audition/class/event dates; single source of truth, no double-entry. Not blocking launch.
+- **Authoritative docs:**
+  - `PROJECT.md` — high-level project status
+  - `_planning/ARCHITECTURE.md` — full engineering plan
+  - `_planning/decisions.md` — running decisions log (autonomous work logs to here)
+  - `_planning/template_inventory.md` — template coverage + build order

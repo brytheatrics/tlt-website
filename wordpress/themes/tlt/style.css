@@ -159,25 +159,45 @@ nav.primary li:focus-within > ul { display: flex; }
 .hero-layered .hero-layer {
   position: absolute; inset: 0;
   width: 100%; height: 100%;
-  object-fit: contain;       /* keep aspect, don't crop critical detail */
-  object-position: center;
+  object-fit: cover;            /* fill hero, crop sides if needed */
+  object-position: center bottom; /* keep the figure/podium anchored at bottom */
   opacity: 0;
-  animation: layerIn 0.9s cubic-bezier(0.2, 0.7, 0.25, 1) forwards;
+  animation: layerIn 1.8s cubic-bezier(0.2, 0.7, 0.25, 1) forwards;
 }
-/* Ordinal layer animations — layer 1 fades in, then 2,3,4,5 slide in from different directions, staggered. */
+/* Slot fallback (used when content-name rules below don't match) —
+   subtle staggered rise so any unknown layer still animates in. */
 .hero-layered .hero-layer-1 { animation-delay: 0.05s; --layer-from: translate(0, 0); }
-.hero-layered .hero-layer-2 { animation-delay: 0.25s; --layer-from: translateY(80px); }
-.hero-layered .hero-layer-3 { animation-delay: 0.40s; --layer-from: translateY(80px); }
-.hero-layered .hero-layer-4 { animation-delay: 0.55s; --layer-from: translateX(-90px); }
-.hero-layered .hero-layer-5 { animation-delay: 0.70s; --layer-from: translateY(120px); }
-.hero-layered .hero-layer-6 { animation-delay: 0.85s; --layer-from: translateY(-30px); }
+.hero-layered .hero-layer-2 { animation-delay: 0.50s; --layer-from: translateY(80px); }
+.hero-layered .hero-layer-3 { animation-delay: 0.95s; --layer-from: translateY(80px); }
+.hero-layered .hero-layer-4 { animation-delay: 1.40s; --layer-from: translateY(80px); }
+.hero-layered .hero-layer-5 { animation-delay: 1.85s; --layer-from: translateY(80px); }
+.hero-layered .hero-layer-6 { animation-delay: 2.30s; --layer-from: translateY(80px); }
+
+/* Animation order is independent of stacking. Stacking is set by the file
+   number prefix (1-* renders behind 5-*); the rules below set WHEN each
+   piece appears and from WHICH direction.
+
+   The Outsider sequence:
+     1. background  — fade in
+     2. podium      — rises from below
+     3. front mics  — slide from the left
+     4. back mics   — rise from below
+     5. man         — slides from the right                                */
+.hero-layered [data-name$="-bg"]         { animation-delay: 0.05s; --layer-from: translate(0, 0); }
+.hero-layered [data-name$="-podium"]     { animation-delay: 0.50s; --layer-from: translateY(70%); }
+.hero-layered [data-name$="-front-mics"] { animation-delay: 0.95s; --layer-from: translateX(-70%); }
+.hero-layered [data-name$="-back-mics"]  { animation-delay: 1.40s; --layer-from: translateY(70%); }
+.hero-layered [data-name$="-person"]     { animation-delay: 1.85s; --layer-from: translateX(70%); }
 
 @keyframes layerIn {
   from { opacity: 0; transform: var(--layer-from, translate(0, 0)); }
   to   { opacity: 1; transform: translate(0, 0); }
 }
 
-.hero-layered .hero-image-mobile { display: none; }
+.hero-layered .hero-image-mobile { display: none; opacity: 1; }
+/* The composite is a flat poster meant to read at full saturation/brightness —
+   text-shadows handle legibility. Override the 0.6 dim used for single-photo
+   heroes. */
 
 @media (max-width: 700px) {
   .hero-layered .hero-layers { display: none; }
@@ -199,13 +219,105 @@ nav.primary li:focus-within > ul { display: flex; }
   .hero-image { animation: none; }
 }
 .hero-content {
-  position: relative; z-index: 1;
+  position: relative; z-index: 2;
   display: flex; flex-direction: column; justify-content: flex-end;
   padding: var(--pad) 0 3rem; flex: 1;
 }
-.hero .eyebrow { font-family: var(--font-display); font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; color: var(--color-accent); font-size: 0.85rem; margin-bottom: 0.5rem; }
-.hero h1 { color: #fff; margin-bottom: 0.5rem; }
-.hero .meta { font-size: 1.1rem; color: rgba(255,255,255,0.85); margin-bottom: 1.5rem; }
+/* Parchment edge vignette — warm sepia darkening on the left and right edges,
+   dissolving across a narrow band so the figure in the middle stays clean.
+   Scaled by viewport: a thin, faint accent on phones; a wider, richer rim on
+   desktop where there's more empty hero space to frame. Sits above the
+   layers, below the text. */
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  /* Default = mobile-first: barely-there warm tint so the small viewport stays
+     light. Most of the legibility on phones comes from the text-shadows. */
+  background:
+    linear-gradient(to right,
+      rgba(45, 28, 14, 0.18) 0,
+      rgba(45, 28, 14, 0.06) 0.8rem,
+      rgba(45, 28, 14, 0)    2rem),
+    linear-gradient(to left,
+      rgba(45, 28, 14, 0.15) 0,
+      rgba(45, 28, 14, 0.05) 0.8rem,
+      rgba(45, 28, 14, 0)    2rem);
+}
+/* Drop the paper-grain overlay on small screens — combined with the small
+   viewport it visually compresses the image and reads as "dark and muddy"
+   even though the noise is brightness-neutral on average. Desktop keeps it. */
+@media (max-width: 699px) {
+  .hero::after { display: none; }
+}
+/* Tablet+ — bands grow, opacity comes back up. */
+@media (min-width: 700px) {
+  .hero::before {
+    background:
+      linear-gradient(to right,
+        rgba(45, 28, 14, 0.50) 0,
+        rgba(45, 28, 14, 0.25) 3rem,
+        rgba(45, 28, 14, 0)    9rem),
+      linear-gradient(to left,
+        rgba(45, 28, 14, 0.45) 0,
+        rgba(45, 28, 14, 0.20) 3rem,
+        rgba(45, 28, 14, 0)    9rem);
+  }
+}
+/* Desktop — full atmospheric rim. Reach uses % at this breakpoint so wide
+   monitors get a proportionally wide vignette like the very first version. */
+@media (min-width: 1100px) {
+  .hero::before {
+    background:
+      linear-gradient(to right,
+        rgba(45, 28, 14, 0.70) 0%,
+        rgba(45, 28, 14, 0.40) 12%,
+        rgba(45, 28, 14, 0)    30%),
+      linear-gradient(to left,
+        rgba(45, 28, 14, 0.60) 0%,
+        rgba(45, 28, 14, 0.30) 12%,
+        rgba(45, 28, 14, 0)    30%);
+  }
+}
+/* Paper-grain noise overlay — a tiny SVG turbulence pattern tiled across the
+   whole hero with very low opacity. Makes the surface feel like aged paper
+   instead of flat pixels, without darkening anything. */
+.hero::after {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  background-size: 220px 220px;
+  opacity: 0.10;
+  mix-blend-mode: overlay;     /* multiplies dark, screens light — adds grain without changing average brightness */
+  pointer-events: none;
+  z-index: 1;
+}
+/* Text legibility comes from a combination of the edge vignette behind it +
+   a tight inner text-shadow that crisps each glyph against any imagery that
+   pokes through. Outer glow is dialed back since the vignette does most of
+   the heavy lifting near the edges. */
+.hero .eyebrow {
+  font-family: var(--font-display); font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.15em; font-size: 0.85rem; margin-bottom: 0.5rem;
+  color: var(--color-accent);
+  text-shadow:
+    0 1px 2px rgba(0,0,0,0.9),
+    0 0 14px rgba(0,0,0,0.7);
+}
+.hero h1 {
+  color: #fff; margin-bottom: 0.5rem;
+  text-shadow:
+    0 1px 2px rgba(0,0,0,0.9),
+    0 2px 14px rgba(0,0,0,0.6);
+}
+.hero .meta {
+  font-size: 1.1rem; color: #fff;
+  margin-bottom: 1.5rem;
+  text-shadow:
+    0 1px 2px rgba(0,0,0,0.9),
+    0 0 14px rgba(0,0,0,0.7);
+}
 .hero .cta { display: flex; gap: 1rem; flex-wrap: wrap; }
 
 /* Buttons */
@@ -280,8 +392,8 @@ section.block > .container { position: relative; z-index: 1; }
 }
 
 /* On /home/ entrance from splash, the page is initially covered by #homeWipe.
-   The bottom edge has the matching curve while it collapses, so the dark lip
-   visually "settles" into the header line. */
+   It collapses straight up into the header. Flat bottom edge — the wipe's
+   bottom line lands precisely on the header's bottom border, no dome. */
 #homeWipe {
   position: fixed; left: 0; right: 0; top: 0;
   height: 100vh; height: 100svh;
@@ -292,17 +404,6 @@ section.block > .container { position: relative; z-index: 1; }
 }
 #homeWipe.is-collapsing { height: var(--header-h, 84px); }
 #homeWipe.is-done { opacity: 0; transition: opacity 0.35s ease 0.05s; }
-/* Soft dome riding the bottom of the home wipe as it collapses. Mirrors the splash dome. */
-#homeWipe::after {
-  content: '';
-  position: absolute;
-  left: 0; right: 0;
-  top: 100%;
-  height: 4rem;
-  background: var(--color-text);
-  border-radius: 0 0 50% 50% / 0 0 100% 100%;
-}
-#homeWipe.is-done::after { display: none; }
 
 /* While the wipe is collapsing on /home/, the real header should not flicker through.
    Keep header below the wipe at z=auto; once #homeWipe is .is-done it fades out. */

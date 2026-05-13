@@ -254,13 +254,37 @@ function tlt_get_upcoming_shows( $limit = 6 ) {
 }
 
 /**
+ * Returns "today" as Y-m-d, with an override for development previews.
+ * Accepts ?as_of=YYYY-MM-DD on any request to simulate a future/past date for
+ * the homepage, season grid, hero picker, status badges, etc. Useful for
+ * previewing what the site will look like after Bedroom Farce closes, etc.
+ * Set ?as_of=clear to drop the override.
+ */
+function tlt_today() {
+    if ( isset( $_GET['as_of'] ) ) {
+        $raw = sanitize_text_field( wp_unslash( $_GET['as_of'] ) );
+        if ( $raw === 'clear' ) {
+            if ( ! headers_sent() ) setcookie( 'tlt_as_of', '', time() - 3600, '/' );
+            unset( $_COOKIE['tlt_as_of'] );
+        } elseif ( preg_match( '/^\d{4}-\d{2}-\d{2}$/', $raw ) ) {
+            if ( ! headers_sent() ) setcookie( 'tlt_as_of', $raw, time() + 86400, '/' );
+            return $raw;
+        }
+    }
+    if ( ! empty( $_COOKIE['tlt_as_of'] ) && preg_match( '/^\d{4}-\d{2}-\d{2}$/', $_COOKIE['tlt_as_of'] ) ) {
+        return $_COOKIE['tlt_as_of'];
+    }
+    return current_time( 'Y-m-d' );
+}
+
+/**
  * Smart hero: returns ['show' => $post, 'mode' => 'now-playing'|'coming-soon'|'recap', 'label' => ...]
  * - now-playing: there's a show currently running
  * - coming-soon: next show is in the future (hasn't opened yet)
  * - recap: no upcoming show, falls back to most recently closed (between-seasons mode)
  */
 function tlt_get_hero_show() {
-    $today = current_time( 'Y-m-d' );
+    $today = tlt_today();
 
     // 1) Currently running show?
     $now = get_posts( [
@@ -304,8 +328,10 @@ function tlt_get_hero_show() {
  * or just-closed. Falls back to the most recently named season term.
  */
 function tlt_get_current_season_term() {
-    $today = current_time( 'Y-m-d' );
-    // 1) Season that has a show whose end >= today (we're inside it)
+    $today = tlt_today();
+    // 1) Season that has a show whose end >= today (we're inside it). This keeps
+    //    the current season featured until its last show actually closes, even
+    //    if the next season has already been announced.
     $shows = get_posts( [
         'post_type' => 'tlt_show', 'posts_per_page' => 1,
         'meta_query' => [
@@ -361,7 +387,7 @@ function tlt_get_current_season_shows() {
  * Returns: 'closed' | 'now-playing' | 'next' | 'upcoming'
  */
 function tlt_show_status( $post_id, $is_first_upcoming = false ) {
-    $today = current_time( 'Y-m-d' );
+    $today = tlt_today();
     $open  = get_post_meta( $post_id, 'show_open_date', true );
     $close = get_post_meta( $post_id, 'show_close_date', true );
     if ( ! $open ) return 'upcoming';

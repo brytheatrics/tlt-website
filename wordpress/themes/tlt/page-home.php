@@ -11,7 +11,7 @@ $hero_mode    = $hero ? $hero['mode'] : '';
 $hero_label   = $hero ? $hero['label'] : '';
 $season_shows = function_exists('tlt_get_current_season_shows') ? tlt_get_current_season_shows() : [];
 $season_term  = function_exists('tlt_get_current_season_term') ? tlt_get_current_season_term() : null;
-$today        = current_time( 'Y-m-d' );
+$today        = function_exists( 'tlt_today' ) ? tlt_today() : current_time( 'Y-m-d' );
 
 // Determine which upcoming show is "next" (first one whose open_date > today)
 $first_upcoming_id = null;

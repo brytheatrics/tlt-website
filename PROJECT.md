@@ -13,25 +13,35 @@ Migration project: Squarespace → self-hosted WordPress.
 
 **Stack:**
 ```
-GoDaddy (domain, unchanged)  →  Cloudways or SiteGround (~$10-15/mo host)
+GoDaddy (domain, unchanged)  →  Cloudways (~$14/mo host)
                               →  WordPress (self-hosted, free)
-                              →  Bricks Builder ($79 lifetime) or Elementor (free)
+                              →  Custom theme + custom post types + flex blocks
+                                 (NO page builder — see ARCHITECTURE.md)
 ```
 
 **Not changing:** Google Workspace email (`@tacomalittletheatre.com`) — different DNS records, won't be touched.
 
-**Cost:** ~$10-15/mo total, vs. current $19/mo Squarespace and the $35/mo we'd need for code access.
+**Cost:** ~$14/mo total, vs. current $19/mo Squarespace and the $35/mo we'd need for code access.
+
+> 📐 **Engineering plan:** see [`_planning/ARCHITECTURE.md`](_planning/ARCHITECTURE.md) for the full architecture (templates, post types, automation rules, etc.).
+> 📋 **Decision log:** see [`_planning/decisions.md`](_planning/decisions.md) for the running log of decisions and why.
+> 📊 **Template inventory:** see [`_planning/template_inventory.md`](_planning/template_inventory.md) for which templates exist, what's missing, build order.
 
 ## Constraints / decisions made
 
 - **WordPress.org (self-hosted), not WordPress.com.** WP.com has the same code-restriction problem as Squarespace.
-- **Visual builder (Bricks or Elementor)** so non-coders on the team can edit pages drag-and-drop, like Squarespace.
-- **Custom post type "Shows"** with structured data (Event schema) so each production gets its own SEO-friendly URL.
+- **NO page builder.** Custom theme with hard templates + flex-content block library + Designed Page template. Chris doesn't need drag-drop; he needs structured forms that produce beautifully-designed pages. Rationale in [`_planning/ARCHITECTURE.md`](_planning/ARCHITECTURE.md).
+- **Custom post types** for Shows, Team, Promotions (universal banner system), News. Pages assemble themselves from these data sources rather than being hand-edited.
+- **Date-driven content.** Every "this needs to change at time X" task is a date field. Required, not optional. Eliminates the "Chris forgot to take this down" problem.
+- **Customizer for content settings only** (logo, address, mission text, social links). Brand controls (colors, fonts) live in code as CSS variables — not exposed in admin UI. Chris is Administrator but can't accidentally drift the brand because the controls don't exist for him to click.
+- **Show post type covers Off the Shelf and Murder Mystery Dinners** as program type variants, not separate post types.
+- **Single auditions hub page**, not per-show audition pages.
+- **Splash auto-shows** when currently-running show has splash photos; auto-hides otherwise.
 - **Password-protected pages** for internal tools (callboard, etc.) — built-in WP feature.
 - **TLT-SERVER stays the master photo archive (155 GB).** Website only shows a curated 6-12 hero photos per show. ~400 MB total site-wide for photos, fits any cheap hosting plan.
 - **TLT Videos are archive-only** (licensing) — never linked or uploaded to public site.
 - **Read-only on TLT-SERVER, no deletes.** Boss owns the server setup; lost data is a serious problem.
-- **No git repo yet.** Add one before WordPress development phase.
+- **Git repo exists:** github.com/brytheatrics/tlt-website. Cross-computer dev via git + Drive + Windows junctions.
 
 ## Site inventory & migration scope
 
