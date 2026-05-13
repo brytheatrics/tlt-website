@@ -131,6 +131,21 @@ add_action( 'pre_get_posts', function ( $query ) {
     $query->set( 'post_type', [ 'tlt_show', 'page', 'post' ] );
 } );
 
+/**
+ * Season archive (/seasons/<slug>/) and main show archive (/shows/) need shows
+ * ordered chronologically by show_open_date. Without this, WP defaults to
+ * post_date DESC and the season grid looks shuffled.
+ */
+add_action( 'pre_get_posts', function ( $query ) {
+    if ( is_admin() || ! $query->is_main_query() ) return;
+    if ( $query->is_tax( 'tlt_season' ) || ( $query->is_post_type_archive( 'tlt_show' ) ) ) {
+        $query->set( 'meta_key', 'show_open_date' );
+        $query->set( 'orderby', 'meta_value' );
+        $query->set( 'order', 'ASC' );
+        $query->set( 'posts_per_page', -1 ); // all shows in a season fit on one page
+    }
+} );
+
 /* ===================================================================
  * Customizer — Content settings only (brand controls stay in CSS vars)
  * Adds editable fields for logo (handled by core), address, phone,
