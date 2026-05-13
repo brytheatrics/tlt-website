@@ -6,6 +6,112 @@ When Claude is doing autonomous work, every "I made a judgment call" decision ge
 
 ---
 
+## Autonomous work — Squarespace asset rehost
+
+**Date:** 2026-05-12 (~23:50)
+**Script:** `wordpress/import/rehost_squarespace_images.py`
+**Backup:** `_snapshots/before_image_rehost_20260512-235019.sql` (wp_posts + wp_postmeta, 1.1 MiB)
+
+**Numbers:**
+- Unique Squarespace URLs found: **561** (in 175 `post_content` rows + 254 `postmeta` rows, all on `_thumbnail_external_url`).
+- Hosts seen: `images.squarespace-cdn.com`, `static1.squarespace.com`.
+- Downloaded successfully: **542** unique files (291 MiB total).
+- Deduped by SHA-256 content hash: **19** URLs collapsed onto existing files (Squarespace serves the same image under multiple CDN URLs).
+- Failed: **0**.
+- All 561 URLs now mapped to `/wp-content/uploads/migrated/<slug>.<ext>`.
+- DB rewrites: **157** `post_content` rows (1,167 substitutions), **189** `postmeta` rows (189 substitutions).
+- Final scan: zero rows still contain `squarespace`.
+
+**Edge cases handled:**
+- Stripped `?format=NNNw` query params before fetch.
+- URLs ending in a 13-digit timestamp with no filename — synthesized filename from path segments + extension from response `Content-Type`.
+- Squarespace serves `image/webp` for URLs that end in `.jpg` — extension chosen from Content-Type, not URL.
+- Filename collisions across distinct images resolved with `-2`, `-3` suffixes.
+
+**/s/*.pdf:** Scanned but the parallel `audit_program_pdfs.py` agent owns this rewrite. Only `/s/TLT-Amended-Bylaws-2016-11-1.pdf` had a counterpart already in `wp-content/uploads/` at scan time, so rewrote that one. Other unmatched `/s/*.pdf` paths logged to `wordpress/import/unmatched_s_pdfs.txt`. Verified no clobber of the cleanup agent's PDF rewrites — their 10 high-confidence matches all survived in the DB after my UPDATEs (rows I touched only contained Squarespace URLs, near-zero overlap with PDF-only rows).
+
+**Idempotency / resume:** state in `wordpress/import/.rehost_squarespace_state.json`; re-running is a no-op. Save-every-25 makes crash recovery safe.
+
+**Operational notes:** 10 concurrent workers, 45 s timeout, 3 retries with 0.6 s × attempt backoff. UA = `TLT-Migration/1.0 (blakeryork@gmail.com; rehosting our own Squarespace site)`.
+
+---
+
+## Autonomous work — HTML cleanup pass
+
+**Date:** 2026-05-12
+
+**Scope:** Ran `wordpress/import/cleanup_imported_html.py` over all 209
+`publish` rows in (`page`, `post`, `tlt_show`, `tlt_team`).
+
+**What changed in the DB:**
+- Stripped `<!--SPECIAL CONTENT-->`, `<!--POST HEADER-->`, `<!--POST BODY-->`,
+  `<!--POST FOOTER-->` HTML comments from every post body that had them
+  (~147 posts).
+- Unwrapped Squarespace layout chrome: any `<div>` whose class starts with
+  `sqs-layout`, `sqs-row`, `sqs-block`, `sqs-block-content`, `columns-12`,
+  or carries `data-block-type`. Children preserved. ~85 wrapper divs
+  removed across the corpus.
+- `website-component-block button-block` divs were converted to
+  `<p class="button-row">…anchor…</p>`. Embed-block wrappers were
+  unwrapped (iframe inside preserved).
+- Rewrote ~1094 `/s/<file>.pdf` links to `/wp-content/uploads/programs/<file>.pdf`,
+  except for ~42 references whose filenames are in `unmatched_pdfs.txt`
+  (those still 404 on `/s/…` until the source PDFs are located on
+  TLT-SERVER or supplied manually). Full list in
+  `_planning/cleanup_imported_html_report.txt`.
+
+**Edge cases / decisions:**
+- **Mojibake pass was a no-op.** I checked for `U+FFFD` characters via both
+  string match and HEX byte scan. Zero occurrences across the corpus.
+  Earlier worries about `Chris�s` style mojibake turned out to be terminal
+  rendering of normal U+2019 / U+00E9 — the underlying bytes are correct
+  UTF-8. The replacement code is still in the script for future imports.
+- **Be conservative with wrapper stripping.** I unwrap only divs that start
+  with the listed Squarespace prefixes. Lots of `summary-block-*`,
+  `summary-item-*`, and `image-block-*` classes remain in the markup —
+  those carry layout intent the new theme might still want to honor, so
+  I left them alone. If they need to go, a follow-up pass with a narrower
+  rule is straightforward.
+- **Idempotency footnote.** First real-mode run partially completed (some
+  posts needed a second pass before all comments and wrapper divs were
+  removed). A third dry-run confirms the script is now a no-op on the
+  current DB, so the corpus is in steady state. Root cause likely
+  attribute-quote normalization through the BeautifulSoup round-trip.
+  Not blocking — script converges in at most two passes.
+- **Backup:** Full `wp_posts` dump at `_snapshots/wp_posts_before_cleanup.sql`
+  (INSERT statements, 262 rows).
+
+**Pages flagged for review:**
+- ID 1059 ("Board of Directors & Staff") — still contains heavy
+  `summary-block-*` Squarespace summary listing. Will need rebuild as a
+  custom team-listing template.
+- Posts referencing the 38 unmatched PDFs (see
+  `_planning/cleanup_imported_html_report.txt` for the full list) — these
+  hrefs still point at `/s/…` and will 404 in WordPress until those PDFs
+  are sourced.
+
+---
+
+## Autonomous work — PDF audit
+
+**2026-05-12 — Program PDF audit (`wordpress/import/audit_program_pdfs.py`)**
+
+- Starting state: 495 of 554 website program PDFs matched to TLT-SERVER copies; 59 unmatched.
+- New high-confidence matches found via fuzzier matching: **10** (all pre-2014 programs with year prefixes in their filename; one had a typo — `Goodbuy` vs server `Goodbye, My Fancy`, fuzzy score 94).
+- Marked for manual review: **7** — all recent shows (2021-26) whose website filename has no year prefix and whose server has only an older production of the same title (e.g. `Fiddler-Program.pdf` on a 2024-25 page vs server `1992-1993 FIDDLER ON THE ROOF.pdf`). Score capped below auto-match threshold; flagged with strategy `token-only (no server file for show's season)`.
+- Still no match: **42** — mostly non-program documents (bylaws, season brochures, ticket order forms, enrollment forms, audition material) plus recent-season programs that genuinely aren't on the server yet.
+- Final coverage after applying supplemental matches: **505 / 554 (91.2%)**.
+- Server programs not referenced by any website show: **45** — listed in report as candidates for the prior-seasons archive page.
+
+**Key pattern observed:** the gap between matched and unmatched is almost entirely seasonal. Server has pre-2020 programs (filename format `YYYY-YYYY Show.pdf`); website's recent show pages (2021-26) use bare `Show-Program.pdf` filenames and the corresponding server program either doesn't exist yet or hasn't been added to the archive folder.
+
+**Output:**
+- Report: `_planning/pdf_audit_report.md`
+- Supplemental matches: `wordpress/import/pdf_supplemental_matches.json` (10 high-confidence entries; awaits Blake's review before any DB action).
+- No DB changes made.
+
+---
+
 ## 2026-05-12 — Architecture pivot: no page builder
 
 **Context:** Originally planned to use Elementor Pro ($59/yr) as the visual editor. Blake raised the question of whether Chris actually needs full drag-drop editing.

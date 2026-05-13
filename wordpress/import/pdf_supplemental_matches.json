@@ -1,0 +1,86 @@
+{
+  "generated_by": "wordpress/import/audit_program_pdfs.py",
+  "threshold_score": 88,
+  "matches": [
+    {
+      "website_filename": "1927-1928-The-Intimate-Strangers-zj62.pdf",
+      "website_url": "/s/1927-1928-The-Intimate-Strangers-zj62.pdf",
+      "server_path": "TLT Programs/1925 -1939-40/1927-1928 The Intimate Strangers.pdf",
+      "server_basename": "1927-1928 The Intimate Strangers.pdf",
+      "similarity": 100.0,
+      "strategy": "year+token"
+    },
+    {
+      "website_filename": "1940-1941-Three-Workshop-Plays-lz5h.pdf",
+      "website_url": "/s/1940-1941-Three-Workshop-Plays-lz5h.pdf",
+      "server_path": "TLT Programs/1941-42 - 1949-50/1940-1941 Three Workshop Plays.pdf",
+      "server_basename": "1940-1941 Three Workshop Plays.pdf",
+      "similarity": 100.0,
+      "strategy": "year+token"
+    },
+    {
+      "website_filename": "1944-1945-Village-Green-p9gd.pdf",
+      "website_url": "/s/1944-1945-Village-Green-p9gd.pdf",
+      "server_path": "TLT Programs/1941-42 - 1949-50/1944-1945 Village Green.pdf",
+      "server_basename": "1944-1945 Village Green.pdf",
+      "similarity": 100.0,
+      "strategy": "year+token"
+    },
+    {
+      "website_filename": "1951-1952-Goodbuy-My-Fancy.pdf",
+      "website_url": "/s/1951-1952-Goodbuy-My-Fancy.pdf",
+      "server_path": "TLT Programs/1950-51 - 1959-60/1951-1952 Goodbye, My Fancy.pdf",
+      "server_basename": "1951-1952 Goodbye, My Fancy.pdf",
+      "similarity": 93.75,
+      "strategy": "year+token"
+    },
+    {
+      "website_filename": "1964-1965-The-Sleeping-Prince-7xkg.pdf",
+      "website_url": "/s/1964-1965-The-Sleeping-Prince-7xkg.pdf",
+      "server_path": "TLT Programs/1960-61 - 1969-70/1964-1965 The Sleeping Prince.pdf",
+      "server_basename": "1964-1965 The Sleeping Prince.pdf",
+      "similarity": 100.0,
+      "strategy": "year+token"
+    },
+    {
+      "website_filename": "1969-1970-Reluctant-Debutante-6lbc.pdf",
+      "website_url": "/s/1969-1970-Reluctant-Debutante-6lbc.pdf",
+      "server_path": "TLT Programs/1960-61 - 1969-70/1969-1970 Reluctant Debutante.pdf",
+      "server_basename": "1969-1970 Reluctant Debutante.pdf",
+      "similarity": 100.0,
+      "strategy": "year+token"
+    },
+    {
+      "website_filename": "1970-1971-The-Cactus-Flower.pdf",
+      "website_url": "/s/1970-1971-The-Cactus-Flower.pdf",
+      "server_path": "TLT Programs/1970-71 - 1979-80/1970-1971 Cactus Flower.pdf",
+      "server_basename": "1970-1971 Cactus Flower.pdf",
+      "similarity": 100.0,
+      "strategy": "year+token"
+    },
+    {
+      "website_filename": "1970-1972-A-Case-of-Libel.pdf",
+      "website_url": "/s/1970-1972-A-Case-of-Libel.pdf",
+      "server_path": "TLT Programs/1970-71 - 1979-80/1970-1971 A Case of Libel.pdf",
+      "server_basename": "1970-1971 A Case of Libel.pdf",
+      "similarity": 100.0,
+      "strategy": "year+token"
+    },
+    {
+      "website_filename": "1979-1980-THE-IMPORTANCE-OF-BEING-EARNEST-blxc.pdf",
+      "website_url": "/s/1979-1980-THE-IMPORTANCE-OF-BEING-EARNEST-blxc.pdf",
+      "server_path": "TLT Programs/1970-71 - 1979-80/1979-1980 THE IMPORTANCE OF BEING EARNEST.pdf",
+      "server_basename": "1979-1980 THE IMPORTANCE OF BEING EARNEST.pdf",
+      "similarity": 100.0,
+      "strategy": "year+token"
+    },
+    {
+      "website_filename": "1996-1997-Joseph-and-the-Amazing-Technicolor-Dreamcoat-2lgn.pdf",
+      "website_url": "/s/1996-1997-Joseph-and-the-Amazing-Technicolor-Dreamcoat-2lgn.pdf",
+      "server_path": "TLT Programs/1990-91 - 1999-2000/1996-1997 Joseph and the Amazing Technicolor Dreamcoat.pdf",
+      "server_basename": "1996-1997 Joseph and the Amazing Technicolor Dreamcoat.pdf",
+      "similarity": 100.0,
+      "strategy": "year+token"
+    }
+  ]
+}

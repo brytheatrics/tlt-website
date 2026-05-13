@@ -1,0 +1,48 @@
+# Cleanup report (DRY-RUN)
+# Generated 2026-05-12 23:52:48
+
+Posts examined          : 209
+Posts modified          : 0
+Wrapper divs stripped   : 0
+U+FFFD chars replaced   : 0
+/s/*.pdf links rewritten: 0
+/s/*.pdf links skipped  : 41
+
+Unmatched /s/ filenames still referenced (count x file):
+    2x  1951-1952-Goodbuy-My-Fancy.pdf
+    1x  2627-Season-Descriptions.pdf
+    1x  2627-Season-Ticket-Order-Form.pdf
+    1x  A-Dolls-House-Part-2-Program-Single-Page.pdf
+    1x  Almost-Maine-Program.pdf
+    1x  Bug-Program.pdf
+    1x  Clue-Program.pdf
+    1x  Curious-Program.pdf
+    2x  Da-Vinci-Program.pdf
+    1x  Delta-Program.pdf
+    1x  Fiddler-Program.pdf
+    1x  Lorca-Dramaturgy.pdf
+    1x  Lorca-Program.pdf
+    1x  Matilda-Program.pdf
+    1x  Misery-Program-Opening.pdf
+    1x  Murder-on-the-Orient-Express-Program.pdf
+    2x  One-Man-Program.pdf
+    1x  Rent-Program-Single-Page.pdf
+    1x  Rock-of-Ages-Program.pdf
+    1x  Rocky-Program.pdf
+    1x  Rudolph-Program.pdf
+    1x  Shawshank-Program.pdf
+    1x  Silent-Sky-Program.pdf
+    1x  Spring-Awakening-Program.pdf
+    2x  Steel-Mags-Program.pdf
+    1x  TLT-OZ-Program-redact.pdf
+    1x  TLT-Po-Boy-Program.pdf
+    1x  TLT-Significant-Other-Program.pdf
+    1x  TLT-The-Luck-of-the-Irish-program.pdf
+    1x  Terms-Program.pdf
+    1x  The-Happiest-Song-Plays-Last-Program.pdf
+    1x  The-Mountaintop-Dramaturgy.pdf
+    1x  The-Mountaintop-Program.pdf
+    1x  The-Mousetrap-Prorgram.pdf
+    1x  The-Play-That-Goes-Wrong-Program-PDF-Program.pdf
+    1x  The-Time-Machine-Program.pdf
+    1x  Xmas-Program.pdf
