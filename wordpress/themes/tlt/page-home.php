@@ -20,6 +20,39 @@ foreach ( $season_shows as $s ) {
     if ( $o && $o > $today ) { $first_upcoming_id = $s->ID; break; }
 }
 
+// Splash -> Home wipe: if we arrived from /splash/, render an inline-blocking script
+// that immediately covers the page with a charcoal band so the rest can paint behind it.
+?>
+<script>
+  // Runs synchronously, blocking render until the wipe is in place — avoids any flash.
+  (function () {
+    try {
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      if (sessionStorage.getItem('tlt_splash_to_home') !== '1') return;
+      sessionStorage.removeItem('tlt_splash_to_home');
+      var w = document.createElement('div');
+      w.id = 'homeWipe';
+      // Append on DOMContentLoaded so <body> exists
+      document.addEventListener('DOMContentLoaded', function () {
+        document.body.appendChild(w);
+        // Force layout, then trigger collapse on next frame
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            w.classList.add('is-collapsing');
+          });
+        });
+        w.addEventListener('transitionend', function (ev) {
+          if (ev.propertyName !== 'height') return;
+          w.classList.add('is-done');
+          // Remove after fade
+          setTimeout(function () { w.remove(); }, 500);
+        }, { once: true });
+      });
+    } catch (_) {}
+  })();
+</script>
+<?php
+
 if ( $current ) :
     $hero_img = tlt_show_image_url( $current->ID, 'full', 'hero' );
     $director = get_post_meta( $current->ID, 'show_director', true );

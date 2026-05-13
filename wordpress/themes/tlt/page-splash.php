@@ -86,7 +86,7 @@ if ( empty( $photo_urls ) ) {
         $tix_url = $tix ?: 'https://tlt.ludus.com/';
       ?>
       <a href="<?php echo esc_url( $tix_url ); ?>" target="_blank" rel="noopener" class="btn">Buy Tickets</a>
-      <a href="<?php echo esc_url( home_url( '/home/' ) ); ?>" class="btn">Continue to TLT's Webpage</a>
+      <a href="<?php echo esc_url( home_url( '/home/' ) ); ?>" class="btn" id="continueToHome">Continue to TLT's Webpage</a>
     </div>
   </div>
 
@@ -109,5 +109,41 @@ if ( empty( $photo_urls ) ) {
   })();
 </script>
 <?php endif; ?>
+
+<script>
+  // Splash -> Home wipe: when "Continue to TLT's Webpage" is clicked, raise a charcoal
+  // band from the bottom of the screen, then navigate. The /home/ page picks up the
+  // wipe and collapses it down to header height — feels like one continuous motion.
+  (function () {
+    const link = document.getElementById('continueToHome');
+    if (!link) return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    link.addEventListener('click', function (e) {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return; // allow new-tab clicks
+      e.preventDefault();
+      const dest = link.href;
+      try { sessionStorage.setItem('tlt_splash_to_home', '1'); } catch (_) {}
+
+      const wipe = document.createElement('div');
+      wipe.id = 'splashWipe';
+      document.body.appendChild(wipe);
+      // Force layout so the transition fires
+      // eslint-disable-next-line no-unused-expressions
+      wipe.offsetHeight;
+      wipe.classList.add('is-rising');
+
+      let navigated = false;
+      const go = function () {
+        if (navigated) return;
+        navigated = true;
+        window.location.href = dest;
+      };
+      wipe.addEventListener('transitionend', go, { once: true });
+      // Safety fallback in case transitionend doesn't fire
+      setTimeout(go, 600);
+    });
+  })();
+</script>
 
 <?php get_footer(); ?>

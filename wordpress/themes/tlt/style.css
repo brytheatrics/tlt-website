@@ -203,21 +203,42 @@ section.block.dark a:not(.btn) { color: #fff; }
 
 section.block > .container { position: relative; z-index: 1; }
 
-/* Homepage page-in animation: soft entrance for the whole home template.
-   Only fires on /home/ load, not internal navigation. */
-body.home-page .hero,
-body.home-page section.block {
-  animation: pageIn 0.55s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+/* ---------- Splash → Home wipe transition ----------
+   When the user clicks "Continue to TLT's Webpage" on the splash, a dark band rises
+   from the bottom and covers the screen. After navigation to /home/, the band
+   collapses from the bottom upward, leaving its color exactly at the header — so
+   visually the wipe BECOMES the header. */
+
+/* On splash, the rising wipe is a div #splashWipe added by JS at click time. */
+#splashWipe {
+  position: fixed; left: 0; right: 0; bottom: 0;
+  height: 100vh; height: 100svh;
+  background: var(--color-text);
+  transform: translateY(100%);
+  z-index: 9999;
+  pointer-events: none;
+  transition: transform 0.42s cubic-bezier(0.7, 0, 0.3, 1);
 }
-body.home-page .hero { animation-delay: 0s; }
-body.home-page section.block { animation-delay: 0.08s; }
-@keyframes pageIn {
-  from { opacity: 0.4; transform: translateY(14px); }
-  to   { opacity: 1;   transform: translateY(0); }
+#splashWipe.is-rising { transform: translateY(0); }
+
+/* On /home/ entrance from splash, the page is initially covered by #homeWipe,
+   which then collapses from 100vh down to var(--header-h) so it lands as the header. */
+#homeWipe {
+  position: fixed; left: 0; right: 0; top: 0;
+  height: 100vh; height: 100svh;
+  background: var(--color-text);
+  z-index: 9999;
+  pointer-events: none;
+  transition: height 0.6s cubic-bezier(0.7, 0, 0.3, 1);
 }
+#homeWipe.is-collapsing { height: var(--header-h, 84px); }
+#homeWipe.is-done { opacity: 0; transition: opacity 0.25s ease 0.05s; }
+
+/* While the wipe is collapsing on /home/, the real header should not flicker through.
+   Keep header below the wipe at z=auto; once #homeWipe is .is-done it fades out. */
+
 @media (prefers-reduced-motion: reduce) {
-  body.home-page .hero,
-  body.home-page section.block { animation: none; }
+  #splashWipe, #homeWipe { display: none !important; }
 }
 
 
