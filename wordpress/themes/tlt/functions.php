@@ -20,9 +20,10 @@ add_action( 'after_setup_theme', function () {
 } );
 
 add_action( 'wp_enqueue_scripts', function () {
-    // Google Font: Montserrat
+    // Google Font: Jost — closest Google Fonts match to TLT's print font Century Gothic.
+    // Geometric humanist sans-serif; loads 400/500/600/700 for body + display + headings.
     wp_enqueue_style( 'tlt-google-fonts',
-        'https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap',
+        'https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&display=swap',
         [],
         null
     );
