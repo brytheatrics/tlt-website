@@ -41,12 +41,20 @@ foreach ( $season_shows as $s ) {
             w.classList.add('is-collapsing');
           });
         });
-        w.addEventListener('transitionend', function (ev) {
-          if (ev.propertyName !== 'height') return;
+        function onEnd(ev) {
+          if (ev.propertyName !== 'height') return; // ignore any non-height transitions
+          w.removeEventListener('transitionend', onEnd);
           w.classList.add('is-done');
-          // Remove after fade
           setTimeout(function () { w.remove(); }, 500);
-        }, { once: true });
+        }
+        w.addEventListener('transitionend', onEnd);
+        // Hard safety: kill the wipe after the longest reasonable duration
+        setTimeout(function () {
+          if (document.body.contains(w)) {
+            w.classList.add('is-done');
+            setTimeout(function () { w.remove(); }, 500);
+          }
+        }, 1500);
       });
     } catch (_) {}
   })();
