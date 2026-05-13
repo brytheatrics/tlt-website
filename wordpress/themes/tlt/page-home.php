@@ -69,18 +69,22 @@ if ( $current ) :
     $tix = get_post_meta( $current->ID, 'show_ticket_url', true );
 
     // ----- Layered hero detection -----
-    // If /wp-content/uploads/hero-layers/[slug]/ exists with layer PNGs, render the animated layered hero.
+    // If /wp-content/uploads/hero-layers/[slug]/ has files like 1-bg.png, 2-foo.png, etc.,
+    // render the layered animated hero. Layer order is the leading number in the filename.
     $slug = $current->post_name;
     $layers_dir = WP_CONTENT_DIR . '/uploads/hero-layers/' . $slug;
     $layers_url = content_url( '/uploads/hero-layers/' . $slug );
     $layers = [];
     if ( is_dir( $layers_dir ) ) {
-        $known = [ '1-bg', '2-podium', '3-person', '4-mics', '5-foreground' ];
-        foreach ( $known as $i => $name ) {
-            $path = $layers_dir . '/' . $name . '.png';
-            if ( file_exists( $path ) ) {
-                $layers[] = [ 'name' => $name, 'url' => $layers_url . '/' . $name . '.png', 'order' => $i + 1 ];
-            }
+        $found = glob( $layers_dir . '/[0-9]-*.png' );
+        sort( $found );
+        foreach ( $found as $i => $path ) {
+            $base = basename( $path );
+            $layers[] = [
+                'name'  => preg_replace( '/\.png$/i', '', $base ),
+                'url'   => $layers_url . '/' . $base,
+                'order' => $i + 1,
+            ];
         }
     }
     $composite_path = $layers_dir . '/composite.jpg';
@@ -91,7 +95,8 @@ if ( $current ) :
     <!-- Layered hero (desktop/tablet): each layer slides in from a different direction, staggered -->
     <div class="hero-layers" aria-hidden="true">
       <?php foreach ( $layers as $l ) : ?>
-        <img class="hero-layer hero-layer-<?php echo esc_attr( $l['name'] ); ?>"
+        <img class="hero-layer hero-layer-<?php echo (int) $l['order']; ?>"
+             data-name="<?php echo esc_attr( $l['name'] ); ?>"
              src="<?php echo esc_url( $l['url'] ); ?>" alt="">
       <?php endforeach; ?>
     </div>

@@ -164,11 +164,13 @@ nav.primary li:focus-within > ul { display: flex; }
   opacity: 0;
   animation: layerIn 0.9s cubic-bezier(0.2, 0.7, 0.25, 1) forwards;
 }
-.hero-layered .hero-layer-1-bg       { animation-delay: 0.05s; --layer-from: translate(0, 0); }
-.hero-layered .hero-layer-2-podium   { animation-delay: 0.30s; --layer-from: translateY(80px); }
-.hero-layered .hero-layer-3-person   { animation-delay: 0.45s; --layer-from: translateX(-90px); }
-.hero-layered .hero-layer-4-mics     { animation-delay: 0.60s; --layer-from: translateY(120px); }
-.hero-layered .hero-layer-5-foreground { animation-delay: 0.80s; --layer-from: translateY(-30px); }
+/* Ordinal layer animations — layer 1 fades in, then 2,3,4,5 slide in from different directions, staggered. */
+.hero-layered .hero-layer-1 { animation-delay: 0.05s; --layer-from: translate(0, 0); }
+.hero-layered .hero-layer-2 { animation-delay: 0.25s; --layer-from: translateY(80px); }
+.hero-layered .hero-layer-3 { animation-delay: 0.40s; --layer-from: translateY(80px); }
+.hero-layered .hero-layer-4 { animation-delay: 0.55s; --layer-from: translateX(-90px); }
+.hero-layered .hero-layer-5 { animation-delay: 0.70s; --layer-from: translateY(120px); }
+.hero-layered .hero-layer-6 { animation-delay: 0.85s; --layer-from: translateY(-30px); }
 
 @keyframes layerIn {
   from { opacity: 0; transform: var(--layer-from, translate(0, 0)); }
