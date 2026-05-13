@@ -141,7 +141,7 @@ if ( empty( $photo_urls ) ) {
       };
       wipe.addEventListener('transitionend', go, { once: true });
       // Safety fallback in case transitionend doesn't fire
-      setTimeout(go, 600);
+      setTimeout(go, 900);
     });
   })();
 </script>

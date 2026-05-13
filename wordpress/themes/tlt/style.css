@@ -209,7 +209,10 @@ section.block > .container { position: relative; z-index: 1; }
    collapses from the bottom upward, leaving its color exactly at the header — so
    visually the wipe BECOMES the header. */
 
-/* On splash, the rising wipe is a div #splashWipe added by JS at click time. */
+/* On splash, the rising wipe is a div #splashWipe added by JS at click time.
+   Top edge has a wide-but-shallow elliptical curve so it reads as a soft "wave"
+   rising rather than a hard rectangle slamming up. The curve flattens to 0 as
+   the band reaches the top, so it lands cleanly as a flat header band. */
 #splashWipe {
   position: fixed; left: 0; right: 0; bottom: 0;
   height: 100vh; height: 100svh;
@@ -217,22 +220,33 @@ section.block > .container { position: relative; z-index: 1; }
   transform: translateY(100%);
   z-index: 9999;
   pointer-events: none;
-  transition: transform 0.42s cubic-bezier(0.7, 0, 0.3, 1);
+  border-radius: 50% 50% 0 0 / 5rem 5rem 0 0;
+  transition: transform 0.75s cubic-bezier(0.6, 0, 0.25, 1),
+              border-radius 0.75s cubic-bezier(0.6, 0, 0.25, 1);
 }
-#splashWipe.is-rising { transform: translateY(0); }
+#splashWipe.is-rising {
+  transform: translateY(0);
+  border-radius: 0;
+}
 
-/* On /home/ entrance from splash, the page is initially covered by #homeWipe,
-   which then collapses from 100vh down to var(--header-h) so it lands as the header. */
+/* On /home/ entrance from splash, the page is initially covered by #homeWipe.
+   The bottom edge has the matching curve while it collapses, so the dark lip
+   visually "settles" into the header line. */
 #homeWipe {
   position: fixed; left: 0; right: 0; top: 0;
   height: 100vh; height: 100svh;
   background: var(--color-text);
   z-index: 9999;
   pointer-events: none;
-  transition: height 0.6s cubic-bezier(0.7, 0, 0.3, 1);
+  border-radius: 0 0 50% 50% / 0 0 5rem 5rem;
+  transition: height 0.95s cubic-bezier(0.6, 0, 0.25, 1),
+              border-radius 0.95s cubic-bezier(0.6, 0, 0.25, 1);
 }
-#homeWipe.is-collapsing { height: var(--header-h, 84px); }
-#homeWipe.is-done { opacity: 0; transition: opacity 0.25s ease 0.05s; }
+#homeWipe.is-collapsing {
+  height: var(--header-h, 84px);
+  border-radius: 0;
+}
+#homeWipe.is-done { opacity: 0; transition: opacity 0.35s ease 0.05s; }
 
 /* While the wipe is collapsing on /home/, the real header should not flicker through.
    Keep header below the wipe at z=auto; once #homeWipe is .is-done it fades out. */
