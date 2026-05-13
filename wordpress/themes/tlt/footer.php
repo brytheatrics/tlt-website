@@ -2,7 +2,8 @@
 /**
  * Footer. Reads address / phone / mission / vision / land acknowledgement /
  * social links from the WordPress Customizer (Appearance → Customize).
- * Falls back to sensible defaults if Customizer values aren't set.
+ * Defaults baked in match the original design — visible even before anyone
+ * touches the Customizer.
  */
 $addr_street = tlt_setting( 'tlt_address_street', '210 N "I" Street' );
 $addr_city   = tlt_setting( 'tlt_address_city', 'Tacoma' );
@@ -10,10 +11,11 @@ $addr_state  = tlt_setting( 'tlt_address_state', 'WA' );
 $addr_zip    = tlt_setting( 'tlt_address_zip', '98403' );
 $phone       = tlt_setting( 'tlt_phone', '(253) 272-2281' );
 $fed_id      = tlt_setting( 'tlt_federal_id', '91-0485763' );
-$mission     = tlt_setting( 'tlt_mission_text' );
-$vision      = tlt_setting( 'tlt_vision_text' );
-$land_en     = tlt_setting( 'tlt_land_ack_english' );
-$land_lush   = tlt_setting( 'tlt_land_ack_lushootseed' );
+
+$mission = tlt_setting( 'tlt_mission_text', 'Providing live theatre and education programs that inspire through stories reflecting the vibrancy of our diverse community.' );
+$vision  = tlt_setting( 'tlt_vision_text', 'TLT enriches lives by providing opportunities for equitable inclusion and representation. Our goal is to ensure everyone — regardless of identity, background or personal experience — belongs at TLT.' );
+$land_en = tlt_setting( 'tlt_land_ack_english', 'Tacoma Little Theatre recognizes that they teach and perform on Indigenous land: the traditional homelands of the Puyallup people.' );
+$land_lush = tlt_setting( 'tlt_land_ack_lushootseed', "ʔuk\u{2019}ʷədiitəb ʔuhigʷətəb čəɫ txʷəl tiiɫ ʔa čəɫ ʔal tə swatxʷixʷtxʷəd ʔə tiiɫ puyaləpabš dxʷəsɫaɫlils gʷəl ʔutxʷəlšucidəbs həlgʷəʔ." );
 
 $fb = tlt_setting( 'tlt_social_facebook', 'https://www.facebook.com/tacomalittletheatre/' );
 $ig = tlt_setting( 'tlt_social_instagram', 'http://instagram.com/tacomalittletheatre' );
