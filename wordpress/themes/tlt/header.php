@@ -34,6 +34,12 @@
         </ul>
       <?php } ?>
     </nav>
+
+    <form role="search" method="get" class="site-search" action="<?php echo esc_url( home_url( '/' ) ); ?>">
+      <label class="visually-hidden" for="site-search-input">Search</label>
+      <input id="site-search-input" type="search" name="s" placeholder="Search…" value="<?php echo esc_attr( get_search_query() ); ?>" autocomplete="off">
+      <button type="submit" aria-label="Search">🔍</button>
+    </form>
   </div>
 </header>
 <?php endif; ?>

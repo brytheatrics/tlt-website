@@ -122,3 +122,129 @@ add_filter( 'body_class', function ( $classes ) {
     }
     return $classes;
 } );
+
+/**
+ * Site search: include shows + pages + posts; exclude promotions + attachments.
+ */
+add_action( 'pre_get_posts', function ( $query ) {
+    if ( is_admin() || ! $query->is_main_query() || ! $query->is_search() ) return;
+    $query->set( 'post_type', [ 'tlt_show', 'page', 'post' ] );
+} );
+
+/* ===================================================================
+ * Customizer — Content settings only (brand controls stay in CSS vars)
+ * Adds editable fields for logo (handled by core), address, phone,
+ * mission text, vision text, land acknowledgement, social media URLs.
+ * =================================================================== */
+
+add_action( 'customize_register', function ( $wp_customize ) {
+
+    // --- Contact info section ---
+    $wp_customize->add_section( 'tlt_contact', [
+        'title'    => 'Contact Information',
+        'priority' => 30,
+    ] );
+
+    $contact_fields = [
+        'tlt_address_street'  => [ 'Street Address',  '210 N "I" Street' ],
+        'tlt_address_city'    => [ 'City',            'Tacoma' ],
+        'tlt_address_state'   => [ 'State',           'WA' ],
+        'tlt_address_zip'     => [ 'ZIP',             '98403' ],
+        'tlt_phone'           => [ 'Phone',           '(253) 272-2281' ],
+        'tlt_email_general'   => [ 'General Email',   'info@tacomalittletheatre.com' ],
+        'tlt_email_boxoffice' => [ 'Box Office Email','boxoffice@tacomalittletheatre.com' ],
+        'tlt_federal_id'      => [ 'Federal Tax ID',  '91-0485763' ],
+    ];
+    foreach ( $contact_fields as $key => [ $label, $default ] ) {
+        $wp_customize->add_setting( $key, [ 'default' => $default, 'sanitize_callback' => 'sanitize_text_field' ] );
+        $wp_customize->add_control( $key, [
+            'label'   => $label,
+            'section' => 'tlt_contact',
+            'type'    => 'text',
+        ] );
+    }
+
+    // --- Footer mission/vision/land acknowledgement ---
+    $wp_customize->add_section( 'tlt_mission', [
+        'title'    => 'Mission / Vision / Land Acknowledgement',
+        'priority' => 35,
+    ] );
+
+    $mission_fields = [
+        'tlt_mission_text'      => [ 'Mission Statement', 'Providing live theatre and education programs that inspire through stories reflecting the vibrancy of our diverse community.', 'textarea' ],
+        'tlt_vision_text'       => [ 'Vision Statement',  'TLT enriches lives by providing opportunities for equitable inclusion and representation. Our goal is to ensure everyone — regardless of identity, background or personal experience — belongs at TLT.', 'textarea' ],
+        'tlt_land_ack_english'  => [ 'Land Acknowledgement (English)', 'Tacoma Little Theatre recognizes that they teach and perform on Indigenous land: the traditional homelands of the Puyallup people.', 'textarea' ],
+        'tlt_land_ack_lushootseed' => [ 'Land Acknowledgement (Lushootseed)', "ʔuk\u{2019}ʷədiitəb ʔuhigʷətəb čəɫ txʷəl tiiɫ ʔa čəɫ ʔal tə swatxʷixʷtxʷəd ʔə tiiɫ puyaləpabš dxʷəsɫaɫlils gʷəl ʔutxʷəlšucidəbs həlgʷəʔ.", 'textarea' ],
+    ];
+    foreach ( $mission_fields as $key => [ $label, $default, $type ] ) {
+        $wp_customize->add_setting( $key, [ 'default' => $default, 'sanitize_callback' => 'wp_kses_post' ] );
+        $wp_customize->add_control( $key, [
+            'label'   => $label,
+            'section' => 'tlt_mission',
+            'type'    => $type,
+        ] );
+    }
+
+    // --- Social media links ---
+    $wp_customize->add_section( 'tlt_social', [
+        'title'    => 'Social Media',
+        'priority' => 40,
+    ] );
+
+    $social_fields = [
+        'tlt_social_facebook'  => 'Facebook URL',
+        'tlt_social_instagram' => 'Instagram URL',
+        'tlt_social_youtube'   => 'YouTube URL',
+        'tlt_social_twitter'   => 'X (Twitter) URL',
+        'tlt_social_tiktok'    => 'TikTok URL',
+    ];
+    foreach ( $social_fields as $key => $label ) {
+        $wp_customize->add_setting( $key, [ 'default' => '', 'sanitize_callback' => 'esc_url_raw' ] );
+        $wp_customize->add_control( $key, [
+            'label'   => $label,
+            'section' => 'tlt_social',
+            'type'    => 'url',
+        ] );
+    }
+} );
+
+/**
+ * Convenience: get a TLT customizer value with a fallback.
+ */
+function tlt_setting( $key, $default = '' ) {
+    return get_theme_mod( $key, $default );
+}
+
+/**
+ * Organization-level JSON-LD on every page (in addition to the per-show
+ * TheaterEvent schema in single-tlt_show.php). Tells search engines who we
+ * are, where, and how to contact us.
+ */
+add_action( 'wp_footer', function () {
+    if ( is_404() ) return;
+    $org = [
+        '@context' => 'https://schema.org',
+        '@type'    => 'PerformingArtsTheater',
+        'name'     => get_bloginfo( 'name' ),
+        'url'      => home_url( '/' ),
+        'logo'     => get_template_directory_uri() . '/assets/logo.png',
+        'telephone' => tlt_setting( 'tlt_phone', '(253) 272-2281' ),
+        'email'    => tlt_setting( 'tlt_email_general', 'info@tacomalittletheatre.com' ),
+        'address'  => [
+            '@type'           => 'PostalAddress',
+            'streetAddress'   => tlt_setting( 'tlt_address_street', '210 N "I" Street' ),
+            'addressLocality' => tlt_setting( 'tlt_address_city', 'Tacoma' ),
+            'addressRegion'   => tlt_setting( 'tlt_address_state', 'WA' ),
+            'postalCode'      => tlt_setting( 'tlt_address_zip', '98403' ),
+            'addressCountry'  => 'US',
+        ],
+        'sameAs' => array_values( array_filter( [
+            tlt_setting( 'tlt_social_facebook' ),
+            tlt_setting( 'tlt_social_instagram' ),
+            tlt_setting( 'tlt_social_youtube' ),
+            tlt_setting( 'tlt_social_twitter' ),
+            tlt_setting( 'tlt_social_tiktok' ),
+        ] ) ),
+    ];
+    echo '<script type="application/ld+json">' . wp_json_encode( $org, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . '</script>';
+} );

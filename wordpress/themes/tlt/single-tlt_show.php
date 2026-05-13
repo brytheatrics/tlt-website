@@ -19,6 +19,14 @@ while ( have_posts() ) : the_post();
     $img       = tlt_show_image_url( get_the_ID(), 'full' );
     $videos_raw = get_post_meta( get_the_ID(), 'show_video_urls', true );
     $videos    = $videos_raw ? array_filter( array_map( 'trim', explode( ',', $videos_raw ) ) ) : [];
+
+    // --- New as of 2026-05-13 ---
+    $ptype       = get_post_meta( get_the_ID(), 'show_program_type', true );
+    $venue_name  = get_post_meta( get_the_ID(), 'show_venue_name', true );
+    $venue_addr  = get_post_meta( get_the_ID(), 'show_venue_address', true );
+    $dinner_menu = get_post_meta( get_the_ID(), 'show_dinner_menu', true );
+    $gallery_raw = get_post_meta( get_the_ID(), 'show_photo_gallery', true );
+    $gallery     = $gallery_raw ? json_decode( $gallery_raw, true ) : [];
 ?>
 
 <article class="show-detail">
@@ -111,6 +119,16 @@ while ( have_posts() ) : the_post();
           ?>
         </div>
 
+        <?php if ( $venue_name ) : ?>
+          <div class="show-venue" style="background:var(--color-soft);padding:1rem 1.25rem;border-left:4px solid var(--color-accent);margin:1.5rem 0">
+            <h3 style="color:var(--color-accent);font-size:0.95rem;letter-spacing:0.08em;margin:0 0 0.5rem">Presented At</h3>
+            <p style="margin:0;font-weight:600"><?php echo esc_html( $venue_name ); ?></p>
+            <?php if ( $venue_addr ) : ?>
+              <p style="margin:0.25rem 0 0;color:var(--color-muted)"><?php echo esc_html( $venue_addr ); ?></p>
+            <?php endif; ?>
+          </div>
+        <?php endif; ?>
+
         <?php if ( $run_time || $age ) : ?>
           <div class="schedule">
             <?php if ( $run_time ) : ?><h3>Run Time</h3><p><?php echo esc_html( $run_time ); ?></p><?php endif; ?>
@@ -145,6 +163,34 @@ while ( have_posts() ) : the_post();
         <?php endif; ?>
       </div>
     </div>
+
+    <?php if ( $dinner_menu ) : ?>
+      <section class="show-dinner-menu" style="max-width:880px;margin:3rem auto;padding:2rem;background:var(--color-soft);border-top:4px solid var(--color-accent)">
+        <h2 style="color:var(--color-accent);margin-top:0">Dinner Menu</h2>
+        <?php echo wp_kses_post( wpautop( $dinner_menu ) ); ?>
+      </section>
+    <?php endif; ?>
+
+    <?php if ( is_array( $gallery ) && $gallery ) : ?>
+      <section class="show-photo-gallery" style="margin-top:3rem">
+        <h2 class="section-heading">Production Photos</h2>
+        <div class="photo-gallery">
+          <?php foreach ( $gallery as $g ) :
+            $url = isset( $g['url'] ) ? esc_url( $g['url'] ) : '';
+            $alt = isset( $g['alt'] ) ? esc_attr( $g['alt'] ) : '';
+            $cap = isset( $g['caption'] ) ? $g['caption'] : '';
+            if ( ! $url ) continue;
+          ?>
+            <a href="<?php echo $url; ?>" class="gallery-item" target="_blank" rel="noopener">
+              <img src="<?php echo $url; ?>" alt="<?php echo $alt; ?>" loading="lazy">
+              <?php if ( $cap ) : ?>
+                <span class="visually-hidden"><?php echo esc_html( $cap ); ?></span>
+              <?php endif; ?>
+            </a>
+          <?php endforeach; ?>
+        </div>
+      </section>
+    <?php endif; ?>
   </div>
 </article>
 

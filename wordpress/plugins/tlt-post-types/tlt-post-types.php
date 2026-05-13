@@ -100,8 +100,24 @@ add_action( 'init', function () {
         'show_ticket_url'        => [ 'string', 'Buy tickets URL' ],
         'show_program_pdf_url'   => [ 'string', 'Program PDF URL' ],
         'show_cancelled'         => [ 'boolean', 'Was cancelled (e.g. COVID)' ],
-        'show_program_type'      => [ 'string', 'mainstage|off-the-shelf|club-tlt|education|special' ],
+        'show_program_type'      => [ 'string', 'mainstage|off_the_shelf|murder_mystery_dinner|club_tlt|childrens|education|special' ],
         'show_legacy_url'        => [ 'string', 'Original Squarespace URL' ],
+        // --- New as of 2026-05-13 ---
+        'show_venue_name'        => [ 'string', 'Off-site venue name (e.g. murder-mystery dinners)' ],
+        'show_venue_address'     => [ 'string', 'Off-site venue address' ],
+        'show_dinner_menu'       => [ 'string', 'Dinner menu HTML (for murder-mystery dinners)' ],
+        'show_photo_gallery'     => [ 'string', 'JSON array of [{url, alt, caption}] production photos' ],
+        'show_splash_gallery'    => [ 'string', 'JSON array of splash-page rotation image URLs' ],
+        'show_tagline'           => [ 'string', 'Short tagline shown on hero / cards' ],
+        'show_hero_image_url'    => [ 'string', 'Hero image URL override' ],
+        // --- Audition meta (single auditions hub uses these from the show record) ---
+        'show_audition_status'   => [ 'string', 'open|scheduled|cast|closed (controls visibility on /auditions/)' ],
+        'show_audition_dates'    => [ 'string', 'Human-readable audition dates ("September 21-23, 2025")' ],
+        'show_audition_location' => [ 'string', 'Audition location text (default: TLT)' ],
+        'show_audition_packet_url'=>[ 'string', 'Audition packet PDF URL' ],
+        'show_audition_signup_url'=>[ 'string', 'Casting Manager signup URL' ],
+        'show_logo_url'          => [ 'string', 'Optional small show logo (used on auditions hub)' ],
+        'show_video_urls'        => [ 'string', 'Comma-separated list of video embed URLs' ],
     ];
     foreach ( $show_fields as $key => [ $type, $desc ] ) {
         register_post_meta( 'tlt_show', $key, [
@@ -144,6 +160,8 @@ add_action( 'add_meta_boxes', function () {
 
 function tlt_render_show_meta( $post ) {
     wp_nonce_field( 'tlt_show_meta', 'tlt_show_nonce' );
+
+    // Core production details
     $fields = [
         'show_director'        => 'Director',
         'show_music_director'  => 'Music Director',
@@ -155,17 +173,86 @@ function tlt_render_show_meta( $post ) {
         'show_content_warning' => 'Content Warning',
         'show_ticket_url'      => 'Tickets URL',
         'show_program_pdf_url' => 'Program PDF URL',
-        'show_program_type'    => 'Program Type (mainstage|off-the-shelf|club-tlt|education|special)',
+        'show_tagline'         => 'Tagline (short hero subtitle)',
+        'show_hero_image_url'  => 'Hero Image URL Override',
         'show_legacy_url'      => 'Legacy Squarespace URL',
     ];
+
+    // Program type as a select for clarity
+    $program_types = [
+        'mainstage'              => 'Mainstage',
+        'off_the_shelf'          => 'Off the Shelf (staged reading)',
+        'murder_mystery_dinner'  => 'Murder Mystery Dinner',
+        'club_tlt'               => 'ClubTLT',
+        'childrens'              => "Children's / Family",
+        'education'              => 'Education event',
+        'special'                => 'Special event',
+    ];
+    $current_type = get_post_meta( $post->ID, 'show_program_type', true ) ?: 'mainstage';
+
     echo '<table class="form-table">';
     foreach ( $fields as $key => $label ) {
         $val = esc_attr( get_post_meta( $post->ID, $key, true ) );
         echo "<tr><th><label for='$key'>$label</label></th><td><input type='text' id='$key' name='$key' value='$val' style='width:100%'></td></tr>";
     }
+    // Program type select
+    echo "<tr><th><label for='show_program_type'>Program Type</label></th><td><select id='show_program_type' name='show_program_type'>";
+    foreach ( $program_types as $v => $label ) {
+        $sel = $v === $current_type ? 'selected' : '';
+        echo "<option value='$v' $sel>" . esc_html( $label ) . "</option>";
+    }
+    echo "</select></td></tr>";
+    // Cancelled checkbox
     $cancelled = get_post_meta( $post->ID, 'show_cancelled', true );
     $checked = $cancelled ? 'checked' : '';
     echo "<tr><th><label for='show_cancelled'>Cancelled</label></th><td><input type='checkbox' name='show_cancelled' id='show_cancelled' value='1' $checked> Was this production cancelled (e.g. COVID)?</td></tr>";
+
+    // --- Off-site venue (used by murder mystery dinners) ---
+    echo '<tr><th colspan="2" style="padding-top:1em;border-top:1px solid #ddd"><strong>Off-site Venue (optional — for shows not at TLT)</strong></th></tr>';
+    foreach ( [
+        'show_venue_name'    => 'Venue Name',
+        'show_venue_address' => 'Venue Address',
+    ] as $key => $label ) {
+        $val = esc_attr( get_post_meta( $post->ID, $key, true ) );
+        echo "<tr><th><label for='$key'>$label</label></th><td><input type='text' id='$key' name='$key' value='$val' style='width:100%'></td></tr>";
+    }
+
+    // --- Dinner menu (Murder Mystery Dinners) ---
+    echo '<tr><th colspan="2" style="padding-top:1em;border-top:1px solid #ddd"><strong>Dinner Menu (Murder Mystery Dinners only)</strong></th></tr>';
+    $dinner = get_post_meta( $post->ID, 'show_dinner_menu', true );
+    echo "<tr><th><label for='show_dinner_menu'>Menu HTML</label></th><td><textarea id='show_dinner_menu' name='show_dinner_menu' rows='8' style='width:100%'>" . esc_textarea( $dinner ) . "</textarea><p class='description'>Rich text supported. Use &lt;h4&gt; for course headings.</p></td></tr>";
+
+    // --- Galleries ---
+    echo '<tr><th colspan="2" style="padding-top:1em;border-top:1px solid #ddd"><strong>Galleries</strong></th></tr>';
+    foreach ( [
+        'show_photo_gallery'  => 'Production Photo Gallery (JSON: [{"url":"…","alt":"…","caption":"…"}, …])',
+        'show_splash_gallery' => 'Splash Gallery (JSON: ["url","url",…] — splash auto-shows if non-empty AND show is running)',
+        'show_video_urls'     => 'Video URLs (comma-separated YouTube/Vimeo URLs)',
+    ] as $key => $label ) {
+        $val = esc_textarea( get_post_meta( $post->ID, $key, true ) );
+        echo "<tr><th><label for='$key'>$label</label></th><td><textarea id='$key' name='$key' rows='3' style='width:100%'>$val</textarea></td></tr>";
+    }
+
+    // --- Auditions ---
+    echo '<tr><th colspan="2" style="padding-top:1em;border-top:1px solid #ddd"><strong>Auditions (drives the /auditions/ hub page)</strong></th></tr>';
+    $audition_status = get_post_meta( $post->ID, 'show_audition_status', true );
+    echo "<tr><th><label for='show_audition_status'>Audition Status</label></th><td><select id='show_audition_status' name='show_audition_status'>";
+    foreach ( [ '' => '— Not on auditions hub —', 'scheduled' => 'Scheduled (dates announced, signups not yet open)', 'open' => 'Open for signups', 'cast' => 'Cast (briefly shown on hub)', 'closed' => 'Closed (hidden)' ] as $v => $label ) {
+        $sel = $v === $audition_status ? 'selected' : '';
+        echo "<option value='$v' $sel>" . esc_html( $label ) . "</option>";
+    }
+    echo "</select></td></tr>";
+    foreach ( [
+        'show_audition_dates'      => 'Audition Dates (human-readable)',
+        'show_audition_location'   => 'Audition Location (default: TLT)',
+        'show_audition_packet_url' => 'Audition Packet PDF URL',
+        'show_audition_signup_url' => 'Audition Signup URL (e.g. Casting Manager)',
+        'show_logo_url'            => 'Show Logo URL (small, optional — used on auditions hub)',
+    ] as $key => $label ) {
+        $val = esc_attr( get_post_meta( $post->ID, $key, true ) );
+        echo "<tr><th><label for='$key'>$label</label></th><td><input type='text' id='$key' name='$key' value='$val' style='width:100%'></td></tr>";
+    }
+
     echo '</table>';
 }
 
@@ -196,9 +283,24 @@ function tlt_save_show_meta( $post_id, $post ) {
     if ( ! isset( $_POST['tlt_show_nonce'] ) || ! wp_verify_nonce( $_POST['tlt_show_nonce'], 'tlt_show_meta' ) ) return;
     if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) return;
     if ( ! current_user_can( 'edit_post', $post_id ) ) return;
-    $keys = [ 'show_director','show_music_director','show_choreographer','show_open_date','show_close_date','show_run_time','show_age_rec','show_content_warning','show_ticket_url','show_program_pdf_url','show_program_type','show_legacy_url' ];
-    foreach ( $keys as $k ) {
+    $text_keys = [
+        'show_director','show_music_director','show_choreographer','show_open_date','show_close_date',
+        'show_run_time','show_age_rec','show_content_warning','show_ticket_url','show_program_pdf_url',
+        'show_program_type','show_legacy_url','show_tagline','show_hero_image_url',
+        'show_venue_name','show_venue_address',
+        'show_audition_status','show_audition_dates','show_audition_location',
+        'show_audition_packet_url','show_audition_signup_url','show_logo_url',
+    ];
+    foreach ( $text_keys as $k ) {
         if ( isset( $_POST[ $k ] ) ) update_post_meta( $post_id, $k, sanitize_text_field( $_POST[ $k ] ) );
+    }
+    // Rich/multi-line fields — allow safe HTML
+    foreach ( [ 'show_dinner_menu' ] as $k ) {
+        if ( isset( $_POST[ $k ] ) ) update_post_meta( $post_id, $k, wp_kses_post( $_POST[ $k ] ) );
+    }
+    // JSON/textarea fields — store as-is but strip tags for safety
+    foreach ( [ 'show_photo_gallery','show_splash_gallery','show_video_urls' ] as $k ) {
+        if ( isset( $_POST[ $k ] ) ) update_post_meta( $post_id, $k, wp_kses_post( $_POST[ $k ] ) );
     }
     update_post_meta( $post_id, 'show_cancelled', ! empty( $_POST['show_cancelled'] ) ? 1 : 0 );
 }
@@ -402,6 +504,31 @@ function tlt_show_status( $post_id, $is_first_upcoming = false ) {
 
 register_activation_hook( __FILE__, function () {
     flush_rewrite_rules();
+} );
+
+/* ---------------------------------------------------------------------------
+ * Off the Shelf URL rewriting
+ * Shows with show_program_type='off_the_shelf' get URLs at /off-the-shelf/<slug>/
+ * instead of /shows/<slug>/. Both URLs resolve.
+ * ------------------------------------------------------------------------- */
+
+// Change permalink for off-the-shelf shows
+add_filter( 'post_type_link', function ( $link, $post ) {
+    if ( $post->post_type !== 'tlt_show' ) return $link;
+    $ptype = get_post_meta( $post->ID, 'show_program_type', true );
+    if ( $ptype === 'off_the_shelf' ) {
+        return home_url( '/off-the-shelf/' . $post->post_name . '/' );
+    }
+    return $link;
+}, 10, 2 );
+
+// Add rewrite rule so /off-the-shelf/<slug>/ resolves to the show
+add_action( 'init', function () {
+    add_rewrite_rule(
+        '^off-the-shelf/([^/]+)/?$',
+        'index.php?post_type=tlt_show&name=$matches[1]',
+        'top'
+    );
 } );
 
 register_deactivation_hook( __FILE__, function () {
