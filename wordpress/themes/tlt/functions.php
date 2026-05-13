@@ -26,7 +26,10 @@ add_action( 'wp_enqueue_scripts', function () {
         [],
         null
     );
-    wp_enqueue_style( 'tlt-style', get_stylesheet_uri(), [ 'tlt-google-fonts' ], '1.0.0' );
+    // Use filemtime() as version so any save instantly busts browser caches.
+    $style_path = get_stylesheet_directory() . '/style.css';
+    $ver = file_exists( $style_path ) ? filemtime( $style_path ) : '1.0.0';
+    wp_enqueue_style( 'tlt-style', get_stylesheet_uri(), [ 'tlt-google-fonts' ], $ver );
 } );
 
 /**
@@ -113,6 +116,9 @@ add_action( 'template_redirect', function () {
 add_filter( 'body_class', function ( $classes ) {
     if ( is_page( 'splash' ) || is_page_template( 'page-splash.php' ) ) {
         $classes[] = 'splash-page';
+    }
+    if ( is_page( 'home' ) ) {
+        $classes[] = 'home-page';
     }
     return $classes;
 } );
