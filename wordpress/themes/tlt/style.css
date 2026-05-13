@@ -146,6 +146,49 @@ nav.primary li:focus-within > ul { display: flex; }
   animation: heroBreath 32s ease-in-out infinite alternate;
   will-change: transform;
 }
+
+/* ---------- Layered hero (used when /wp-content/uploads/hero-layers/[slug]/ exists) ----------
+   Each layer slides into its final position on page load, staggered.
+   Mobile (≤700px): layered version hides, single composite jpg shows static. */
+
+.hero-layered .hero-layers {
+  position: absolute; inset: 0;
+  display: block;
+  pointer-events: none;
+}
+.hero-layered .hero-layer {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: contain;       /* keep aspect, don't crop critical detail */
+  object-position: center;
+  opacity: 0;
+  animation: layerIn 0.9s cubic-bezier(0.2, 0.7, 0.25, 1) forwards;
+}
+.hero-layered .hero-layer-1-bg       { animation-delay: 0.05s; --layer-from: translate(0, 0); }
+.hero-layered .hero-layer-2-podium   { animation-delay: 0.30s; --layer-from: translateY(80px); }
+.hero-layered .hero-layer-3-person   { animation-delay: 0.45s; --layer-from: translateX(-90px); }
+.hero-layered .hero-layer-4-mics     { animation-delay: 0.60s; --layer-from: translateY(120px); }
+.hero-layered .hero-layer-5-foreground { animation-delay: 0.80s; --layer-from: translateY(-30px); }
+
+@keyframes layerIn {
+  from { opacity: 0; transform: var(--layer-from, translate(0, 0)); }
+  to   { opacity: 1; transform: translate(0, 0); }
+}
+
+.hero-layered .hero-image-mobile { display: none; }
+
+@media (max-width: 700px) {
+  .hero-layered .hero-layers { display: none; }
+  .hero-layered .hero-image-mobile { display: block; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-layered .hero-layer {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
 @keyframes heroBreath {
   0%   { transform: scale(1) translate(0, 0); }
   100% { transform: scale(1.06) translate(-1.5%, -1%); }

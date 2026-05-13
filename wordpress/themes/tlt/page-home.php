@@ -67,9 +67,41 @@ if ( $current ) :
     $open  = get_post_meta( $current->ID, 'show_open_date', true );
     $close = get_post_meta( $current->ID, 'show_close_date', true );
     $tix = get_post_meta( $current->ID, 'show_ticket_url', true );
+
+    // ----- Layered hero detection -----
+    // If /wp-content/uploads/hero-layers/[slug]/ exists with layer PNGs, render the animated layered hero.
+    $slug = $current->post_name;
+    $layers_dir = WP_CONTENT_DIR . '/uploads/hero-layers/' . $slug;
+    $layers_url = content_url( '/uploads/hero-layers/' . $slug );
+    $layers = [];
+    if ( is_dir( $layers_dir ) ) {
+        $known = [ '1-bg', '2-podium', '3-person', '4-mics', '5-foreground' ];
+        foreach ( $known as $i => $name ) {
+            $path = $layers_dir . '/' . $name . '.png';
+            if ( file_exists( $path ) ) {
+                $layers[] = [ 'name' => $name, 'url' => $layers_url . '/' . $name . '.png', 'order' => $i + 1 ];
+            }
+        }
+    }
+    $composite_path = $layers_dir . '/composite.jpg';
+    $composite_url  = file_exists( $composite_path ) ? $layers_url . '/composite.jpg' : '';
 ?>
-<section class="hero <?php echo esc_attr( 'hero-mode-' . $hero_mode ); ?>">
-  <?php if ( $hero_img ) : ?>
+<section class="hero <?php echo esc_attr( 'hero-mode-' . $hero_mode ); ?><?php echo $layers ? ' hero-layered' : ''; ?>">
+  <?php if ( $layers ) : ?>
+    <!-- Layered hero (desktop/tablet): each layer slides in from a different direction, staggered -->
+    <div class="hero-layers" aria-hidden="true">
+      <?php foreach ( $layers as $l ) : ?>
+        <img class="hero-layer hero-layer-<?php echo esc_attr( $l['name'] ); ?>"
+             src="<?php echo esc_url( $l['url'] ); ?>" alt="">
+      <?php endforeach; ?>
+    </div>
+    <?php if ( $composite_url ) : ?>
+      <!-- Mobile static fallback -->
+      <img class="hero-image hero-image-mobile" src="<?php echo esc_url( $composite_url ); ?>" alt="">
+    <?php elseif ( $hero_img ) : ?>
+      <img class="hero-image hero-image-mobile" src="<?php echo esc_url( $hero_img ); ?>" alt="">
+    <?php endif; ?>
+  <?php elseif ( $hero_img ) : ?>
     <img class="hero-image" src="<?php echo esc_url( $hero_img ); ?>" alt="">
   <?php endif; ?>
   <div class="hero-content">
