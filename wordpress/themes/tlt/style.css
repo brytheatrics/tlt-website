@@ -179,8 +179,18 @@ section.block {
   background: linear-gradient(180deg, #fff 0%, #f7f7f7 100%);
 }
 section.block.alt {
-  /* Cool neutral grey with a vertical gradient — stays in the brand palette */
-  background: linear-gradient(180deg, #ececec 0%, #dfdfdf 100%);
+  /* Cool neutral grey with a subtle, slow horizontal drift behind the content.
+     Inspired by Southern Futures CPA's banner movement, dialed way down. */
+  background: linear-gradient(110deg, #ececec 0%, #e2e2e3 25%, #ececec 50%, #e2e2e3 75%, #ececec 100%);
+  background-size: 280% 100%;
+  animation: bandDrift 70s linear infinite;
+}
+@keyframes bandDrift {
+  from { background-position: 0% 50%; }
+  to   { background-position: 100% 50%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  section.block.alt { animation: none; background-size: auto; }
 }
 section.block.dark {
   background: linear-gradient(180deg, #272727 0%, #1a1a1a 100%);
@@ -192,6 +202,23 @@ section.block.dark .section-head .eyebrow { color: rgba(255,255,255,0.55); }
 section.block.dark a:not(.btn) { color: #fff; }
 
 section.block > .container { position: relative; z-index: 1; }
+
+/* Homepage page-in animation: soft entrance for the whole home template.
+   Only fires on /home/ load, not internal navigation. */
+body.page-template-page-home .hero,
+body.page-template-page-home section.block {
+  animation: pageIn 0.55s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+body.page-template-page-home .hero { animation-delay: 0s; }
+body.page-template-page-home section.block { animation-delay: 0.08s; }
+@keyframes pageIn {
+  from { opacity: 0.4; transform: translateY(14px); }
+  to   { opacity: 1;   transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.page-template-page-home .hero,
+  body.page-template-page-home section.block { animation: none; }
+}
 
 
 /* Editorial section header: small number/label eyebrow + display heading + thin accent rule */
