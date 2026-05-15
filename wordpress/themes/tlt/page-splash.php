@@ -27,12 +27,26 @@ $age      = get_post_meta( $current->ID, 'show_age_rec', true );
 $warn     = get_post_meta( $current->ID, 'show_content_warning', true );
 $tagline  = get_post_meta( $current->ID, 'show_tagline', true );
 
-// Gather photos: gallery attachments first, then featured image
-$photos = get_attached_media( 'image', $current->ID );
+// Gather photos for cycling background. Priority:
+//   1. show_splash_gallery meta — JSON array of image URLs Chris curates
+//   2. Attached media (gallery attachments)
+//   3. Featured image (last-resort single)
 $photo_urls = [];
-foreach ( $photos as $p ) {
-    $u = wp_get_attachment_image_url( $p->ID, 'full' );
-    if ( $u ) $photo_urls[] = $u;
+$gallery_raw = get_post_meta( $current->ID, 'show_splash_gallery', true );
+if ( $gallery_raw ) {
+    $decoded = json_decode( $gallery_raw, true );
+    if ( is_array( $decoded ) ) {
+        foreach ( $decoded as $u ) {
+            if ( is_string( $u ) && $u ) $photo_urls[] = $u;
+        }
+    }
+}
+if ( empty( $photo_urls ) ) {
+    $photos = get_attached_media( 'image', $current->ID );
+    foreach ( $photos as $p ) {
+        $u = wp_get_attachment_image_url( $p->ID, 'full' );
+        if ( $u ) $photo_urls[] = $u;
+    }
 }
 if ( empty( $photo_urls ) ) {
     $hero = tlt_show_image_url( $current->ID, 'full' );

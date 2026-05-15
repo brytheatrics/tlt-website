@@ -322,14 +322,31 @@ function tlt_save_team_meta( $post_id, $post ) {
  * ------------------------------------------------------------------------- */
 
 function tlt_get_current_show() {
-    $today = current_time( 'Y-m-d' );
-    // Find shows whose end_date >= today, ordered by start_date asc, limit 1
+    $today = function_exists( 'tlt_today' ) ? tlt_today() : current_time( 'Y-m-d' );
+    // Find the show that's actually running today (open <= today <= close).
+    // If nothing's running, return the next upcoming show so splash etc. has
+    // something to render in development.
     $q = new WP_Query( [
         'post_type'      => 'tlt_show',
         'posts_per_page' => 1,
         'meta_query'     => [
             'relation' => 'AND',
+            [ 'key' => 'show_open_date', 'value' => $today, 'compare' => '<=', 'type' => 'DATE' ],
             [ 'key' => 'show_close_date', 'value' => $today, 'compare' => '>=', 'type' => 'DATE' ],
+            [ 'key' => 'show_program_type', 'value' => 'mainstage', 'compare' => '=' ],
+        ],
+        'meta_key'       => 'show_open_date',
+        'orderby'        => 'meta_value',
+        'order'          => 'ASC',
+    ] );
+    if ( $q->have_posts() ) return $q->posts[0];
+    // Fallback — soonest upcoming
+    $q = new WP_Query( [
+        'post_type'      => 'tlt_show',
+        'posts_per_page' => 1,
+        'meta_query'     => [
+            'relation' => 'AND',
+            [ 'key' => 'show_open_date', 'value' => $today, 'compare' => '>', 'type' => 'DATE' ],
             [ 'key' => 'show_program_type', 'value' => 'mainstage', 'compare' => '=' ],
         ],
         'meta_key'       => 'show_open_date',
@@ -340,7 +357,7 @@ function tlt_get_current_show() {
 }
 
 function tlt_get_upcoming_shows( $limit = 6 ) {
-    $today = current_time( 'Y-m-d' );
+    $today = function_exists( 'tlt_today' ) ? tlt_today() : current_time( 'Y-m-d' );
     $q = new WP_Query( [
         'post_type'      => 'tlt_show',
         'posts_per_page' => $limit,
