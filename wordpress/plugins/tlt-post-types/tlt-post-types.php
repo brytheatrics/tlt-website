@@ -373,13 +373,22 @@ function tlt_get_upcoming_shows( $limit = 6 ) {
 }
 
 /**
- * Returns "today" as Y-m-d, with an override for development previews.
- * Accepts ?as_of=YYYY-MM-DD on any request to simulate a future/past date for
- * the homepage, season grid, hero picker, status badges, etc. Useful for
- * previewing what the site will look like after Bedroom Farce closes, etc.
- * Set ?as_of=clear to drop the override.
+ * Returns "today" as Y-m-d, with overrides for development previews.
+ *
+ * Precedence (highest first):
+ *   1. TLT_AS_OF constant (defined in functions.php or wp-config.php) —
+ *      a permanent site-wide override. Use this until the site goes live,
+ *      then remove it. Affects every visitor.
+ *   2. ?as_of=YYYY-MM-DD URL parameter — sticky via a 24h cookie. Per-user
+ *      preview. Set ?as_of=clear to drop the cookie.
+ *   3. Real current date.
  */
 function tlt_today() {
+    // 1. Constant override (set in functions.php while site is pre-launch)
+    if ( defined( 'TLT_AS_OF' ) && TLT_AS_OF && preg_match( '/^\d{4}-\d{2}-\d{2}$/', TLT_AS_OF ) ) {
+        return TLT_AS_OF;
+    }
+    // 2. URL parameter (sets cookie for stickiness during a single dev session)
     if ( isset( $_GET['as_of'] ) ) {
         $raw = sanitize_text_field( wp_unslash( $_GET['as_of'] ) );
         if ( $raw === 'clear' ) {

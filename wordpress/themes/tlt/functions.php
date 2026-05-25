@@ -5,6 +5,18 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
+/**
+ * Pre-launch date override. The TLT site doesn't go live until after Bedroom
+ * Farce closes (Jul 26, 2026). Until then, simulate that the site is already
+ * post-launch by forcing "today" to a date in the announce-window for the
+ * 2026-2027 season. This drives the hero, season grid, splash logic, status
+ * badges, /shows/, etc. as if it were Aug 1, 2026.
+ *
+ * REMOVE THIS LINE WHEN THE SITE GOES LIVE (or change date as you want to
+ * preview different states). All other code reads it via tlt_today().
+ */
+if ( ! defined( 'TLT_AS_OF' ) ) define( 'TLT_AS_OF', '2026-08-01' );
+
 add_action( 'after_setup_theme', function () {
     add_theme_support( 'title-tag' );
     add_theme_support( 'post-thumbnails' );
