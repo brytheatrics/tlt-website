@@ -1208,27 +1208,75 @@ body.splash-page { overflow: hidden; }
 }
 
 /* --- Search results --- */
-.site-search {
-  display: flex; align-items: center; gap: 0.5rem;
+/* Search lives as a magnifier-icon button in the header. Click expands a
+   popout form (slides down from below the header) until submitted, dismissed
+   with the × button, Escape, or a click outside. */
+.site-search-wrap { position: relative; }
+.site-search-toggle {
+  background: transparent; border: 0; color: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
 }
+.site-search-toggle:hover,
+.site-search-toggle[aria-expanded="true"] {
+  background: rgba(255,255,255,0.10);
+  color: var(--color-accent);
+}
+.site-search {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  z-index: 100;
+  background: var(--color-text);
+  border: 1px solid rgba(255,255,255,0.15);
+  padding: 0.6rem 0.75rem;
+  border-radius: 3px;
+  display: flex; align-items: center; gap: 0.4rem;
+  min-width: 280px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+.site-search.is-open { opacity: 1; transform: translateY(0); }
 .site-search input[type="search"] {
-  background: rgba(255,255,255,0.1);
+  flex: 1;
+  background: rgba(255,255,255,0.08);
   border: 1px solid rgba(255,255,255,0.25);
   color: #fff;
-  padding: 0.4rem 0.8rem;
+  padding: 0.5rem 0.8rem;
   border-radius: 3px;
   font-family: var(--font-body);
-  font-size: 0.9rem;
+  font-size: 0.95rem;
+  min-width: 0;
 }
-.site-search input[type="search"]::placeholder { color: rgba(255,255,255,0.6); }
+.site-search input[type="search"]::placeholder { color: rgba(255,255,255,0.55); }
 .site-search input[type="search"]:focus {
-  outline: none; border-color: var(--color-accent); background: rgba(255,255,255,0.18);
+  outline: none; border-color: var(--color-accent); background: rgba(255,255,255,0.14);
 }
 .site-search button {
   background: transparent; border: 0; color: #fff; cursor: pointer;
-  font-size: 1.1rem; padding: 0.25rem 0.5rem;
+  padding: 0.25rem 0.4rem;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 3px;
 }
 .site-search button:hover { color: var(--color-accent); }
+.site-search-close {
+  font-size: 1.4rem; line-height: 1; padding: 0 0.4rem !important;
+}
+
+/* On very small screens, the popout becomes near-full-width */
+@media (max-width: 600px) {
+  .site-search {
+    position: fixed;
+    top: var(--header-h, 84px);
+    left: 0.75rem; right: 0.75rem;
+    min-width: 0;
+  }
+}
 
 .search-results__count {
   color: var(--color-muted);
