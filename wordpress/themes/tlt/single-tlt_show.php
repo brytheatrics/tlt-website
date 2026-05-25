@@ -68,7 +68,18 @@ while ( have_posts() ) : the_post();
             //       Handles the common case where all three credits live in one
             //       paragraph joined by <br>.
             //    b) Strip single-credit paragraphs (date below, etc.).
-            $credit_phrase = '(?:Directed by|Musically Directed by|Music(?:al)? Direction by|Choreographed by|Choreography by|Co-Directed by)';
+            // Match any credit-line opener. Order matters — list longest variants first
+            // so "Co-Directed and Choreographed by" doesn't get partially-matched as
+            // "Directed by".
+            $credit_phrase = '(?:'
+                . 'Co-Directed and Choreographed by'
+                . '|Co-Directed by'
+                . '|Musically Directed by'
+                . '|Music(?:al)? Direction by'
+                . '|Choreographed by'
+                . '|Choreography by'
+                . '|Directed by'
+                . ')';
             // 2a — whole-paragraph match: <p> containing only credit lines + <br>s
             $body = preg_replace(
                 '#<p[^>]*>\s*(?:<[^>]+>\s*)*' .
@@ -79,7 +90,7 @@ while ( have_posts() ) : the_post();
                 $body
             );
             // 2b — single-credit paragraph fallback (also catches credits with stray inline tags)
-            foreach ( [ 'Directed by', 'Musically Directed by', 'Music(?:al)? Direction by', 'Choreographed by', 'Choreography by', 'Co-Directed by' ] as $phrase ) {
+            foreach ( [ 'Co-Directed and Choreographed by', 'Co-Directed by', 'Musically Directed by', 'Music(?:al)? Direction by', 'Choreographed by', 'Choreography by', 'Directed by' ] as $phrase ) {
                 $body = preg_replace( '#<p[^>]*>\s*(?:<[^>]+>)*\s*' . $phrase . '\b[^<]*(?:<br\s*/?>[^<]*)?\s*</p>#i', '', $body );
             }
 
