@@ -16,7 +16,7 @@
       <?php if ( has_custom_logo() ) {
         the_custom_logo();
       } else { ?>
-        <img src="<?php echo get_template_directory_uri(); ?>/assets/logo.png" alt="<?php bloginfo( 'name' ); ?>">
+        <img src="<?php echo get_template_directory_uri(); ?>/assets/logo-1918.svg" alt="<?php bloginfo( 'name' ); ?>">
       <?php } ?>
     </a>
     <nav class="primary">

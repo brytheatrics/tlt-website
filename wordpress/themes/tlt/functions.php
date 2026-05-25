@@ -255,7 +255,7 @@ add_action( 'wp_footer', function () {
         '@type'    => 'PerformingArtsTheater',
         'name'     => get_bloginfo( 'name' ),
         'url'      => home_url( '/' ),
-        'logo'     => get_template_directory_uri() . '/assets/logo.png',
+        'logo'     => get_template_directory_uri() . '/assets/logo-1918.svg',
         'telephone' => tlt_setting( 'tlt_phone', '(253) 272-2281' ),
         'email'    => tlt_setting( 'tlt_email_general', 'info@tacomalittletheatre.com' ),
         'address'  => [
