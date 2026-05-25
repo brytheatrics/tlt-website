@@ -61,10 +61,25 @@ while ( have_posts() ) : the_post();
             if ( ! $cnt ) $body = preg_replace( '/<a[^>]*>\s*<img[^>]+>\s*<\/a>/s', '', $body, 1, $cnt );
             if ( ! $cnt ) $body = preg_replace( '/<img[^>]+>/', '', $body, 1 );
 
-            // 2) Drop credit paragraphs we already show in .credits above. Each pattern matches
-            //    a <p>...</p> whose visible text starts with the credit phrase, optionally with
-            //    a <br> on the next line.
-            foreach ( [ 'Directed by', 'Musically Directed by', 'Music(?:al)? Direction by', 'Choreographed by', 'Co-Directed by' ] as $phrase ) {
+            // 2) Drop credit paragraphs we already show in .credits above.
+            //    Two passes:
+            //    a) Strip any whole <p> whose ENTIRE content is credit lines
+            //       (Directed by ... <br> Musically Directed by ... <br> ...).
+            //       Handles the common case where all three credits live in one
+            //       paragraph joined by <br>.
+            //    b) Strip single-credit paragraphs (date below, etc.).
+            $credit_phrase = '(?:Directed by|Musically Directed by|Music(?:al)? Direction by|Choreographed by|Choreography by|Co-Directed by)';
+            // 2a — whole-paragraph match: <p> containing only credit lines + <br>s
+            $body = preg_replace(
+                '#<p[^>]*>\s*(?:<[^>]+>\s*)*' .
+                $credit_phrase . '\b[^<]*' .                   // first credit
+                '(?:\s*<br\s*/?>\s*' . $credit_phrase . '\b[^<]*)*' .  // subsequent credits via <br>
+                '\s*</p>#i',
+                '',
+                $body
+            );
+            // 2b — single-credit paragraph fallback (also catches credits with stray inline tags)
+            foreach ( [ 'Directed by', 'Musically Directed by', 'Music(?:al)? Direction by', 'Choreographed by', 'Choreography by', 'Co-Directed by' ] as $phrase ) {
                 $body = preg_replace( '#<p[^>]*>\s*(?:<[^>]+>)*\s*' . $phrase . '\b[^<]*(?:<br\s*/?>[^<]*)?\s*</p>#i', '', $body );
             }
 
