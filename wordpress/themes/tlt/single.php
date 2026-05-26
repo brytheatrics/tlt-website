@@ -25,12 +25,33 @@ get_header(); ?>
     </header>
 
     <?php
-      // Intro from post_content (short blurb)
-      $intro = trim( get_the_content() );
-      if ( $intro ) :
+      // Split body into intro paragraph + rest-of-content.
+      // Intro: rendered centered as a short blurb under the title.
+      // Rest (typically <h2>Seasons</h2><ul>… and <h2>Year Summaries</h2><ul>…):
+      //   rendered as two left-aligned columns inside a centered card so the
+      //   bullets line up with their text instead of floating to the left.
+      $raw = trim( get_the_content() );
+      $intro = '';
+      $rest  = '';
+      if ( $raw ) {
+          // Pull the first <p>…</p> out as intro; everything after = rest.
+          if ( preg_match( '#^(\s*<p[^>]*>.*?</p>)\s*(.*)$#s', $raw, $m ) ) {
+              $intro = $m[1];
+              $rest  = trim( $m[2] );
+          } else {
+              $intro = $raw;
+          }
+      }
     ?>
+    <?php if ( $intro ) : ?>
       <div class="decade-intro" style="max-width:780px;margin:0 auto 2rem;text-align:center;color:var(--color-muted)">
         <?php echo apply_filters( 'the_content', $intro ); ?>
+      </div>
+    <?php endif; ?>
+
+    <?php if ( $rest ) : ?>
+      <div class="decade-toc">
+        <?php echo apply_filters( 'the_content', $rest ); ?>
       </div>
     <?php endif; ?>
 

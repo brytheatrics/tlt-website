@@ -656,6 +656,52 @@ body.splash-page { overflow: hidden; }
 .page-content h3 { font-size: 1.15rem; color: var(--color-text); }
 .page-content p { line-height: 1.7; margin: 1rem 0; }
 .page-content ul, .page-content ol { line-height: 1.7; margin: 1rem 0 1rem 1.5rem; }
+
+/* Decade summary page: Seasons + Year Summaries TOC block.
+   Renders body content (h2 + ul) as a clean two-column card layout below
+   the centered intro paragraph. Left-aligned text within centered columns
+   so bullets sit naturally next to their links. */
+.decade-toc {
+  max-width: 880px;
+  margin: 0 auto 3rem;
+  padding: 2rem 1.5rem;
+  background: var(--color-soft);
+  border-radius: 4px;
+  display: grid;
+  gap: 2rem 3rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 700px) {
+  .decade-toc:has(h2 + ul ~ h2) { grid-template-columns: 1fr 1fr; }
+}
+.decade-toc h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.05rem !important;
+  letter-spacing: 0.08em;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--color-line);
+}
+.decade-toc h2 + p {
+  font-size: 0.9rem;
+  color: var(--color-muted);
+  margin: 0 0 0.75rem;
+}
+.decade-toc ul {
+  list-style: disc;
+  margin: 0 0 0 1.25rem !important;
+  padding: 0;
+}
+.decade-toc ul li {
+  padding: 0.15rem 0;
+  line-height: 1.5;
+}
+.decade-toc ul li a {
+  color: var(--color-text);
+  font-weight: 500;
+}
+.decade-toc ul li a:hover { color: var(--color-accent); text-decoration: none; }
 .page-content img {
   display: block;
   max-width: 100%;
