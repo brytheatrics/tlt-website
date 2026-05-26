@@ -65,6 +65,11 @@ def clean_body(html):
     s = re.sub(r'<p[^>]*>\s*(?:&nbsp;|\xa0)?\s*</p>', '', s)
     # The whole <footer class="meta">…<span class="tags">…</span>…</footer> block
     s = re.sub(r'<footer[^>]*>.*?</footer>', '', s, flags=re.S | re.I)
+    # Squarespace also emits a <header><div class="meta"><span class="date"><time>...</time></span></div></header>
+    # at the top of imported show bodies with the post publication date. Strip it.
+    s = re.sub(r'<header[^>]*>.*?</header>', '', s, flags=re.S | re.I)
+    # And a standalone <time class="published"> tag (sometimes outside header)
+    s = re.sub(r'<time[^>]*class="[^"]*published[^"]*"[^>]*>.*?</time>', '', s, flags=re.S | re.I)
     # Any standalone <span class="tags"> not in a footer
     s = re.sub(r'<span[^>]*class="[^"]*tags[^"]*"[^>]*>.*?</span>', '', s, flags=re.S | re.I)
     s = re.sub(r'<(?:p|div)[^>]*class="[^"]*tag[^"]*"[^>]*>.*?</(?:p|div)>', '', s, flags=re.S | re.I)
