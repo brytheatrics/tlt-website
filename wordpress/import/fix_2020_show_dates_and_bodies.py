@@ -57,9 +57,19 @@ def clean_body(html):
         '', s, flags=re.I | re.S
     )
 
-    # Drop trailing "Reviews   Tags 2019-2020" navigation block
-    s = re.sub(r'<p[^>]*>\s*Reviews\s*(?:&nbsp;)?\s*</p>', '', s, flags=re.I)
+    # Drop trailing "Reviews / Tags YYYY-YYYY" Squarespace navigation block
+    # in any of its variants:
+    s = re.sub(r'<h[1-6][^>]*>\s*Reviews?\s*</h[1-6]>', '', s, flags=re.I)
+    s = re.sub(r'<p[^>]*>\s*Reviews?\s*(?:&nbsp;)?\s*</p>', '', s, flags=re.I)
+    # Empty paragraphs that often sit right after the Reviews header
+    s = re.sub(r'<p[^>]*>\s*(?:&nbsp;|\xa0)?\s*</p>', '', s)
+    # The whole <footer class="meta">…<span class="tags">…</span>…</footer> block
+    s = re.sub(r'<footer[^>]*>.*?</footer>', '', s, flags=re.S | re.I)
+    # Any standalone <span class="tags"> not in a footer
+    s = re.sub(r'<span[^>]*class="[^"]*tags[^"]*"[^>]*>.*?</span>', '', s, flags=re.S | re.I)
     s = re.sub(r'<(?:p|div)[^>]*class="[^"]*tag[^"]*"[^>]*>.*?</(?:p|div)>', '', s, flags=re.S | re.I)
+    # The trailing "sqs-html-content" wrapper that wraps the Reviews block
+    s = re.sub(r'<div[^>]*class="[^"]*sqs-html-content[^"]*"[^>]*>\s*(?:<[^>]+>\s*)*</div>', '', s, flags=re.S)
     s = re.sub(r'Recommended\s+for\s+Ages\s+[0-9+]+', '', s)
 
     # Collapse multiple blank lines / empty <p>s
