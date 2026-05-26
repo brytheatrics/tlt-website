@@ -74,6 +74,8 @@ while ( have_posts() ) : the_post();
             $credit_phrase = '(?:'
                 . 'Co-Directed and Choreographed by'
                 . '|Co-Directed by'
+                . '|Directed (?:&amp;|&|and) Choreographed by'
+                . '|Directed (?:&amp;|&|and) Musically Directed by'
                 . '|Musically Directed by'
                 . '|Music(?:al)? Direction by'
                 . '|Choreographed by'
@@ -90,7 +92,7 @@ while ( have_posts() ) : the_post();
                 $body
             );
             // 2b — single-credit paragraph fallback (also catches credits with stray inline tags)
-            foreach ( [ 'Co-Directed and Choreographed by', 'Co-Directed by', 'Musically Directed by', 'Music(?:al)? Direction by', 'Choreographed by', 'Choreography by', 'Directed by' ] as $phrase ) {
+            foreach ( [ 'Co-Directed and Choreographed by', 'Co-Directed by', 'Directed (?:&amp;|&|and) Choreographed by', 'Directed (?:&amp;|&|and) Musically Directed by', 'Musically Directed by', 'Music(?:al)? Direction by', 'Choreographed by', 'Choreography by', 'Directed by' ] as $phrase ) {
                 $body = preg_replace( '#<p[^>]*>\s*(?:<[^>]+>)*\s*' . $phrase . '\b[^<]*(?:<br\s*/?>[^<]*)?\s*</p>#i', '', $body );
             }
 
