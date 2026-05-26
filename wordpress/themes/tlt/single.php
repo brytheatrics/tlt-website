@@ -48,67 +48,72 @@ get_header(); ?>
         <?php echo apply_filters( 'the_content', $intro ); ?>
       </div>
     <?php endif; ?>
-
-    <?php if ( $rest ) : ?>
-      <div class="decade-toc">
-        <?php echo apply_filters( 'the_content', $rest ); ?>
-      </div>
-    <?php endif; ?>
+    <?php // (Body sections beyond the intro are intentionally skipped on
+          // decade-summary pages — the season-card grid below replaces them.) ?>
 
     <?php
-      // Walk every potential season inside this decade (newest first).
-      for ( $sy = $decade_end - 1; $sy >= $decade_start; $sy-- ) :
+      // Grid of season cards for this decade. Each card links to the season
+      // archive page where visitors see the actual shows.
+      $season_cards = [];
+      for ( $sy = $decade_end - 1; $sy >= $decade_start; $sy-- ) {
           $season_name = sprintf( '%d-%d', $sy, $sy + 1 );
           $season_term = get_term_by( 'name', $season_name, 'tlt_season' );
-          if ( ! $season_term ) continue;
 
-          $q = new WP_Query( [
-              'post_type'      => 'tlt_show',
-              'posts_per_page' => -1,
-              'tax_query'      => [ [ 'taxonomy' => 'tlt_season', 'field' => 'term_id', 'terms' => $season_term->term_id ] ],
-              'meta_query'     => [
-                  'relation' => 'OR',
-                  'has_open' => [ 'key' => 'show_open_date', 'compare' => 'EXISTS' ],
-                  'no_open'  => [ 'key' => 'show_open_date', 'compare' => 'NOT EXISTS' ],
-              ],
-              'orderby' => [ 'has_open' => 'ASC', 'meta_value' => 'ASC', 'title' => 'ASC' ],
-              'order'   => 'ASC',
-          ] );
-          if ( ! $q->have_posts() ) continue;
+          // Count DB shows in this season, if the term exists
+          $show_count = 0;
+          if ( $season_term ) {
+              $q = new WP_Query( [
+                  'post_type'      => 'tlt_show',
+                  'posts_per_page' => -1,
+                  'fields'         => 'ids',
+                  'tax_query'      => [ [ 'taxonomy' => 'tlt_season', 'field' => 'term_id', 'terms' => $season_term->term_id ] ],
+              ] );
+              $show_count = $q->found_posts;
+              wp_reset_postdata();
+          }
+
+          // Look for a year-summary post (slug matches YYYY-YYYY)
+          $summary_post = get_page_by_path( $season_name, OBJECT, 'post' );
+
+          // Build link target — prefer season archive when shows exist, otherwise summary
+          $link = null;
+          if ( $show_count > 0 && $season_term ) {
+              $link = get_term_link( $season_term );
+          } elseif ( $summary_post ) {
+              $link = get_permalink( $summary_post );
+          }
+
+          $season_cards[] = [
+              'name'        => $season_name,
+              'show_count'  => $show_count,
+              'link'        => $link,
+              'has_summary' => (bool) $summary_post,
+          ];
+      }
     ?>
-      <section style="margin: 2.5rem 0">
-        <h2 style="text-align:center; margin-bottom: 1.25rem">
-          <a href="<?php echo esc_url( get_term_link( $season_term ) ); ?>" style="color:var(--color-text)">
-            <?php echo esc_html( $season_term->name ); ?> Season
-          </a>
-        </h2>
-        <div class="show-grid">
-          <?php while ( $q->have_posts() ) : $q->the_post();
-            $img       = function_exists( 'tlt_show_image_url' ) ? tlt_show_image_url( get_the_ID(), 'medium_large' ) : get_post_meta( get_the_ID(), '_thumbnail_external_url', true );
-            $open      = get_post_meta( get_the_ID(), 'show_open_date', true );
-            $close     = get_post_meta( get_the_ID(), 'show_close_date', true );
-            $director  = get_post_meta( get_the_ID(), 'show_director', true );
-            $cancelled = get_post_meta( get_the_ID(), 'show_cancelled', true );
-          ?>
-            <a href="<?php the_permalink(); ?>" class="show-card<?php echo $cancelled ? ' status-cancelled' : ''; ?>">
-              <div class="img-wrap">
-                <?php if ( $img ) : ?><img src="<?php echo esc_url( $img ); ?>" alt=""><?php endif; ?>
-                <?php if ( $cancelled ) : ?><span class="status-badge status-closed">Cancelled</span><?php endif; ?>
-              </div>
-              <div class="body">
-                <?php if ( $open ) : ?>
-                  <div class="dates"><?php echo esc_html( function_exists('tlt_format_date_range') ? tlt_format_date_range( $open, $close ) : $open ); ?></div>
-                <?php endif; ?>
-                <h3><?php the_title(); ?></h3>
-                <?php if ( $director ) : ?>
-                  <p style="color:var(--color-muted);font-size:0.9rem;margin:0">Directed by <?php echo esc_html( $director ); ?></p>
+    <section class="decade-seasons" aria-label="Seasons in this decade">
+      <div class="season-card-grid">
+        <?php foreach ( $season_cards as $card ) : ?>
+          <?php if ( $card['link'] ) : ?>
+            <a href="<?php echo esc_url( $card['link'] ); ?>" class="season-card">
+              <div class="season-card__name"><?php echo esc_html( $card['name'] ); ?></div>
+              <div class="season-card__meta">
+                <?php if ( $card['show_count'] > 0 ) : ?>
+                  <?php echo (int) $card['show_count']; ?> show<?php echo $card['show_count'] === 1 ? '' : 's'; ?>
+                <?php elseif ( $card['has_summary'] ) : ?>
+                  Summary
                 <?php endif; ?>
               </div>
             </a>
-          <?php endwhile; wp_reset_postdata(); ?>
-        </div>
-      </section>
-    <?php endfor; ?>
+          <?php else : ?>
+            <div class="season-card season-card--empty" aria-hidden="true">
+              <div class="season-card__name"><?php echo esc_html( $card['name'] ); ?></div>
+              <div class="season-card__meta">No records yet</div>
+            </div>
+          <?php endif; ?>
+        <?php endforeach; ?>
+      </div>
+    </section>
 
   <?php else :
       // Normal single-post layout
