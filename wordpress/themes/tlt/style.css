@@ -598,7 +598,15 @@ a:hover > .promo-image,
 /* Team archive grid */
 .team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.5rem; padding: 2rem 0; }
 .team-card { text-align: center; }
-.team-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 4px; margin-bottom: 0.75rem; }
+.team-card img {
+  width: 100%;
+  aspect-ratio: 3/4;           /* portrait headshot ratio */
+  object-fit: cover;            /* fills the frame, crops sides if needed */
+  object-position: center top;  /* anchor at top so faces aren't cut off at the chin */
+  border-radius: 4px;
+  margin-bottom: 0.75rem;
+  background: var(--color-soft);
+}
 .team-card h3 { font-size: 1rem; margin-bottom: 0.2rem; }
 .team-card .role { font-size: 0.85rem; color: var(--color-muted); }
 
