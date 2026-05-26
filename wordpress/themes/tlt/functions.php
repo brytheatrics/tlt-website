@@ -145,6 +145,25 @@ add_action( 'pre_get_posts', function ( $query ) {
 } );
 
 /**
+ * "This Season" menu item — rewrite the URL on render so it always points at
+ * the current season's archive (/seasons/YYYY-YYYY/), not the static /shows/.
+ * Auto-tracks as seasons change; falls back to /shows/ if no current season.
+ */
+add_filter( 'wp_nav_menu_objects', function ( $items ) {
+    if ( ! function_exists( 'tlt_get_current_season_term' ) ) return $items;
+    $current = tlt_get_current_season_term();
+    if ( ! $current || is_wp_error( $current ) ) return $items;
+    $link = get_term_link( $current );
+    if ( ! $link || is_wp_error( $link ) ) return $items;
+    foreach ( $items as $item ) {
+        if ( strcasecmp( trim( wp_strip_all_tags( $item->title ) ), 'This Season' ) === 0 ) {
+            $item->url = $link;
+        }
+    }
+    return $items;
+} );
+
+/**
  * Season archive (/seasons/<slug>/) and main show archive (/shows/) need shows
  * ordered chronologically by show_open_date. Without this, WP defaults to
  * post_date DESC and the season grid looks shuffled.
