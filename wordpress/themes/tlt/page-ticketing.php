@@ -10,13 +10,22 @@
 get_header();
 
 while ( have_posts() ) : the_post();
-  $tiers_raw = get_post_meta( get_the_ID(), 'ticketing_tiers', true );
-  $tiers = $tiers_raw ? json_decode( $tiers_raw, true ) : [];
+  // Pricing tiers: prefer ACF "Key: value" textarea; fall back to legacy JSON.
+  $tiers_text = get_post_meta( get_the_ID(), 'ticketing_tiers_text', true );
+  if ( $tiers_text && function_exists( 'tlt_parse_ticketing_tiers' ) ) {
+      $tiers = tlt_parse_ticketing_tiers( $tiers_text );
+  } else {
+      $tiers_raw = get_post_meta( get_the_ID(), 'ticketing_tiers', true );
+      $tiers     = $tiers_raw ? json_decode( $tiers_raw, true ) : [];
+  }
 
   $cta_primary_label = get_post_meta( get_the_ID(), 'cta_primary_label', true );
   $cta_primary_url   = get_post_meta( get_the_ID(), 'cta_primary_url', true );
   $cta_secondary_label = get_post_meta( get_the_ID(), 'cta_secondary_label', true );
   $cta_secondary_url   = get_post_meta( get_the_ID(), 'cta_secondary_url', true );
+
+  // Body: prefer ACF wysiwyg; fall back to post_content for legacy pages.
+  $body_acf = function_exists( 'get_field' ) ? get_field( 'ticketing_body' ) : '';
 ?>
 
 <?php if ( has_post_thumbnail() ) : ?>
@@ -32,7 +41,13 @@ while ( have_posts() ) : the_post();
   </header>
 
   <article class="page-body">
-    <?php the_content(); ?>
+    <?php
+    if ( $body_acf ) {
+        echo apply_filters( 'the_content', $body_acf );
+    } else {
+        the_content();
+    }
+    ?>
 
     <?php if ( is_array( $tiers ) && $tiers ) : ?>
       <section class="ticketing-tiers" aria-label="Pricing">

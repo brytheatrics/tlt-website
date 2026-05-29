@@ -98,7 +98,15 @@ while ( have_posts() ) : the_post();
     <span class="eyebrow">Contact</span>
     <h1><?php the_title(); ?></h1>
     <div class="lede">
-      <?php the_content(); ?>
+      <?php
+      // Prefer the ACF intro wysiwyg; fall back to post_content for legacy pages.
+      $intro_acf = function_exists( 'get_field' ) ? get_field( 'contact_intro' ) : '';
+      if ( $intro_acf ) {
+          echo apply_filters( 'the_content', $intro_acf );
+      } else {
+          the_content();
+      }
+      ?>
     </div>
   </header>
 

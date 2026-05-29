@@ -25,8 +25,19 @@ while ( have_posts() ) : the_post();
   $cta_heading   = get_post_meta( get_the_ID(), 'campaign_cta_heading', true ) ?: 'Become part of the campaign';
   $cta_body      = get_post_meta( get_the_ID(), 'campaign_cta_body', true );
   $cta_button    = get_post_meta( get_the_ID(), 'campaign_cta_button', true ) ?: 'Donate Now';
-  $donors_raw    = get_post_meta( get_the_ID(), 'campaign_donors', true );
-  $donors        = $donors_raw ? json_decode( $donors_raw, true ) : [];
+
+  // Donors: prefer the new ACF textarea ("## Tier" format); fall back to
+  // legacy JSON in campaign_donors meta.
+  $donors_text = get_post_meta( get_the_ID(), 'campaign_donors_text', true );
+  if ( $donors_text && function_exists( 'tlt_parse_campaign_donors' ) ) {
+      $donors = tlt_parse_campaign_donors( $donors_text );
+  } else {
+      $donors_raw = get_post_meta( get_the_ID(), 'campaign_donors', true );
+      $donors     = $donors_raw ? json_decode( $donors_raw, true ) : [];
+  }
+
+  // Body: prefer ACF wysiwyg; fall back to the_content() for legacy pages.
+  $body_acf = function_exists( 'get_field' ) ? get_field( 'campaign_body' ) : '';
 ?>
 
 <?php if ( $hero_url ) : ?>
@@ -48,7 +59,13 @@ while ( have_posts() ) : the_post();
       <p class="campaign-lead"><?php echo esc_html( $lead ); ?></p>
     <?php endif; ?>
 
-    <?php the_content(); ?>
+    <?php
+    if ( $body_acf ) {
+        echo apply_filters( 'the_content', $body_acf );
+    } else {
+        the_content();
+    }
+    ?>
   </article>
 
   <section class="campaign-cta-band">
