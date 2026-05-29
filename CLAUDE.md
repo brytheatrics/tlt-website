@@ -73,6 +73,9 @@ pymysql.connect(host='127.0.0.1', port=10005, user='root', password='root', data
 
 ## Workflow notes
 
+- **Git push/pull is pre-authorized.** When Blake says "push to git", commit any outstanding work with sensible messages and push to origin. When he says "pull from git", run `git pull`. Don't re-confirm routine cases. STILL pause and flag if: a new secret/credential would be committed, there's a merge conflict, or a push would need a force-push. Repo: github.com/brytheatrics/tlt-website.
+- **`tlt-manager/` is a SEPARATE project** that happens to live in this working dir (Google Apps Script: Ludus sync/casting/bios). It is gitignored and contains a Google service-account key — NEVER commit anything under it to the website repo.
+- **Cloudways deploy toolkit is in `deploy/`** (`export_db.py`, `sync_down.py`, `DEPLOY.md`). Site pushed to a Cloudways temp URL (see `deploy/cloudways.json`, gitignored). Started on a 3-day trial (~expires 2026-05-31) — verify the server still exists if working after that.
 - User has two computers (home + work) and wants Claude Code to work from either. Plan: keep this repo in Git, Cloudways for DB/uploads, MDs synced via Git.
 - User prefers shorter responses. Don't over-explain. Don't run diagnostic bash for pure-question conversations.
 - DB is on Local Sites' MySQL; not in repo. Schema/content sync to Cloudways happens during deploy (one-time export-import).
