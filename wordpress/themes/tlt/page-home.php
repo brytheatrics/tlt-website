@@ -20,45 +20,9 @@ foreach ( $season_shows as $s ) {
     if ( $o && $o > $today ) { $first_upcoming_id = $s->ID; break; }
 }
 
-// Splash -> Home wipe: if we arrived from /splash/, render an inline-blocking script
-// that immediately covers the page with a charcoal band so the rest can paint behind it.
+// Splash → Home wipe is now handled in header.php (it has to run BEFORE the
+// header markup renders to prevent the header from flashing into view).
 ?>
-<script>
-  // Runs synchronously, blocking render until the wipe is in place — avoids any flash.
-  (function () {
-    try {
-      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-      if (sessionStorage.getItem('tlt_splash_to_home') !== '1') return;
-      sessionStorage.removeItem('tlt_splash_to_home');
-      var w = document.createElement('div');
-      w.id = 'homeWipe';
-      // Append on DOMContentLoaded so <body> exists
-      document.addEventListener('DOMContentLoaded', function () {
-        document.body.appendChild(w);
-        // Force layout, then trigger collapse on next frame
-        requestAnimationFrame(function () {
-          requestAnimationFrame(function () {
-            w.classList.add('is-collapsing');
-          });
-        });
-        function onEnd(ev) {
-          if (ev.propertyName !== 'height') return; // ignore any non-height transitions
-          w.removeEventListener('transitionend', onEnd);
-          w.classList.add('is-done');
-          setTimeout(function () { w.remove(); }, 500);
-        }
-        w.addEventListener('transitionend', onEnd);
-        // Hard safety: kill the wipe after the longest reasonable duration
-        setTimeout(function () {
-          if (document.body.contains(w)) {
-            w.classList.add('is-done');
-            setTimeout(function () { w.remove(); }, 500);
-          }
-        }, 1500);
-      });
-    } catch (_) {}
-  })();
-</script>
 <?php
 
 if ( $current ) :
@@ -134,6 +98,36 @@ if ( $current ) :
           <?php echo $hero_mode === 'recap' ? 'View Show Details' : 'Show Details'; ?>
         </a>
       </div>
+    </div>
+  </div>
+</section>
+<?php endif; ?>
+
+<?php
+// Cityline interview block — only renders when the hero show has a URL set.
+$cityline_url = $current ? get_post_meta( $current->ID, 'show_cityline_url', true ) : '';
+if ( $cityline_url ) :
+  $cityline_embed = wp_oembed_get( $cityline_url, [ 'width' => 800 ] );
+?>
+<section class="block cityline-block" data-section-num="00" aria-label="Cityline interview">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow"><span class="num">★</span> As Seen On TV</div>
+      <h2>Watch Our Cityline Interview</h2>
+      <p class="section-lede">Hear from the team behind <em><?php echo esc_html( get_the_title( $current ) ); ?></em>.</p>
+    </div>
+    <div class="cityline-video">
+      <?php
+      if ( $cityline_embed ) {
+          echo $cityline_embed;
+      } else {
+          // Fallback: extract the YouTube ID and build the iframe directly
+          if ( preg_match( '~(?:youtu\.be/|youtube\.com/(?:watch\?v=|embed/|v/|shorts/))([A-Za-z0-9_-]{6,})~', $cityline_url, $m ) ) {
+              $vid = $m[1];
+              echo '<iframe src="https://www.youtube.com/embed/' . esc_attr( $vid ) . '" title="Cityline interview" frameborder="0" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+          }
+      }
+      ?>
     </div>
   </div>
 </section>

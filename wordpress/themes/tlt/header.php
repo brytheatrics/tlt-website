@@ -8,6 +8,43 @@
 </head>
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
+<?php if ( is_page( 'home' ) ) : ?>
+<script>
+  // Splash → Home wipe: when we arrive from /splash/, insert a charcoal cover
+  // BEFORE the header markup renders, then collapse it down to header height
+  // once DOMContentLoaded fires. Inserting here (not on DOMContentLoaded) is
+  // what kills the flash — the wipe is in the DOM before the header paints.
+  (function () {
+    try {
+      if (sessionStorage.getItem('tlt_splash_to_home') !== '1') return;
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      sessionStorage.removeItem('tlt_splash_to_home');
+
+      var w = document.createElement('div');
+      w.id = 'homeWipe';
+      document.body.appendChild(w);
+
+      document.addEventListener('DOMContentLoaded', function () {
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            w.classList.add('is-collapsing');
+          });
+        });
+      });
+
+      function done(ev) {
+        if (ev && ev.propertyName && ev.propertyName !== 'height') return;
+        w.removeEventListener('transitionend', done);
+        w.classList.add('is-done');
+        setTimeout(function () { if (w.parentNode) w.remove(); }, 500);
+      }
+      w.addEventListener('transitionend', done);
+      // Safety: kill the wipe after the longest reasonable duration
+      setTimeout(function () { if (document.body.contains(w)) done(); }, 1500);
+    } catch (_) {}
+  })();
+</script>
+<?php endif; ?>
 
 <?php if ( ! is_page_template( 'page-splash.php' ) && ! is_page( 'splash' ) ) : ?>
 <header class="site-header">
@@ -19,7 +56,13 @@
         <img src="<?php echo get_template_directory_uri(); ?>/assets/logo-1918.svg" alt="<?php bloginfo( 'name' ); ?>">
       <?php } ?>
     </a>
-    <nav class="primary">
+    <button type="button" class="mobile-nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="primary-nav">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28" aria-hidden="true">
+        <path class="mnt-open" d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/>
+        <path class="mnt-close" d="M18.3 5.7L12 12l6.3 6.3-1.4 1.4L10.6 13.4 4.3 19.7 2.9 18.3 9.2 12 2.9 5.7l1.4-1.4L10.6 10.6 16.9 4.3z" style="display:none"/>
+      </svg>
+    </button>
+    <nav class="primary" id="primary-nav">
       <?php
       if ( has_nav_menu( 'primary' ) ) {
           wp_nav_menu( [ 'theme_location' => 'primary', 'container' => false ] );
@@ -54,6 +97,46 @@
     </div>
   </div>
 </header>
+<script>
+  // Mobile nav drawer
+  (function () {
+    const btn = document.querySelector('.mobile-nav-toggle');
+    const nav = document.getElementById('primary-nav');
+    if (!btn || !nav) return;
+    const openIcon = btn.querySelector('.mnt-open');
+    const closeIcon = btn.querySelector('.mnt-close');
+
+    function setOpen(open) {
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      nav.classList.toggle('is-open', open);
+      document.body.classList.toggle('mobile-nav-open', open);
+      if (openIcon)  openIcon.style.display  = open ? 'none' : '';
+      if (closeIcon) closeIcon.style.display = open ? '' : 'none';
+    }
+
+    btn.addEventListener('click', () => setOpen(btn.getAttribute('aria-expanded') !== 'true'));
+    // If a link points to the page we're already on, navigation would be a
+    // visible no-op — give meaningful feedback by closing the drawer and
+    // scrolling to top. Other URLs pass through untouched.
+    nav.addEventListener('click', (e) => {
+      const a = e.target.closest('a');
+      if (!a || !a.href) return;
+      try {
+        const here  = window.location.href.replace(/#.*$/, '').replace(/\/$/, '');
+        const there = a.href.replace(/#.*$/, '').replace(/\/$/, '');
+        if (here === there) {
+          e.preventDefault();
+          setOpen(false);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      } catch (_) {}
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && nav.classList.contains('is-open')) setOpen(false);
+    });
+  })();
+</script>
 <script>
   (function () {
     const toggle = document.querySelector('.site-search-toggle');

@@ -125,10 +125,75 @@ nav.primary ul ul a:hover {
 }
 nav.primary li:hover > ul,
 nav.primary li:focus-within > ul { display: flex; }
+/* Hamburger toggle — hidden on desktop */
+.mobile-nav-toggle {
+  display: none;
+  background: transparent; border: 0; padding: 0.4rem;
+  color: #fff; cursor: pointer; line-height: 0;
+  align-self: center;
+}
+.mobile-nav-toggle:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; border-radius: 2px; }
+
+/* Lock body scroll while drawer is open */
+body.mobile-nav-open { overflow: hidden; }
+
 @media (max-width: 800px) {
-  nav.primary ul { gap: 0.6rem; font-size: 0.75rem; }
-  nav.primary ul ul { position: static; box-shadow: none; border: none; padding: 0 0 0 1rem; }
-  nav.primary ul ul a { padding: 0.3rem 0; }
+  /* Keep logo from being squished by flex */
+  .site-header .container { gap: 0.5rem; }
+  .site-header .logo img { max-height: 44px; width: auto; flex-shrink: 0; }
+  .site-search-wrap { margin-left: auto; }
+
+  /* Show hamburger */
+  .mobile-nav-toggle { display: inline-flex; }
+
+  /* Nav becomes a full-screen drawer */
+  nav.primary {
+    position: fixed;
+    top: var(--header-h, 76px); left: 0; right: 0; bottom: 0;
+    background: var(--color-text);
+    padding: 1rem 0 3rem;
+    overflow-y: auto;
+    transform: translateY(-8px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s linear 0.2s;
+    z-index: 90;
+  }
+  nav.primary.is-open {
+    transform: translateY(0); opacity: 1; visibility: visible;
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s;
+  }
+
+  /* Stack list items vertically, full width tap targets */
+  nav.primary ul {
+    flex-direction: column; gap: 0;
+    font-size: 1.05rem;
+  }
+  nav.primary li {
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  nav.primary li > a {
+    display: block;
+    padding: 1rem var(--pad);
+    min-height: 44px;  /* iOS tap target */
+  }
+  /* Submenus inline beneath their parent in the drawer */
+  nav.primary ul ul {
+    position: static; box-shadow: none; border: none; padding: 0;
+    background: rgba(255,255,255,0.04);
+    display: flex; flex-direction: column;
+  }
+  nav.primary ul ul a {
+    padding: 0.7rem var(--pad) 0.7rem calc(var(--pad) + 1.25rem);
+    font-size: 0.95rem;
+    min-height: 0;
+  }
+  nav.primary li.menu-item-has-children > a::after { content: none; }
+  /* Show CTA buttons full-width */
+  nav.primary li.nav-cta-primary,
+  nav.primary li.nav-cta-secondary { padding: 0 var(--pad); border-bottom: 0; margin-top: 0.5rem; }
+  nav.primary li.nav-cta-primary > a,
+  nav.primary li.nav-cta-secondary > a { text-align: center; min-height: 48px; padding: 0.85rem 1rem; }
 }
 
 /* Hero */
@@ -147,6 +212,12 @@ nav.primary li:focus-within > ul { display: flex; }
   /* Subtle, continuous "Ken Burns" breath: slow zoom + drift. ~30s loop, eases both ways. */
   animation: heroBreath 32s ease-in-out infinite alternate;
   will-change: transform;
+}
+/* On phone-portrait viewports, frame the image lower so the subject's head
+   isn't cropped by the standard 30% focal point. */
+@media (max-width: 700px) {
+  .hero-image { object-position: 50% 70%; }
+  .hero-layered .hero-image-mobile { object-position: 50% 70%; }
 }
 
 /* ---------- Layered hero (used when /wp-content/uploads/hero-layers/[slug]/ exists) ----------
@@ -355,6 +426,29 @@ section.block.dark {
   background: linear-gradient(180deg, #272727 0%, #1a1a1a 100%);
   color: #fff;
 }
+
+/* Cityline interview block — fits between hero and "Onstage" */
+section.cityline-block .cityline-video {
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+section.cityline-block .cityline-video iframe {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  border: 0;
+}
+section.cityline-block .section-lede {
+  color: var(--color-muted);
+  font-size: 1rem;
+  max-width: 540px;
+  margin: 0.5rem auto 0;
+}
 section.block.dark h2, section.block.dark h3 { color: #fff; }
 section.block.dark p { color: rgba(255,255,255,0.85); }
 section.block.dark .section-head .eyebrow { color: rgba(255,255,255,0.55); }
@@ -530,7 +624,13 @@ section.block > .container { position: relative; z-index: 1; }
 
 /* Two-column feature */
 .feature-row { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; }
-@media (max-width: 800px) { .feature-row { grid-template-columns: 1fr; } }
+@media (max-width: 800px) {
+  .feature-row { grid-template-columns: 1fr; gap: 1.25rem; }
+  /* Always put text first, image second on mobile — regardless of DOM order
+     used to alternate sides on desktop. Keeps each group cohesive. */
+  .feature-row > div { order: 1; }
+  .feature-row > a   { order: 2; }
+}
 
 /* Promo image: handles any aspect ratio — image sits on the section background, no visible matte */
 .promo-image {
@@ -1311,6 +1411,7 @@ body.splash-page { overflow: hidden; }
   transform: translateY(-6px);
   transition: opacity 0.18s ease, transform 0.18s ease;
 }
+.site-search[hidden] { display: none; }
 .site-search.is-open { opacity: 1; transform: translateY(0); }
 .site-search input[type="search"] {
   flex: 1;

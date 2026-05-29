@@ -118,6 +118,7 @@ add_action( 'init', function () {
         'show_audition_signup_url'=>[ 'string', 'Casting Manager signup URL' ],
         'show_logo_url'          => [ 'string', 'Optional small show logo (used on auditions hub)' ],
         'show_video_urls'        => [ 'string', 'Comma-separated list of video embed URLs' ],
+        'show_cityline_url'      => [ 'string', 'Cityline interview YouTube URL — featured on homepage when this is the running show' ],
     ];
     foreach ( $show_fields as $key => [ $type, $desc ] ) {
         register_post_meta( 'tlt_show', $key, [
@@ -233,6 +234,11 @@ function tlt_render_show_meta( $post ) {
         echo "<tr><th><label for='$key'>$label</label></th><td><textarea id='$key' name='$key' rows='3' style='width:100%'>$val</textarea></td></tr>";
     }
 
+    // --- Cityline interview ---
+    echo '<tr><th colspan="2" style="padding-top:1em;border-top:1px solid #ddd"><strong>Cityline Interview</strong></th></tr>';
+    $cityline = esc_attr( get_post_meta( $post->ID, 'show_cityline_url', true ) );
+    echo "<tr><th><label for='show_cityline_url'>YouTube URL</label></th><td><input type='url' id='show_cityline_url' name='show_cityline_url' value='$cityline' style='width:100%' placeholder='https://www.youtube.com/watch?v=…'><p class='description'>Paste the YouTube link to the Cityline interview for this show. When this show is currently running, the video will appear on the homepage.</p></td></tr>";
+
     // --- Auditions ---
     echo '<tr><th colspan="2" style="padding-top:1em;border-top:1px solid #ddd"><strong>Auditions (drives the /auditions/ hub page)</strong></th></tr>';
     $audition_status = get_post_meta( $post->ID, 'show_audition_status', true );
@@ -290,6 +296,7 @@ function tlt_save_show_meta( $post_id, $post ) {
         'show_venue_name','show_venue_address',
         'show_audition_status','show_audition_dates','show_audition_location',
         'show_audition_packet_url','show_audition_signup_url','show_logo_url',
+        'show_cityline_url',
     ];
     foreach ( $text_keys as $k ) {
         if ( isset( $_POST[ $k ] ) ) update_post_meta( $post_id, $k, sanitize_text_field( $_POST[ $k ] ) );

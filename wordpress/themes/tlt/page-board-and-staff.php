@@ -12,7 +12,7 @@ get_header(); ?>
   .bs-page h1 { text-align: center; margin: 2.5rem 0 1.5rem; }
   .bs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.5rem; }
   .bs-card { text-align: center; }
-  .bs-card .photo { width: 100%; aspect-ratio: 1/1; object-fit: cover; background: #eee; border-radius: 4px; margin-bottom: 0.75rem; }
+  .bs-card .photo { width: 100%; aspect-ratio: 3/4; object-fit: cover; object-position: center top; background: #eee; border-radius: 4px; margin-bottom: 0.75rem; }
   .bs-card h3 { font-size: 0.95rem; margin: 0 0 0.15rem; text-transform: uppercase; letter-spacing: 0.03em; }
   .bs-card .role { font-size: 0.8rem; color: var(--color-muted); text-transform: uppercase; letter-spacing: 0.05em; }
   .bs-bylaws { text-align: center; margin: 2rem 0; }
@@ -38,8 +38,7 @@ function tlt_render_team_grid( $args ) {
     $q = new WP_Query( array_merge( [
         'post_type' => 'tlt_team',
         'posts_per_page' => -1,
-        'orderby' => 'title',
-        'order' => 'ASC',
+        'orderby' => [ 'menu_order' => 'ASC', 'title' => 'ASC' ],
     ], $args ) );
     if ( ! $q->have_posts() ) { echo '<p style="text-align:center">(empty)</p>'; return; }
     echo '<div class="bs-grid">';
@@ -105,14 +104,8 @@ function tlt_render_team_grid( $args ) {
       $group_img = get_template_directory_uri() . '/assets/past-mads.jpg';
       ?>
       <img src="<?php echo esc_url( $group_img ); ?>" alt="Past Managing Artistic Directors group photo">
-      <p class="caption">Pictured left to right: TLT Artistic Directors Judy Cullen (1999–2000 &amp; 2001–2006), Chris Serface (2013–present), David Duvall (2007–2008), David Fischer (1994–1996), Charlotte Teincken (1996–1999), Scott Campbell (2009–2011), Nikki Smith (1988–1990).</p>
+      <p class="caption">Pictured left to right: TLT Artistic Directors Judy Cullen (1999–2000 &amp; 2001–2006), Chris Serface (2013–present), David Duvall (2007–2008), David Fischer (1994–1996), and Charlotte Tiencken (1996–1999). Taken during the TLT 100th Anniversary Celebration.</p>
     </div>
-  </section>
-
-  <section class="venue-section">
-    <h2>Located at 210 N "I" Street, Tacoma, WA 98403</h2>
-    <p class="mission"><strong>Our Mission:</strong> Providing live theatre and education programs that inspire through stories reflecting the vibrancy of our diverse community.</p>
-    <p class="land-ack">Tacoma Little Theatre recognizes that they teach and perform on Indigenous land: the traditional homelands of the Puyallup Tribe and Coast Salish peoples.</p>
   </section>
 
 </div>

@@ -19,6 +19,7 @@ while ( have_posts() ) : the_post();
     $img       = tlt_show_image_url( get_the_ID(), 'full' );
     $videos_raw = get_post_meta( get_the_ID(), 'show_video_urls', true );
     $videos    = $videos_raw ? array_filter( array_map( 'trim', explode( ',', $videos_raw ) ) ) : [];
+    $cityline_url = get_post_meta( get_the_ID(), 'show_cityline_url', true );
 
     // --- New as of 2026-05-13 ---
     $ptype       = get_post_meta( get_the_ID(), 'show_program_type', true );
@@ -173,11 +174,34 @@ while ( have_posts() ) : the_post();
             <a href="<?php echo esc_url( $tix ); ?>" class="btn btn-primary">Buy Tickets</a>
           <?php endif; ?>
           <?php if ( $program ) : ?>
-            <a href="<?php echo esc_url( $program ); ?>" class="btn btn-primary" style="background:transparent;color:var(--color-accent);border:2px solid var(--color-accent)">View Program</a>
+            <a href="<?php echo esc_url( $program ); ?>" class="btn btn-primary" target="_blank" rel="noopener" style="background:transparent;color:var(--color-accent);border:2px solid var(--color-accent)">View Program</a>
           <?php else : ?>
             <a href="#" class="btn btn-primary" style="background:transparent;color:var(--color-muted);border:2px solid var(--color-muted);cursor:not-allowed" title="Program PDF not yet linked — coming soon" onclick="event.preventDefault()">View Program</a>
           <?php endif; ?>
         </p>
+
+        <?php if ( $cityline_url ) :
+          $cityline_embed = wp_oembed_get( $cityline_url, [ 'width' => 600 ] );
+          // Build a clean embed src as a fallback
+          $cityline_iframe_src = '';
+          if ( ! $cityline_embed && preg_match( '~(?:youtu\.be/|youtube\.com/(?:watch\?v=|embed/|v/|shorts/))([A-Za-z0-9_-]{6,})~', $cityline_url, $m ) ) {
+              $cityline_iframe_src = 'https://www.youtube.com/embed/' . $m[1];
+          }
+        ?>
+          <div class="show-cityline" style="margin-top:2rem">
+            <h3 style="margin-bottom:0.4rem;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--color-accent)">Cityline Interview</h3>
+            <div class="video-wrap" style="position:relative;aspect-ratio:16/9;background:#000;border-radius:4px;overflow:hidden">
+              <?php
+              if ( $cityline_embed ) {
+                  echo $cityline_embed;
+              } elseif ( $cityline_iframe_src ) {
+                  echo '<iframe src="' . esc_url( $cityline_iframe_src ) . '" title="Cityline interview" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen frameborder="0" style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe>';
+              }
+              ?>
+            </div>
+          </div>
+          <style>.show-cityline .video-wrap iframe { position:absolute; inset:0; width:100%; height:100%; border:0; }</style>
+        <?php endif; ?>
 
         <?php if ( ! empty( $videos ) ) : ?>
           <div class="show-videos" style="margin-top:2rem">
