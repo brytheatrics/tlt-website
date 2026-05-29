@@ -4,6 +4,11 @@
 /assets/
 /mockup/
 
+# Separate project (Google Apps Script: Ludus sync / casting / bios).
+# Lives here on disk but is NOT part of the website repo; has its own git repo.
+# Critically, contains a Google service-account key that must never be committed.
+/tlt-manager/
+
 # Local server inventory snapshot — too big for git, regenerated as needed
 tlt_server_inventory.json
 
@@ -26,3 +31,9 @@ venv/
 
 # Local test artifacts
 *.log
+
+# DB dumps for deploy — contain content, large; canonical DB lives on Cloudways
+/deploy/dumps/
+
+# Cloudways connection details (real one is per-machine; commit only the example)
+/deploy/cloudways.json

@@ -1,0 +1,6 @@
+{
+  "ssh_user": "master_xxxxxxxxxx",
+  "ssh_host": "000.000.000.000",
+  "app_folder": "xxxxxxxxxx",
+  "temp_url": "https://wordpress-XXXXXX-XXXXXX.cloudwaysapps.com"
+}
