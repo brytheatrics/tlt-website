@@ -47,6 +47,11 @@
 <?php endif; ?>
 
 <?php if ( ! is_page_template( 'page-splash.php' ) && ! is_page( 'splash' ) ) : ?>
+<?php
+// Sitewide promo banner (auto-renders when any active promo has
+// location=sitewide; dismissable per-visitor via cookie).
+if ( function_exists( 'tlt_render_sitewide_banner' ) ) tlt_render_sitewide_banner();
+?>
 <header class="site-header">
   <div class="container">
     <a href="<?php echo esc_url( home_url( '/home/' ) ); ?>" class="logo">

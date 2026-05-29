@@ -202,111 +202,45 @@ if ( $cityline_url ) :
   </div>
 </section>
 
-<!-- Education group -->
-<section class="block alt" data-section-num="02">
+<?php
+/* ---------------------------------------------------------------------------
+ * Promotion sections (CPT-driven). Each section auto-hides when there are no
+ * active promos for that group. Chris edits these from WP admin → Promotions.
+ * ------------------------------------------------------------------------- */
+
+// Standalone promos (their own rows, no section heading). Rendered first.
+$standalone_promos = function_exists( 'tlt_get_active_promotions' )
+    ? tlt_get_active_promotions( 'homepage', [ 'homepage_section' => 'standalone' ] )
+    : [];
+if ( $standalone_promos ) : ?>
+<section class="block">
   <div class="container">
-    <div class="section-head">
-      <div class="eyebrow"><span class="num">02</span> Education</div>
-      <h2>Programs for Every Age</h2>
-      <p>Classes, camps, and youth productions — explore the craft of theatre at TLT.</p>
-    </div>
-
-    <div class="feature-row">
-      <div>
-        <h2>Spring Education</h2>
-        <p>Three great programs for students in grades 1&ndash;8 &mdash; classes, after-school sessions, and youth productions.</p>
-        <p><a href="/spring-classes-2026/" class="btn btn-primary">Learn More</a></p>
-      </div>
-      <a href="/spring-classes-2026/"><img src="<?php echo get_template_directory_uri(); ?>/assets/home-promo-spring-classes.png" alt="" class="promo-image"></a>
-    </div>
-
-    <div class="feature-row" style="margin-top:3rem">
-      <a href="/summer-camp-2026/"><img src="<?php echo get_template_directory_uri(); ?>/assets/home-promo-summer-camp.png" alt="" class="promo-image"></a>
-      <div>
-        <h2>Summer Camp at TLT</h2>
-        <p>Registration now open for summer 2026 camps. Performance-based programs for kids who love the stage.</p>
-        <p><a href="/summer-camp-2026/" class="btn btn-primary">Camp Details</a></p>
-      </div>
-    </div>
-
+    <?php foreach ( $standalone_promos as $i => $p ) tlt_render_promo( $p, $i, 'feature-row' ); ?>
   </div>
 </section>
+<?php endif; ?>
 
-<!-- Special Events group -->
-<section class="block" data-section-num="03">
-  <div class="container">
-    <div class="section-head">
-      <div class="eyebrow"><span class="num">03</span> Beyond the Stage</div>
-      <h2>Special Events</h2>
-      <p>Mystery dinners, partner restaurants, and other ways to make a night of it.</p>
-    </div>
-
-    <div class="feature-row">
-      <div>
-        <h2>The Golden Ball Murder</h2>
-        <p>Our annual murder mystery dinner returns at a NEW LOCATION! Join us May 28&ndash;31, 2026 at La Quinta Inn for a fun-filled evening.</p>
-        <p><a href="/golden-ball-murder/" class="btn btn-primary">Mystery Dinner Info</a></p>
-      </div>
-      <a href="/golden-ball-murder/"><img src="<?php echo get_template_directory_uri(); ?>/assets/home-promo-mystery.jpg" alt="" class="promo-image"></a>
-    </div>
-
-    <div class="feature-row" style="margin-top:3rem">
-      <a href="/harbor-lights/"><img src="<?php echo get_template_directory_uri(); ?>/assets/home-promo-harbor-lights.jpg" alt="" class="promo-image"></a>
-      <div>
-        <h2>Dinner at Harbor Lights</h2>
-        <p>Grab dinner before the show at Anthony's Harbor Lights. Mention TLT and a portion supports the theatre &mdash; great food and great support, all in one stop.</p>
-        <p><a href="/harbor-lights/" class="btn btn-primary">How It Works</a></p>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<!-- Get Involved / Opportunities group -->
-<section class="block alt" data-section-num="04">
-  <div class="container">
-    <div class="section-head">
-      <div class="eyebrow"><span class="num">04</span> Get Involved</div>
-      <h2>Join Us</h2>
-      <p>Hiring, season tickets, and other ways to be part of TLT.</p>
-    </div>
-
-    <div class="feature-row">
-      <div>
-        <h2>Now Hiring</h2>
-        <p>TLT is currently accepting applications for production team members for the 2026&ndash;2027 season. Join the crew that brings every show to life.</p>
-        <p><a href="/now-hiring-2026-27/" class="btn btn-primary">View Openings</a></p>
-      </div>
-      <a href="/now-hiring-2026-27/"><img src="<?php echo get_template_directory_uri(); ?>/assets/home-promo-hiring.png" alt="" class="promo-image"></a>
-    </div>
-
-    <div class="feature-row" style="margin-top:3rem">
-      <a href="/season-tickets/"><img src="<?php echo get_template_directory_uri(); ?>/assets/home-promo-season-tickets.jpg" alt="" class="promo-image"></a>
-      <div>
-        <h2>2026&ndash;2027 Season Tickets</h2>
-        <p>New and renewing orders welcome. Lock in your seats for the entire upcoming season and never miss a show.</p>
-        <p><a href="/season-tickets/" class="btn btn-primary">Order Now</a></p>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<!-- Easy ways to support -->
-<section class="block" data-section-num="05">
-  <div class="container">
-    <div class="section-head">
-      <div class="eyebrow"><span class="num">05</span> Support</div>
-      <h2>Easy (and Free) Ways to Help TLT</h2>
-    </div>
-    <div style="display:flex;justify-content:center;gap:2rem;flex-wrap:wrap;align-items:center">
-      <a href="/news/fred-meyer-community-rewards/" style="text-align:center;text-decoration:none">
-        <img src="<?php echo get_template_directory_uri(); ?>/assets/sponsor-fred-meyer.jpg" alt="Fred Meyer Community Rewards" style="max-width:280px;margin-bottom:0.5rem">
-        <p style="font-size:0.85rem;color:var(--color-muted)">Link your Fred Meyer Rewards card → TLT</p>
-      </a>
-    </div>
-  </div>
-</section>
+<?php if ( function_exists( 'tlt_render_homepage_section' ) ) : ?>
+<?php tlt_render_homepage_section(
+    'education', '02', 'Education', 'Programs for Every Age',
+    'Classes, camps, and youth productions — explore the craft of theatre at TLT.',
+    'block alt'
+); ?>
+<?php tlt_render_homepage_section(
+    'special_events', '03', 'Beyond the Stage', 'Special Events',
+    'Mystery dinners, partner restaurants, and other ways to make a night of it.',
+    'block'
+); ?>
+<?php tlt_render_homepage_section(
+    'get_involved', '04', 'Get Involved', 'Join Us',
+    'Hiring, season tickets, and other ways to be part of TLT.',
+    'block alt'
+); ?>
+<?php tlt_render_homepage_section(
+    'support', '05', 'Support', 'Easy (and Free) Ways to Help TLT',
+    '', 'block'
+); ?>
+<?php endif; ?>
 
 <!-- Sponsors -->
 <section class="block dark" data-section-num="06">

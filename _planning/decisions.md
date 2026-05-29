@@ -6,6 +6,66 @@ When Claude is doing autonomous work, every "I made a judgment call" decision ge
 
 ---
 
+## 2026-05-29 — Editing architecture: ACF + hand-rolled CPTs
+
+**Context:** Building out the editing tier so Chris can manage content (promotions, designed pages, flex content) without code changes.
+
+**Decisions:**
+
+1. **ACF Free as the field-tooling for new editing surfaces.** Existing
+   hand-rolled meta-box pattern on Shows/Team stays as-is; new editing
+   surfaces (Promotions, Designed Page, future tier-1 ACF retrofits) use
+   ACF field groups defined in PHP via `acf_add_local_field_group()`
+   so definitions are version-controlled, not stored in the DB. Field
+   groups guard against ACF being disabled with `function_exists()`
+   checks; helpers fall back to raw post meta where they can.
+
+2. **5 promo display locations** (not the 8 from `template_inventory.md`):
+   Homepage, Visit, Education, Get Involved, Sitewide banner. Tickets /
+   Season Tickets / Auditions zones can be added later when those tier-1
+   templates land — wiring a new zone is a one-line change.
+
+3. **Both `promo_start_date` and `promo_end_date` are required.** Forces
+   auto-expiration — solves the "I forgot to take this banner down"
+   problem documented in [ARCHITECTURE.md](ARCHITECTURE.md#headline-decisions).
+
+4. **Homepage promo grouping preserved.** The existing visual rhythm
+   (Education / Special Events / Get Involved / Support sections, each
+   numbered 02–05 with eyebrow + heading) was worth keeping. Added a
+   `promo_homepage_section` ACF select (Standalone / Education group /
+   Special Events / Get Involved / Support) so each promo knows which
+   homepage section it belongs to. Each section's wrapper auto-hides
+   when no active promos are in it. Standalone promos render in their
+   own row above the grouped sections.
+
+5. **Sitewide banner is dismissable, scoped per-promo.** Cookie
+   `tlt_dismiss_promo_<id>` set for 7 days when visitor clicks ×. New
+   banners (new promo ID) re-show even if a prior banner was dismissed.
+
+6. **Seeder, not auto-migration.** Created a Tools → "TLT: Seed
+   Promotions" admin page that creates the 7 hardcoded homepage promos
+   as Promotion records on demand. Idempotent (skips slugs that
+   already exist). Lets the user verify what will be created before
+   running, and works on both Local and Cloudways. After seeding,
+   the hardcoded copies are gone from `page-home.php` — Chris owns the
+   content via WP admin.
+
+**Files touched:**
+- `wordpress/plugins/tlt-post-types/includes/promotions.php` (new, ~430 lines)
+- `wordpress/plugins/tlt-post-types/tlt-post-types.php` (requires above)
+- `wordpress/themes/tlt/page-home.php` (sections 02–05 now dynamic)
+- `wordpress/themes/tlt/page-visit.php` (visit promo zone)
+- `wordpress/themes/tlt/page-education.php` ("Currently Happening" zone)
+- `wordpress/themes/tlt/header.php` (sitewide banner injection)
+- `wordpress/themes/tlt/style.css` (banner + visit-promos styles)
+
+**Open follow-ups (next milestones, not blocking):**
+- Wire the `get_involved` zone once `page-get-involved.php` exists.
+- ACF field groups for `page-designed.php` and `page-campaign.php`.
+- Flex blocks tier — decision deferred until milestone 4.
+
+---
+
 ## Autonomous work — Squarespace asset rehost
 
 **Date:** 2026-05-12 (~23:50)

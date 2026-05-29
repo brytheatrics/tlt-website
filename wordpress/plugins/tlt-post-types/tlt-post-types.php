@@ -8,6 +8,9 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
+// Promotions (tlt_promotion CPT + ACF fields + helpers + seeder)
+require_once __DIR__ . '/includes/promotions.php';
+
 /* ---------------------------------------------------------------------------
  * Custom Post Types
  * ------------------------------------------------------------------------- */

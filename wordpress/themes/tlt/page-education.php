@@ -127,30 +127,21 @@ get_header(); ?>
     </div>
   </div>
 
-  <!-- Currently Happening (white) -->
+  <!-- Currently Happening (white) — driven by Promotions with location=education -->
+  <?php
+  $edu_promos = function_exists( 'tlt_get_active_promotions' )
+      ? tlt_get_active_promotions( 'education' )
+      : [];
+  if ( $edu_promos ) :
+  ?>
   <div class="edu-inner edu-section">
     <h2>Currently Happening</h2>
     <p class="lede">What's running right now. Click for details and registration.</p>
     <div class="edu-current-grid">
-
-      <a href="/spring-classes-2026/" class="edu-current-card">
-        <div class="img-wrap"><img src="<?php echo get_template_directory_uri(); ?>/assets/home-promo-spring-classes.png" alt=""></div>
-        <div class="body">
-          <h3>Spring Education @ TLT</h3>
-          <p>Three great programs for students in grades 1&ndash;8.</p>
-        </div>
-      </a>
-
-      <a href="/summer-camp-2026/" class="edu-current-card">
-        <div class="img-wrap"><img src="<?php echo get_template_directory_uri(); ?>/assets/home-promo-summer-camp.png" alt=""></div>
-        <div class="body">
-          <h3>Summer Camp @ TLT</h3>
-          <p>Registration is open for summer 2026.</p>
-        </div>
-      </a>
-
+      <?php foreach ( $edu_promos as $i => $p ) tlt_render_promo( $p, $i, 'edu-card' ); ?>
     </div>
   </div>
+  <?php endif; ?>
 
   <!-- Our Programs (full-width soft band) -->
   <div class="edu-soft-band">

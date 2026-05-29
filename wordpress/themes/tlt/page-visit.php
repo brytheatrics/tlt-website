@@ -75,6 +75,19 @@ get_header(); ?>
     <p class="address"><a href="https://www.google.com/maps/dir/?api=1&destination=210+N+I+Street,+Tacoma,+WA+98403" target="_blank" rel="noopener">210 N "I" Street, Tacoma, WA 98403</a> &middot; Box Office: <a href="tel:+12532722281">(253) 272-2281</a></p>
   </header>
 
+  <?php
+  // Visit-page promotions (active promos with location=visit). Auto-hides
+  // when there are no active visit promos.
+  $visit_promos = function_exists( 'tlt_get_active_promotions' )
+      ? tlt_get_active_promotions( 'visit' )
+      : [];
+  if ( $visit_promos ) :
+  ?>
+  <section class="visit-promos" aria-label="Featured">
+    <?php foreach ( $visit_promos as $i => $p ) tlt_render_promo( $p, $i, 'feature-row' ); ?>
+  </section>
+  <?php endif; ?>
+
   <nav class="visit-nav" aria-label="On this page">
     <a href="#directions">Transportation &amp; Parking</a>
     <a href="#accessibility">Accessibility</a>

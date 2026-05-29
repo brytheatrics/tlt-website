@@ -1528,3 +1528,52 @@ body.splash-page { overflow: hidden; }
   border: 1px dashed var(--color-line);
   background: #fafafa;
 }
+
+/* =====================================================================
+ * Sitewide promo banner — top of every page (header.php), dismissable.
+ * ===================================================================== */
+.sitewide-banner {
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 0.9rem;
+  overflow: hidden;
+}
+.sitewide-banner a { color: #fff; text-decoration: underline; }
+.sitewide-banner-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.55rem var(--pad);
+}
+.sitewide-banner-text { flex: 1; line-height: 1.4; }
+.sitewide-banner-text strong { margin-right: 0.4rem; }
+.sitewide-banner-body { opacity: 0.95; margin-right: 0.4rem; }
+.sitewide-banner-cta {
+  white-space: nowrap;
+  font-weight: 600;
+  text-decoration: underline;
+}
+.sitewide-banner-dismiss {
+  background: transparent;
+  border: 0;
+  color: #fff;
+  font-size: 1.4rem;
+  line-height: 1;
+  padding: 0 0.25rem;
+  cursor: pointer;
+  opacity: 0.8;
+  flex-shrink: 0;
+}
+.sitewide-banner-dismiss:hover { opacity: 1; }
+
+@media (max-width: 600px) {
+  .sitewide-banner { font-size: 0.85rem; }
+  .sitewide-banner-text { flex-direction: column; }
+}
+
+/* Visit-page promo zone (above anchor nav). Just gives it the same
+ * page-padded container as the rest of the visit page. */
+.visit-promos {
+  margin: 2rem auto 1rem;
+}
