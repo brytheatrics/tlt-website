@@ -18,7 +18,11 @@ A practical guide for Chris (and future TLT staff) on how to update the site.
 | Add a board or staff member | Team → Add New Team Member |
 | Update splash page photos | Shows → (current show) → Splash Gallery field |
 | Add a new audition opening | Just open the show and set the audition fields — the /auditions/ page auto-updates |
-| Promote a new event on the homepage | (Once Promotions are set up) Promotions → Add New |
+| Promote a new event on the homepage | Promotions → Add New |
+| Add a featured banner on Visit / Education pages | Promotions → Add New → check the right "Where to show this" boxes |
+| Show a sitewide alert (top of every page) | Promotions → Add New → check "Sitewide banner" |
+| Take down an old promo | Just wait — promos auto-expire on their End Date |
+| Nest a page under About in the nav | Pages → (the page) → Page Attributes → Parent: About |
 | Update site address / phone / mission | Appearance → Customize → Contact Information / Mission |
 | Update social media links | Appearance → Customize → Social Media |
 | Add a press release or news post | Posts → Add New → Category: Press |
@@ -153,9 +157,62 @@ The post appears in the relevant listing page automatically.
 
 ## Promotions (homepage and other page banners)
 
-> *(Coming soon — once the Promotions post type is wired up.)*
+**Promotions** are how you add a temporary banner, event card, or announcement to the homepage or any tier-1 page. Each promo has **start and end dates**, so it auto-appears and auto-disappears — you don't have to remember to take anything down.
 
-Promotions will be a way to add a temporary banner to the homepage, education page, or other pages. Each promo has start/end dates so it auto-disappears when no longer relevant. Until that's set up, banners can be added by editing the relevant page template directly.
+### Adding a homepage event (the common case)
+
+1. **Promotions → Add New**
+2. **Title** — this is the promo headline shown on the homepage (e.g. "Summer Camp at TLT")
+3. **Start date** + **End date** — when the promo appears and disappears. Both required.
+4. **Where to show this** — check **Homepage** (and any other zones it should appear on, like Education or Visit)
+5. **Homepage section** — pick which group it lives in so it visually fits:
+   - **Education group** — Education / classes / camps
+   - **Special Events / Beyond the Stage** — Mystery dinners, partner restaurants
+   - **Get Involved group** — Hiring, season tickets, donations
+   - **Support group** — Smaller centered cards (Fred Meyer rewards, Amazon Smile)
+   - **Standalone** — its own row at the very top of the homepage promos
+6. **Priority** — lower numbers show first within the same section. Default is 50; leave it unless you need to reorder.
+7. **Image** — wide-ish image (16:10 aspect works best). Click the image picker and upload or pick from media library.
+8. **Body text** — one or two short sentences.
+9. **Button label** and **Button URL** — the CTA button.
+10. **Linked show** (optional) — if this promo is about a specific show, link it.
+11. **Publish.**
+
+The promo appears on the homepage immediately (assuming today is within the start/end window).
+
+### Adding a sitewide banner
+
+A small strip across the top of every page — use sparingly (e.g. "Box office closed Memorial Day weekend").
+
+1. **Promotions → Add New**
+2. Set Title, Start/End dates, Body, optional Button
+3. Under **Where to show this**, check **Sitewide banner**
+4. Publish.
+
+Visitors who dismiss the banner won't see it again for 7 days. New banners (different posts) re-appear even if a previous one was dismissed.
+
+### Retiring or expiring a promotion
+
+Three ways, in increasing order of effort:
+
+1. **Best — set the end date when you create it.** The promo disappears on its own when that date passes. No follow-up needed.
+2. **Change the end date to today** if you want it gone immediately. (Or unpublish the post.)
+3. **Delete the post** — Promotions → trash. Only do this if you're sure you won't need to re-enable it.
+
+### Editing existing promos
+
+**Promotions → All Promotions.** The list shows where each promo runs, its date window, and a colored Status badge:
+
+- 🟢 **Active** — currently showing on the site
+- 🟡 **Upcoming** — start date hasn't arrived yet
+- 🔴 **Expired** — end date has passed; not showing
+- ⚫ **Missing dates** — promo won't show until you fix the dates
+
+Click any promo title to edit. Changes appear on the site immediately.
+
+### One-time setup (only matters once)
+
+After the new Promotion system launches, the 7 hardcoded homepage promos (Spring Education, Summer Camp, Golden Ball Murder, Harbor Lights, Now Hiring, Season Tickets, Fred Meyer) need to be turned into Promotion records. **Blake will do this once** via **Tools → TLT: Seed Promotions** (one-click migration; idempotent — safe to run twice). After that runs, all 7 appear as editable Promotions.
 
 ---
 
@@ -177,7 +234,7 @@ Update once; reflects everywhere.
 
 Most pages on the site use specific templates that do the design work for you. When creating a new page, pick the right template (right sidebar → **Page Attributes → Template**):
 
-- **Default** — for prose pages with optional inline images (mission, history, policies)
+- **Default** — for prose pages built from Flex Blocks (mission, history, policies, one-off pages)
 - **Auditions Hub** — single use, already assigned to `/auditions/`
 - **Ticketing** — for pricing / ticket info pages (uses optional pricing tier fields)
 - **Campaign** — Flush-style fundraising pages
@@ -186,7 +243,59 @@ Most pages on the site use specific templates that do the design work for you. W
 - **Contact** — main content + sidebar (hours, address, map, phone, email)
 - **Video Archive** — video grid for recorded programs
 
-The right template makes everything look polished. **Don't try to build layouts in the editor — use templates.**
+The right template makes everything look polished. **Don't try to build layouts in the editor — use templates or Flex Blocks.**
+
+### Creating a Designed Page (image + headline + body + buttons)
+
+The Designed Page template is the go-to for class announcements, partner perks, special events — anything that's basically a promo poster.
+
+1. **Pages → Add New**
+2. **Title** — this becomes the headline on the page
+3. **Page Attributes → Template → Designed Page**
+4. **Save Draft** (the editor will reload showing the Designed Page fields instead of the default block editor)
+5. Fill in the tabs:
+   - **Hero** — desktop image (and optionally a different mobile image)
+   - **Headline & Body** — subhead (optional one-line under the title) and rich-text body
+   - **Buttons (up to 3)** — label, URL, style (solid or outline), open in new tab toggle
+6. **Publish**
+
+### Creating a one-off page with Flex Blocks
+
+For long-form pages that don't fit a specific template (mission, history, story pages):
+
+1. **Pages → Add New**
+2. **Title** — the page title
+3. **Page Attributes → Template → Default** (or leave unset)
+4. In the block editor, click the **"+" (Add block)** button → switch to the **Patterns** tab → pick the **TLT Flex Blocks** category
+5. You'll see a library of pre-styled blocks you can insert. The current set:
+   - **Prose** — heading + paragraphs (the workhorse)
+   - **Figure** — image with caption
+   - **Image with text wrap** — image floats next to a paragraph
+   - **Section heading** — big underlined divider for long pages
+   - **Full-bleed banner image** — wide hero-ish image
+   - **Button (CTA)** — a primary-style call-to-action button
+   - **Video embed** — YouTube or Vimeo video
+   - **PDF link list** — bulleted list of PDF links (each gets a 📄 icon)
+   - **Photo gallery** — multi-image lightbox grid
+   - **Two-column callout** — bordered box with two side-by-side sections
+   - **Logo / sponsor row** — wrapping row of logos with links
+   - **Pull-quote** — large emphasized quote
+6. Click a pattern to insert it, then edit the text/images in place
+7. Repeat — stack as many patterns as you need
+8. **Publish**
+
+Patterns are starting points. Once inserted they become regular blocks you can edit, duplicate, move, or delete.
+
+### Nesting a page under another (e.g. under About)
+
+Want a page to live at `/about/our-history/` instead of `/our-history/`?
+
+1. Open the page in **Pages**
+2. In the right sidebar, find **Page Attributes → Parent**
+3. Pick the parent page (e.g. **About**)
+4. **Update**
+
+The URL automatically updates to reflect the nesting. To also nest the page **in the navigation menu**, go to **Appearance → Menus**, drag the menu item underneath its new parent (it indents to show it's nested), and Save Menu.
 
 ---
 
@@ -265,4 +374,4 @@ For anything in those categories, reach out to Blake or hire a WordPress contrac
 
 ---
 
-*Last updated: 2026-05-13. This document will evolve as the site does.*
+*Last updated: 2026-05-29 (added Promotions, Designed Page, Flex Blocks, and page-nesting workflows). This document will evolve as the site does.*
