@@ -232,7 +232,32 @@ C:\Users\blake\dev\TLT_Website\
 
 ## How to resume if Claude crashes
 
-1. Open this file, read top-to-bottom.
-2. Check `scrape/`, `assets/`, `mockup/` to confirm what's actually on disk vs. what this doc says.
-3. Look at the unchecked items in **Progress so far** — that's the next work.
-4. Tell Claude: "Continue the TLT migration. Read PROJECT.md."
+1. **Read `CLAUDE.md`** at project root first — it's the fastest orientation
+2. Open this file (PROJECT.md), read for deeper context
+3. Check `scrape/`, `assets/`, `mockup/` to confirm what's actually on disk vs. what this doc says
+4. Look at the unchecked items in **Progress so far** — that's the next work
+5. Tell Claude: "Continue the TLT migration. Read CLAUDE.md and PROJECT.md."
+
+## Latest status (May 2026)
+
+**Phase:** Late development, pre-launch.
+
+**What's complete:**
+- All migrated content from Squarespace (shows, team, pages, posts, redirects)
+- 18+ custom page templates built and styled
+- Two custom post types (tlt_show, tlt_team) with extensive meta
+- Splash → home wipe transition
+- Cityline interview integration (43 historical videos imported and linked to shows)
+- Mobile hamburger nav + drawer (post header-overlay bug fix)
+- Customizer fields for content settings
+- Forms (Contact Form 7) for Contact, Donation Request, Volunteer
+- Mobile audit on splash + homepage (in progress)
+
+**What's next:**
+1. Splash gallery per-image focal points (avoid mobile-portrait cropping)
+2. Mobile audit on remaining top-traffic templates (show detail, auditions, education)
+3. Production photo import pipeline from `\\TLT-SERVER\Marketing\` (currently ~700 MB after web-sizing)
+4. Cloudways setup + push migrated site to temp URL for review
+5. DNS cutover (whenever Chris is ready)
+
+**Hosting decision:** Cloudways DigitalOcean Micro ($14/mo) is the pick. User is in process of signing up. Site will live at a Cloudways temp URL until DNS is cut over from Squarespace.
