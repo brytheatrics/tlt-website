@@ -6,6 +6,49 @@ When Claude is doing autonomous work, every "I made a judgment call" decision ge
 
 ---
 
+## 2026-05-29 — Flex content tier: Gutenberg block patterns, not ACF Flexible Content
+
+**Context:** The architecture has a "tier 2" flex-content system for one-off
+pages where Chris wants to stack pre-styled blocks. The original
+[ARCHITECTURE.md](ARCHITECTURE.md) options were (a) ACF Flexible Content on a
+`page-flex.php` template, or (b) native Gutenberg block patterns. Picking now.
+
+**Decision:** Gutenberg block patterns.
+
+**Why:**
+- ACF Flexible Content is **Pro-only**. We chose ACF Free for the rest of
+  the editing tier; pulling in Pro just for this would be inconsistent.
+- Block patterns are **native to WordPress** — zero plugin lock-in. If TLT
+  ever needs to migrate off WordPress, patterns are just standard block
+  markup in `post_content`.
+- They live in `post_content` (not in custom meta fields), so they show up
+  cleanly in search, copy-paste correctly between pages, and survive any
+  future theme switch.
+- They reuse the existing `.page-content` styles in style.css (`.pull-quote`,
+  `.callout-pair`, `.logo-row`, `.full-bleed`, `.section-heading`,
+  `.pdf-list`, etc.) — no new CSS needed.
+- One-click insertion: Chris clicks the "+" in the editor → Patterns tab →
+  "TLT Flex Blocks" → done.
+- No dedicated `page-flex.php` template needed. Default `page.php` is enough.
+  This also means flex blocks are usable on ANY page where the block editor
+  is active, not just ones with a special template assigned.
+
+**Trade-offs accepted:**
+- The block editor is Gutenberg, which is more learning curve than a simple
+  ACF form. Mitigated by curated patterns — Chris doesn't build from
+  scratch, he picks pre-styled layouts and edits text/images inside them.
+- Block markup in `post_content` is harder to manipulate programmatically
+  than ACF data. Not a real issue for editorial flex pages.
+
+**12 patterns shipped:**
+Prose, Figure, Image-with-text-float, Section heading, Full-bleed banner,
+Button/CTA, Video embed, PDF link list, Photo gallery, Two-column callout,
+Logo/sponsor row, Pull-quote. Registered in
+`wordpress/themes/tlt/includes/block-patterns.php` under the "TLT Flex
+Blocks" category.
+
+---
+
 ## 2026-05-29 — Editing architecture: ACF + hand-rolled CPTs
 
 **Context:** Building out the editing tier so Chris can manage content (promotions, designed pages, flex content) without code changes.
