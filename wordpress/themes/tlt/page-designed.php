@@ -57,7 +57,17 @@ while ( have_posts() ) : the_post();
     <?php endif; ?>
 
     <div class="designed-page__body">
-      <?php the_content(); ?>
+      <?php
+      // Prefer the ACF body field (introduced when the editing UI moved off
+      // the block editor). Legacy Designed Pages with body in post_content
+      // continue to render via the_content() fallback until re-edited.
+      $body_acf = function_exists( 'get_field' ) ? get_field( 'designed_body' ) : '';
+      if ( $body_acf ) {
+          echo apply_filters( 'the_content', $body_acf );
+      } else {
+          the_content();
+      }
+      ?>
     </div>
 
     <?php if ( $ctas ) : ?>

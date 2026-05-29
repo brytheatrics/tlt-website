@@ -5,6 +5,9 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
+// ACF field groups for page templates (Designed, Campaign, etc.)
+require_once __DIR__ . '/includes/acf-page-templates.php';
+
 /**
  * Pre-launch date override. The TLT site doesn't go live until after Bedroom
  * Farce closes (Jul 26, 2026). Until then, simulate that the site is already
