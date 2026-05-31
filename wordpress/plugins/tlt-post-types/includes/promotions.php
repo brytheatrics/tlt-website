@@ -175,7 +175,8 @@ add_action( 'acf/init', function () {
                 'key'           => 'field_promo_cta_url',
                 'label'         => 'Button URL',
                 'name'          => 'promo_cta_url',
-                'type'          => 'url',
+                'type'          => 'text',
+                'instructions'  => 'Full URL (https://…) or an on-site path like /board-and-staff/',
                 'placeholder'   => 'https://… or /page-slug/',
                 'wrapper'       => [ 'width' => '60' ],
             ],
@@ -296,11 +297,23 @@ function tlt_get_active_promotions( $zone, $args = [] ) {
         'no_found_rows'  => true,
     ] );
 
+    // Helper: normalize date to Y-m-d. ACF date picker can store either
+    // Ymd (admin-saved) or Y-m-d (legacy/seeded). get_field() formats per
+    // the field's return_format; raw meta is the fallback.
+    $normalize = function ( $v ) {
+        if ( ! $v ) return '';
+        // Already Y-m-d
+        if ( preg_match( '/^\d{4}-\d{2}-\d{2}$/', $v ) ) return $v;
+        // Ymd → Y-m-d
+        if ( preg_match( '/^(\d{4})(\d{2})(\d{2})$/', $v, $m ) ) return "{$m[1]}-{$m[2]}-{$m[3]}";
+        return $v;
+    };
+
     $out = [];
     foreach ( $q->posts as $p ) {
         // Date window check
-        $s = get_post_meta( $p->ID, 'promo_start_date', true );
-        $e = get_post_meta( $p->ID, 'promo_end_date', true );
+        $s = $normalize( get_post_meta( $p->ID, 'promo_start_date', true ) );
+        $e = $normalize( get_post_meta( $p->ID, 'promo_end_date', true ) );
         if ( ! $s || ! $e ) continue;
         if ( $today < $s || $today > $e ) continue;
 

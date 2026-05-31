@@ -33,6 +33,55 @@ add_filter( 'use_block_editor_for_post', function ( $use, $post ) {
     return $use;
 }, 10, 2 );
 
+/**
+ * Auto-reload the page editor after save when the template was just changed
+ * to an ACF-managed one. Without this, Chris has to manually navigate back
+ * to Pages → click the page → reload, because the Gutenberg editor doesn't
+ * full-reload after save and so the editor stays Gutenberg instead of
+ * switching to the classic+ACF view that templates need.
+ */
+add_action( 'admin_enqueue_scripts', function ( $hook ) {
+    if ( ! in_array( $hook, [ 'post.php', 'post-new.php' ], true ) ) return;
+    $screen = get_current_screen();
+    if ( ! $screen || $screen->post_type !== 'page' ) return;
+    $managed = wp_json_encode( tlt_acf_managed_templates() );
+    $js = <<<JS
+(function () {
+  if (typeof wp === 'undefined' || !wp.data || !wp.data.select('core/editor')) return;
+  var MANAGED = {$managed};
+  function get() {
+    return wp.data.select('core/editor').getEditedPostAttribute('template') || '';
+  }
+  var initial   = get();
+  var wasSaving = false;
+  var dirty     = false;
+
+  wp.data.subscribe(function () {
+    var current   = get();
+    var isSaving  = wp.data.select('core/editor').isSavingPost();
+    var isAutosave= wp.data.select('core/editor').isAutosavingPost();
+    if (current !== initial) dirty = true;
+    // Detect a real save completing (not autosave)
+    if (wasSaving && !isSaving && !isAutosave && dirty) {
+      // If the just-saved template is ACF-managed, reload so the editor
+      // switches to the ACF view.
+      if (MANAGED.indexOf(current) !== -1) {
+        dirty = false;
+        // Tiny delay so WP can finish post-save cleanup before reload
+        setTimeout(function () { window.location.reload(); }, 250);
+      } else {
+        // Template still not managed — accept the new state
+        initial = current;
+        dirty = false;
+      }
+    }
+    wasSaving = isSaving;
+  });
+})();
+JS;
+    wp_add_inline_script( 'wp-edit-post', $js );
+} );
+
 // Hide the post_content textarea on the Classic editor for managed templates,
 // since the body lives in ACF for those templates.
 add_action( 'admin_head', function () {
