@@ -73,9 +73,15 @@ $listings = [
 
 <div class="jobs-page">
   <header class="jobs-hero">
-    <span class="eyebrow">Work With Us</span>
-    <h1><?php the_title(); ?></h1>
-    <p class="lede">Tacoma Little Theatre is always looking for talented people to join our team. Check below for current openings, and feel free to send a resume to <a href="mailto:jobs@tacomalittletheatre.com">jobs@tacomalittletheatre.com</a> any time — even if nothing's posted, we keep applications on file.</p>
+    <?php $_jo_eb = function_exists( 'tlt_hero_field' ) ? tlt_hero_field( 'eyebrow', 'Work With Us' ) : 'Work With Us'; ?>
+    <?php if ( $_jo_eb ) : ?><span class="eyebrow"><?php echo esc_html( $_jo_eb ); ?></span><?php endif; ?>
+    <h1><?php echo esc_html( function_exists( 'tlt_hero_field' ) ? tlt_hero_field( 'title', get_the_title() ) : get_the_title() ); ?></h1>
+    <p class="lede"><?php
+      $_jo_default_lede = 'Tacoma Little Theatre is always looking for talented people to join our team. Check below for current openings, and feel free to send a resume to jobs@tacomalittletheatre.com any time — even if nothing\'s posted, we keep applications on file.';
+      $_jo_lede = function_exists( 'tlt_hero_field' ) ? tlt_hero_field( 'lede', $_jo_default_lede ) : $_jo_default_lede;
+      // Auto-link the email
+      echo wp_kses_post( str_replace( 'jobs@tacomalittletheatre.com', '<a href="mailto:jobs@tacomalittletheatre.com">jobs@tacomalittletheatre.com</a>', esc_html( $_jo_lede ) ) );
+    ?></p>
   </header>
 
   <?php if ( ! empty( $listings ) ) : ?>

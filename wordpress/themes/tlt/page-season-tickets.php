@@ -131,9 +131,10 @@ $shows = [
   <!-- HERO -->
   <header class="st-hero">
     <div class="st-hero__text">
-      <span class="eyebrow"><?php echo esc_html( $season_label ); ?></span>
-      <h1>Season Tickets &amp; FLEX Passes</h1>
-      <p class="lede">Seven Mainstage productions. One subscription. Save per show over single ticket prices, lock in your seat for every show, or grab a FLEX Pass and use the six punches however you like.</p>
+      <?php $_st_eb = function_exists( 'tlt_hero_field' ) ? tlt_hero_field( 'eyebrow', $season_label ) : $season_label; ?>
+      <?php if ( $_st_eb ) : ?><span class="eyebrow"><?php echo esc_html( $_st_eb ); ?></span><?php endif; ?>
+      <h1><?php echo wp_kses_post( function_exists( 'tlt_hero_field' ) ? tlt_hero_field( 'title', 'Season Tickets &amp; FLEX Passes' ) : 'Season Tickets &amp; FLEX Passes' ); ?></h1>
+      <p class="lede"><?php echo esc_html( function_exists( 'tlt_hero_field' ) ? tlt_hero_field( 'lede', 'Seven Mainstage productions. One subscription. Save per show over single ticket prices, lock in your seat for every show, or grab a FLEX Pass and use the six punches however you like.' ) : 'Seven Mainstage productions. One subscription. Save per show over single ticket prices, lock in your seat for every show, or grab a FLEX Pass and use the six punches however you like.' ); ?></p>
       <div class="cta-row">
         <?php if ( $online_orders_live ) : ?>
           <a class="btn btn-primary" href="<?php echo esc_url( $online_orders_url ); ?>" target="_blank" rel="noopener">Order Online</a>

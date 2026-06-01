@@ -102,32 +102,49 @@ get_header(); ?>
   .policies-grid p { font-size: 0.9rem; line-height: 1.6; margin: 0; }
 </style>
 
+<?php
+// All editable text comes from ACF fields via tlt_edu_field(). Defaults defined
+// in includes/acf-page-templates.php → tlt_edu_defaults(). External links are
+// auto-detected so an http(s) URL opens in a new tab; on-site /paths/ don't.
+$_edu_target = function ( $u ) {
+    return ( $u && preg_match( '#^https?://#i', $u ) ) ? ' target="_blank" rel="noopener"' : '';
+};
+$scholarship_image = function_exists( 'get_field' ) ? get_field( 'edu_scholarship_image' ) : null;
+$scholarship_img_url = '';
+if ( is_array( $scholarship_image ) && ! empty( $scholarship_image['url'] ) ) {
+    $scholarship_img_url = $scholarship_image['url'];
+} else {
+    $scholarship_img_url = get_template_directory_uri() . '/assets/edu-clubtlt.jpg';
+}
+?>
 <div class="edu-page">
 
-  <!-- Hero (full-width soft band) -->
+  <!-- Hero -->
   <div class="edu-soft-band">
     <div class="edu-inner edu-hero">
-      <h1>Education at Tacoma Little Theatre</h1>
-      <p class="lead">TLT's Theatre classes help students of all ages to grow to their full potential as performers and more importantly as people. TLT's vision is to bring together students in our community to learn about and practice the skills and techniques of performance art, building life skills in the process.</p>
+      <h1><?php echo esc_html( tlt_edu_field( 'hero_title' ) ); ?></h1>
+      <p class="lead"><?php echo esc_html( tlt_edu_field( 'hero_intro' ) ); ?></p>
+      <?php
+        $hero_label = tlt_edu_field( 'hero_cta_label' );
+        $hero_url   = tlt_edu_field( 'hero_cta_url' );
+        if ( $hero_label && $hero_url ) :
+      ?>
       <p>
-        <a href="https://tlt.ludus.com/index.php?sections=classes" target="_blank" rel="noopener" class="btn btn-primary">Camp &amp; Class Registration</a>
+        <a href="<?php echo esc_url( $hero_url ); ?>"<?php echo $_edu_target( $hero_url ); ?> class="btn btn-primary"><?php echo esc_html( $hero_label ); ?></a>
       </p>
+      <?php endif; ?>
     </div>
   </div>
 
-  <!-- Why Theatre Education? (full-width soft band, sits right under hero) -->
+  <!-- Why Theatre Education? -->
   <div class="philosophy">
     <div class="inner">
-      <h2>Why Theatre Education?</h2>
-      <p>While TLT prides itself in educating students with extensive knowledge and powerful skills they need as performers, our courses and camps are also created to build confidence, team work, collaboration, self esteem, communication, innovative thinking and much, much more!</p>
-      <p>Our classes are designed to enhance curriculums of study for both students attending public or private schools and those who are homeschooled, by providing opportunities for art to be part of the daily lives of our students.</p>
-      <p>In addition to skill building courses, TLT also offers exciting avenues for performance through our drama camps and stage productions.</p>
-      <p>Our instructors are trained theatre artists and bring a variety of experiences within the industry of theatre. Additionally, all instructors provide thorough curriculums for outstanding learning potential and must pass an extensive background check required by TLT.</p>
-      <p>TLT is excited to further our mission of enriching our community with quality, live theater experiences. Come join the fun!</p>
+      <h2><?php echo esc_html( tlt_edu_field( 'why_heading' ) ); ?></h2>
+      <?php echo wp_kses_post( tlt_edu_field( 'why_body' ) ); ?>
     </div>
   </div>
 
-  <!-- Currently Happening (white) — driven by Promotions with location=education -->
+  <!-- Currently Happening — driven by Promotions with location=education -->
   <?php
   $edu_promos = function_exists( 'tlt_get_active_promotions' )
       ? tlt_get_active_promotions( 'education' )
@@ -143,117 +160,74 @@ get_header(); ?>
   </div>
   <?php endif; ?>
 
-  <!-- Our Programs (full-width soft band) -->
+  <!-- Our Programs -->
+  <?php $programs = tlt_edu_field( 'programs' ); if ( ! is_array( $programs ) ) $programs = []; ?>
+  <?php if ( $programs ) : ?>
   <div class="edu-soft-band">
    <div class="edu-inner edu-section">
-    <h2>Our Programs</h2>
-    <p class="lede">A full menu of theatre education for every age and interest.</p>
+    <h2><?php echo esc_html( tlt_edu_field( 'programs_heading' ) ); ?></h2>
+    <p class="lede"><?php echo esc_html( tlt_edu_field( 'programs_lede' ) ); ?></p>
     <div class="programs-dir">
-
+      <?php foreach ( $programs as $prog ) :
+        $title = isset( $prog['title'] ) ? $prog['title'] : '';
+        $link  = isset( $prog['link_url'] ) ? trim( $prog['link_url'] ) : '';
+        $body  = isset( $prog['body'] ) ? $prog['body'] : '';
+        if ( ! $title && ! $body ) continue;
+      ?>
       <div class="program-entry">
-        <h3>After-School @ TLT</h3>
-        <p>These wonderful six-week sessions are held twice weekly (Mondays &amp; Wednesdays or Tuesdays &amp; Thursdays) from 4:00pm-6:00pm. We'll offer classes in the fall, winter, and spring, and each class will culminate in a fully staged play or musical production for friends and family to come enjoy. Students can enroll in one or both sessions. Classes are open to students in grades 1-8.</p>
+        <h3>
+          <?php if ( $link ) : ?>
+            <a href="<?php echo esc_url( $link ); ?>"><?php echo esc_html( $title ); ?>
+              <svg class="link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            </a>
+          <?php else : ?>
+            <?php echo esc_html( $title ); ?>
+          <?php endif; ?>
+        </h3>
+        <?php echo wp_kses_post( $body ); ?>
       </div>
-
-      <div class="program-entry">
-        <h3>Homeschool @ TLT</h3>
-        <p>Modeled on our after school program, this class is designed for the homeschool families in our community. These classes meet twice weekly and take place over a six-week period, culminating in a fully staged production for friends and family to come and enjoy. Tacoma Little Theatre is a certified Community Based Instructor (CBI). Classes are open to students in grades 1-8.</p>
-      </div>
-
-      <div class="program-entry">
-        <h3>Improv</h3>
-        <p>Learn the skills necessary to think on your feet and say &ldquo;Yes, and&hellip;&rdquo;. These tools help young and adult actors with their onstage skills, as well as off stage in school and work. Classes vary from evening to weekend times; please be sure to check our website for the latest details. Classes are available for 12-18-year-olds and for adults.</p>
-      </div>
-
-      <div class="program-entry">
-        <h3>Voice Lessons</h3>
-        <p>TLT is not currently offering voice lessons. If you are interested, feel free to reach out to us and we may be able to put you in contact with a teaching artist in our community. You can email us at <a href="mailto:education@tacomalittletheatre.com">education@tacomalittletheatre.com</a>.</p>
-      </div>
-
-      <div class="program-entry">
-        <h3>Dance</h3>
-        <p>Getting ready for an audition or just wanting to build some skills? Come join us for these fast-paced classes. Classes are offered at a variety of levels and skill sets ranging from the basics of ballet, jazz and musical theater, to more intensive and specific styles of musical theater. Students will spend six weeks focused on a specific style or skill set. Classes are available for all ages.</p>
-      </div>
-
-      <div class="program-entry">
-        <h3>Adult Classes @ TLT</h3>
-        <p>TLT's education program includes our adult actors. These programs start for students 18 and up, they include classes like intro to acting, advanced acting, improv classes, and dance classes. We offer classes and workshops periodically. Check in to see what's available online or email us at <a href="mailto:education@tacomalittletheatre.com">education@tacomalittletheatre.com</a>.</p>
-      </div>
-
-      <div class="program-entry">
-        <h3><a href="/clubtlt/">Club TLT
-          <svg class="link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
-        </a></h3>
-        <p>A unique club that offers year-round education dedicated to middle and high school students, ages 13-19. Students will have opportunities to focus on their audition skills to help prepare for school and community auditions they are working on! Students will also have opportunities to learn more about writing and directing their first play. Students can work their improv skills to help build confidence to mold into a variety of characters for their theatrical endeavors. Workshops and master classes in performance, direction, design, stage management, and play writing have all been offered in the past. Special events and activities offer students opportunities to attend performances and volunteer at TLT. Students will work together to create performances specially suited for teenagers.</p>
-      </div>
-
-      <div class="program-entry">
-        <h3>Winter Break Camp</h3>
-        <p>Join us during winter break for a fun and exciting camp experience! Dates change year to year to avoid Holidays. This is a great chance for students to spend some time onstage preparing an exciting musical before jumping back into the school year! Camp is most Mondays-Thursdays 9:00am-4:00pm, with one to two performances the last weekend of camp. Open for grades 1-12.</p>
-      </div>
-
-      <div class="program-entry">
-        <h3>Spring Break Camp</h3>
-        <p>Join TLT for this lightning fast theater experience! Students will work hard to put together a fully staged musical in just one week! If you plan to stay home for spring break, come join us for this wonderful program! Monday-Friday 9:00am-4:00pm, performs on the weekend. In 2023, we will offer a skills break camp &ndash; featuring all of the skill building, learning, and fun of a theater workshop without the pressure of putting on a play. This immersive experience would be appropriate for students who are interested in exploring theater arts, or deepening their skills on stage. Open for grades 1-12.</p>
-      </div>
-
-      <div class="program-entry">
-        <h3>Summer Break Camps</h3>
-        <p>We have two summer break camps each year. Camps are four weeks long, and provide an in-depth experience of putting a fully staged musical together, learning about the technical aspects of a production, and learning new theater techniques. Camp meets for four weeks, Monday-Friday 9:00am-4:00pm.</p>
-      </div>
-
-      <div class="program-entry">
-        <h3><a href="/students-on-stage/">Students On Stage
-          <svg class="link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
-        </a></h3>
-        <p>Our outreach program is designed to bring the entire educational experience to your school! Our programs range from a variety of musical and non-musical options, all designed to bring the importance and value of art into students' learning. Please contact us for more details by emailing <a href="mailto:education@tacomalittletheatre.com">education@tacomalittletheatre.com</a>.</p>
-      </div>
-
+      <?php endforeach; ?>
     </div>
    </div>
   </div>
+  <?php endif; ?>
 
   <section class="edu-inner scholarship-section">
     <div>
-      <h2 style="color:var(--color-accent)">Scholarships</h2>
-      <p>The following button will direct you to our online scholarship application. This application is in draft form, and is being used for beta testing. If you choose to submit an application with us and do not hear back in just a couple of days, please send us an email at <a href="mailto:education@tacomalittletheatre.com">education@tacomalittletheatre.com</a>, to make sure your application has been received and is being processed. We may reach out for additional information as well. Thank you for your patience, as we seek to make the application process easy and accessible!</p>
+      <h2 style="color:var(--color-accent)"><?php echo esc_html( tlt_edu_field( 'scholarship_heading' ) ); ?></h2>
+      <?php echo wp_kses_post( tlt_edu_field( 'scholarship_body' ) ); ?>
+      <?php
+        $sch_label = tlt_edu_field( 'scholarship_cta_label' );
+        $sch_url   = tlt_edu_field( 'scholarship_cta_url' );
+        if ( $sch_label && $sch_url ) :
+      ?>
       <p style="margin-top:1.5rem">
-        <a href="https://docs.google.com/forms/d/e/1FAIpQLSdEwJCTMI4GGxAXoBhfZhi1GrNk0DP5pFTkFFJd1qKc8TciDA/viewform?usp=header" target="_blank" rel="noopener" class="btn btn-primary">Scholarship Application</a>
+        <a href="<?php echo esc_url( $sch_url ); ?>"<?php echo $_edu_target( $sch_url ); ?> class="btn btn-primary"><?php echo esc_html( $sch_label ); ?></a>
       </p>
+      <?php endif; ?>
     </div>
-    <img src="<?php echo get_template_directory_uri(); ?>/assets/edu-clubtlt.jpg" alt="">
+    <img src="<?php echo esc_url( $scholarship_img_url ); ?>" alt="">
   </section>
 
+  <?php $policies = tlt_edu_field( 'policies' ); if ( ! is_array( $policies ) ) $policies = []; ?>
+  <?php if ( $policies ) : ?>
   <section class="edu-inner policies">
-    <h2 style="color:var(--color-accent);text-align:center;margin-bottom:0">Registration &amp; Program Policies</h2>
-    <p style="text-align:center;color:var(--color-muted);margin-bottom:2rem">A quick look at what to expect when enrolling.</p>
+    <h2 style="color:var(--color-accent);text-align:center;margin-bottom:0"><?php echo esc_html( tlt_edu_field( 'policies_heading' ) ); ?></h2>
+    <p style="text-align:center;color:var(--color-muted);margin-bottom:2rem"><?php echo esc_html( tlt_edu_field( 'policies_lede' ) ); ?></p>
     <div class="policies-grid">
+      <?php foreach ( $policies as $pol ) :
+        $title = isset( $pol['title'] ) ? $pol['title'] : '';
+        $body  = isset( $pol['body'] ) ? $pol['body'] : '';
+        if ( ! $title && ! $body ) continue;
+      ?>
       <div>
-        <h3>Registration</h3>
-        <p>All registrations are processed in the order they are received. Only payment in full or a payment of the $50 registration fee will secure your spot. Registrations will be accepted until the class is full or until the end of the first week of class, whichever comes first. Once your registration is processed, you will receive confirmation and further class details via e-mail.</p>
+        <h3><?php echo esc_html( $title ); ?></h3>
+        <?php echo wp_kses_post( $body ); ?>
       </div>
-      <div>
-        <h3>Payment</h3>
-        <p>When you register for classes or camps online, you will be prompted to pay the full tuition amount at that time. If you would prefer to set up a payment plan, we can arrange that! Just contact us at <a href="mailto:education@tacomalittletheatre.com">education@tacomalittletheatre.com</a>. The minimum, nonrefundable fee for enrollment is $50. Some scholarship funding is available! Click the button above to apply now. A $35.00 service charge will be attached to any check returned by the bank due to insufficient funds.</p>
-      </div>
-      <div>
-        <h3>Cancellations</h3>
-        <p>If you cancel or withdraw from the class more than 14 days prior to the class start, TLT can refund tuition minus a $50.00 cancellation fee. If you cancel within 14 days of the class/camp start date TLT can refund up to half of the tuition. No refunds will be given after the first class or day of camp. In camps or classes where casting is done, no refunds will be offered after casting is complete. We reserve the right to cancel a class if enrollment is insufficient. In this instance, any tuition paid will be refunded in full.</p>
-      </div>
-      <div>
-        <h3>Performances</h3>
-        <p>Please check all performance dates and times for conflicts before enrolling. Typically, actors are called to the theater one to one and a half hours before the performance. Details will be provided for the individual camp or class.</p>
-      </div>
-      <div>
-        <h3>Attendance</h3>
-        <p>Please check all rehearsal and class dates/times for conflicts before enrolling. Theater is a team based activity, and absences can impact the whole group. We are often able to work around absences with enough advanced notice.</p>
-      </div>
-      <div>
-        <h3>Participation</h3>
-        <p>When students join our program, they will be expected to participate in a safe manner, demonstrating respect for others and for property. If a student violates any rules or creates an unsafe situation for staff or other students, we reserve the right to remove the student from the class. Tacoma Little Theatre is not responsible for any lost, damaged, or stolen personal belongings. All dates, times and programming are subject to change.</p>
-      </div>
+      <?php endforeach; ?>
     </div>
   </section>
+  <?php endif; ?>
 
 </div>
 

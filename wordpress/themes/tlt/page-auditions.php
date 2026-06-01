@@ -78,9 +78,10 @@ $audition_shows = get_posts( [
 <div class="aud-page">
 
   <header class="aud-hero">
-    <span class="eyebrow">Get on Stage</span>
-    <h1><?php the_title(); ?></h1>
-    <p class="lede">Audition opportunities at Tacoma Little Theatre. We're a community theatre — no experience required to audition, and we cast a wide range of roles each season.</p>
+    <?php $_aud_eb = function_exists( 'tlt_hero_field' ) ? tlt_hero_field( 'eyebrow', 'Get on Stage' ) : 'Get on Stage'; ?>
+    <?php if ( $_aud_eb ) : ?><span class="eyebrow"><?php echo esc_html( $_aud_eb ); ?></span><?php endif; ?>
+    <h1><?php echo esc_html( function_exists( 'tlt_hero_field' ) ? tlt_hero_field( 'title', get_the_title() ) : get_the_title() ); ?></h1>
+    <p class="lede"><?php echo esc_html( function_exists( 'tlt_hero_field' ) ? tlt_hero_field( 'lede', "Audition opportunities at Tacoma Little Theatre. We're a community theatre — no experience required to audition, and we cast a wide range of roles each season." ) : "Audition opportunities at Tacoma Little Theatre. We're a community theatre — no experience required to audition, and we cast a wide range of roles each season." ); ?></p>
   </header>
 
   <!-- KEY FACTS STRIP ============================================ -->

@@ -63,9 +63,10 @@ $items = [
 
 <div class="press-page">
   <header class="press-hero">
-    <span class="eyebrow">Press</span>
-    <h1><?php the_title(); ?></h1>
-    <p class="lede">Press releases, recognitions, and news about Tacoma Little Theatre. For media inquiries, reach out to our box office.</p>
+    <?php $_pr_eb = function_exists( 'tlt_hero_field' ) ? tlt_hero_field( 'eyebrow', 'Press' ) : 'Press'; ?>
+    <?php if ( $_pr_eb ) : ?><span class="eyebrow"><?php echo esc_html( $_pr_eb ); ?></span><?php endif; ?>
+    <h1><?php echo esc_html( function_exists( 'tlt_hero_field' ) ? tlt_hero_field( 'title', get_the_title() ) : get_the_title() ); ?></h1>
+    <p class="lede"><?php echo esc_html( function_exists( 'tlt_hero_field' ) ? tlt_hero_field( 'lede', 'Press releases, recognitions, and news about Tacoma Little Theatre. For media inquiries, reach out to our box office.' ) : 'Press releases, recognitions, and news about Tacoma Little Theatre. For media inquiries, reach out to our box office.' ); ?></p>
   </header>
 
   <?php if ( ! empty( $items ) ) : ?>

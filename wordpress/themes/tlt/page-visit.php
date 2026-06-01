@@ -70,8 +70,10 @@ get_header(); ?>
 <div class="visit-page">
 
   <header class="visit-hero">
-    <h1>Visit Tacoma Little Theatre</h1>
-    <p class="lede">Five minutes from downtown Tacoma, tucked into the historic Stadium District — here's everything you need to plan a great night at the theatre.</p>
+    <?php $_v_eb = function_exists( 'tlt_hero_field' ) ? tlt_hero_field( 'eyebrow', '' ) : ''; ?>
+    <?php if ( $_v_eb ) : ?><span class="eyebrow"><?php echo esc_html( $_v_eb ); ?></span><?php endif; ?>
+    <h1><?php echo esc_html( function_exists( 'tlt_hero_field' ) ? tlt_hero_field( 'title', 'Visit Tacoma Little Theatre' ) : 'Visit Tacoma Little Theatre' ); ?></h1>
+    <p class="lede"><?php echo esc_html( function_exists( 'tlt_hero_field' ) ? tlt_hero_field( 'lede', "Five minutes from downtown Tacoma, tucked into the historic Stadium District — here's everything you need to plan a great night at the theatre." ) : "Five minutes from downtown Tacoma, tucked into the historic Stadium District — here's everything you need to plan a great night at the theatre." ); ?></p>
     <p class="address"><a href="https://www.google.com/maps/dir/?api=1&destination=210+N+I+Street,+Tacoma,+WA+98403" target="_blank" rel="noopener">210 N "I" Street, Tacoma, WA 98403</a> &middot; Box Office: <a href="tel:+12532722281">(253) 272-2281</a></p>
   </header>
 

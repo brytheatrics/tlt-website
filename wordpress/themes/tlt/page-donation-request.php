@@ -112,9 +112,10 @@ get_header(); ?>
 <div class="dr-page">
 
   <header class="dr-hero">
-    <span class="eyebrow">Auction Donations</span>
-    <h1><?php the_title(); ?></h1>
-    <p class="lede">Tacoma Little Theatre is always happy to give back to our wonderful and supportive community. Thank you for thinking of TLT as a way to support your organization.</p>
+    <?php $_dr_eb = function_exists( 'tlt_hero_field' ) ? tlt_hero_field( 'eyebrow', 'Auction Donations' ) : 'Auction Donations'; ?>
+    <?php if ( $_dr_eb ) : ?><span class="eyebrow"><?php echo esc_html( $_dr_eb ); ?></span><?php endif; ?>
+    <h1><?php echo esc_html( function_exists( 'tlt_hero_field' ) ? tlt_hero_field( 'title', get_the_title() ) : get_the_title() ); ?></h1>
+    <p class="lede"><?php echo esc_html( function_exists( 'tlt_hero_field' ) ? tlt_hero_field( 'lede', 'Tacoma Little Theatre is always happy to give back to our wonderful and supportive community. Thank you for thinking of TLT as a way to support your organization.' ) : 'Tacoma Little Theatre is always happy to give back to our wonderful and supportive community. Thank you for thinking of TLT as a way to support your organization.' ); ?></p>
   </header>
 
   <div class="dr-layout">

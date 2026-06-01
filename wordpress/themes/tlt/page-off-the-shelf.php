@@ -213,9 +213,10 @@ $archive = [
 <div class="ots-page">
 
   <header class="ots-hero">
-    <span class="eyebrow">Staged Readings</span>
-    <h1>Off the Shelf</h1>
-    <p class="lede">Each season TLT presents its "Off the Shelf" series. There is a tremendous amount of wonderful theatre that deserves to be heard but sometimes just doesn't get the opportunity. With "Off the Shelf," local directors and actors bring some of these scripts to life — entertaining, challenging, educational. Sit back and enjoy an evening of theatre. You never know, you might see one of these on our Mainstage in the future.</p>
+    <?php $_ots_eb = function_exists( 'tlt_hero_field' ) ? tlt_hero_field( 'eyebrow', 'Staged Readings' ) : 'Staged Readings'; ?>
+    <?php if ( $_ots_eb ) : ?><span class="eyebrow"><?php echo esc_html( $_ots_eb ); ?></span><?php endif; ?>
+    <h1><?php echo esc_html( function_exists( 'tlt_hero_field' ) ? tlt_hero_field( 'title', 'Off the Shelf' ) : 'Off the Shelf' ); ?></h1>
+    <p class="lede"><?php echo esc_html( function_exists( 'tlt_hero_field' ) ? tlt_hero_field( 'lede', 'Each season TLT presents its "Off the Shelf" series. There is a tremendous amount of wonderful theatre that deserves to be heard but sometimes just doesn\'t get the opportunity. With "Off the Shelf," local directors and actors bring some of these scripts to life — entertaining, challenging, educational. Sit back and enjoy an evening of theatre. You never know, you might see one of these on our Mainstage in the future.' ) : 'Each season TLT presents its "Off the Shelf" series. There is a tremendous amount of wonderful theatre that deserves to be heard but sometimes just doesn\'t get the opportunity. With "Off the Shelf," local directors and actors bring some of these scripts to life — entertaining, challenging, educational. Sit back and enjoy an evening of theatre. You never know, you might see one of these on our Mainstage in the future.' ); ?></p>
     <span class="schedule-note">Events take place in December, March, April, June, and July.</span>
   </header>
 

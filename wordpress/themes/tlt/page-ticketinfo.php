@@ -71,9 +71,10 @@ get_header(); ?>
 <div class="ti-page">
 
   <header class="ti-hero">
-    <span class="eyebrow">Ticket Information</span>
-    <h1><?php the_title(); ?></h1>
-    <p class="lede">Everything you need to know about ticket prices, season passes, and the few house rules we have in place to keep everyone comfortable.</p>
+    <?php $_ti_eb = function_exists( 'tlt_hero_field' ) ? tlt_hero_field( 'eyebrow', 'Ticket Information' ) : 'Ticket Information'; ?>
+    <?php if ( $_ti_eb ) : ?><span class="eyebrow"><?php echo esc_html( $_ti_eb ); ?></span><?php endif; ?>
+    <h1><?php echo esc_html( function_exists( 'tlt_hero_field' ) ? tlt_hero_field( 'title', get_the_title() ) : get_the_title() ); ?></h1>
+    <p class="lede"><?php echo esc_html( function_exists( 'tlt_hero_field' ) ? tlt_hero_field( 'lede', 'Everything you need to know about ticket prices, season passes, and the few house rules we have in place to keep everyone comfortable.' ) : 'Everything you need to know about ticket prices, season passes, and the few house rules we have in place to keep everyone comfortable.' ); ?></p>
     <div class="cta-row">
       <a class="btn btn-primary" href="https://tlt.ludus.com" target="_blank" rel="noopener">Buy Tickets</a>
       <a class="btn btn-outline" href="/season-tickets/">Season Tickets</a>
