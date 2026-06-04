@@ -226,22 +226,85 @@ while ( have_posts() ) : the_post();
     <?php if ( is_array( $gallery ) && $gallery ) : ?>
       <section class="show-photo-gallery" style="margin-top:3rem">
         <h2 class="section-heading">Production Photos</h2>
-        <div class="photo-gallery">
-          <?php foreach ( $gallery as $g ) :
-            $url = isset( $g['url'] ) ? esc_url( $g['url'] ) : '';
-            $alt = isset( $g['alt'] ) ? esc_attr( $g['alt'] ) : '';
-            $cap = isset( $g['caption'] ) ? $g['caption'] : '';
-            if ( ! $url ) continue;
-          ?>
-            <a href="<?php echo $url; ?>" class="gallery-item" target="_blank" rel="noopener">
-              <img src="<?php echo $url; ?>" alt="<?php echo $alt; ?>" loading="lazy">
-              <?php if ( $cap ) : ?>
-                <span class="visually-hidden"><?php echo esc_html( $cap ); ?></span>
-              <?php endif; ?>
-            </a>
-          <?php endforeach; ?>
+        <div class="show-slideshow" data-count="<?php echo count( $gallery ); ?>">
+          <div class="show-slideshow__viewport">
+            <?php foreach ( $gallery as $i => $g ) :
+              $url = isset( $g['url'] ) ? esc_url( $g['url'] ) : '';
+              $alt = isset( $g['alt'] ) ? esc_attr( $g['alt'] ) : '';
+              $cap = isset( $g['caption'] ) ? $g['caption'] : '';
+              if ( ! $url ) continue;
+            ?>
+              <figure class="show-slide<?php echo $i === 0 ? ' is-active' : ''; ?>">
+                <img src="<?php echo $url; ?>" alt="<?php echo $alt; ?>" loading="<?php echo $i === 0 ? 'eager' : 'lazy'; ?>">
+                <?php if ( $cap ) : ?><figcaption><?php echo esc_html( $cap ); ?></figcaption><?php endif; ?>
+              </figure>
+            <?php endforeach; ?>
+          </div>
+          <button type="button" class="show-slideshow__nav show-slideshow__nav--prev" aria-label="Previous photo">&#8592;</button>
+          <button type="button" class="show-slideshow__nav show-slideshow__nav--next" aria-label="Next photo">&#8594;</button>
+          <div class="show-slideshow__dots" role="tablist" aria-label="Slide selector">
+            <?php foreach ( $gallery as $i => $g ) : ?>
+              <button type="button" class="show-slideshow__dot<?php echo $i === 0 ? ' is-active' : ''; ?>" role="tab" aria-label="Photo <?php echo $i + 1; ?>" data-index="<?php echo $i; ?>"></button>
+            <?php endforeach; ?>
+          </div>
+          <div class="show-slideshow__counter"><span class="show-slideshow__current">1</span> / <?php echo count( $gallery ); ?></div>
         </div>
       </section>
+      <style>
+        .show-slideshow { position: relative; max-width: 1100px; margin: 0 auto; background: #000; border-radius: 6px; overflow: hidden; }
+        .show-slideshow__viewport { position: relative; aspect-ratio: 3/2; }
+        .show-slide { position: absolute; inset: 0; margin: 0; opacity: 0; transition: opacity 0.4s ease; display: flex; align-items: center; justify-content: center; background: #000; }
+        .show-slide.is-active { opacity: 1; z-index: 1; }
+        .show-slide img { width: 100%; height: 100%; object-fit: contain; display: block; }
+        .show-slide figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 0.85rem 1rem; background: linear-gradient(to top, rgba(0,0,0,0.75), transparent); color: #fff; font-size: 0.9rem; text-align: center; }
+        .show-slideshow__nav { position: absolute; top: 50%; transform: translateY(-50%); z-index: 5; background: rgba(255,255,255,0.85); border: 0; width: 44px; height: 44px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #000; transition: background 0.15s; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+        .show-slideshow__nav:hover { background: #fff; }
+        .show-slideshow__nav--prev { left: 1rem; }
+        .show-slideshow__nav--next { right: 1rem; }
+        .show-slideshow__dots { position: absolute; left: 0; right: 0; bottom: 0.6rem; display: flex; justify-content: center; gap: 0.4rem; z-index: 5; flex-wrap: wrap; padding: 0 1rem; max-width: 80%; margin: 0 auto; }
+        .show-slideshow__dot { width: 8px; height: 8px; border-radius: 50%; border: 0; background: rgba(255,255,255,0.45); cursor: pointer; padding: 0; transition: background 0.15s, transform 0.15s; }
+        .show-slideshow__dot.is-active { background: #fff; transform: scale(1.3); }
+        .show-slideshow__dot:hover { background: rgba(255,255,255,0.75); }
+        .show-slideshow__counter { position: absolute; top: 1rem; right: 1rem; z-index: 5; background: rgba(0,0,0,0.55); color: #fff; padding: 0.25rem 0.65rem; border-radius: 999px; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.05em; }
+        @media (max-width: 600px) {
+          .show-slideshow__viewport { aspect-ratio: 4/3; }
+          .show-slideshow__nav { width: 36px; height: 36px; }
+          .show-slideshow__nav--prev { left: 0.4rem; }
+          .show-slideshow__nav--next { right: 0.4rem; }
+          .show-slideshow__dots { display: none; }
+        }
+      </style>
+      <script>
+        (function () {
+          var box = document.querySelector('.show-slideshow');
+          if (!box) return;
+          var slides = box.querySelectorAll('.show-slide');
+          var dots   = box.querySelectorAll('.show-slideshow__dot');
+          var counter= box.querySelector('.show-slideshow__current');
+          var idx = 0;
+          function go(n) {
+            idx = (n + slides.length) % slides.length;
+            slides.forEach(function (s, i) { s.classList.toggle('is-active', i === idx); });
+            dots.forEach(function (d, i) { d.classList.toggle('is-active', i === idx); });
+            if (counter) counter.textContent = (idx + 1);
+          }
+          box.querySelector('.show-slideshow__nav--prev').addEventListener('click', function () { go(idx - 1); });
+          box.querySelector('.show-slideshow__nav--next').addEventListener('click', function () { go(idx + 1); });
+          dots.forEach(function (d, i) { d.addEventListener('click', function () { go(i); }); });
+          // Keyboard arrows
+          document.addEventListener('keydown', function (e) {
+            if (e.key === 'ArrowLeft')  go(idx - 1);
+            if (e.key === 'ArrowRight') go(idx + 1);
+          });
+          // Swipe on touch
+          var startX = 0;
+          box.addEventListener('touchstart', function (e) { startX = e.touches[0].clientX; }, { passive: true });
+          box.addEventListener('touchend',   function (e) {
+            var dx = e.changedTouches[0].clientX - startX;
+            if (Math.abs(dx) > 50) go(idx + (dx < 0 ? 1 : -1));
+          });
+        })();
+      </script>
     <?php endif; ?>
   </div>
 </article>

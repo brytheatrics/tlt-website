@@ -1005,6 +1005,38 @@ body.splash-page { overflow: hidden; }
   content: '📄';
   font-size: 1.1em;
 }
+/* Suppress the global PDF auto-icon for our archive buttons — the .archive-btn
+   markup carries its own icon. */
+.page-content .archive-btn[href$=".pdf"]::before { content: none; }
+/* Also override the global PDF link color/weight so our archive Program button
+   uses the same red accent as the Photos button. */
+.page-content .archive-btn[href$=".pdf"] { color: var(--color-accent); font-weight: 700; }
+.page-content .archive-btn[href$=".pdf"]:hover { color: #fff; }
+
+/* Decade-archive list: per-show row with photos/program buttons (no bullets). */
+.page-content .archive-list { list-style: none; padding: 0; margin: 0; max-width: 720px; margin-left: auto; margin-right: auto; }
+.page-content .archive-list li.archive-row {
+  display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+  padding: 0.85rem 0.25rem; border-bottom: 1px solid var(--color-line);
+}
+.page-content .archive-list li.archive-row:last-child { border-bottom: 0; }
+.archive-row__title { font-size: 1rem; color: var(--color-text); }
+.archive-row__btns  { display: flex; gap: 0.5rem; flex-shrink: 0; }
+.archive-btn {
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  padding: 0.35rem 0.85rem; font-size: 0.78rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.05em;
+  border-radius: 4px; border: 1px solid var(--color-line);
+  background: #fff; color: var(--color-accent); text-decoration: none;
+  min-width: 110px; justify-content: center;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+.archive-btn:hover { border-color: var(--color-accent); background: var(--color-accent); color: #fff; text-decoration: none; }
+.archive-btn__icon { font-size: 1em; line-height: 1; color: var(--color-text); }
+.archive-btn:hover .archive-btn__icon { color: #fff; }
+@media (max-width: 500px) {
+  .page-content .archive-list li.archive-row { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+}
 
 /* Two-column callout (address + hours, two pricing tiers, etc.) */
 .page-content .callout-pair {

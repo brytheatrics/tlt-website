@@ -38,24 +38,35 @@ pymysql.connect(host='127.0.0.1', port=10005, user='root', password='root', data
 
 `page-home.php`, `page-splash.php`, `page-visit.php`, `page-contact.php`, `page-board-and-staff.php`, `page-auditions.php`, `page-ticketinfo.php`, `page-season-tickets.php`, `page-donation-request.php`, `page-press.php`, `page-press-post.php`, `page-job-openings.php`, `page-job-posting.php`, `page-off-the-shelf.php`, `page-education.php`, `page-prior-seasons.php`, `page-post-listing.php`, `page-ticketing.php`, `page-designed.php`, `page-campaign.php`, `page-styleguide.php`
 
-## Recent work (most recent session)
+## Recent work (most recent session — May 29 2026)
 
-- **Cityline interview integration** — added `show_cityline_url` field; renders on homepage + show detail. Bulk-imported 43 historical Cityline interviews from the [Cityline playlist](https://www.youtube.com/playlist?list=PLHN0JO4EyqcdNYjDZyvHnLrl1heaNFuwq) to their matching shows
-- **Mobile fixes** — built proper hamburger drawer; fixed hero image cropping on portrait viewports (object-position 50% 70%); fixed homepage promo rows stacking inconsistently on mobile
-- **Header z-index bug** — the hidden site-search form was overlapping the Home menu link in the mobile drawer at z-index 100, eating taps. Fixed with explicit `.site-search[hidden] { display: none; }` rule
-- **Tickets consolidation** — `/tickets/` is now the full ticket-info page (template page-ticketinfo.php). `/ticketinfo/` is trashed. Submenu has "Ticket Information" (→ `/tickets/`), "Single Tickets" (→ ludus.com), "Season Tickets", "Gift Cards", "Plan Your Trip"
-- **Splash → home wipe** — moved wipe injection from page-home.php DOMContentLoaded to header.php right after wp_body_open() so the header doesn't flash before the cover lands
-- **Built/rebuilt page templates** — `/season-tickets/`, `/job-openings/`, `/press/`, `/off-the-shelf/`, `/donation-request/`, `/visit/`, `/board-and-staff/`, `/contact/`
-- **PDF program links** — added `target="_blank"` so mobile Safari opens inline instead of downloading
-- **Volunteer link** — points externally to https://tlt.ludus.com/volunteer
+- **ACF-ified hardcoded templates** — Education got the full treatment (5 tabs: Hero / Why / Programs / Scholarships / Policies, with repeaters for programs and policies). Visit / Off the Shelf / Auditions / Season Tickets / Ticket Info / Donation Request / Press / Job Openings got "hero-only" ACF (eyebrow pill + title + lede). Pattern: helpers `tlt_register_hero_acf_group()` and `tlt_hero_field()` in `includes/acf-page-templates.php`. Defaults baked in so pages render identically without Chris editing.
+- **Editor auto-reload after template switch** — when Chris picks an ACF-managed template and saves, page reloads automatically so the ACF panel appears (was: manually navigate back to Pages → re-open)
+- **Promotion fixes** — `promo_cta_url` field type changed from `url` (rejected `/board-and-staff/`) to `text`; date filter normalizes both `Ymd` (admin-saved) and `Y-m-d` (legacy/seeded)
+- **2627 posters extracted + wired** — all 7 shows in the 2026-2027 season have their poster PSDs extracted to `/wp-content/uploads/posters/2627/<slug>.jpg` and linked via `show_hero_image_url` + `_thumbnail_external_url`
+- **2627 hero animation refreshed** — new 6-layer PSD with added "Overlays" layer, renumbered so Overlays sits on top. Files at `/wp-content/uploads/hero-layers/the-outsider/`, old layers backed up to `the-outsider.bak/`
+- **Show photo gallery → slideshow** — `single-tlt_show.php` Production Photos section now renders as a slideshow (arrows, dots, counter, keyboard, swipe) instead of a wall of thumbnails
+- **Pre-2010 show mockup** — `/shows/1776-0506/` is the first proof-of-concept for option-1 (per-show pages for ancient shows). Photo gallery from `\\TLT-SERVER\TLT Photos\0506 Production Photos\1776`, program PDF linked
+- **Decade-archive button pattern** — `/2000-2010/` has 2005-06 mocked with `[📷 Photos] [📄 Program]` buttons per show (only when the source exists). `.archive-list` + `.archive-btn` CSS lives in theme `style.css`. Pattern ready to roll out to other seasons/decades
+- **Local ACF install fix** — ACF wasn't installed locally; `active_plugins` serialized length was also wrong (would silently break ALL plugins). Both fixed.
+- **Production photo inventory complete** — 92 of 112 DB shows have photos in `\\TLT-SERVER\Marketing\` and/or `\\TLT-SERVER\TLT Photos\`. Full match report at `C:/temp/full_photo_report.json`. **Import script NOT YET WRITTEN.** Decision pending: photo cap per show (default 20).
+- **Cityline interview integration** *(prior)* — `show_cityline_url` field; 43 historical interviews bulk-imported
+- **Splash → home wipe** *(prior)* — moved injection from page-home.php DOMContentLoaded to header.php right after wp_body_open()
+- **Mobile drawer + header z-index fix** *(prior)*
+- **Tickets consolidation** *(prior)* — `/tickets/` is the full ticket-info page; `/ticketinfo/` trashed
+- **PDF links** *(prior)* — `target="_blank"`
+- **Volunteer link** *(prior)* — external to tlt.ludus.com
 
 ## Outstanding work (highest priority first)
 
-1. **Splash page focal point per image** — currently splash backgrounds are centered; subjects get cropped on mobile portrait. Schema currently is `show_splash_gallery` = JSON array of URLs. Need to support `[{url: "...", focal: "30% 50%"}]` and apply per-image background-position.
-2. **Mobile audit for top traffic pages** — Splash takes 40% of all pageviews. Home next. Show detail pages combined account for another big chunk. Auditions and Education round out the top 8.
-3. **Production photos import from `\\TLT-SERVER\Marketing\`** — Chris's photographers already export web-sized JPEGs in `JPEG/` subfolders. Real total after import would be ~700 MB. Folder naming varies across eras (Production Photos vs Press Photos vs Production Stills, etc.). User confirmed: photo consent likely fine, plus a "request removal" line in footer.
-4. **Set up Cloudways** — user is in process of signing up for Cloudways Micro ($14/mo). After signup: push migrated code + DB to Cloudways temp URL, test there freely until DNS cutover.
-5. **Production hardening** (see LAUNCH_CHECKLIST.md P0/P1)
+1. **Run the production photos import** — inventory done, script not written. Source data: `C:/temp/full_photo_report.json` (92 matched shows). Plan: prefer `Marketing\<show>\Production Photos\*\JPEG\` (already web-sized) → fall back to `TLT Photos\<season> Production Photos\<show>\` (resize to 1600px during copy). Cap ~20 photos per show → ~500 MB total. Copy to `/wp-content/uploads/productions/<slug>/01.jpg…`, set `show_photo_gallery` meta. Slideshow already wired in `single-tlt_show.php`.
+2. **Roll out decade-archive button pattern** — only `/2000-2010/` 2005-06 block is done. Pattern: walk each `<li>` in each decade page (1900-1910 through 2000-2010), detect `.pdf` link + check for any matching `tlt_show` record with photos, render `[📷 Photos] [📄 Program]` buttons as appropriate. CSS lives in style.css (`.archive-list` / `.archive-btn`).
+3. **Create show records for pre-2010 shows that have photos** — 1776 is the proof of concept (`/shows/1776-0506/`). About ~250 more shows from `TLT Photos\<season> Production Photos\<show>\` folders going back to 1996. Sparse metadata (folder names only have title), but galleries become browsable + Google-indexable.
+4. **Cloudways trial expiration** — trial expires ~2026-05-31. Server credentials in `deploy/cloudways.json`. Upgrade to paid plan before then OR re-provision after.
+5. **Mobile audit for top-traffic pages** — Splash (40% of pageviews) and Home are done. Remaining top 8: Show detail, Auditions, Education, "About the Program" (= Education).
+6. **Splash page focal point per image** — currently splash backgrounds use centered `background-position`; subjects get cropped on mobile portrait. Schema currently `show_splash_gallery` = JSON array of URLs. Need to support `[{url: "...", focal: "30% 50%"}]`.
+7. **ACF-ify the rest** — Education got the full treatment. The hero-only ACF on Visit/Off the Shelf/Auditions/Season Tickets/Ticket Info/Donation Request/Press/Job Openings only covers the top eyebrow+title+lede. Body content on these is still hardcoded. Decide which to deepen based on Chris's editing needs.
+8. **Production hardening** (see LAUNCH_CHECKLIST.md P0/P1) — SMTP, Flamingo, backups, security, search-replace at DNS cutover.
 
 ## Domain / hosting status
 
