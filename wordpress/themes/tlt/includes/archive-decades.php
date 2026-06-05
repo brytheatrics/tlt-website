@@ -16,6 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 /** Normalise a show title for matching: lowercase, strip punctuation + leading "the". */
 function tlt_archive_norm_title( $t ) {
     $t = strtolower( html_entity_decode( wp_strip_all_tags( (string) $t ), ENT_QUOTES ) );
+    $t = str_replace( '&', ' and ', $t ); // "Guys & Dolls" must match the record "Guys and Dolls"
     $t = preg_replace( '/[^a-z0-9 ]+/', ' ', $t );
     $t = preg_replace( '/^the\s+/', '', $t );
     $t = preg_replace( '/\s+/', ' ', $t );

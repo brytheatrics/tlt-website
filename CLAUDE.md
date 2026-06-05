@@ -85,6 +85,7 @@ pymysql.connect(host='127.0.0.1', port=10005, user='root', password='root', data
 ## Domain / hosting status
 
 - Cloudways: original trial server is DEAD (deprovisioned ~2026-05-29; see Outstanding #4). User re-figuring out hosting. Deploy to a fresh host once provisioned.
+- **TODO — apply tax exemption to the Cloudways account.** TLT is a nonprofit; submitting tax-exempt info should drop sales tax off the hosting bill. Blake to supply the tax-exempt cert/details (doesn't have them handy yet). Do it when setting up the paid subscription.
 - DNS cutover: not done; tacomalittletheatre.com still on Squarespace
 - Email: Google Workspace on TLT's own domain; will NOT be touched by DNS changes (MX/SPF/DKIM stay)
 
