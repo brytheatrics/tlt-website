@@ -93,7 +93,7 @@ get_header(); ?>
       'post_type' => 'post',
       'posts_per_page' => -1,
       'meta_query' => [
-          [ 'key' => '_migration_legacy_url', 'value' => '/blog/2015/[0-9]{4}-[0-9]{4}', 'compare' => 'REGEXP' ],
+          [ 'key' => '_migration_legacy_url', 'value' => '/blog/(2015|tag)/[0-9]{4}-[0-9]{4}', 'compare' => 'REGEXP' ],
       ],
       'orderby' => 'title',
       'order' => 'DESC',

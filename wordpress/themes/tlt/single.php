@@ -25,95 +25,41 @@ get_header(); ?>
     </header>
 
     <?php
-      // Split body into intro paragraph + rest-of-content.
-      // Intro: rendered centered as a short blurb under the title.
-      // Rest (typically <h2>Seasons</h2><ul>… and <h2>Year Summaries</h2><ul>…):
-      //   rendered as two left-aligned columns inside a centered card so the
-      //   bullets line up with their text instead of floating to the left.
-      $raw = trim( get_the_content() );
-      $intro = '';
-      $rest  = '';
-      if ( $raw ) {
-          // Pull the first <p>…</p> out as intro; everything after = rest.
-          if ( preg_match( '#^(\s*<p[^>]*>.*?</p>)\s*(.*)$#s', $raw, $m ) ) {
-              $intro = $m[1];
-              $rest  = trim( $m[2] );
-          } else {
-              $intro = $raw;
-          }
+      // Parse the decade body into a clean intro (text before the first season
+      // heading) plus per-season sections. Each season is re-rendered below as a
+      // uniform archive-list with [Photos]/[Program] buttons.
+      list( $decade_intro, $decade_sections ) = tlt_parse_decade_body( get_the_content() );
+      // Use the body only when its sections are actual season lists (YYYY-YY
+      // headers). Modern decades (e.g. 2010-2020) instead carry "Seasons" /
+      // "Year Summaries" nav, or nothing — for those, build the season lists
+      // from tlt_show records so they match the other decade pages.
+      $has_year_sections = false;
+      foreach ( $decade_sections as $sec ) {
+          if ( preg_match( '/^\d{4}[-\x{2013}]\d{2,4}/u', $sec['header'] ) ) { $has_year_sections = true; break; }
+      }
+      if ( ! $has_year_sections ) {
+          $decade_sections = tlt_decade_record_sections( $decade_start, $decade_end );
+          $decade_intro = ''; // drop the legacy nav intro; the season lists stand on their own
       }
     ?>
-    <?php if ( $intro ) : ?>
+    <?php if ( $decade_intro ) : ?>
       <div class="decade-intro" style="max-width:780px;margin:0 auto 2rem;text-align:center;color:var(--color-muted)">
-        <?php echo apply_filters( 'the_content', $intro ); ?>
+        <?php echo apply_filters( 'the_content', $decade_intro ); ?>
       </div>
     <?php endif; ?>
-    <?php // (Body sections beyond the intro are intentionally skipped on
-          // decade-summary pages — the season-card grid below replaces them.) ?>
 
-    <?php
-      // Grid of season cards for this decade. Each card links to the season
-      // archive page where visitors see the actual shows.
-      $season_cards = [];
-      for ( $sy = $decade_end - 1; $sy >= $decade_start; $sy-- ) {
-          $season_name = sprintf( '%d-%d', $sy, $sy + 1 );
-          $season_term = get_term_by( 'name', $season_name, 'tlt_season' );
-
-          // Count DB shows in this season, if the term exists
-          $show_count = 0;
-          if ( $season_term ) {
-              $q = new WP_Query( [
-                  'post_type'      => 'tlt_show',
-                  'posts_per_page' => -1,
-                  'fields'         => 'ids',
-                  'tax_query'      => [ [ 'taxonomy' => 'tlt_season', 'field' => 'term_id', 'terms' => $season_term->term_id ] ],
-              ] );
-              $show_count = $q->found_posts;
-              wp_reset_postdata();
-          }
-
-          // Look for a year-summary post (slug matches YYYY-YYYY)
-          $summary_post = get_page_by_path( $season_name, OBJECT, 'post' );
-
-          // Build link target — prefer season archive when shows exist, otherwise summary
-          $link = null;
-          if ( $show_count > 0 && $season_term ) {
-              $link = get_term_link( $season_term );
-          } elseif ( $summary_post ) {
-              $link = get_permalink( $summary_post );
-          }
-
-          $season_cards[] = [
-              'name'        => $season_name,
-              'show_count'  => $show_count,
-              'link'        => $link,
-              'has_summary' => (bool) $summary_post,
-          ];
-      }
-    ?>
-    <section class="decade-seasons" aria-label="Seasons in this decade">
-      <div class="season-card-grid">
-        <?php foreach ( $season_cards as $card ) : ?>
-          <?php if ( $card['link'] ) : ?>
-            <a href="<?php echo esc_url( $card['link'] ); ?>" class="season-card">
-              <div class="season-card__name"><?php echo esc_html( $card['name'] ); ?></div>
-              <div class="season-card__meta">
-                <?php if ( $card['show_count'] > 0 ) : ?>
-                  <?php echo (int) $card['show_count']; ?> show<?php echo $card['show_count'] === 1 ? '' : 's'; ?>
-                <?php elseif ( $card['has_summary'] ) : ?>
-                  Summary
-                <?php endif; ?>
-              </div>
-            </a>
-          <?php else : ?>
-            <div class="season-card season-card--empty" aria-hidden="true">
-              <div class="season-card__name"><?php echo esc_html( $card['name'] ); ?></div>
-              <div class="season-card__meta">No records yet</div>
-            </div>
-          <?php endif; ?>
+    <?php // Each season rendered like the 2005-06 block — one row per show
+          // with [Photos] (when a show page exists) + [Program] buttons. ?>
+    <?php if ( $decade_sections ) : ?>
+      <div class="decade-archive-seasons" style="margin-top:3rem">
+        <?php foreach ( $decade_sections as $sec ) : ?>
+          <section class="archive-season" style="margin:2.5rem auto;max-width:720px">
+            <h2 style="text-align:center;color:var(--color-accent);margin-bottom:1rem"><?php echo esc_html( $sec['header'] ); ?></h2>
+            <?php echo tlt_render_archive_list( $sec['header'], $sec['shows'] ); ?>
+          </section>
         <?php endforeach; ?>
       </div>
-    </section>
+    <?php endif; ?>
 
   <?php else :
       // Normal single-post layout

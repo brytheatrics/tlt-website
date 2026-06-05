@@ -84,6 +84,11 @@ if ( function_exists( 'tlt_render_sitewide_banner' ) ) tlt_render_sitewide_banne
     </nav>
 
     <div class="site-search-wrap">
+      <a class="site-cal-link" href="<?php echo esc_url( home_url( '/calendar/' ) ); ?>" aria-label="Calendar">
+        <svg xmlns="http://www.w3.org/2000/svg" height="22" width="22" viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true">
+          <path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Z"/>
+        </svg>
+      </a>
       <button type="button" class="site-search-toggle" aria-label="Search" aria-expanded="false" aria-controls="site-search-form">
         <svg xmlns="http://www.w3.org/2000/svg" height="22" width="22" viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true">
           <path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"/>

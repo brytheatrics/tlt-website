@@ -16,10 +16,20 @@ while ( have_posts() ) : the_post();
     $tix       = get_post_meta( get_the_ID(), 'show_ticket_url', true );
     $program   = get_post_meta( get_the_ID(), 'show_program_pdf_url', true );
     $cancelled = get_post_meta( get_the_ID(), 'show_cancelled', true );
+    $cast      = tlt_parse_cast( get_post_meta( get_the_ID(), 'show_cast', true ) );
     $img       = tlt_show_image_url( get_the_ID(), 'full' );
     $videos_raw = get_post_meta( get_the_ID(), 'show_video_urls', true );
     $videos    = $videos_raw ? array_filter( array_map( 'trim', explode( ',', $videos_raw ) ) ) : [];
     $cityline_url = get_post_meta( get_the_ID(), 'show_cityline_url', true );
+
+    // Has this show already closed? Hide the "Buy Tickets" button once the run
+    // is over. Uses tlt_today() so it respects the pre-launch date override.
+    $is_closed = false;
+    if ( $close ) {
+        $close_ts = strtotime( $close );
+        $today_ts = strtotime( function_exists( 'tlt_today' ) ? tlt_today() : date( 'Y-m-d' ) );
+        if ( $close_ts && $today_ts ) $is_closed = $today_ts > $close_ts;
+    }
 
     // --- New as of 2026-05-13 ---
     $ptype       = get_post_meta( get_the_ID(), 'show_program_type', true );
@@ -28,6 +38,25 @@ while ( have_posts() ) : the_post();
     $dinner_menu = get_post_meta( get_the_ID(), 'show_dinner_menu', true );
     $gallery_raw = get_post_meta( get_the_ID(), 'show_photo_gallery', true );
     $gallery     = $gallery_raw ? json_decode( $gallery_raw, true ) : [];
+    if ( ! is_array( $gallery ) ) $gallery = [];
+    // Also fold in the splash-page photos Chris curates (show_splash_gallery,
+    // a JSON array of plain URLs). Read live so when he removes/replaces splash
+    // images next week, they drop out of this slideshow too — nothing stale sticks.
+    $splash_raw = get_post_meta( get_the_ID(), 'show_splash_gallery', true );
+    $splash     = $splash_raw ? json_decode( $splash_raw, true ) : [];
+    if ( is_array( $splash ) && $splash ) {
+        $seen = [];
+        foreach ( $gallery as $g ) { if ( ! empty( $g['url'] ) ) $seen[ $g['url'] ] = true; }
+        $splash_items = [];
+        foreach ( $splash as $s ) {
+            $url = is_array( $s ) ? ( $s['url'] ?? '' ) : $s; // splash items are usually plain URLs
+            if ( ! $url || isset( $seen[ $url ] ) ) continue;
+            $seen[ $url ] = true;
+            $splash_items[] = [ 'url' => $url, 'alt' => get_the_title() . ' production photo', 'caption' => '' ];
+        }
+        // Splash photos first (Chris's current curated set), then any imported extras.
+        $gallery = array_merge( $splash_items, $gallery );
+    }
 ?>
 
 <article class="show-detail">
@@ -40,7 +69,13 @@ while ( have_posts() ) : the_post();
         <?php if ( $cancelled ) : ?>
           <p style="background:#ef5350;color:#fff;padding:0.5rem 1rem;display:inline-block;font-weight:600;text-transform:uppercase;letter-spacing:0.05em">Cancelled</p>
         <?php endif; ?>
-        <div class="dates"><?php echo esc_html( tlt_format_date_range( $open, $close ) ); ?></div>
+        <?php
+          // Exact dates when known; otherwise fall back to a season label
+          // (archival shows where only the season year is known).
+          $datestr = tlt_format_date_range( $open, $close );
+          if ( ! $datestr ) $datestr = get_post_meta( get_the_ID(), 'show_season_label', true );
+        ?>
+        <div class="dates"><?php echo esc_html( $datestr ); ?></div>
         <h1><?php the_title(); ?></h1>
         <p class="credits">
           <?php if ( $director ) echo 'Directed by ' . esc_html( $director ); ?>
@@ -110,16 +145,18 @@ while ( have_posts() ) : the_post();
             //     "Please be advised that this show contains…") were wrapped by Squarespace
             //     in <h2><strong> or <p><strong><em>, rendering them huge and bold. Demote any
             //     such block to a plain <p> so it reads as normal body text.
-            $warning_kw = '(?:recommended|please be advised|this (?:show|production) contains|contains:|warning:|advisory)';
+            $warning_kw = '(?:recommended|please be advised|this (?:show|production) contains|contains flashing|flashing lights|mature themes|strong language|hypoallergenic|recorded gunshot|content advisory|warning:|advisory)';
             $body = preg_replace_callback(
                 '#<(h[1-6]|p)([^>]*)>(.*?)</\1>#is',
-                function ( $m ) use ( $warning_kw ) {
-                    $tag = $m[1]; $inner = $m[3];
+                function ( $m ) use ( $warning_kw, $warn ) {
+                    $inner = $m[3];
                     $plain = wp_strip_all_tags( $inner );
                     if ( ! preg_match( '/' . $warning_kw . '/i', $plain ) ) return $m[0];
-                    // Strip inline emphasis wrappers
+                    // When we render the warning structurally from show_content_warning
+                    // meta, drop it from the body to avoid a duplicate. Otherwise demote
+                    // the (often huge/bold) block to plain body text.
+                    if ( $warn ) return '';
                     $inner = preg_replace( '#</?(?:strong|em|b|i)\b[^>]*>#i', '', $inner );
-                    // Always emit as plain <p>
                     return '<p>' . $inner . '</p>';
                 },
                 $body
@@ -138,15 +175,52 @@ while ( have_posts() ) : the_post();
                 '(?:View\s+)?Program(?:\s*\(PDF\))?' .
                 '\s*(?:</(?:strong|em|b|i)>\s*)*' .
                 '</a>\s*' .
-                '(?:</(?:strong|em|b|i)>\s*)*' .              // close any outer wrap
+                '(?:</(?:strong|em|b|i)>\s*|<br\s*/?>\s*)*' . // close any outer wrap / trailing <br>
                 '</p>#i',
                 '',
                 $body
             );
 
+            // 4) Drop body "Run Time:" blocks — the schedule box below already shows
+            //    this from show_run_time meta.
+            if ( $run_time ) {
+                $body = preg_replace( '#<(h[1-6]|p)[^>]*>\s*(?:<[^>]+>\s*)*Run\s*Time\b.*?</\1>#is', '', $body );
+            }
+
+            // 5) Drop the inline cast list from the body — we render it structurally
+            //    from show_cast below, so the body copy would be a duplicate.
+            if ( ! empty( $cast ) ) {
+                // "Featuring the talents of:" / "Cast" header block.
+                $body = preg_replace( '#<(p|h[1-6])[^>]*>\s*(?:<[^>]+>\s*)*(?:Featuring the talents of|The Cast|Cast of Characters)\b.*?</\1>#is', '', $body );
+                // Leaf paragraphs/headings that are predominantly a cast list (3+
+                // "Name as Role"). NOT <div> — a wrapping div can hold the synopsis
+                // too, and we'd strip the lot.
+                $body = preg_replace_callback( '#<(p|h[1-6])[^>]*>(.*?)</\1>#is', function ( $m ) {
+                    $plain = wp_strip_all_tags( $m[2] );
+                    $n = preg_match_all( '/[A-Z][A-Za-z.\'-]+(?:\s+[A-Z][A-Za-z.\'-]+){1,3}\s+as\s+[A-Z]/', $plain );
+                    return $n >= 3 ? '' : $m[0];
+                }, $body );
+                // Single-line cast paragraphs ("Firstname Lastname as Role").
+                $body = preg_replace( '#<p[^>]*>\s*[A-Z][A-Za-z.\'-]+(?:\s+[A-Z][A-Za-z.\'-]+){1,3}\s+as\s+[^<]{1,60}</p>#', '', $body );
+            }
+
             echo apply_filters( 'the_content', $body );
           ?>
         </div>
+
+        <?php if ( $cast ) : ?>
+          <section class="show-cast">
+            <h3 class="section-heading">Cast</h3>
+            <ul class="cast-list">
+              <?php foreach ( $cast as $cm ) : ?>
+                <li>
+                  <span class="cast-actor"><?php echo esc_html( $cm['actor'] ); ?></span>
+                  <?php if ( $cm['role'] !== '' ) : ?><span class="cast-role"><?php echo esc_html( $cm['role'] ); ?></span><?php endif; ?>
+                </li>
+              <?php endforeach; ?>
+            </ul>
+          </section>
+        <?php endif; ?>
 
         <?php if ( $venue_name ) : ?>
           <div class="show-venue" style="background:var(--color-soft);padding:1rem 1.25rem;border-left:4px solid var(--color-accent);margin:1.5rem 0">
@@ -170,7 +244,7 @@ while ( have_posts() ) : the_post();
         <?php endif; ?>
 
         <p>
-          <?php if ( $tix && ! $cancelled ) : ?>
+          <?php if ( $tix && ! $cancelled && ! $is_closed ) : ?>
             <a href="<?php echo esc_url( $tix ); ?>" class="btn btn-primary">Buy Tickets</a>
           <?php endif; ?>
           <?php if ( $program ) : ?>
@@ -332,7 +406,7 @@ if ( $open && ! $cancelled ) {
         ],
         'description' => wp_strip_all_tags( get_the_excerpt() ),
         'image'       => $img,
-        'offers'      => $tix ? [ '@type' => 'Offer', 'url' => $tix, 'availability' => 'https://schema.org/InStock' ] : null,
+        'offers'      => ( $tix && ! $is_closed ) ? [ '@type' => 'Offer', 'url' => $tix, 'availability' => 'https://schema.org/InStock' ] : null,
     ];
     echo '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT ) . '</script>';
 }

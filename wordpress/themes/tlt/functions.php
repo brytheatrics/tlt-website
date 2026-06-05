@@ -11,6 +11,12 @@ require_once __DIR__ . '/includes/acf-page-templates.php';
 // Flex content library — Gutenberg block patterns (Prose, Figure, Pull-quote, etc.)
 require_once __DIR__ . '/includes/block-patterns.php';
 
+// Decade-archive rendering (parse decade posts -> per-season photo/program buttons)
+require_once __DIR__ . '/includes/archive-decades.php';
+
+// Calendar data layer (performances + auditions + events -> /calendar/)
+require_once __DIR__ . '/includes/calendar.php';
+
 /**
  * Pre-launch date override. The TLT site doesn't go live until after Bedroom
  * Farce closes (Jul 26, 2026). Until then, simulate that the site is already
@@ -50,6 +56,30 @@ add_action( 'wp_enqueue_scripts', function () {
     $ver = file_exists( $style_path ) ? filemtime( $style_path ) : '1.0.0';
     wp_enqueue_style( 'tlt-style', get_stylesheet_uri(), [ 'tlt-google-fonts' ], $ver );
 } );
+
+/**
+ * Parse a show_cast string ("Actor as Character, Actor as Character, …") into
+ * [ ['actor'=>…, 'role'=>…], … ]. Commas separate cast members; " as " splits
+ * actor from role; an entry with no " as " is a name-only credit (ensemble/revue).
+ */
+function tlt_parse_cast( $str ) {
+    $str = (string) $str;
+    // Protect suffix commas ("DuWayne Andrews, Jr.", "Martin Luther King, Jr.",
+    // "Sammy Davis III") so a name/role suffix isn't read as a cast separator.
+    // Stash the comma as \x01, split on the real separators, then restore it.
+    $str = preg_replace( '/,\s*(Jr|Sr|II|III|IV|Ph\.?\s?D|M\.?\s?D|Esq)(\.?)/i', "\x01$1$2", $str );
+    $out = [];
+    foreach ( explode( ',', $str ) as $entry ) {
+        $entry = trim( str_replace( "\x01", ', ', $entry ) );
+        if ( $entry === '' ) continue;
+        if ( preg_match( '/^(.*?)\s+as\s+(.+)$/i', $entry, $m ) ) {
+            $out[] = [ 'actor' => trim( $m[1] ), 'role' => trim( $m[2] ) ];
+        } else {
+            $out[] = [ 'actor' => $entry, 'role' => '' ];
+        }
+    }
+    return $out;
+}
 
 /**
  * Helper to format date ranges like "Oct 24 – Nov 9, 2025"

@@ -11,6 +11,9 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 // Promotions (tlt_promotion CPT + ACF fields + helpers + seeder)
 require_once __DIR__ . '/includes/promotions.php';
 
+// Events (tlt_event CPT — calendar events that aren't productions)
+require_once __DIR__ . '/includes/events.php';
+
 /* ---------------------------------------------------------------------------
  * Custom Post Types
  * ------------------------------------------------------------------------- */
@@ -122,6 +125,10 @@ add_action( 'init', function () {
         'show_logo_url'          => [ 'string', 'Optional small show logo (used on auditions hub)' ],
         'show_video_urls'        => [ 'string', 'Comma-separated list of video embed URLs' ],
         'show_cityline_url'      => [ 'string', 'Cityline interview YouTube URL — featured on homepage when this is the running show' ],
+        // --- Calendar schedules (one entry per line) ---
+        'show_performances'      => [ 'string', 'Performance schedule — one per line: "YYYY-MM-DD 7:30 PM"' ],
+        'show_audition_schedule' => [ 'string', 'Audition schedule — one per line: "YYYY-MM-DD 6:00 PM @ Location"' ],
+        'show_cast'              => [ 'string', 'Cast — "Actor as Character, …" (comma-separated; "/" for multiple roles; name alone if no character)' ],
     ];
     foreach ( $show_fields as $key => [ $type, $desc ] ) {
         register_post_meta( 'tlt_show', $key, [
@@ -262,6 +269,18 @@ function tlt_render_show_meta( $post ) {
         echo "<tr><th><label for='$key'>$label</label></th><td><input type='text' id='$key' name='$key' value='$val' style='width:100%'></td></tr>";
     }
 
+    // --- Cast ---
+    echo '<tr><th colspan="2" style="padding-top:1em;border-top:1px solid #ddd"><strong>Cast</strong></th></tr>';
+    $cast = esc_textarea( get_post_meta( $post->ID, 'show_cast', true ) );
+    echo "<tr><th><label for='show_cast'>Cast</label></th><td><textarea id='show_cast' name='show_cast' rows='4' style='width:100%' placeholder='Kennedy Miller as Annie, Roxanne De Vito as Miss Hannigan, …'>$cast</textarea><p class='description'>Comma-separated <code>Actor as Character</code>. Use <code>/</code> for an actor's multiple roles; a name alone (no &ldquo;as&rdquo;) is fine for ensemble/revue.</p></td></tr>";
+
+    // --- Calendar schedules ---
+    echo '<tr><th colspan="2" style="padding-top:1em;border-top:1px solid #ddd"><strong>Calendar Schedules</strong> — these drive the /calendar/ page</th></tr>';
+    $perf = esc_textarea( get_post_meta( $post->ID, 'show_performances', true ) );
+    echo "<tr><th><label for='show_performances'>Performance Dates</label></th><td><textarea id='show_performances' name='show_performances' rows='6' style='width:100%' placeholder='2026-08-28 7:30 PM&#10;2026-08-29 7:30 PM&#10;2026-08-30 2:00 PM'>$perf</textarea><p class='description'>One performance per line: <code>YYYY-MM-DD 7:30 PM</code>. Each becomes a calendar entry linking to this show.</p></td></tr>";
+    $aud = esc_textarea( get_post_meta( $post->ID, 'show_audition_schedule', true ) );
+    echo "<tr><th><label for='show_audition_schedule'>Audition Dates</label></th><td><textarea id='show_audition_schedule' name='show_audition_schedule' rows='4' style='width:100%' placeholder='2026-06-07 6:00 PM @ Tacoma Little Theatre&#10;2026-06-09 7:00 PM @ STAR Center'>$aud</textarea><p class='description'>One audition per line: <code>YYYY-MM-DD 7:00 PM @ Location</code>. Location is optional (defaults to TLT).</p></td></tr>";
+
     echo '</table>';
 }
 
@@ -309,7 +328,7 @@ function tlt_save_show_meta( $post_id, $post ) {
         if ( isset( $_POST[ $k ] ) ) update_post_meta( $post_id, $k, wp_kses_post( $_POST[ $k ] ) );
     }
     // JSON/textarea fields — store as-is but strip tags for safety
-    foreach ( [ 'show_photo_gallery','show_splash_gallery','show_video_urls' ] as $k ) {
+    foreach ( [ 'show_photo_gallery','show_splash_gallery','show_video_urls','show_performances','show_audition_schedule','show_cast' ] as $k ) {
         if ( isset( $_POST[ $k ] ) ) update_post_meta( $post_id, $k, wp_kses_post( $_POST[ $k ] ) );
     }
     update_post_meta( $post_id, 'show_cancelled', ! empty( $_POST['show_cancelled'] ) ? 1 : 0 );
