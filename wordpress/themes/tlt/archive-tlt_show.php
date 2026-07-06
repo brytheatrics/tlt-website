@@ -14,6 +14,14 @@ get_header(); ?>
         echo 'Shows';
       }
     ?></h1>
+    <?php
+      if ( is_tax( 'tlt_season' ) ) {
+        $season_term = get_queried_object();
+        if ( $season_term && ! empty( $season_term->description ) ) {
+          echo '<p class="season-tagline">' . wp_kses_post( $season_term->description ) . '</p>';
+        }
+      }
+    ?>
   </header>
 
   <?php if ( is_tax( 'tlt_season' ) ) :

@@ -2,74 +2,82 @@
 /**
  * Template Name: Season Tickets
  *
- * 2026–2027 season ticket landing page. Hero + ordering CTAs + season pass
- * explainer + 7 show cards. Update the $shows array as the season changes.
+ * Self-maintaining season ticket landing page. The 7 show cards auto-populate
+ * from the current season's Mainstage shows; the season label + date window are
+ * derived from those shows. Operational bits (online-ordering toggle, PDF links,
+ * hero image, prices, pass wording) are editable via the "Season Tickets
+ * Settings" ACF fields, with the real current copy as defaults.
  */
 get_header();
 
-// Toggle this to true once online ordering goes live in July.
-$online_orders_live = false;
-$online_orders_url  = 'https://tlt.ludus.com';
+// Small ACF reader with a baked-in default so the page renders unchanged.
+$stf = function ( $name, $default = '' ) {
+    $v = function_exists( 'get_field' ) ? get_field( $name ) : null;
+    return ( $v === null || $v === '' ) ? $default : $v;
+};
 
-// Resources
-$brochure_url    = '/wp-content/uploads/programs/2627-Season-Descriptions.pdf';
-$order_form_url  = '/wp-content/uploads/programs/2627-Season-Ticket-Order-Form.pdf';
+// --- Operational settings (editable) ---
+$online_orders_live = (bool) ( function_exists( 'get_field' ) ? get_field( 'st_online_live' ) : false );
+$online_orders_url  = $stf( 'st_online_url', 'https://tlt.ludus.com' );
+$brochure_url       = $stf( 'st_brochure_url', '/wp-content/uploads/programs/2627-Season-Descriptions.pdf' );
+$order_form_url     = $stf( 'st_order_form_url', '/wp-content/uploads/programs/2627-Season-Ticket-Order-Form.pdf' );
+// --- Shows + season label/window auto-derived. Season tickets are always
+// for the UPCOMING season, so we prefer next-season data when it exists and
+// only fall back to the current season if nothing is announced yet.
+$next_term    = function_exists( 'tlt_get_next_season_term' )    ? tlt_get_next_season_term()    : null;
+$next_shows   = function_exists( 'tlt_get_next_season_shows' )   ? tlt_get_next_season_shows()   : [];
+$season_term  = $next_term
+    ?: ( function_exists( 'tlt_get_current_season_term' ) ? tlt_get_current_season_term() : null );
+$season_shows = $next_shows
+    ?: ( function_exists( 'tlt_get_current_season_shows' ) ? tlt_get_current_season_shows() : [] );
+$season_label = $season_term ? str_replace( '-', "\u{2013}", $season_term->name ) . ' Season' : '2026–2027 Season';
 
-$hero_image      = '/wp-content/uploads/migrated/2627-season.jpg';
-$season_label    = '2026–2027 Season';
-$season_window   = 'August 28, 2026 – July 25, 2027';
+// Hero image — no fallback; if Chris hasn't uploaded one, the poster slot
+// stays empty rather than showing a stale prior-season default.
+$hero_image = function_exists( 'get_field' ) ? get_field( 'st_hero_image' ) : '';
+$shows = [];
+$first_open = $last_close = '';
+foreach ( $season_shows as $sp ) {
+    $open  = get_post_meta( $sp->ID, 'show_open_date', true );
+    $close = get_post_meta( $sp->ID, 'show_close_date', true );
+    if ( $open  && ( ! $first_open || $open  < $first_open ) ) $first_open = $open;
+    if ( $close && ( ! $last_close || $close > $last_close ) ) $last_close = $close;
+    $shows[] = [
+        'title'   => get_the_title( $sp ),
+        'author'  => get_post_meta( $sp->ID, 'show_playwright', true ),
+        'dates'   => function_exists( 'tlt_format_date_range' ) ? tlt_format_date_range( $open, $close ) : '',
+        'tagline' => get_post_meta( $sp->ID, 'show_tagline', true ),
+        'blurb'   => wp_strip_all_tags( $sp->post_content ),
+    ];
+}
+$season_window = ( $first_open && $last_close && function_exists( 'tlt_format_date_range' ) )
+    ? tlt_format_date_range( $first_open, $last_close )
+    : 'August 28, 2026 – July 25, 2027';
 
-$shows = [
-    [
-        'title'   => 'The Outsider',
-        'author'  => 'By Paul Slade Smith',
-        'dates'   => 'August 28 – September 13, 2026',
-        'tagline' => 'Politics have never been this awkward… or this funny',
-        'blurb'   => "Ned Newley doesn't even want to be governor. He's terrified of public speaking, and his poll numbers are impressively bad. But political consultant Arthur Vance sees things differently: Ned might be the worst candidate to ever run for office. Unless the public is looking for the worst candidate to ever run for office. A timely and hilarious comedy that skewers politics and celebrates democracy.",
-    ],
-    [
-        'title'   => 'Arsenic and Old Lace',
-        'author'  => 'By Joseph Kesserling',
-        'dates'   => 'October 16 – November 1, 2026',
-        'tagline' => 'Meet the sweetest little old ladies… with a deadly hobby',
-        'blurb'   => "Drama critic Mortimer Brewster's engagement announcement is upended when he discovers a corpse in his elderly aunts' window seat — only to learn the two women aren't just aware of the dead man in their parlor, they killed him! Between his aunts' penchant for poisoning wine, a brother who thinks he's Teddy Roosevelt, and another brother using plastic surgery to hide from the police, it'll be a miracle if Mortimer makes it to his wedding.",
-    ],
-    [
-        'title'   => 'Hallmarked',
-        'author'  => 'By Michael D. Fox',
-        'dates'   => 'December 4 – December 27, 2026',
-        'tagline' => 'The West Coast premiere of a new musical for people who love Hallmark movies… and people who don\'t',
-        'blurb'   => "It seems everyone on the planet is obsessed with Hallmark movies. Everyone except Julie. She had her heart stomped on once and it will not happen again. No way. No how. Not even in Idyllic, Vermont. Packed with fabulous new pop songs, loads of laughter, and heartwarming delight, Hallmarked is a rom-com fever dream.",
-    ],
-    [
-        'title'   => 'Dot',
-        'author'  => 'By Colman Domingo',
-        'dates'   => 'February 5 – February 21, 2027',
-        'tagline' => 'A family comedy with heart — and just a touch of heartbreak',
-        'blurb'   => "The holidays are always a wild family affair at the Shealy house. This year, Dotty and her three grown children gather with more than presents on their minds. As Dotty struggles to hold on to her memory, her children must fight to balance care for their mother and care for themselves. A twisted, hilarious play set in the heart of a West Philly neighborhood.",
-    ],
-    [
-        'title'   => 'Urinetown',
-        'author'  => 'By Greg Kotis',
-        'dates'   => 'March 26 – April 18, 2027',
-        'tagline' => 'A wickedly funny, fast-paced, and surprisingly intelligent comedic romp',
-        'blurb'   => 'In this side-splitting satire, young hero Bobby Strong leads his community in a fight against oppression. Set in a dystopian world where water is scarce and "Hope" is even scarcer, citizens must now pay for "The Privilege to Pee" at facilities controlled by a selfish tycoon. The poorest of these — run by the formidable Penelope Pennywise — becomes a "number one" site for major change.',
-    ],
-    [
-        'title'   => 'The Importance of Being Earnest',
-        'author'  => 'By Oscar Wilde · UWT Partner Project',
-        'dates'   => 'May 21 – June 6, 2027',
-        'tagline' => 'A trivial comedy for serious people, in partnership with UWT',
-        'blurb'   => 'Being sensible can be excessively boring. At least Jack thinks so. While assuming the role of dutiful guardian in the country, he lets loose in town under a false identity. His friend Algernon takes on a similar facade. Unfortunately, double lives have drawbacks, especially in love — and especially when two eligible ladies are involved.',
-    ],
-    [
-        'title'   => 'The Play That Goes Wrong',
-        'author'  => 'By Henry Lewis, Jonathan Sayer &amp; Henry Shields',
-        'dates'   => 'July 9 – July 25, 2027',
-        'tagline' => 'Back by popular demand — get ready to laugh even more',
-        'blurb'   => "Welcome to opening night of the Cornley University Drama Society's newest production, where things are quickly going from bad to utterly disastrous. An unconscious leading lady, a corpse that can't play dead, and actors who trip over everything (including their lines). Part Monty Python, part Sherlock Holmes — this Olivier Award–winning comedy is a global phenomenon guaranteed to leave you aching with laughter.",
-    ],
-];
+// --- Pass content (editable) ---
+$pass_intro     = $stf( 'st_pass_intro', "Both options save you money over single tickets. Season Tickets are best if you like seeing the same seat at the same time of week every show. FLEX Passes are best if your schedule changes — or if you'd rather bring a friend than commit to dates." );
+$season_summary = $stf( 'st_season_summary', 'One reserved seat to all seven Mainstage productions, same date and seat every show.' );
+$season_prices  = $stf( 'st_season_prices', "\$171.20 | Adult\n\$160.00 | Senior / Student / Military\n\$132.00 | Child" );
+$season_bullets = $stf( 'st_season_bullets', "Guaranteed same seat for every show in your package\nSave per show over the single ticket price\nFree exchanges with at least 24 hours notice" );
+$flex_summary   = $stf( 'st_flex_summary', 'Six prepaid admissions you can use however you want — bring a friend, double up, save for later.' );
+$flex_price     = $stf( 'st_flex_price', '$160.00 | 6 punches' );
+$flex_bullets   = $stf( 'st_flex_bullets', "Save per show over the single ticket price\nUse punches in any combination — bring guests, double up\nReserve at least 24 hours before each performance\nValid for Mainstage only · not Special Events\n6 punches across 7 shows" );
+
+$render_price_tags = function ( $text ) {
+    foreach ( preg_split( '/\r\n|\r|\n/', (string) $text ) as $line ) {
+        $line = trim( $line ); if ( $line === '' ) continue;
+        $p = array_map( 'trim', explode( '|', $line, 2 ) );
+        echo '<span class="price-tag">' . esc_html( $p[0] );
+        if ( ! empty( $p[1] ) ) echo ' <span class="who">' . esc_html( $p[1] ) . '</span>';
+        echo '</span>';
+    }
+};
+$render_bullets = function ( $text ) {
+    foreach ( preg_split( '/\r\n|\r|\n/', (string) $text ) as $line ) {
+        $line = trim( $line ); if ( $line === '' ) continue;
+        echo '<li>' . esc_html( $line ) . '</li>';
+    }
+};
 ?>
 
 <style>
@@ -143,57 +151,51 @@ $shows = [
         <a class="btn btn-outline" href="<?php echo esc_url( $order_form_url ); ?>" target="_blank" rel="noopener">Mail-In Order Form (PDF)</a>
       </div>
     </div>
-    <div class="st-hero__poster">
-      <img src="<?php echo esc_url( $hero_image ); ?>" alt="<?php echo esc_attr( $season_label . ' poster' ); ?>">
-    </div>
+    <?php if ( $hero_image ) : ?>
+      <div class="st-hero__poster">
+        <img src="<?php echo esc_url( $hero_image ); ?>" alt="<?php echo esc_attr( $season_label . ' poster' ); ?>">
+      </div>
+    <?php endif; ?>
   </header>
 
   <?php if ( ! $online_orders_live ) : ?>
     <div class="st-notice">
       <span class="eyebrow">Heads up</span>
-      <p>Online orders open in <strong>July</strong>. Until then, use the Mail-In Order Form above, or call the Box Office at <a href="tel:+12532722281">(253) 272-2281</a>.</p>
+      <p>Online orders open in <strong>August</strong>. Until then, use the Mail-In Order Form above, or call the Box Office at <a href="tel:+12532722281">(253) 272-2281</a>.</p>
     </div>
   <?php endif; ?>
 
   <!-- SEASON PASS EXPLAINER -->
   <section class="st-section">
     <h2>Choose Your Pass</h2>
-    <p class="intro">Both options save you money over single tickets. Season Tickets are best if you like seeing the same seat at the same time of week every show. FLEX Passes are best if your schedule changes — or if you'd rather bring a friend than commit to dates.</p>
+    <p class="intro"><?php echo esc_html( $pass_intro ); ?></p>
 
     <div class="pass-grid">
       <div class="pass-card">
         <h3>Season Ticket</h3>
-        <p class="summary">One reserved seat to all seven Mainstage productions, same date and seat every show.</p>
-        <span class="price-tag">$171.20 <span class="who">Adult</span></span>
-        <span class="price-tag">$160.00 <span class="who">Senior / Student / Military</span></span>
-        <span class="price-tag">$132.00 <span class="who">Child</span></span>
+        <p class="summary"><?php echo esc_html( $season_summary ); ?></p>
+        <?php $render_price_tags( $season_prices ); ?>
         <ul>
-          <li>Guaranteed same seat for every show in your package</li>
-          <li>Save per show over the single ticket price</li>
-          <li>Free exchanges with at least 24 hours notice</li>
+          <?php $render_bullets( $season_bullets ); ?>
           <li>Valid <?php echo esc_html( $season_window ); ?></li>
         </ul>
       </div>
 
       <div class="pass-card">
         <h3>FLEX Pass</h3>
-        <p class="summary">Six prepaid admissions you can use however you want — bring a friend, double up, save for later.</p>
-        <span class="price-tag">$160.00 <span class="who">6 punches</span></span>
+        <p class="summary"><?php echo esc_html( $flex_summary ); ?></p>
+        <?php $render_price_tags( $flex_price ); ?>
         <ul>
-          <li>Save per show over the single ticket price</li>
-          <li>Use punches in any combination — bring guests, double up</li>
-          <li>Reserve at least 24 hours before each performance</li>
-          <li>Valid for Mainstage only · not Special Events</li>
-          <li>6 punches across 7 shows</li>
+          <?php $render_bullets( $flex_bullets ); ?>
           <li>Valid <?php echo esc_html( $season_window ); ?></li>
         </ul>
       </div>
     </div>
 
-    <p class="pass-footnote">For the full set of policies (exchanges, refunds, group rates, etc.), see <a href="/ticketinfo/">Ticket Information</a>.</p>
+    <p class="pass-footnote">For the full set of policies (exchanges, refunds, group rates, etc.), see <a href="/tickets/">Ticket Information</a>.</p>
   </section>
 
-  <!-- THE 7 SHOWS -->
+  <!-- THE SHOWS -->
   <section class="st-section">
     <h2>The <?php echo esc_html( $season_label ); ?></h2>
     <p class="intro">Seven Mainstage productions across the year.</p>
@@ -204,10 +206,10 @@ $shows = [
           <div class="show-card__num"><?php echo $i + 1; ?></div>
           <div>
             <h3 class="show-card__title"><?php echo esc_html( $s['title'] ); ?></h3>
-            <p class="show-card__author"><?php echo wp_kses( $s['author'], [ 'em' => [] ] ); ?></p>
-            <span class="show-card__dates"><?php echo esc_html( $s['dates'] ); ?></span>
-            <p class="show-card__tagline"><?php echo esc_html( $s['tagline'] ); ?></p>
-            <p class="show-card__blurb"><?php echo esc_html( $s['blurb'] ); ?></p>
+            <?php if ( $s['author'] ) : ?><p class="show-card__author"><?php echo esc_html( $s['author'] ); ?></p><?php endif; ?>
+            <?php if ( $s['dates'] ) : ?><span class="show-card__dates"><?php echo esc_html( $s['dates'] ); ?></span><?php endif; ?>
+            <?php if ( $s['tagline'] ) : ?><p class="show-card__tagline"><?php echo esc_html( $s['tagline'] ); ?></p><?php endif; ?>
+            <?php if ( $s['blurb'] ) : ?><p class="show-card__blurb"><?php echo esc_html( $s['blurb'] ); ?></p><?php endif; ?>
           </div>
         </article>
       <?php endforeach; ?>

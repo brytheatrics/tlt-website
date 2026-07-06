@@ -89,6 +89,48 @@ The old site used URLs like `/blog/donationrequest`, `/blog/2021/tlt-wins-nation
   ```
 - [ ] Block `xmlrpc.php` at the server level (not used by anything we built)
 
+### Show transitions (layered animated heroes)
+
+The home page hero auto-rotates as the current show closes — when one show's
+`show_close_date` passes, the next upcoming show takes over. Each show with a
+layered hero (PSD broken into ordered PNG layers under
+`/wp-content/uploads/hero-layers/<slug>/`) gets its own animated entrance —
+on **both desktop and mobile** when a `mobile/` subfolder also exists with
+portrait-oriented versions of the same layers.
+**Verify every show in the season works before launch — once we cut over, a
+broken hero is the first thing every visitor sees.**
+
+**Critical PSD rule (so the crop doesn't cut off the animation):** each
+animated layer's PNG must extend past the canvas in the direction it slides
+in from. Person enters from right → layer canvas needs transparent space to
+the right. Podium rises from below → layer canvas extends below. If the
+layer is exactly canvas-sized, the slide animation reveals the IMG box's
+hard edge — see CLAUDE.md → "Hero PSD design spec" for the full contract.
+
+- [ ] For each of the 7 shows in 2026–2027, confirm `hero-layers/<slug>/`
+      exists with the numbered desktop PNG layers (`1-bg.png`, `2-…png`, …)
+      and a `composite.jpg`
+- [ ] For each show, confirm `hero-layers/<slug>/mobile/` exists with the
+      same set of numbered portrait PNGs + a `composite.jpg` for the
+      mobile static fallback (extraction script:
+      `C:/temp/extract_outsider_mobile.py`, copy + rename per show)
+- [ ] Test each show's animation on **both** desktop AND a real phone via
+      Local Sites' Live Link — slide-in elements should appear without
+      revealing hard IMG-box edges. If a slide reveals an edge, the PSD
+      needs more bleed in that direction OR the CSS slide distance for
+      that layer needs to be reduced
+- [ ] Use `tlt_today()` date override (in theme `functions.php`) to
+      fast-forward and confirm the hero swaps cleanly the day after each
+      show closes — walk all 7 transitions
+- [ ] Confirm the splash → home wipe still hands off cleanly on the new
+      show (re-test for each one — different posters/backgrounds expose
+      timing bugs)
+- [ ] Confirm `prefers-reduced-motion: reduce` disables the layer
+      animation and shows the static composite instead
+- [ ] Check the "Coming Soon" hero mode for the very-next-up show after
+      the season ends — it falls back to the next season's first show
+      or a recap
+
 ### Final content review
 
 - [ ] Walk through every page in **MAINTENANCE.md** → "Quick reference" table and verify it looks right

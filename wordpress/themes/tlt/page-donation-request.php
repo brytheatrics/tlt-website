@@ -120,26 +120,33 @@ get_header(); ?>
 
   <div class="dr-layout">
 
+    <?php
+      $gf = function ( $name, $default = '' ) {
+          $v = function_exists( 'get_field' ) ? get_field( $name ) : '';
+          return ( $v === null || $v === '' ) ? $default : $v;
+      };
+      $dr_intro     = $gf( 'dr_form_intro', 'Fields marked with (required) must be filled in. Please allow at least four weeks before your event.' );
+      $dr_shortcode = $gf( 'donation_form_shortcode', '[contact-form-7 id="1313" title="Donation Request"]' );
+      $dr_rev_head  = $gf( 'dr_review_heading', 'Review Process' );
+      $dr_rev_body  = $gf( 'dr_review_body', '<p>This request must be submitted at least <strong>four weeks</strong> prior to the day your organization needs the item.</p><p>Staff reviews submissions on an ongoing basis. Due to the high volume we receive, we are unable to honor every request.</p><p><strong>Good luck at your upcoming event!</strong></p>' );
+      $dr_q_head    = $gf( 'dr_questions_heading', 'Questions?' );
+      $dr_q_body    = $gf( 'dr_questions_body', '<p>Contact our Box Office:</p><p><a href="mailto:info@tacomalittletheatre.com">info@tacomalittletheatre.com</a><br><a href="tel:+12532722281">(253) 272-2281</a></p>' );
+    ?>
+
     <div class="dr-form-card">
-      <p>Fields marked with (required) must be filled in. Please allow at least four weeks before your event.</p>
-      <?php while ( have_posts() ) : the_post(); the_content(); endwhile; ?>
+      <?php if ( $dr_intro ) : ?><p><?php echo esc_html( $dr_intro ); ?></p><?php endif; ?>
+      <?php echo do_shortcode( $dr_shortcode ); ?>
     </div>
 
     <aside class="dr-aside">
       <div class="panel accent">
-        <h3>Review Process</h3>
-        <p>This request must be submitted at least <strong>four weeks</strong> prior to the day your organization needs the item.</p>
-        <p>Staff reviews submissions on an ongoing basis. Due to the high volume we receive, we are unable to honor every request.</p>
-        <p><strong>Good luck at your upcoming event!</strong></p>
+        <?php if ( $dr_rev_head ) : ?><h3><?php echo esc_html( $dr_rev_head ); ?></h3><?php endif; ?>
+        <?php echo wp_kses_post( $dr_rev_body ); ?>
       </div>
 
       <div class="panel">
-        <h3>Questions?</h3>
-        <p>Contact our Box Office:</p>
-        <p>
-          <a href="mailto:info@tacomalittletheatre.com">info@tacomalittletheatre.com</a><br>
-          <a href="tel:+12532722281">(253) 272-2281</a>
-        </p>
+        <?php if ( $dr_q_head ) : ?><h3><?php echo esc_html( $dr_q_head ); ?></h3><?php endif; ?>
+        <?php echo wp_kses_post( $dr_q_body ); ?>
       </div>
     </aside>
 

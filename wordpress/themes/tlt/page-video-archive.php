@@ -23,10 +23,21 @@
 get_header();
 
 while ( have_posts() ) : the_post();
-  $sections_raw     = get_post_meta( get_the_ID(), 'video_sections', true );
-  $sections         = $sections_raw ? json_decode( $sections_raw, true ) : [];
-  $partner_logos_raw = get_post_meta( get_the_ID(), 'partner_logos', true );
-  $partner_logos    = $partner_logos_raw ? json_decode( $partner_logos_raw, true ) : [];
+  // Prefer the editable textarea fields (parsed); fall back to the legacy JSON meta.
+  $sections_text    = function_exists( 'get_field' ) ? get_field( 'video_sections_text' ) : '';
+  if ( $sections_text && function_exists( 'tlt_parse_video_sections' ) ) {
+      $sections = tlt_parse_video_sections( $sections_text );
+  } else {
+      $sections_raw = get_post_meta( get_the_ID(), 'video_sections', true );
+      $sections     = $sections_raw ? json_decode( $sections_raw, true ) : [];
+  }
+  $logos_text = function_exists( 'get_field' ) ? get_field( 'partner_logos_text' ) : '';
+  if ( $logos_text && function_exists( 'tlt_parse_partner_logos' ) ) {
+      $partner_logos = tlt_parse_partner_logos( $logos_text );
+  } else {
+      $partner_logos_raw = get_post_meta( get_the_ID(), 'partner_logos', true );
+      $partner_logos     = $partner_logos_raw ? json_decode( $partner_logos_raw, true ) : [];
+  }
 ?>
 
 <?php if ( has_post_thumbnail() ) : ?>
@@ -42,7 +53,14 @@ while ( have_posts() ) : the_post();
   </header>
 
   <article class="page-body">
-    <?php the_content(); ?>
+    <?php
+      $va_intro = function_exists( 'get_field' ) ? get_field( 'va_intro' ) : '';
+      if ( $va_intro ) {
+          echo wpautop( wp_kses_post( $va_intro ) );
+      } else {
+          the_content(); // fallback for any legacy body content
+      }
+    ?>
   </article>
 
   <?php if ( is_array( $sections ) && $sections ) : ?>

@@ -14,7 +14,8 @@ get_header();
 
 while ( have_posts() ) : the_post();
     $date  = get_post_meta( get_the_ID(), 'press_date', true );
-    $thumb = get_post_meta( get_the_ID(), 'press_thumb', true );
+    // Prefer the ACF image picker (press_image); fall back to the legacy press_thumb URL.
+    $thumb = ( function_exists( 'get_field' ) ? get_field( 'press_image' ) : '' ) ?: get_post_meta( get_the_ID(), 'press_thumb', true );
 ?>
 
 <style>

@@ -52,7 +52,9 @@ get_header(); ?>
   $current_decade_start = (int) ( ( (int) date( 'Y' ) ) / 10 ) * 10;
   // Current-decade seasons: start year >= current_decade_start
   $current_season_term = function_exists('tlt_get_current_season_term') ? tlt_get_current_season_term() : null;
+  $next_season_term    = function_exists('tlt_get_next_season_term')    ? tlt_get_next_season_term()    : null;
   $current_id = $current_season_term ? $current_season_term->term_id : 0;
+  $next_id    = $next_season_term    ? $next_season_term->term_id    : 0;
   $seasons = get_terms( [
       'taxonomy' => 'tlt_season',
       'hide_empty' => true,
@@ -63,6 +65,7 @@ get_header(); ?>
   if ( ! is_wp_error( $seasons ) && ! empty( $seasons ) ) {
       foreach ( $seasons as $term ) {
           if ( $term->term_id === $current_id ) continue; // skip the actively-running season
+          if ( $next_id && $term->term_id === $next_id ) continue; // skip the not-yet-started next season
           // Parse season name like "2024-2025" — first year tells us the decade
           if ( preg_match( '/^(\d{4})-/', $term->name, $m ) ) {
               if ( (int) $m[1] >= $current_decade_start ) {

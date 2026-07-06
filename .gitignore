@@ -37,3 +37,7 @@ venv/
 
 # Cloudways connection details (real one is per-machine; commit only the example)
 /deploy/cloudways.json
+
+# Recovered third-party reviews — copyright belongs to the publications, kept
+# as an internal archive only. NEVER commit (would publish them publicly).
+/archive/reviews/

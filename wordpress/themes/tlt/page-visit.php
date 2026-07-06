@@ -67,6 +67,27 @@ get_header(); ?>
   .disclaimer { font-size: 0.8rem; color: var(--color-muted); font-style: italic; margin-top: 1.5rem; }
 </style>
 
+<?php
+$vf = function ( $n, $d = '' ) { $v = function_exists( 'get_field' ) ? get_field( $n ) : null; return ( $v === null || $v === '' ) ? $d : $v; };
+$v_address       = $vf( 'visit_address', '210 N "I" Street, Tacoma, WA 98403' );
+$v_phone         = $vf( 'visit_phone', '(253) 272-2281' );
+$v_phone_tel     = preg_replace( '/[^0-9]/', '', $v_phone );
+$v_access_intro  = $vf( 'visit_access_intro' );
+$v_access_cards  = function_exists( 'tlt_parse_heading_cards' ) ? tlt_parse_heading_cards( $vf( 'visit_access_cards' ) ) : [];
+$v_quick_facts   = array_filter( array_map( 'trim', preg_split( '/\r\n|\r|\n/', (string) $vf( 'visit_quick_facts' ) ) ) );
+$v_seating_url   = $vf( 'visit_seating_chart_url', '/wp-content/uploads/TLT-Seating-Chart.png' );
+$v_lobby_intro   = $vf( 'visit_lobby_intro' );
+$v_lobby_cards   = function_exists( 'tlt_parse_heading_cards' ) ? tlt_parse_heading_cards( $vf( 'visit_lobby_cards' ) ) : [];
+$v_eat_intro     = $vf( 'visit_eat_intro' );
+$v_harbor_heading= $vf( 'visit_harbor_heading', 'Harbor Lights' );
+$v_harbor_pill   = $vf( 'visit_harbor_pill', 'Featured Partner' );
+$v_harbor_blurb  = $vf( 'visit_harbor_blurb' );
+$v_harbor_perks  = $vf( 'visit_harbor_perks' );
+$v_rest_intro    = $vf( 'visit_restaurants_intro' );
+$v_restaurants   = function_exists( 'tlt_parse_visit_restaurants' ) ? tlt_parse_visit_restaurants( $vf( 'visit_restaurants' ) ) : [];
+$v_disclaimer    = $vf( 'visit_disclaimer' );
+?>
+
 <div class="visit-page">
 
   <header class="visit-hero">
@@ -74,7 +95,7 @@ get_header(); ?>
     <?php if ( $_v_eb ) : ?><span class="eyebrow"><?php echo esc_html( $_v_eb ); ?></span><?php endif; ?>
     <h1><?php echo esc_html( function_exists( 'tlt_hero_field' ) ? tlt_hero_field( 'title', 'Visit Tacoma Little Theatre' ) : 'Visit Tacoma Little Theatre' ); ?></h1>
     <p class="lede"><?php echo esc_html( function_exists( 'tlt_hero_field' ) ? tlt_hero_field( 'lede', "Five minutes from downtown Tacoma, tucked into the historic Stadium District — here's everything you need to plan a great night at the theatre." ) : "Five minutes from downtown Tacoma, tucked into the historic Stadium District — here's everything you need to plan a great night at the theatre." ); ?></p>
-    <p class="address"><a href="https://www.google.com/maps/dir/?api=1&destination=210+N+I+Street,+Tacoma,+WA+98403" target="_blank" rel="noopener">210 N "I" Street, Tacoma, WA 98403</a> &middot; Box Office: <a href="tel:+12532722281">(253) 272-2281</a></p>
+    <p class="address"><a href="https://www.google.com/maps/dir/?api=1&destination=210+N+I+Street,+Tacoma,+WA+98403" target="_blank" rel="noopener"><?php echo esc_html( $v_address ); ?></a> &middot; Box Office: <a href="tel:+<?php echo esc_attr( $v_phone_tel ); ?>"><?php echo esc_html( $v_phone ); ?></a></p>
   </header>
 
   <?php
@@ -139,32 +160,14 @@ get_header(); ?>
   <!-- ACCESSIBILITY ==================================================== -->
   <section class="visit-section" id="accessibility">
     <h2>Accessibility</h2>
-    <p>We want every patron to have a comfortable, dignified experience at TLT. If you have a question or accommodation request, please call the box office at <a href="tel:+12532722281">(253) 272-2281</a> at least 48 hours before your performance and we'll do our best to help.</p>
+    <?php if ( $v_access_intro ) : ?><p><?php echo esc_html( $v_access_intro ); ?></p><?php endif; ?>
     <div class="access-grid">
-      <div class="info-card">
-        <h3>Wheelchair Seating</h3>
-        <p>Designated wheelchair-accessible seats are available in the back row of the auditorium. Companion seating is provided adjacent. Please request these seats when booking so we can hold them for you.</p>
-      </div>
-      <div class="info-card">
-        <h3>Hearing Assistance</h3>
-        <p>Assistive listening devices are available from the box office at no charge — just ask when you arrive. Please bring photo ID to check one out.</p>
-      </div>
-      <div class="info-card">
-        <h3>Restrooms</h3>
-        <p>Two ADA-accessible restrooms are located in the lobby. There are no stairs.</p>
-      </div>
-      <div class="info-card">
-        <h3>Service Animals</h3>
-        <p>Service animals are welcome at all TLT performances. Please let the box office know in advance if possible.</p>
-      </div>
-      <div class="info-card">
-        <h3>Fragrance Sensitivity</h3>
-        <p>We ask all patrons to refrain from wearing strong fragrances out of consideration for those with chemical sensitivities.</p>
-      </div>
-      <div class="info-card">
-        <h3>Content Advisories</h3>
-        <p>Show-specific content advisories (language, themes, stage effects such as fog or strobe) are posted on each show's page. Call the box office if you'd like more detail before booking.</p>
-      </div>
+      <?php foreach ( $v_access_cards as $card ) : ?>
+        <div class="info-card">
+          <h3><?php echo esc_html( $card['heading'] ); ?></h3>
+          <p><?php echo wp_kses_post( $card['body'] ); ?></p>
+        </div>
+      <?php endforeach; ?>
     </div>
   </section>
 
@@ -175,17 +178,13 @@ get_header(); ?>
       <div>
         <p>Tacoma Little Theatre has been making theatre in Tacoma for more than a century — we're one of the oldest continuously operating community theatres in the country. Our home at 210 N "I" Street has been our stage since the 1940s.</p>
         <p>The auditorium seats roughly 200, with no seat more than a few rows from the action. There isn't a bad seat in the house — but if it's your first visit, the center section about ten rows back is a favorite.</p>
-        <p><a href="/wp-content/uploads/TLT-Seating-Chart.png" target="_blank" rel="noopener">View the seating chart &rarr;</a></p>
+        <p><a href="<?php echo esc_url( $v_seating_url ); ?>" target="_blank" rel="noopener">View the seating chart &rarr;</a></p>
         <p>For more about our history, board, and staff, visit the <a href="/board-and-staff/">Board &amp; Staff</a> page.</p>
       </div>
       <div class="info-card">
         <h3>Quick Facts</h3>
         <ul>
-          <li>~200 seats, single auditorium</li>
-          <li>Founded 1918 &middot; building occupied since 1940s</li>
-          <li>Year-round Mainstage and Off the Shelf seasons</li>
-          <li>Education programs for ages 6 through adult</li>
-          <li>501(c)(3) nonprofit &middot; Federal ID 91-0485763</li>
+          <?php foreach ( $v_quick_facts as $fact ) : ?><li><?php echo esc_html( $fact ); ?></li><?php endforeach; ?>
         </ul>
       </div>
     </div>
@@ -194,37 +193,30 @@ get_header(); ?>
   <!-- LOBBY & CONCESSIONS ============================================== -->
   <section class="visit-section" id="lobby">
     <h2>Lobby &amp; Concessions</h2>
-    <p>Doors open about 30 minutes before curtain. Our concessions bar serves wine, beer, soft drinks, water, coffee, and a rotating selection of snacks and treats. All proceeds from concessions support TLT's productions and education programs.</p>
+    <?php if ( $v_lobby_intro ) : ?><p><?php echo esc_html( $v_lobby_intro ); ?></p><?php endif; ?>
     <div class="two-col" style="margin-top:1.25rem">
-      <div class="info-card">
-        <h3>Before the Show</h3>
-        <p>Arrive early to browse the lobby, peek at the cast bios, grab a drink, and settle in before the show.</p>
-      </div>
-      <div class="info-card">
-        <h3>At Intermission</h3>
-        <p>Most performances include one 15-minute intermission. Drinks and snacks are available again — we appreciate cash and cards equally.</p>
-      </div>
+      <?php foreach ( $v_lobby_cards as $card ) : ?>
+        <div class="info-card">
+          <h3><?php echo esc_html( $card['heading'] ); ?></h3>
+          <p><?php echo wp_kses_post( $card['body'] ); ?></p>
+        </div>
+      <?php endforeach; ?>
     </div>
   </section>
 
   <!-- EAT & DRINK ====================================================== -->
   <section class="visit-section" id="eat">
     <h2>Eat &amp; Drink Nearby</h2>
-    <p>Make a night of it. The Stadium District is walkable, with restaurants and bars five minutes from the theatre door.</p>
+    <?php if ( $v_eat_intro ) : ?><p><?php echo esc_html( $v_eat_intro ); ?></p><?php endif; ?>
 
     <!-- Featured: Harbor Lights -->
     <div class="harbor-feature">
       <img src="<?php echo esc_url( get_template_directory_uri() . '/assets/sponsor-harbor-lights.png' ); ?>" alt="Harbor Lights">
       <div>
-        <span class="pill">Featured Partner</span>
-        <h3>Harbor Lights</h3>
-        <p>Tacoma waterfront landmark since 1959. We're proud to partner with Harbor Lights for our patrons.</p>
-        <div class="perks">
-          <strong>All Patrons</strong>
-          Access to the 3-Course Sunset Dinner menu any day of the week before or after a performance. Just show your ticket.
-          <strong>Season &amp; Flex Pass Holders</strong>
-          One complimentary appetizer or dessert with every performance.
-        </div>
+        <span class="pill"><?php echo esc_html( $v_harbor_pill ); ?></span>
+        <h3><?php echo esc_html( $v_harbor_heading ); ?></h3>
+        <?php if ( $v_harbor_blurb ) : ?><p><?php echo esc_html( $v_harbor_blurb ); ?></p><?php endif; ?>
+        <div class="perks"><?php echo wp_kses_post( $v_harbor_perks ); ?></div>
         <div class="actions">
           <a class="btn btn-primary" href="https://www.anthonys.com/restaurant/harbor-lights/#reservation-section" target="_blank" rel="noopener">Make a Reservation</a>
           <a class="btn btn-outline" href="/harbor-lights/">Partnership Details</a>
@@ -233,96 +225,21 @@ get_header(); ?>
     </div>
 
     <h3 style="margin-top:2rem">Food &amp; Drinks</h3>
-    <p style="color:var(--color-muted); font-size:0.9rem">A few of our favorite Stadium District spots within easy walking distance. We're not affiliated with any of these — just good neighbors.</p>
+    <?php if ( $v_rest_intro ) : ?><p style="color:var(--color-muted); font-size:0.9rem"><?php echo esc_html( $v_rest_intro ); ?></p><?php endif; ?>
     <div class="eats-grid">
-
+      <?php foreach ( $v_restaurants as $r ) :
+        $tier_class = $r['tier'] === 'close' ? ' close' : ( $r['tier'] === 'far' ? ' far' : '' );
+      ?>
       <div class="eats-card">
-        <span class="distance close">0.1 mi</span>
-        <div class="meta">Craft Beer &middot; Pub Food</div>
-        <h4><a href="https://www.parkwaytavern.com/" target="_blank" rel="noopener">Parkway Tavern</a></h4>
-        <p>Tacoma craft-beer institution literally a block away. Big rotating tap list, gourmet burgers, and sandwiches. 313 N I St.</p>
+        <span class="distance<?php echo $tier_class; ?>"><?php echo esc_html( $r['dist'] ); ?></span>
+        <?php if ( $r['tags'] ) : ?><div class="meta"><?php echo esc_html( $r['tags'] ); ?></div><?php endif; ?>
+        <h4><?php if ( $r['url'] ) : ?><a href="<?php echo esc_url( $r['url'] ); ?>" target="_blank" rel="noopener"><?php echo esc_html( $r['name'] ); ?></a><?php else : echo esc_html( $r['name'] ); endif; ?></h4>
+        <?php if ( $r['blurb'] ) : ?><p><?php echo esc_html( $r['blurb'] ); ?></p><?php endif; ?>
       </div>
-
-      <div class="eats-card">
-        <span class="distance close">0.3 mi</span>
-        <div class="meta">Pizza &middot; Bar</div>
-        <h4><a href="https://www.hankstacoma.com/" target="_blank" rel="noopener">Hank's Bar and Pizza</a></h4>
-        <p>Neighborhood pizza-and-beer joint, easy walk from the theatre. Pies, salads, and a solid beer list. 524 N K St.</p>
-      </div>
-
-      <div class="eats-card">
-        <span class="distance close">0.3 mi</span>
-        <div class="meta">Burgers &middot; Retro</div>
-        <h4><a href="https://shakeshakeshake.me/" target="_blank" rel="noopener">Shake Shake Shake</a></h4>
-        <p>Old-school diner-style burgers, hand-pressed and voted Best in Tacoma. Plus 25+ craft milkshakes. 124 N Tacoma Ave.</p>
-      </div>
-
-      <div class="eats-card">
-        <span class="distance close">0.3 mi</span>
-        <div class="meta">Southeast Asian</div>
-        <h4><a href="https://indostreeteatery.com/" target="_blank" rel="noopener">Indo Asian Street Eatery</a></h4>
-        <p>Pan-Asian street food and craft cocktails — bao, dumplings, satays, rice bowls — set in the historic Stadium District. 110 N Tacoma Ave.</p>
-      </div>
-
-      <div class="eats-card">
-        <span class="distance close">0.3 mi</span>
-        <div class="meta">Thai &middot; Noodles</div>
-        <h4><a href="https://sappsapptacoma.com/" target="_blank" rel="noopener">Sapp Sapp Thai Noodle House</a></h4>
-        <p>Newer Thai noodle spot on Tacoma Ave. Boat noodles, curries, stir-fries, and cocktails. 110 N Tacoma Ave (Suite B).</p>
-      </div>
-
-      <div class="eats-card">
-        <span class="distance close">0.4 mi</span>
-        <div class="meta">Pizza &middot; Italian</div>
-        <h4><a href="https://salamonespizzeria.com/" target="_blank" rel="noopener">Salamone's Pizza</a></h4>
-        <p>New York–style pizza by the slice or whole pie, plus Italian standards. Great if you're feeding a group on the way in. 24 N Tacoma Ave.</p>
-      </div>
-
-      <div class="eats-card">
-        <span class="distance">0.5 mi</span>
-        <div class="meta">Italian-Inspired &middot; Scratch Kitchen</div>
-        <h4><a href="https://manuscripttacoma.com/" target="_blank" rel="noopener">Manuscript</a></h4>
-        <p>Italian-inspired fusion in a lively, vinyl-DJ atmosphere — in the former Hub space. Weekend brunch too. 203 Tacoma Ave S.</p>
-      </div>
-
-      <div class="eats-card">
-        <span class="distance">0.6 mi</span>
-        <div class="meta">French Bistro</div>
-        <h4><a href="https://www.leselbistro.com/" target="_blank" rel="noopener">Le Sel Bistro</a></h4>
-        <p>Classic French bistro fare in a small, intimate room. Steak frites, mussels, well-curated wine list. Reservations a good idea. 229 St Helens Ave.</p>
-      </div>
-
-      <div class="eats-card">
-        <span class="distance">0.6 mi</span>
-        <div class="meta">Irish Pub</div>
-        <h4><a href="https://www.doylespublichouse.com/" target="_blank" rel="noopener">Doyle's Public House</a></h4>
-        <p>Cozy Irish pub a few blocks south. Whiskeys, Guinness on draft, and pub food until late. 208 St Helens Ave.</p>
-      </div>
-
-      <div class="eats-card">
-        <span class="distance">0.7 mi</span>
-        <div class="meta">Ramen &middot; Sushi Burritos</div>
-        <h4><a href="https://www.zenramensushiburrito.com/" target="_blank" rel="noopener">Zen Ramen &amp; Sushi Burrito</a></h4>
-        <p>Ramen, sushi burritos, poke, and rice bowls. Fast and reliable for a quick pre-show meal. 322 Tacoma Ave S.</p>
-      </div>
-
-      <div class="eats-card">
-        <span class="distance far">0.9 mi</span>
-        <div class="meta">Tacos &middot; Tequila</div>
-        <h4><a href="https://www.redstartacobar.com/tacoma" target="_blank" rel="noopener">Red Star Taco Bar</a></h4>
-        <p>Tacos, tequila flights, and margaritas in a lively bar setting. A bit further down St Helens — a good after-show stop. 454 St Helens Ave.</p>
-      </div>
-
-      <div class="eats-card">
-        <span class="distance">0.7 mi</span>
-        <div class="meta">Burgers &middot; Drive-In</div>
-        <h4><a href="https://friskofreeze.com/" target="_blank" rel="noopener">Frisko Freeze</a></h4>
-        <p>Tacoma landmark since 1950. Burgers, fries, and shakes from the drive-thru or walk-up window — pure retro Americana. 1201 Division Ave.</p>
-      </div>
-
+      <?php endforeach; ?>
     </div>
 
-    <p class="disclaimer">Restaurant and bar hours change. Please call ahead or check online before you head out.</p>
+    <?php if ( $v_disclaimer ) : ?><p class="disclaimer"><?php echo esc_html( $v_disclaimer ); ?></p><?php endif; ?>
   </section>
 
 </div>

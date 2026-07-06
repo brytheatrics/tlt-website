@@ -8,15 +8,42 @@
  * Photos come from the current show's gallery (attached photos), or fall
  * back to the featured image.
  */
-get_header();
+$current = function_exists( 'tlt_get_current_show' ) ? tlt_get_current_show() : null;
 
-$current = function_exists('tlt_get_current_show') ? tlt_get_current_show() : null;
-
-if ( ! $current ) {
-    echo '<div class="container" style="padding:5rem 0;text-align:center"><h1>Welcome</h1><p><a href="' . esc_url( home_url( '/home/' ) ) . '" class="btn btn-primary">Continue to Website</a></p></div>';
-    get_footer();
-    return;
+// Cover photos come ONLY from the Photo Gallery (or the legacy splash list) — the
+// poster does NOT count as a cover. If there are no cover photos (or no current
+// show), there's nothing to take over with, so skip the splash entirely and send
+// the visitor straight to the home page. (Done before get_header() so the redirect
+// fires before any output.)
+// Each entry: [ 'url' => …, 'focal' => '50% 30%' ] — focal positions the crop.
+$photos = [];
+if ( $current ) {
+    $gallery_raw = get_post_meta( $current->ID, 'show_photo_gallery', true );
+    $decoded = $gallery_raw ? json_decode( $gallery_raw, true ) : null;
+    if ( is_array( $decoded ) ) {
+        foreach ( $decoded as $g ) {
+            if ( is_array( $g ) && ! empty( $g['url'] ) ) {
+                $photos[] = [ 'url' => $g['url'], 'focal' => ! empty( $g['focal'] ) ? $g['focal'] : '50% 30%' ];
+            } elseif ( is_string( $g ) && $g ) {
+                $photos[] = [ 'url' => $g, 'focal' => '50% 30%' ];
+            }
+        }
+    }
+    if ( empty( $photos ) ) {
+        $legacy = get_post_meta( $current->ID, 'show_splash_gallery', true );
+        $dec = $legacy ? json_decode( $legacy, true ) : null;
+        if ( is_array( $dec ) ) {
+            foreach ( $dec as $u ) { if ( is_string( $u ) && $u ) $photos[] = [ 'url' => $u, 'focal' => '50% 30%' ]; }
+        }
+    }
 }
+
+if ( empty( $photos ) ) {
+    wp_safe_redirect( home_url( '/home/' ) );
+    exit;
+}
+
+get_header();
 
 $open    = get_post_meta( $current->ID, 'show_open_date', true );
 $close   = get_post_meta( $current->ID, 'show_close_date', true );
@@ -26,37 +53,11 @@ $run_time = get_post_meta( $current->ID, 'show_run_time', true );
 $age      = get_post_meta( $current->ID, 'show_age_rec', true );
 $warn     = get_post_meta( $current->ID, 'show_content_warning', true );
 $tagline  = get_post_meta( $current->ID, 'show_tagline', true );
-
-// Gather photos for cycling background. Priority:
-//   1. show_splash_gallery meta — JSON array of image URLs Chris curates
-//   2. Attached media (gallery attachments)
-//   3. Featured image (last-resort single)
-$photo_urls = [];
-$gallery_raw = get_post_meta( $current->ID, 'show_splash_gallery', true );
-if ( $gallery_raw ) {
-    $decoded = json_decode( $gallery_raw, true );
-    if ( is_array( $decoded ) ) {
-        foreach ( $decoded as $u ) {
-            if ( is_string( $u ) && $u ) $photo_urls[] = $u;
-        }
-    }
-}
-if ( empty( $photo_urls ) ) {
-    $photos = get_attached_media( 'image', $current->ID );
-    foreach ( $photos as $p ) {
-        $u = wp_get_attachment_image_url( $p->ID, 'full' );
-        if ( $u ) $photo_urls[] = $u;
-    }
-}
-if ( empty( $photo_urls ) ) {
-    $hero = tlt_show_image_url( $current->ID, 'full' );
-    if ( $hero ) $photo_urls[] = $hero;
-}
 ?>
 
 <div class="splash-bg">
-  <?php foreach ( $photo_urls as $i => $u ) : ?>
-    <div class="splash-photo<?php echo $i === 0 ? ' active' : ''; ?>" style="background-image:url('<?php echo esc_url( $u ); ?>')"></div>
+  <?php foreach ( $photos as $i => $p ) : ?>
+    <div class="splash-photo<?php echo $i === 0 ? ' active' : ''; ?>" style="background-image:url('<?php echo esc_url( $p['url'] ); ?>');background-position:<?php echo esc_attr( $p['focal'] ); ?>"></div>
   <?php endforeach; ?>
 </div>
 <div class="splash-overlay"></div>
@@ -110,7 +111,7 @@ if ( empty( $photo_urls ) ) {
 
 </div>
 
-<?php if ( count( $photo_urls ) > 1 ) : ?>
+<?php if ( count( $photos ) > 1 ) : ?>
 <script>
   (function(){
     const photos = document.querySelectorAll('.splash-photo');
@@ -138,6 +139,11 @@ if ( empty( $photo_urls ) ) {
       e.preventDefault();
       const dest = link.href;
       try { sessionStorage.setItem('tlt_splash_to_home', '1'); } catch (_) {}
+
+      // Paint html charcoal as the wipe rises — if the wipe rise finishes a
+      // hair early or the browser shows an unload frame on navigation, the
+      // underlying background already matches the wipe's color (no flash).
+      document.documentElement.style.background = '#272727';
 
       const wipe = document.createElement('div');
       wipe.id = 'splashWipe';

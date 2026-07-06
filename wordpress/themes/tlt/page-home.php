@@ -35,38 +35,105 @@ if ( $current ) :
     // ----- Layered hero detection -----
     // If /wp-content/uploads/hero-layers/[slug]/ has files like 1-bg.png, 2-foo.png, etc.,
     // render the layered animated hero. Layer order is the leading number in the filename.
+    // If a `mobile/` subfolder also exists with the same naming convention, the
+    // template emits a <picture> element per layer so phones get the portrait
+    // version and desktops get the landscape version.
     $slug = $current->post_name;
     $layers_dir = WP_CONTENT_DIR . '/uploads/hero-layers/' . $slug;
     $layers_url = content_url( '/uploads/hero-layers/' . $slug );
+    $mobile_dir = $layers_dir . '/mobile';
+    $mobile_url = $layers_url . '/mobile';
+    // Mobile layers can be either .png (older) or .webp (newer — ~75% smaller
+     // for typical hero layers). Desktop stays PNG. Prefer .webp when a mobile
+     // variant exists; fall back to matching .png.
+    $has_mobile = is_dir( $mobile_dir )
+                  && ( glob( $mobile_dir . '/[0-9]-*.webp' ) || glob( $mobile_dir . '/[0-9]-*.png' ) );
     $layers = [];
     if ( is_dir( $layers_dir ) ) {
-        $found = glob( $layers_dir . '/[0-9]-*.png' );
+        // Accept .png (layered animated heroes) or .jpg (single-image static
+        // heroes — photos compress an order of magnitude better as JPG).
+        $found = array_merge(
+            glob( $layers_dir . '/[0-9]-*.png' ) ?: [],
+            glob( $layers_dir . '/[0-9]-*.jpg' ) ?: []
+        );
         sort( $found );
         foreach ( $found as $i => $path ) {
             $base = basename( $path );
+            $stem = preg_replace( '/\.(png|jpe?g)$/i', '', $base );
+            $mobile_webp = $mobile_dir . '/' . $stem . '.webp';
+            $mobile_png  = $mobile_dir . '/' . $base;
+            $mobile_url_final = '';
+            $mobile_path_final = '';
+            if ( $has_mobile ) {
+                if ( file_exists( $mobile_webp ) ) {
+                    $mobile_url_final = $mobile_url . '/' . basename( $mobile_webp )
+                                        . '?v=' . filemtime( $mobile_webp );
+                    $mobile_path_final = $mobile_webp;
+                } elseif ( file_exists( $mobile_png ) ) {
+                    $mobile_url_final = $mobile_url . '/' . $base
+                                        . '?v=' . filemtime( $mobile_png );
+                    $mobile_path_final = $mobile_png;
+                }
+            }
+            // Intrinsic dimensions declared as HTML attributes give the browser
+            // the aspect ratio BEFORE the image decodes — critical for bleed
+            // layers whose CSS uses `height: X%; width: auto`. Without these,
+            // pre-decode layout picks a wrong aspect and the layer snaps to
+            // the correct size only after load (visible glitch on first paint).
+            $dims       = @getimagesize( $path );
+            $mobile_dims = $mobile_path_final ? @getimagesize( $mobile_path_final ) : false;
             $layers[] = [
-                'name'  => preg_replace( '/\.png$/i', '', $base ),
-                'url'   => $layers_url . '/' . $base,
-                'order' => $i + 1,
+                'name'         => $stem,
+                'url'          => $layers_url . '/' . $base . '?v=' . filemtime( $path ),
+                'mobile_url'   => $mobile_url_final,
+                'order'        => $i + 1,
+                'w'            => $dims ? (int) $dims[0] : 0,
+                'h'            => $dims ? (int) $dims[1] : 0,
+                'mobile_w'     => $mobile_dims ? (int) $mobile_dims[0] : 0,
+                'mobile_h'     => $mobile_dims ? (int) $mobile_dims[1] : 0,
             ];
         }
     }
     $composite_path = $layers_dir . '/composite.jpg';
     $composite_url  = file_exists( $composite_path ) ? $layers_url . '/composite.jpg' : '';
+    $mobile_composite_path = $mobile_dir . '/composite.jpg';
+    $mobile_composite_url  = file_exists( $mobile_composite_path ) ? $mobile_url . '/composite.jpg' : '';
 ?>
-<section class="hero <?php echo esc_attr( 'hero-mode-' . $hero_mode ); ?><?php echo $layers ? ' hero-layered' : ''; ?>">
+<section class="hero <?php echo esc_attr( 'hero-mode-' . $hero_mode ); ?><?php echo $layers ? ' hero-layered' : ''; ?><?php echo $layers ? ' hero-slug-' . esc_attr( $slug ) : ''; ?>">
   <?php if ( $layers ) : ?>
-    <!-- Layered hero (desktop/tablet): each layer slides in from a different direction, staggered -->
+    <!-- Layered hero: each layer slides in from a different direction, staggered.
+         When a mobile/ subfolder exists, <picture> swaps to portrait-oriented
+         versions on phones. -->
     <div class="hero-layers" aria-hidden="true">
       <?php foreach ( $layers as $l ) : ?>
-        <img class="hero-layer hero-layer-<?php echo (int) $l['order']; ?>"
-             data-name="<?php echo esc_attr( $l['name'] ); ?>"
-             src="<?php echo esc_url( $l['url'] ); ?>" alt="">
+        <?php if ( $l['mobile_url'] ) : ?>
+          <picture>
+            <source media="(max-width: 700px)"
+                    srcset="<?php echo esc_url( $l['mobile_url'] ); ?>"
+                    <?php if ( $l['mobile_w'] && $l['mobile_h'] ) : ?>
+                    width="<?php echo (int) $l['mobile_w']; ?>" height="<?php echo (int) $l['mobile_h']; ?>"
+                    <?php endif; ?>>
+            <img class="hero-layer hero-layer-<?php echo (int) $l['order']; ?>"
+                 data-name="<?php echo esc_attr( $l['name'] ); ?>"
+                 <?php if ( $l['w'] && $l['h'] ) : ?>
+                 width="<?php echo (int) $l['w']; ?>" height="<?php echo (int) $l['h']; ?>"
+                 <?php endif; ?>
+                 src="<?php echo esc_url( $l['url'] ); ?>" alt="">
+          </picture>
+        <?php else : ?>
+          <img class="hero-layer hero-layer-<?php echo (int) $l['order']; ?>"
+               data-name="<?php echo esc_attr( $l['name'] ); ?>"
+               <?php if ( $l['w'] && $l['h'] ) : ?>
+               width="<?php echo (int) $l['w']; ?>" height="<?php echo (int) $l['h']; ?>"
+               <?php endif; ?>
+               src="<?php echo esc_url( $l['url'] ); ?>" alt="">
+        <?php endif; ?>
       <?php endforeach; ?>
     </div>
-    <?php if ( $composite_url ) : ?>
-      <!-- Mobile static fallback -->
-      <img class="hero-image hero-image-mobile" src="<?php echo esc_url( $composite_url ); ?>" alt="">
+    <?php $mobile_static = $mobile_composite_url ?: $composite_url; ?>
+    <?php if ( $mobile_static ) : ?>
+      <!-- Static fallback used by prefers-reduced-motion or as a backstop -->
+      <img class="hero-image hero-image-mobile" src="<?php echo esc_url( $mobile_static ); ?>" alt="">
     <?php elseif ( $hero_img ) : ?>
       <img class="hero-image hero-image-mobile" src="<?php echo esc_url( $hero_img ); ?>" alt="">
     <?php endif; ?>
@@ -136,23 +203,28 @@ if ( $cityline_url ) :
 <!-- Current Season -->
 <section class="block" data-section-num="01">
   <div class="container">
-    <div class="section-head">
-      <div class="eyebrow"><span class="num">01</span> Onstage</div>
-      <h2><?php echo esc_html( $season_term ? $season_term->name : '' ); ?> Season</h2>
-      <?php
-      // Tally counts for live progress text
-      $closed = $now = $upcoming_count = 0;
-      foreach ( $season_shows as $s ) {
-          $st = tlt_show_status( $s->ID, false );
-          if ( $st === 'closed' ) $closed++;
-          elseif ( $st === 'now-playing' ) $now++;
-          else $upcoming_count++;
-      }
-      $total = count( $season_shows );
-      $progress = $total ? '<strong>' . ($closed + $now) . '</strong> of <strong>' . $total . '</strong> shows so far this season' : '';
-      ?>
-      <p><?php echo $progress ? wp_kses_post( $progress ) : 'A full season of mainstage productions, special events, and educational programs.'; ?></p>
-    </div>
+    <?php
+    // Tally counts for live progress text (used as the default lede)
+    $closed = $now = $upcoming_count = 0;
+    foreach ( $season_shows as $s ) {
+        $st = tlt_show_status( $s->ID, false );
+        if ( $st === 'closed' ) $closed++;
+        elseif ( $st === 'now-playing' ) $now++;
+        else $upcoming_count++;
+    }
+    $total          = count( $season_shows );
+    $progress_text  = $total ? ($closed + $now) . ' of ' . $total . ' shows so far this season' : 'A full season of mainstage productions, special events, and educational programs.';
+    $auto_title     = $season_term ? $season_term->name . ' Season' : '';
+    // ACF-overridable: eyebrow / title / lede / hide number badge.
+    $onstage_eyebrow = function_exists( 'tlt_home_field' ) ? tlt_home_field( 'onstage', 'eyebrow' ) : 'Onstage';
+    $onstage_title   = function_exists( 'tlt_home_field' ) ? ( tlt_home_field( 'onstage', 'title' ) ?: $auto_title ) : $auto_title;
+    $onstage_lede    = function_exists( 'tlt_home_field' ) ? ( tlt_home_field( 'onstage', 'lede' )  ?: $progress_text ) : $progress_text;
+    if ( function_exists( 'tlt_render_home_section_head' ) ) {
+        tlt_render_home_section_head( 'onstage', '01', $onstage_eyebrow, $onstage_title, $onstage_lede );
+    } else {
+        echo '<div class="section-head"><div class="eyebrow">Onstage</div><h2>' . esc_html( $auto_title ) . '</h2><p>' . esc_html( $progress_text ) . '</p></div>';
+    }
+    ?>
     <div class="show-scroller-wrap">
       <div class="show-scroller">
         <div class="show-scroller-track" id="seasonTrack">
@@ -182,7 +254,12 @@ if ( $cityline_url ) :
           <div class="body">
             <div class="dates"><?php echo esc_html( tlt_format_date_range( $open, $close ) ); ?></div>
             <h3><?php echo esc_html( get_the_title( $show ) ); ?></h3>
-            <p><?php echo esc_html( wp_trim_words( get_the_excerpt( $show ), 22 ) ); ?></p>
+            <p><?php
+              // Card blurb: the tagline (single source). Fall back to the synopsis opening.
+              $card_blurb = get_post_meta( $show->ID, 'show_tagline', true );
+              if ( '' === trim( (string) $card_blurb ) ) $card_blurb = wp_trim_words( wp_strip_all_tags( $show->post_content ), 22 );
+              echo esc_html( $card_blurb );
+            ?></p>
             <span class="more"><?php
               if ( $status === 'closed' ) echo 'Photos &amp; details &rarr;';
               elseif ( $status === 'now-playing' ) echo 'Buy tickets &rarr;';
@@ -196,9 +273,18 @@ if ( $cityline_url ) :
       </div>
     </div>
 
-    <div style="text-align:center;margin-top:2rem">
-      <a href="https://tlt.ludus.com/index.php" target="_blank" rel="noopener" class="btn btn-primary">Order Single Tickets Here</a>
-    </div>
+    <?php
+    if ( function_exists( 'tlt_render_home_buttons' ) ) {
+        $onstage_buttons = tlt_parse_home_buttons( tlt_home_field( 'onstage', 'buttons' ) );
+        tlt_render_home_buttons( $onstage_buttons );
+    } else {
+        // Fallback if the helpers aren't loaded for some reason
+        echo '<div style="text-align:center;margin-top:2rem;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">';
+        echo '<a href="https://tlt.ludus.com/index.php" target="_blank" rel="noopener" class="btn btn-primary">Order Single Tickets Here</a>';
+        echo '<a href="/season-tickets/" class="btn btn-primary">Order Season Tickets</a>';
+        echo '</div>';
+    }
+    ?>
   </div>
 </section>
 
@@ -245,9 +331,16 @@ if ( $standalone_promos ) : ?>
 <!-- Sponsors -->
 <section class="block dark" data-section-num="06">
   <div class="container">
+    <?php
+    $sp_eyebrow = function_exists( 'tlt_home_field' ) ? tlt_home_field( 'sponsors', 'eyebrow' ) : 'With Gratitude';
+    $sp_title   = function_exists( 'tlt_home_field' ) ? tlt_home_field( 'sponsors', 'title' )   : 'Tacoma Little Theatre is honored to receive support from';
+    $sp_lede    = function_exists( 'tlt_home_field' ) ? tlt_home_field( 'sponsors', 'lede' )    : '';
+    $sp_hidenum = function_exists( 'tlt_home_hide_number' ) ? tlt_home_hide_number( 'sponsors' ) : false;
+    ?>
     <div class="section-head">
-      <div class="eyebrow"><span class="num">06</span> With Gratitude</div>
-      <h2 style="font-size:1.3rem">Tacoma Little Theatre is honored to receive support from</h2>
+      <div class="eyebrow"><?php echo esc_html( $sp_eyebrow ); ?></div>
+      <h2 style="font-size:1.3rem"><?php echo esc_html( $sp_title ); ?></h2>
+      <?php if ( $sp_lede ) : ?><p><?php echo wp_kses_post( $sp_lede ); ?></p><?php endif; ?>
     </div>
     <div style="display:flex;justify-content:center;gap:3rem;flex-wrap:wrap;align-items:center">
       <a href="https://www.tacomacreates.org/" target="_blank" rel="noopener">
@@ -273,9 +366,20 @@ if ( $standalone_promos ) : ?>
       </a>
     </div>
 
-    <div style="text-align:center;margin-top:3rem">
-      <a href="https://tlt.ludus.com/subscribe.php" target="_blank" rel="noopener" class="btn btn-primary">Join Our Weekly Email List</a>
-    </div>
+    <?php
+    if ( function_exists( 'tlt_render_home_buttons' ) ) {
+        $sp_buttons = tlt_parse_home_buttons( tlt_home_field( 'sponsors', 'buttons' ) );
+        if ( $sp_buttons ) {
+            // Sponsors block wants a bit more breathing room above buttons
+            echo '<div style="margin-top:1rem"></div>';
+            tlt_render_home_buttons( $sp_buttons );
+        }
+    } else {
+        echo '<div style="text-align:center;margin-top:3rem">';
+        echo '<a href="https://tlt.ludus.com/subscribe.php" target="_blank" rel="noopener" class="btn btn-primary">Join Our Weekly Email List</a>';
+        echo '</div>';
+    }
+    ?>
   </div>
 </section>
 

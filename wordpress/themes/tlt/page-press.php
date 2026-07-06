@@ -11,15 +11,21 @@
  */
 get_header();
 
-$items = [
-    [
-        'title'    => 'TLT Wins National Award',
-        'permalink'=> '/press/tlt-wins-national-award/',
-        'thumb'    => '/wp-content/uploads/migrated/tlt-american-association-of-community-thaetre-diamond-award-2.jpg',
-        'date'     => 'May 28, 2021',
-        'excerpt'  => 'Tacoma Little Theatre is being honored with the Diamond Crown Organizational Award by the American Association of Community Theatre (AACT), recognizing longevity, vitality, and continued community impact.',
-    ],
-];
+// Cards auto-build from the Press Post (Detail) pages — create a page with that
+// template and it appears here automatically; no array to edit.
+$press_pages = function_exists( 'tlt_pages_using_template' ) ? tlt_pages_using_template( 'page-press-post.php' ) : [];
+$items = [];
+foreach ( $press_pages as $pp ) {
+    $img = ( function_exists( 'get_field' ) ? get_field( 'press_image', $pp->ID ) : '' ) ?: get_post_meta( $pp->ID, 'press_thumb', true );
+    $excerpt = has_excerpt( $pp->ID ) ? get_the_excerpt( $pp ) : wp_trim_words( wp_strip_all_tags( $pp->post_content ), 40 );
+    $items[] = [
+        'title'    => get_the_title( $pp ),
+        'permalink'=> get_permalink( $pp ),
+        'thumb'    => $img,
+        'date'     => get_post_meta( $pp->ID, 'press_date', true ),
+        'excerpt'  => $excerpt,
+    ];
+}
 ?>
 
 <style>

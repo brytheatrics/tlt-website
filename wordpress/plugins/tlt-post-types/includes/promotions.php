@@ -191,7 +191,52 @@ add_action( 'acf/init', function () {
                 'return_format' => 'id',
                 'ui'            => 1,
                 'allow_null'    => 1,
-                'instructions'  => 'If this promo is about a specific show, link it here. Currently informational; future versions may auto-default the end date to the show close date.',
+                'instructions'  => 'Auto-populated by the Show → Feature on Homepage sync. Don\'t touch — hidden from the promo form via acf/prepare_field filter below.',
+            ],
+
+            // ---- Show on the calendar (optional) ----
+            // Lets a promo (camp, murder-mystery dinner, gala, etc.) also appear
+            // on /calendar/ without creating a separate Calendar event. These are
+            // the EVENT dates — distinct from the promo's display window above.
+            [
+                'key'           => 'field_promo_on_calendar',
+                'label'         => 'Also show on the calendar',
+                'name'          => 'promo_on_calendar',
+                'type'          => 'true_false',
+                'ui'            => 1,
+                'message'       => 'Add this promotion to the public calendar on the event date(s) below.',
+                'instructions'  => 'Turn on if this promo is a dated event (camp, dinner, gala). Use the actual event date — not the promo display window above.',
+            ],
+            [
+                'key'           => 'field_promo_event_schedule',
+                'label'         => 'Event dates',
+                'name'          => 'promo_event_schedule',
+                'type'          => 'textarea',
+                'rows'          => 5,
+                'placeholder'   => "2026-08-14 7:30 PM\n2026-08-15 7:30 PM\n2026-08-16 2:00 PM",
+                'instructions'  => 'One date per line: <code>YYYY-MM-DD</code> then an optional time (e.g. <code>2026-08-15 7:30 PM</code>). Leave the time off for an all-day entry. Add <code>@ Location</code> to override the location for that one date. List only the days the event actually happens — gaps are fine.',
+                'conditional_logic' => [ [ [ 'field' => 'field_promo_on_calendar', 'operator' => '==', 'value' => '1' ] ] ],
+            ],
+            [
+                'key'           => 'field_promo_event_location',
+                'label'         => 'Location',
+                'name'          => 'promo_event_location',
+                'type'          => 'text',
+                'placeholder'   => 'Tacoma Little Theatre',
+                'instructions'  => 'Default location for the dates above (a per-line <code>@ Location</code> overrides it).',
+                'wrapper'       => [ 'width' => '50' ],
+                'conditional_logic' => [ [ [ 'field' => 'field_promo_on_calendar', 'operator' => '==', 'value' => '1' ] ] ],
+            ],
+            [
+                'key'           => 'field_promo_event_category',
+                'label'         => 'Calendar category',
+                'name'          => 'promo_event_category',
+                'type'          => 'select',
+                'choices'       => function_exists( 'tlt_event_categories' ) ? tlt_event_categories() : [ 'special' => 'Special Event' ],
+                'default_value' => 'special',
+                'instructions'  => 'Sets the colour/label on the calendar.',
+                'wrapper'       => [ 'width' => '50' ],
+                'conditional_logic' => [ [ [ 'field' => 'field_promo_on_calendar', 'operator' => '==', 'value' => '1' ] ] ],
             ],
         ],
         'location' => [
@@ -206,6 +251,14 @@ add_action( 'acf/init', function () {
         'instruction_placement'  => 'label',
     ] );
 } );
+
+/**
+ * Hide the "Linked show" field from the promo edit UI. The meta is still
+ * written/read by the Show → homepage-promo auto-sync (via update_post_meta
+ * directly), so this is purely a UX cleanup — Chris doesn't get confused by
+ * a field that does nothing when filled manually.
+ */
+add_filter( 'acf/prepare_field/name=promo_linked_show', '__return_false' );
 
 /* ---------------------------------------------------------------------------
  * Admin list table — add Start / End / Zones / Status columns
@@ -252,18 +305,29 @@ add_action( 'manage_tlt_promotion_posts_custom_column', function ( $col, $post_i
     }
 }, 10, 2 );
 
+/**
+ * Normalise a promo date to Y-m-d. ACF date_picker can store Ymd (admin-saved)
+ * or Y-m-d (legacy/seeded); they must be normalised before any string compare,
+ * or "2026-08-01" < "20260101" gives wrong results (dash sorts before a digit).
+ */
+function tlt_promo_normalize_date( $v ) {
+    if ( ! $v ) return '';
+    if ( preg_match( '/^\d{4}-\d{2}-\d{2}$/', $v ) ) return $v;
+    if ( preg_match( '/^(\d{4})(\d{2})(\d{2})$/', $v, $m ) ) return "{$m[1]}-{$m[2]}-{$m[3]}";
+    return $v;
+}
+
 function tlt_promo_format_date( $iso ) {
     if ( ! $iso ) return '?';
-    // Stored as Y-m-d (per ACF return_format). Display friendly.
-    $t = strtotime( $iso );
+    $t = strtotime( tlt_promo_normalize_date( $iso ) );
     if ( ! $t ) return $iso;
     return date( 'M j, Y', $t );
 }
 
 function tlt_promo_status( $post_id ) {
     $today = function_exists( 'tlt_today' ) ? tlt_today() : current_time( 'Y-m-d' );
-    $s = get_post_meta( $post_id, 'promo_start_date', true );
-    $e = get_post_meta( $post_id, 'promo_end_date', true );
+    $s = tlt_promo_normalize_date( get_post_meta( $post_id, 'promo_start_date', true ) );
+    $e = tlt_promo_normalize_date( get_post_meta( $post_id, 'promo_end_date', true ) );
     if ( ! $s || ! $e ) return 'no-dates';
     if ( $today < $s ) return 'upcoming';
     if ( $today > $e ) return 'expired';
@@ -297,23 +361,11 @@ function tlt_get_active_promotions( $zone, $args = [] ) {
         'no_found_rows'  => true,
     ] );
 
-    // Helper: normalize date to Y-m-d. ACF date picker can store either
-    // Ymd (admin-saved) or Y-m-d (legacy/seeded). get_field() formats per
-    // the field's return_format; raw meta is the fallback.
-    $normalize = function ( $v ) {
-        if ( ! $v ) return '';
-        // Already Y-m-d
-        if ( preg_match( '/^\d{4}-\d{2}-\d{2}$/', $v ) ) return $v;
-        // Ymd → Y-m-d
-        if ( preg_match( '/^(\d{4})(\d{2})(\d{2})$/', $v, $m ) ) return "{$m[1]}-{$m[2]}-{$m[3]}";
-        return $v;
-    };
-
     $out = [];
     foreach ( $q->posts as $p ) {
-        // Date window check
-        $s = $normalize( get_post_meta( $p->ID, 'promo_start_date', true ) );
-        $e = $normalize( get_post_meta( $p->ID, 'promo_end_date', true ) );
+        // Date window check (normalise Ymd / Y-m-d before comparing)
+        $s = tlt_promo_normalize_date( get_post_meta( $p->ID, 'promo_start_date', true ) );
+        $e = tlt_promo_normalize_date( get_post_meta( $p->ID, 'promo_end_date', true ) );
         if ( ! $s || ! $e ) continue;
         if ( $today < $s || $today > $e ) continue;
 
@@ -466,14 +518,30 @@ function tlt_render_promo( $promo, $index = 0, $variant = 'feature-row' ) {
 function tlt_render_homepage_section( $section_key, $section_num, $eyebrow, $heading, $lede = '', $block_class = 'block' ) {
     $promos = tlt_get_active_promotions( 'homepage', [ 'homepage_section' => $section_key ] );
     if ( ! $promos ) return false;
+
+    // ACF overrides: if Chris filled in the home-page section fields, those win
+    // over the values page-home.php passed in. Helper falls back to its own
+    // defaults when neither is set.
+    if ( function_exists( 'tlt_home_field' ) ) {
+        $eyebrow = tlt_home_field( $section_key, 'eyebrow' ) ?: $eyebrow;
+        $heading = tlt_home_field( $section_key, 'title' )   ?: $heading;
+        $lede    = tlt_home_field( $section_key, 'lede' )    ?: $lede;
+    }
+    $buttons = function_exists( 'tlt_parse_home_buttons' )
+        ? tlt_parse_home_buttons( tlt_home_field( $section_key, 'buttons' ) )
+        : [];
     ?>
     <section class="<?php echo esc_attr( $block_class ); ?>" data-section-num="<?php echo esc_attr( $section_num ); ?>">
       <div class="container">
-        <div class="section-head">
-          <div class="eyebrow"><span class="num"><?php echo esc_html( $section_num ); ?></span> <?php echo esc_html( $eyebrow ); ?></div>
-          <h2><?php echo esc_html( $heading ); ?></h2>
-          <?php if ( $lede ) : ?><p><?php echo esc_html( $lede ); ?></p><?php endif; ?>
-        </div>
+        <?php if ( function_exists( 'tlt_render_home_section_head' ) ) : ?>
+          <?php tlt_render_home_section_head( $section_key, $section_num, $eyebrow, $heading, $lede ); ?>
+        <?php else : ?>
+          <div class="section-head">
+            <div class="eyebrow"><?php echo esc_html( $eyebrow ); ?></div>
+            <h2><?php echo esc_html( $heading ); ?></h2>
+            <?php if ( $lede ) : ?><p><?php echo esc_html( $lede ); ?></p><?php endif; ?>
+          </div>
+        <?php endif; ?>
         <?php if ( $section_key === 'support' ) : ?>
           <div style="display:flex;justify-content:center;gap:2rem;flex-wrap:wrap;align-items:center">
             <?php foreach ( $promos as $i => $p ) tlt_render_promo( $p, $i, 'support' ); ?>
@@ -481,6 +549,7 @@ function tlt_render_homepage_section( $section_key, $section_num, $eyebrow, $hea
         <?php else : ?>
           <?php foreach ( $promos as $i => $p ) tlt_render_promo( $p, $i, 'feature-row' ); ?>
         <?php endif; ?>
+        <?php if ( $buttons && function_exists( 'tlt_render_home_buttons' ) ) tlt_render_home_buttons( $buttons ); ?>
       </div>
     </section>
     <?php
@@ -737,3 +806,105 @@ function tlt_render_seed_promotions_page() {
     </div>
     <?php
 }
+
+/* ---------------------------------------------------------------------------
+ * "Feature on homepage" → linked promotion.
+ *
+ * When a Show's "Feature on homepage" box is on, keep a LINKED tlt_promotion in
+ * sync. On first enable we create the promo and populate it from the show
+ * (title, poster, ticket link, tagline). After that we ONLY sync the display
+ * window + publish state — never the wording/image — so Chris's edits in the
+ * Promotions tab are preserved (no drift, no clobber). Unchecking sets the promo
+ * to draft (recoverable); trashing the show trashes its linked promo.
+ * ------------------------------------------------------------------------- */
+
+/** Find the promotion linked to a show (any status), or 0. */
+function tlt_find_linked_promo( $show_id ) {
+    $ids = get_posts( [
+        'post_type'   => 'tlt_promotion',
+        'post_status' => [ 'publish', 'draft', 'pending', 'future' ],
+        'numberposts' => 1,
+        'fields'      => 'ids',
+        'meta_key'    => 'promo_linked_show',
+        'meta_value'  => (string) $show_id,
+    ] );
+    return $ids ? (int) $ids[0] : 0;
+}
+
+/** Set an ACF-style meta value + its field-key reference so ACF recognises it. */
+function tlt_set_acf_meta( $post_id, $name, $value, $field_key ) {
+    update_post_meta( $post_id, $name, $value );
+    update_post_meta( $post_id, '_' . $name, $field_key );
+}
+
+add_action( 'save_post_tlt_show', 'tlt_sync_show_homepage_promo', 20, 1 );
+function tlt_sync_show_homepage_promo( $show_id ) {
+    if ( wp_is_post_revision( $show_id ) || wp_is_post_autosave( $show_id ) ) return;
+    if ( get_post_type( $show_id ) !== 'tlt_show' ) return;
+    if ( get_post_status( $show_id ) === 'trash' ) return;
+
+    $feature  = get_post_meta( $show_id, 'show_feature_homepage', true ) === '1';
+    $promo_id = tlt_find_linked_promo( $show_id );
+
+    if ( ! $feature ) {
+        // Hide (don't delete) the linked promo.
+        if ( $promo_id && get_post_status( $promo_id ) === 'publish' ) {
+            wp_update_post( [ 'ID' => $promo_id, 'post_status' => 'draft' ] );
+        }
+        return;
+    }
+
+    // Compute the display window.
+    $from  = get_post_meta( $show_id, 'show_feature_from', true );
+    $until = get_post_meta( $show_id, 'show_feature_until', true );
+    if ( ! $until ) $until = get_post_meta( $show_id, 'show_close_date', true );
+    if ( ! $from )  $from  = function_exists( 'tlt_today' ) ? tlt_today() : current_time( 'Y-m-d' );
+
+    if ( ! $promo_id ) {
+        // Create + populate from the show (one time).
+        $promo_id = wp_insert_post( [
+            'post_type'   => 'tlt_promotion',
+            'post_status' => 'publish',
+            'post_title'  => get_the_title( $show_id ),
+        ] );
+        if ( is_wp_error( $promo_id ) || ! $promo_id ) return;
+
+        tlt_set_acf_meta( $promo_id, 'promo_linked_show', (string) $show_id, 'field_promo_linked_show' );
+        tlt_set_acf_meta( $promo_id, 'promo_locations', [ 'homepage' ], 'field_promo_locations' );
+        tlt_set_acf_meta( $promo_id, 'promo_homepage_section', 'standalone', 'field_promo_homepage_section' );
+        tlt_set_acf_meta( $promo_id, 'promo_priority', 50, 'field_promo_priority' );
+
+        $tagline = get_post_meta( $show_id, 'show_tagline', true );
+        if ( $tagline ) tlt_set_acf_meta( $promo_id, 'promo_body', $tagline, 'field_promo_body' );
+
+        $tix = get_post_meta( $show_id, 'show_ticket_url', true );
+        if ( $tix ) {
+            tlt_set_acf_meta( $promo_id, 'promo_cta_url', $tix, 'field_promo_cta_url' );
+            tlt_set_acf_meta( $promo_id, 'promo_cta_label', 'Buy Tickets', 'field_promo_cta_label' );
+        } else {
+            tlt_set_acf_meta( $promo_id, 'promo_cta_url', get_permalink( $show_id ), 'field_promo_cta_url' );
+            tlt_set_acf_meta( $promo_id, 'promo_cta_label', 'Learn More', 'field_promo_cta_label' );
+        }
+
+        $thumb_id = get_post_thumbnail_id( $show_id );
+        if ( $thumb_id ) {
+            tlt_set_acf_meta( $promo_id, 'promo_image', $thumb_id, 'field_promo_image' );
+        } else {
+            $ext = get_post_meta( $show_id, '_thumbnail_external_url', true );
+            if ( $ext ) update_post_meta( $promo_id, 'promo_image_url', $ext ); // seeded-fallback used by tlt_promo_image_url
+        }
+    } elseif ( get_post_status( $promo_id ) !== 'publish' ) {
+        wp_update_post( [ 'ID' => $promo_id, 'post_status' => 'publish' ] );
+    }
+
+    // ALWAYS sync the window (cheap, non-destructive); never touch wording/image.
+    tlt_set_acf_meta( $promo_id, 'promo_start_date', $from, 'field_promo_start_date' );
+    tlt_set_acf_meta( $promo_id, 'promo_end_date', $until, 'field_promo_end_date' );
+}
+
+// Trashing a show trashes its linked promo (keeps the Promotions list clean).
+add_action( 'wp_trash_post', function ( $post_id ) {
+    if ( get_post_type( $post_id ) !== 'tlt_show' ) return;
+    $promo_id = function_exists( 'tlt_find_linked_promo' ) ? tlt_find_linked_promo( $post_id ) : 0;
+    if ( $promo_id ) wp_trash_post( $promo_id );
+} );

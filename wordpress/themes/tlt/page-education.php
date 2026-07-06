@@ -17,6 +17,11 @@ get_header(); ?>
   }
   .edu-hero h1 { margin-bottom: 1rem; }
   .edu-hero .lead { max-width: 700px; margin: 0 auto 1.5rem; font-size: 1.1rem; line-height: 1.6; color: var(--color-text); }
+  /* Full intro blurb: centered column, left-aligned text, tight paragraph spacing */
+  .edu-blurb { max-width: 760px; margin: 0 auto; text-align: left; color: var(--color-text); }
+  .edu-blurb p { line-height: 1.6; margin: 0 0 0.8rem; }
+  .edu-blurb p:last-child { margin-bottom: 0; }
+  .edu-hero-cta { margin: 1.75rem 0 0; }
 
   .edu-section { padding: 3rem 0; }
   .edu-section h2 { color: var(--color-accent); text-align: center; margin-bottom: 0.5rem; }
@@ -68,9 +73,18 @@ get_header(); ?>
   .program-entry p { line-height: 1.6; color: var(--color-text); margin: 0; font-size: 0.95rem; }
 
   .philosophy { background: var(--color-soft); padding: 4rem var(--pad); }
-  .philosophy .inner { max-width: 800px; margin: 0 auto; text-align: center; }
+  .philosophy .inner { max-width: 880px; margin: 0 auto; text-align: center; }
   .philosophy h2 { color: var(--color-accent); }
   .philosophy p { line-height: 1.7; margin: 1rem 0; }
+  /* Benefit icon row (hero) */
+  .edu-tagline { max-width: 640px; margin: 0 auto; font-size: 1.2rem; line-height: 1.5; color: var(--color-text); }
+  .edu-benefits { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; max-width: 960px; margin: 2.75rem auto 0; text-align: center; }
+  @media (max-width: 760px) { .edu-benefits { grid-template-columns: 1fr 1fr; gap: 2.5rem 1.5rem; } }
+  @media (max-width: 420px) { .edu-benefits { grid-template-columns: 1fr; } }
+  .edu-benefit__icon { color: var(--color-accent); }
+  .edu-benefit__icon svg { width: 120px; height: 120px; display: block; margin: 0 auto 0.85rem; }
+  .edu-benefit h3 { font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.04em; margin: 0 0 0.4rem; color: var(--color-text); }
+  .edu-benefit p { margin: 0; font-size: 0.9rem; color: var(--color-muted); line-height: 1.45; }
 
   .scholarship-section {
     display: grid;
@@ -100,6 +114,12 @@ get_header(); ?>
     margin-bottom: 0.5rem;
   }
   .policies-grid p { font-size: 0.9rem; line-height: 1.6; margin: 0; }
+  /* More breathing room on the sides for phones (default --pad is only ~16px) */
+  @media (max-width: 600px) {
+    .edu-inner,
+    .edu-hero,
+    .philosophy { padding-left: 1.5rem; padding-right: 1.5rem; }
+  }
 </style>
 
 <?php
@@ -119,30 +139,44 @@ if ( is_array( $scholarship_image ) && ! empty( $scholarship_image['url'] ) ) {
 ?>
 <div class="edu-page">
 
-  <!-- Hero -->
+  <!-- Hero: tagline + benefit icons + CTA -->
   <div class="edu-soft-band">
     <div class="edu-inner edu-hero">
       <h1><?php echo esc_html( tlt_edu_field( 'hero_title' ) ); ?></h1>
-      <p class="lead"><?php echo esc_html( tlt_edu_field( 'hero_intro' ) ); ?></p>
+      <?php $edu_tagline = tlt_edu_field( 'hero_tagline' ); ?>
+      <?php if ( $edu_tagline ) : ?><p class="edu-tagline"><?php echo esc_html( $edu_tagline ); ?></p><?php endif; ?>
+      <div class="edu-benefits">
+        <?php
+        // Benefits: "Label | Description | icon" per line (icon = a file in assets/icons/).
+        $edu_benefits = [];
+        foreach ( preg_split( '/\r\n|\r|\n/', (string) tlt_edu_field( 'benefits' ) ) as $line ) {
+          $line = trim( $line ); if ( $line === '' ) continue;
+          $p = array_map( 'trim', explode( '|', $line ) );
+          $edu_benefits[] = [ $p[0], $p[1] ?? '', $p[2] ?? '' ];
+        }
+        $icon_dir = get_template_directory() . '/assets/icons/';
+        foreach ( $edu_benefits as $b ) :
+          $svg = ( $b[2] && is_readable( $icon_dir . $b[2] . '.svg' ) ) ? file_get_contents( $icon_dir . $b[2] . '.svg' ) : '';
+        ?>
+          <div class="edu-benefit">
+            <?php if ( $svg ) : ?><div class="edu-benefit__icon"><?php echo $svg; // inline SVG, recolored via CSS ?></div><?php endif; ?>
+            <h3><?php echo esc_html( $b[0] ); ?></h3>
+            <p><?php echo esc_html( $b[1] ); ?></p>
+          </div>
+        <?php endforeach; ?>
+      </div>
       <?php
         $hero_label = tlt_edu_field( 'hero_cta_label' );
         $hero_url   = tlt_edu_field( 'hero_cta_url' );
         if ( $hero_label && $hero_url ) :
       ?>
-      <p>
+      <p class="edu-hero-cta">
         <a href="<?php echo esc_url( $hero_url ); ?>"<?php echo $_edu_target( $hero_url ); ?> class="btn btn-primary"><?php echo esc_html( $hero_label ); ?></a>
       </p>
       <?php endif; ?>
     </div>
   </div>
 
-  <!-- Why Theatre Education? -->
-  <div class="philosophy">
-    <div class="inner">
-      <h2><?php echo esc_html( tlt_edu_field( 'why_heading' ) ); ?></h2>
-      <?php echo wp_kses_post( tlt_edu_field( 'why_body' ) ); ?>
-    </div>
-  </div>
 
   <!-- Currently Happening — driven by Promotions with location=education -->
   <?php
@@ -160,8 +194,17 @@ if ( is_array( $scholarship_image ) && ! empty( $scholarship_image['url'] ) ) {
   </div>
   <?php endif; ?>
 
+  <!-- Full intro blurb (moved below Currently Happening) -->
+  <?php if ( trim( wp_strip_all_tags( tlt_edu_field( 'hero_intro' ) ) ) !== '' ) : ?>
+  <div class="philosophy">
+    <div class="inner">
+      <div class="edu-blurb"><?php echo wp_kses_post( wpautop( tlt_edu_field( 'hero_intro' ) ) ); ?></div>
+    </div>
+  </div>
+  <?php endif; ?>
+
   <!-- Our Programs -->
-  <?php $programs = tlt_edu_field( 'programs' ); if ( ! is_array( $programs ) ) $programs = []; ?>
+  <?php $programs = function_exists( 'tlt_parse_edu_list' ) ? tlt_parse_edu_list( tlt_edu_field( 'programs' ) ) : []; ?>
   <?php if ( $programs ) : ?>
   <div class="edu-soft-band">
    <div class="edu-inner edu-section">
@@ -209,7 +252,7 @@ if ( is_array( $scholarship_image ) && ! empty( $scholarship_image['url'] ) ) {
     <img src="<?php echo esc_url( $scholarship_img_url ); ?>" alt="">
   </section>
 
-  <?php $policies = tlt_edu_field( 'policies' ); if ( ! is_array( $policies ) ) $policies = []; ?>
+  <?php $policies = function_exists( 'tlt_parse_edu_list' ) ? tlt_parse_edu_list( tlt_edu_field( 'policies' ) ) : []; ?>
   <?php if ( $policies ) : ?>
   <section class="edu-inner policies">
     <h2 style="color:var(--color-accent);text-align:center;margin-bottom:0"><?php echo esc_html( tlt_edu_field( 'policies_heading' ) ); ?></h2>

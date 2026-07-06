@@ -252,19 +252,246 @@ body.mobile-nav-open { overflow: hidden; }
 
    The Outsider sequence:
      1. background  — fade in
+     1b. overlays   — fade in at the same time (grain/vignette rides on top)
      2. podium      — rises from below
      3. front mics  — slide from the left
      4. back mics   — rise from below
      5. man         — slides from the right                                */
 .hero-layered [data-name$="-bg"]         { animation-delay: 0.05s; --layer-from: translate(0, 0); }
-.hero-layered [data-name$="-podium"]     { animation-delay: 0.50s; --layer-from: translateY(70%); }
-.hero-layered [data-name$="-front-mics"] { animation-delay: 0.95s; --layer-from: translateX(-70%); }
-.hero-layered [data-name$="-back-mics"]  { animation-delay: 1.40s; --layer-from: translateY(70%); }
-.hero-layered [data-name$="-person"]     { animation-delay: 1.85s; --layer-from: translateX(70%); }
+.hero-layered [data-name$="-overlays"]   { animation-delay: 0.05s; --layer-from: translate(0, 0); --layer-opacity: 0.55; }
+/* Physical subjects use solid slide-in (no fade during entry). Grain/bg
+   stays fade-in. Individual delay + --layer-from set below per layer. */
+.hero-layered [data-name$="-podium"],
+.hero-layered [data-name$="-front-mics"],
+.hero-layered [data-name$="-back-mics"],
+.hero-layered [data-name$="-person"],
+.hero-layered [data-name$="-bottle"],
+.hero-layered [data-name$="-lace"],
+.hero-layered [data-name$="-stamp"],
+.hero-layered [data-name$="-woman"],
+.hero-layered [data-name$="-pieces"],
+.hero-layered [data-name$="-ground"],
+.hero-layered [data-name$="-pipes"],
+.hero-layered [data-name$="-toilet"],
+.hero-layered [data-name$="-toilet-paper"],
+.hero-layered [data-name$="-back-sandwich"],
+.hero-layered [data-name$="-front-sandwich"] {
+  animation-name: layerSlideIn;
+  animation-fill-mode: both;
+  opacity: 1;
+}
+.hero-layered [data-name$="-podium"]     { animation-delay: 0.50s; --layer-from: translateY(80%); }
+.hero-layered [data-name$="-front-mics"] { animation-delay: 0.95s; --layer-from: translateX(-100%); }
+.hero-layered [data-name$="-back-mics"]  { animation-delay: 1.40s; --layer-from: translateY(80%); }
+.hero-layered [data-name$="-person"]     { animation-delay: 1.85s; animation-duration: 2.5s; --layer-from: translateX(100%); }
+
+/* Arsenic and Old Lace sequence:
+     1. background   — fade in
+     1b. overlays    — fade in with bg (same treatment as every show)
+     2. lace         — rises into place (doily settling from below)
+     3. bottle       — slides in from the right (dramatic pour entrance)
+     4. arsenic      — green splat scales up from its own center
+     5. smoke        — skull scales up from its base (smoke growing upward)
+   Scale layers use layerScaleIn keyframe + a transform-origin pinned to the
+   visible content's position on the 4800x2000 canvas (measured from the
+   layer PNG's non-transparent bbox center or bottom-center).                */
+.hero-layered [data-name$="-lace"]       { animation-delay: 0.35s; --layer-from: translateY(70%); }
+.hero-layered [data-name$="-bottle"]     { animation-delay: 0.75s; --layer-from: translateX(70%); }
+
+/* Hallmarked sequence:
+     1. background   — fade in
+     1b. overlays    — fade in with bg
+     2. stamp        — slides in from bottom (solid, no fade)
+     3. mountain     — fades in place after stamp lands
+     4. buildings    — fades in place after mountain
+     5. people       — fades in place after buildings
+     6. heart+star   — fade in place simultaneously after people           */
+/* Dot sequence:
+     1. background   — fade in
+     1b. overlays    — fade in with bg
+     2. woman        — slides in from bottom
+     3. pieces       — slides in from right (colored squares scattering)      */
+.hero-layered [data-name$="-woman"]      { animation-delay: 0.5s; animation-duration: 2.5s; --layer-from: translateY(100%); }
+.hero-layered [data-name$="-pieces"]     { animation-delay: 0.9s; animation-duration: 2.5s; --layer-from: translateX(100%); }
+
+/* Urinetown sequence:
+     1. background   — fade in
+     1b. overlays    — fade in with bg
+     2. ground       — slides in from bottom
+     3. pipes        — slides in from top
+     4. toilet       — slides in from left
+     5. toilet paper — slides in from right                                 */
+.hero-layered [data-name$="-ground"]       { animation-delay: 0.5s; --layer-from: translateY(100%); }
+.hero-layered [data-name$="-pipes"]        { animation-delay: 0.9s; --layer-from: translateY(-100%); }
+.hero-layered [data-name$="-toilet"]       { animation-delay: 1.3s; animation-duration: 2.5s; --layer-from: translateX(-100%); }
+.hero-layered [data-name$="-toilet-paper"] { animation-delay: 1.7s; animation-duration: 2.5s; --layer-from: translateX(100%); }
+
+/* Earnest sequence:
+     1. background      — fade in
+     1b. overlays       — fade in with bg
+     2. back sandwich   — slides in from top-right (diagonal)
+     3. front sandwich  — slides in from bottom-left (diagonal)             */
+.hero-layered [data-name$="-back-sandwich"]  { animation-delay: 0.5s; animation-duration: 2.5s; --layer-from: translate(100%, -100%); }
+.hero-layered [data-name$="-front-sandwich"] { animation-delay: 0.9s; animation-duration: 2.5s; --layer-from: translate(-25%, 100%); }
+
+/* The Play That Goes Wrong sequence — 3-state word morph:
+     0-25%   : each word slides in from a random off-screen direction to
+               its "state 1" (scrambled order) position.
+     25-50%  : hold at state 1.
+     50-70%  : words rearrange to their "state 2" (correct title) position.
+     70-85%  : hold at state 2.
+     85-100% : each word rotates to its "state 3" tilt.
+   Word images extracted from PTGW 2.psd (state 2 = base rest). Per-word
+   offsets and transform-origins computed from bbox deltas across the
+   three state PSDs. */
+.hero-layered [data-name$="-the"],
+.hero-layered [data-name$="-play"],
+.hero-layered [data-name$="-that"],
+.hero-layered [data-name$="-goes"],
+.hero-layered [data-name$="-wrong"] {
+  opacity: 1;
+  animation-fill-mode: both;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-duration: 7s;
+  animation-delay: 0.5s;
+}
+/* All words share the top-left corner of "The" as transform-origin so the
+   state-3 rotation swings the whole title around that anchor point.
+   The bbox (1996, 288) → (41.58%, 14.4%) of canvas. */
+.hero-layered [data-name$="-the"],
+.hero-layered [data-name$="-play"],
+.hero-layered [data-name$="-that"],
+.hero-layered [data-name$="-goes"],
+.hero-layered [data-name$="-wrong"] {
+  transform-origin: 41.58% 14.4%;
+}
+.hero-layered [data-name$="-the"]   { animation-name: ptgwThe;   }
+.hero-layered [data-name$="-play"]  { animation-name: ptgwPlay;  }
+.hero-layered [data-name$="-that"]  { animation-name: ptgwThat;  }
+.hero-layered [data-name$="-goes"]  { animation-name: ptgwGoes;  }
+.hero-layered [data-name$="-wrong"] { animation-name: ptgwWrong; }
+
+/* Rearrange staggered in a random order (Play → Wrong → The → That → Goes)
+   so it feels chaotic, not fluid. Everyone finishes rearranging by ~71%,
+   then holds at state 2 from 71% to 92% (a ~1.5s pause) before the whole
+   title rotates to state 3 at 92-100%. */
+@keyframes ptgwThe {
+  0%   { transform: translate(-120%, -120%); }
+  25%, 57% { transform: translate(0, 22.15%); }
+  65%, 92% { transform: translate(0, 0); }
+  100% { transform: translate(0, 0) rotate(20deg); }
+}
+@keyframes ptgwPlay {
+  0%   { transform: translate(120%, -120%); }
+  25%, 50% { transform: translate(0.10%, 22.25%); }
+  58%, 92% { transform: translate(0, 0); }
+  100% { transform: translate(0, 0) rotate(20deg); }
+}
+@keyframes ptgwThat {
+  0%   { transform: translate(-140%, 0); }
+  25%, 60% { transform: translate(0, -22.05%); }
+  68%, 92% { transform: translate(0, 0); }
+  100% { transform: translate(0, 0) rotate(20deg); }
+}
+@keyframes ptgwGoes {
+  0%   { transform: translate(140%, 0); }
+  25%, 63% { transform: translate(-18.92%, 22.80%); }
+  71%, 92% { transform: translate(0, 0); }
+  100% { transform: translate(0, 0) rotate(20deg); }
+}
+@keyframes ptgwWrong {
+  0%   { transform: translate(0, 140%); }
+  25%, 53% { transform: translate(20.13%, -49.55%); }
+  61%, 92% { transform: translate(0, 0); }
+  100% { transform: translate(0, 0) rotate(20deg); }
+}
+
+.hero-layered [data-name$="-stamp"]      {
+  animation-name: layerSlideRotateIn;
+  animation-delay: 0.5s;
+  --layer-from: translateY(100%) rotate(15deg);
+  /* Stamp extracted with 350px top bleed (layer 4800x2350, aspect 2.043).
+     Size by HEIGHT so the canvas portion (bottom 85% of layer) covers full
+     hero_h: layer at 117.5% of hero_h, top offset -17.5%. Natural aspect
+     makes the layer wider than hero_w on typical desktop aspects; the
+     excess is clipped by hero overflow:hidden. Stays a canvas-aligned
+     cover-fit even when hero aspect varies. */
+  inset: -17.5% auto auto 50%;
+  translate: -50% 0;
+  height: 117.5%;
+  width: auto;
+  object-fit: unset;
+}
+.hero-layered [data-name$="-mountain"]   { animation-delay: 2.3s;  --layer-from: translate(0, 0); }
+.hero-layered [data-name$="-buildings"]  { animation-delay: 3.0s;  --layer-from: translate(0, 0); }
+.hero-layered [data-name$="-people"]     { animation-delay: 3.7s;  --layer-from: translate(0, 0); }
+.hero-layered [data-name$="-heart"]      { animation-delay: 4.4s;  --layer-from: translate(0, 0); }
+.hero-layered [data-name$="-star"]       { animation-delay: 4.4s;  --layer-from: translate(0, 0); }
+.hero-layered [data-name$="-arsenic"] {
+  animation-name: layerScaleIn;
+  animation-delay: 1.9s;                /* starts just before bottle fully lands */
+  transform-origin: 54.7% 75%;          /* just right of the bottle tip (composition shifted +347px right in PSD) */
+}
+.hero-layered [data-name$="-smoke"] {
+  animation-name: layerScaleIn;
+  animation-delay: 2.75s;               /* 0.85s into arsenic — poison-fume overlap */
+  transform-origin: 53.2% 75%;          /* bottle tip on canvas — smoke rises from where the pour lands */
+  /* Smoke PNG is 4800x2250 (250px of bleed above canvas — the PSD's Smoke2
+     layer has content extending to y=-250). Display with natural aspect
+     (taller than hero), bottom-pinned; bleed sits above hero and is clipped
+     by overflow:hidden at scale(1), but as the layer scales down toward
+     scale(0), the off-canvas smoke content briefly falls within the hero
+     frame — the "full smoke" effect during scale-up. */
+  inset: auto 0 0 0;
+  height: auto;
+  width: 100%;
+  object-fit: unset;
+}
 
 @keyframes layerIn {
   from { opacity: 0; transform: var(--layer-from, translate(0, 0)); }
-  to   { opacity: 1; transform: translate(0, 0); }
+  to   { opacity: var(--layer-opacity, 1); transform: translate(0, 0); }
+}
+/* Scale-in variant: for layers that should grow from zero rather than slide.
+   Set transform-origin on the layer to control the anchor point (default
+   center of the FULL canvas PNG, which is usually wrong — pick the content
+   center as % of the canvas). */
+@keyframes layerScaleIn {
+  from { opacity: 0; transform: scale(0); }
+  to   { opacity: var(--layer-opacity, 1); transform: scale(1); }
+}
+/* Slide-only variant: slides in at full opacity, no fade. Use for solid
+   objects that should read as physical (a bottle entering the frame from
+   off-screen). Pair with `animation-fill-mode: both` and `opacity: 1` on
+   the layer so it stays hidden off-screen during the delay. */
+@keyframes layerSlideIn {
+  from { transform: var(--layer-from, translate(0, 0)); }
+  to   { transform: translate(0, 0); }
+}
+/* Slide + rotate variant: for objects that should tumble into place (e.g.
+   the Hallmarked stamp entering tilted from below and straightening).
+   --layer-from should be a compound like `translateY(100%) rotate(15deg)`. */
+@keyframes layerSlideRotateIn {
+  from { transform: var(--layer-from, translate(0, 0) rotate(0)); }
+  to   { transform: translate(0, 0) rotate(0); }
+}
+
+/* Ken Burns — slow zoom + gentle pan for single-image static heroes.
+   Long duration + linear reverse loop so the motion feels ambient, not looped. */
+@keyframes kenBurns {
+  0%   { transform: scale(1.00) translate(0%, 0%); }
+  100% { transform: scale(1.12) translate(-2%, 1.5%); }
+}
+
+/* Bedroom Farce — non-animated static hero with a Ken Burns pan.
+   The one layer (1-bg.jpg) covers the full hero, slowly zooms + drifts. */
+.hero-slug-bedroom-farce .hero-layer-1 {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transform-origin: center center;
+  opacity: 1;
+  animation: kenBurns 24s ease-in-out infinite alternate;
 }
 
 .hero-layered .hero-image-mobile { display: none; opacity: 1; }
@@ -272,9 +499,159 @@ body.mobile-nav-open { overflow: hidden; }
    text-shadows handle legibility. Override the 0.6 dim used for single-photo
    heroes. */
 
+/* Mobile: KEEP the animated layers (instead of falling back to the static
+   composite). The composite jpg stays in the DOM but hidden, so we can flip
+   back instantly if a specific show looks wrong on a real phone.
+
+   Two adjustments for portrait phones:
+   1. Timing — compressed ~75% of desktop. Phone users scroll fast, the full
+      2.3s desktop sequence felt slow on a small screen, but 50% felt rushed.
+   2. Framing — the PSDs are landscape (16:9-ish). On a portrait phone with
+      object-fit: cover, the center slice gets shown — which crops the
+      subject (the man is in the right ~30% of The Outsider's source). Shift
+      object-position rightward so the focal subject stays in frame. */
 @media (max-width: 700px) {
-  .hero-layered .hero-layers { display: none; }
-  .hero-layered .hero-image-mobile { display: block; }
+  .hero-layered .hero-layers { display: block; }
+  .hero-layered .hero-image-mobile { display: none; }
+
+  .hero-layered .hero-layer {
+    animation-duration: 2.1s;
+    /* Mobile PSDs are re-extracted with bleed past the canvas in all
+       directions so slide animations have content to expose beyond the
+       hero edges. Layer renders height-fit with natural aspect (slightly
+       wider than hero), centered. The hero's overflow:hidden clips the
+       bleed; slide animations move within that bleed envelope. */
+    inset: auto;
+    top: 0;
+    height: 100%;
+    width: auto;
+    max-width: none;
+    left: 50%;
+    translate: -50% 0;
+  }
+  /* Full slide distances on mobile (was smaller when layers used fade+slide
+     to hide the img-box edge — now they use solid slide, so the subject
+     must be fully off-screen at start). This may reveal a thin edge of the
+     PNG's transparent bleed area during mid-slide — which is invisible
+     anyway (alpha 0) as long as the bleed extends past the visible content. */
+  .hero-layered [data-name$="-bg"]         { --layer-from: translate(0, 0); }
+  .hero-layered [data-name$="-podium"]     { --layer-from: translateY(80%); }
+  .hero-layered [data-name$="-front-mics"] { --layer-from: translateX(-100%); }
+  .hero-layered [data-name$="-back-mics"]  { --layer-from: translateY(80%); }
+  .hero-layered [data-name$="-person"]     { --layer-from: translateX(100%); }
+  /* Numbered fallback delays (used when content-name rules don't match) */
+  .hero-layered .hero-layer-1 { animation-delay: 0.05s; }
+  .hero-layered .hero-layer-2 { animation-delay: 0.40s; }
+  .hero-layered .hero-layer-3 { animation-delay: 0.75s; }
+  .hero-layered .hero-layer-4 { animation-delay: 1.10s; }
+  .hero-layered .hero-layer-5 { animation-delay: 1.45s; }
+  .hero-layered .hero-layer-6 { animation-delay: 1.80s; }
+  /* Content-name rules — match the sequence used on desktop, compressed ~75%.
+     Overlays fade in at the same time as background (start of cycle) and
+     hold at reduced opacity on mobile because the grain/vignette reads much
+     heavier on a small portrait viewport. */
+  .hero-layered [data-name$="-bg"]         { animation-delay: 0.05s; }
+  .hero-layered [data-name$="-overlays"]   { animation-delay: 0.05s; --layer-opacity: 0.55; }
+  .hero-layered [data-name$="-podium"]     { animation-delay: 0.40s; }
+  .hero-layered [data-name$="-front-mics"] { animation-delay: 0.75s; }
+  .hero-layered [data-name$="-back-mics"]  { animation-delay: 1.10s; }
+  .hero-layered [data-name$="-person"]     { animation-delay: 1.45s; }
+  /* Arsenic mobile timing — match desktop delays exactly. Without these,
+     the numbered fallback rules above override the desktop content-name
+     delays and everything runs on the podium/mics/person schedule. */
+  .hero-layered [data-name$="-lace"]       { animation-delay: 0.35s; }
+  .hero-layered [data-name$="-bottle"]     { animation-delay: 0.75s; }
+  .hero-layered [data-name$="-arsenic"]    { animation-delay: 1.9s;  transform-origin: 40% 75%; }
+  .hero-layered [data-name$="-smoke"]      { animation-delay: 2.75s; transform-origin: 43.5% 78.5%; }
+  /* Hallmarked mobile timing — match desktop delays (same reason as
+     Arsenic: numbered fallback rules above would reset these). */
+  .hero-layered [data-name$="-mountain"]   { animation-delay: 2.3s; }
+  .hero-layered [data-name$="-buildings"]  { animation-delay: 3.0s; }
+  .hero-layered [data-name$="-people"]     { animation-delay: 3.7s; }
+  .hero-layered [data-name$="-heart"]      { animation-delay: 4.4s; }
+  .hero-layered [data-name$="-star"]       { animation-delay: 4.4s; }
+  /* Hallmarked mobile stamp — layer PNG 1200x1360 (viewport 4300x4875,
+     symmetric 800px horizontal + 350/250 vertical bleed). Canvas fills hero
+     at height 114% with -8.2% top offset. Aspect 0.88 makes layer wider
+     than hero_w; horizontal excess clipped by overflow. */
+  .hero-layered [data-name$="-stamp"] {
+    animation-delay: 0.5s;
+    inset: -8.19% auto auto 50%;
+    height: 114.04%;
+  }
+  /* Dot mobile timing — match desktop delays and 2.5s slide duration. */
+  .hero-layered [data-name$="-woman"]      { animation-delay: 0.5s; animation-duration: 2.5s; }
+  .hero-layered [data-name$="-pieces"]     { animation-delay: 0.9s; animation-duration: 2.5s; }
+  /* Urinetown mobile timing — match desktop delays; toilet + toilet paper
+     keep the 2.5s slower duration. */
+  .hero-layered [data-name$="-ground"]       { animation-delay: 0.5s; }
+  .hero-layered [data-name$="-pipes"]        { animation-delay: 0.9s; }
+  .hero-layered [data-name$="-toilet"]       { animation-delay: 1.3s; animation-duration: 2.5s; }
+  .hero-layered [data-name$="-toilet-paper"] { animation-delay: 1.7s; animation-duration: 2.5s; }
+  /* Earnest mobile timing — match desktop delays and 2.5s slide duration. */
+  .hero-layered [data-name$="-back-sandwich"]  { animation-delay: 0.5s; animation-duration: 2.5s; }
+  .hero-layered [data-name$="-front-sandwich"] { animation-delay: 0.9s; animation-duration: 2.5s; }
+
+  /* PTGW mobile — swap to mobile-specific keyframes with mobile bbox offsets,
+     rotate the other direction, pivot near the top-left of the backward G.
+     Restore 7s duration AND 0.5s delay for all five words (mobile base sets
+     2.1s duration; numbered fallback rules set staggered delays per layer
+     order — both would break the desktop-style parallel entry + grouped
+     rotation). */
+  .hero-layered [data-name$="-the"],
+  .hero-layered [data-name$="-play"],
+  .hero-layered [data-name$="-that"],
+  .hero-layered [data-name$="-goes"],
+  .hero-layered [data-name$="-wrong"] {
+    transform-origin: 82% 30%;
+    animation-duration: 7s;
+    animation-delay: 0.5s;
+  }
+  .hero-layered [data-name$="-the"]   { animation-name: ptgwMobileThe;   }
+  .hero-layered [data-name$="-play"]  { animation-name: ptgwMobilePlay;  }
+  .hero-layered [data-name$="-that"]  { animation-name: ptgwMobileThat;  }
+  .hero-layered [data-name$="-goes"]  { animation-name: ptgwMobileGoes;  }
+  .hero-layered [data-name$="-wrong"] { animation-name: ptgwMobileWrong; }
+
+  @keyframes ptgwMobileThe {
+    0%   { transform: translate(-120%, -120%); }
+    25%, 57% { transform: translate(0, 11.58%); }
+    65%, 92% { transform: translate(0, 0); }
+    100% { transform: translate(0, 0) rotate(-20deg) scale(1.1); }
+  }
+  @keyframes ptgwMobilePlay {
+    0%   { transform: translate(120%, -120%); }
+    25%, 50% { transform: translate(0.19%, 11.63%); }
+    58%, 92% { transform: translate(0, 0); }
+    100% { transform: translate(0, 0) rotate(-20deg) scale(1.1); }
+  }
+  @keyframes ptgwMobileThat {
+    0%   { transform: translate(-140%, 0); }
+    25%, 60% { transform: translate(0, -11.51%); }
+    68%, 92% { transform: translate(0, 0); }
+    100% { transform: translate(0, 0) rotate(-20deg) scale(1.1); }
+  }
+  @keyframes ptgwMobileGoes {
+    0%   { transform: translate(140%, 0); }
+    25%, 63% { transform: translate(-37.56%, 11.91%); }
+    71%, 92% { transform: translate(0, 0); }
+    100% { transform: translate(0, 0) rotate(-20deg) scale(1.1); }
+  }
+  @keyframes ptgwMobileWrong {
+    0%   { transform: translate(0, 140%); }
+    25%, 53% { transform: translate(39.93%, -25.87%); }
+    61%, 92% { transform: translate(0, 0); }
+    100% { transform: translate(0, 0) rotate(-20deg) scale(1.1); }
+  }
+  /* Smoke mobile has 700px top bleed AND 750px symmetric horizontal bleed
+     (its wisps extend to canvas x=-738). Layer PNG 1200x1421, aspect 0.844.
+     Positioned 16.4% higher and 16.4% taller than a canvas-only layer so
+     its canvas portion aligns exactly with the hero; the horizontal bleed
+     hides the layer-edge clip during scale-up. */
+  .hero-layered [data-name$="-smoke"]      {
+    top: -16.4%;
+    height: 116.4%;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -498,11 +875,13 @@ section.block > .container { position: relative; z-index: 1; }
   pointer-events: none;
   transition: height 0.95s cubic-bezier(0.6, 0, 0.25, 1);
 }
-#homeWipe.is-collapsing { height: var(--header-h, 84px); }
-#homeWipe.is-done { opacity: 0; transition: opacity 0.35s ease 0.05s; }
+#homeWipe.is-collapsing { height: var(--wipe-h, var(--header-h, 84px)); }
+/* No opacity fade after collapse — wipe and header are the same charcoal and
+   the wipe's final height is measured in JS to pixel-match the real header,
+   so we simply remove the element when the height transition completes. */
 
 /* While the wipe is collapsing on /home/, the real header should not flicker through.
-   Keep header below the wipe at z=auto; once #homeWipe is .is-done it fades out. */
+   Keep header below the wipe at z=auto; the wipe sits on top until removed. */
 
 @media (prefers-reduced-motion: reduce) {
   #splashWipe, #homeWipe { display: none !important; }
@@ -675,9 +1054,35 @@ a:hover > .promo-image,
 
 /* Show single page */
 .show-detail { padding: 3rem 0; }
+/* Announcement ribbon — eye-catching top-of-page note for limited-run events
+   (talkbacks, post-show panels, free previews, etc.). Renders only when the
+   show_announcement meta is non-empty. */
+.show-announcement {
+  background: var(--color-accent);
+  color: #fff;
+  padding: 0.85rem 0;
+  margin: -3rem 0 2.5rem; /* eat the .show-detail top padding so it sits flush */
+  border-top: 1px solid var(--color-accent-dark);
+  border-bottom: 1px solid var(--color-accent-dark);
+}
+.show-announcement p {
+  margin: 0;
+  font-weight: 600;
+  text-align: center;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+}
+@media (max-width: 600px) {
+  .show-announcement { margin-top: -2rem; padding: 0.7rem 0; }
+  .show-announcement p { font-size: 0.88rem; }
+}
 .show-detail .layout { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; }
 @media (max-width: 800px) { .show-detail .layout { grid-template-columns: 1fr; } }
 .show-detail .poster img { width: 100%; box-shadow: 0 12px 32px rgba(0,0,0,0.15); }
+.show-detail .poster .show-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0 0; }
+.show-detail .poster .show-actions .btn { flex: 1 1 calc(50% - 0.25rem); text-align: center; }
+@media (max-width: 800px) { .show-detail .poster .show-actions .btn { flex: 1 1 100%; } }
 /* Grid columns refuse to shrink below their content's intrinsic min-width by default,
    so a 854px-wide YouTube iframe in .info will push .poster smaller. Let .info shrink. */
 .show-detail .info { min-width: 0; }
@@ -689,11 +1094,60 @@ a:hover > .promo-image,
 /* Responsive 16:9 wrapper for any iframe (YouTube etc.) */
 .show-detail .info iframe { aspect-ratio: 16/9; width: 100%; height: auto; }
 .show-detail .info .dates { color: var(--color-accent); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+.show-detail .info .show-playwright { font-family: var(--font-display); font-size: 1.05rem; line-height: 1.2; color: var(--color-muted); margin: -1.25rem 0 1.5rem; letter-spacing: 0.02em; }
+.show-detail .info .tagline { font-style: italic; font-weight: 700; font-size: 1.1rem; line-height: 1.4; color: var(--color-text); margin: 0.25rem 0 0.75rem; }
 .show-detail .info .credits { color: var(--color-muted); margin-bottom: 1.5rem; }
-.show-detail .schedule { background: var(--color-soft); padding: 1.25rem; margin: 1.5rem 0; }
-.show-detail .schedule h3 { margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--color-text); }
-.show-detail .schedule p { margin: 0.2rem 0; font-size: 0.95rem; }
-.show-detail .content-warning { font-style: italic; padding: 1rem; background: #fff8e1; border-left: 4px solid var(--color-accent); margin: 1rem 0; font-size: 0.9rem; }
+/* Primary CTA under the show title — Buy Tickets is the most important
+   action, so it gets its own prominent line right after the headline. */
+.show-detail .info .show-buy-cta { margin: 0.5rem 0 1rem; }
+.show-detail .info .show-buy-cta .btn { padding: 0.85rem 2rem; font-size: 1rem; }
+/* Secondary "Audition for this show" CTA — shown when auditions are open.
+   Sits just below Buy Tickets. Outline red on white so it doesn't compete
+   with the primary Buy Tickets button but stays clearly clickable. */
+.show-detail .info .show-audition-cta { margin: 0 0 1.5rem; }
+.show-detail .info .show-audition-cta .btn {
+  background: transparent; color: var(--color-accent);
+  border: 2px solid var(--color-accent);
+  padding: 0.85rem 2rem; font-size: 1rem;
+}
+.show-detail .info .show-audition-cta .btn:hover {
+  background: var(--color-accent); color: #fff; text-decoration: none;
+}
+/* Showtimes & Tickets — free-form practical info card. Same shell as
+   At A Glance and Content Warning so the right column reads as a family. */
+.show-detail .show-perf { margin: 1.5rem 0; font-size: 0.95rem; }
+.show-detail .show-perf__header {
+  background: var(--color-accent); color: #fff;
+  font-weight: 700; font-size: 1rem;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 0.7rem 1rem;
+}
+.show-detail .show-perf__body { background: var(--color-soft); color: #000; padding: 1rem; line-height: 1.55; }
+
+/* Schedule (At A Glance) — same shell as content warning, but with a
+   charcoal header so the warning still wins the visual hierarchy. */
+.show-detail .schedule { margin: 1.5rem 0; font-size: 0.9rem; }
+.show-detail .schedule__header {
+  background: var(--color-accent); color: #fff;
+  font-weight: 700; font-size: 1rem;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 0.7rem 1rem;
+}
+.show-detail .schedule__body { background: var(--color-soft); color: #000; padding: 0.9rem 1rem; }
+.show-detail .schedule__body p { margin: 0; }
+.show-detail .schedule__body p + p { margin-top: 0.4rem; }
+/* Content warning — red header banner over a grey body. */
+.show-detail .content-warning { margin: 1rem 0; font-size: 0.9rem; }
+.show-detail .content-warning__header {
+  background: var(--color-accent); color: #fff;
+  font-weight: 700; font-size: 1rem;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 0.7rem 1rem;
+}
+.show-detail .content-warning__body { background: var(--color-soft); color: #000; padding: 0.9rem 1rem; }
+.show-detail .content-warning__subhead { font-weight: 700; margin: 0 0 0.4rem; color: #000; }
+.show-detail .content-warning__body p { margin: 0; }
+.show-detail .content-warning__body p + p { margin-top: 0.5rem; }
 
 /* Team archive grid */
 .team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.5rem; padding: 2rem 0; }
@@ -750,6 +1204,7 @@ body.splash-page { overflow: hidden; }
 
 /* Generic page */
 .page-header { padding: 3rem 0 1rem; border-bottom: 1px solid var(--color-line); margin-bottom: 2rem; }
+.page-header .season-tagline { margin: 0.5rem 0 0; font-size: 1.15rem; font-style: italic; color: var(--color-muted, #555); max-width: 60ch; }
 .page-content { padding-bottom: 4rem; max-width: 1080px; margin: 0 auto; }
 .page-content > article > h1:first-child,
 .page-content > h1:first-child { display: none; } /* the post title is rendered separately in .page-header */
@@ -1028,6 +1483,33 @@ body.splash-page { overflow: hidden; }
   .show-cast .cast-list li { flex-direction: column; align-items: flex-start; gap: 0.1rem; }
   .show-cast .cast-role { text-align: left; }
 }
+
+/* Dramaturgy lightbox (image slideshow opened from the View Dramaturgy button) */
+.dramaturgy-lightbox { position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.88); display: flex; align-items: center; justify-content: center; padding: 3rem 1.5rem; }
+.dramaturgy-lightbox[hidden] { display: none; }
+.dramaturgy-lightbox__inner { position: relative; width: 100%; max-width: 1000px; }
+.dramaturgy-lightbox__inner .show-photo-gallery { margin-top: 0; }
+.dramaturgy-lightbox__inner .section-heading { color: #fff; text-align: center; }
+.dramaturgy-lightbox__close { position: absolute; top: -2.6rem; right: 0; background: none; border: 0; color: #fff; font-size: 2.2rem; line-height: 1; cursor: pointer; padding: 0 0.25rem; }
+.dramaturgy-lightbox__close:hover { color: var(--color-accent); }
+
+/* Reviews (links out to external press) */
+/* Reviews — same shell as schedule & content warning (charcoal header,
+   grey body) so the fact-sheet column reads as one consistent family. */
+.show-reviews { margin: 1.5rem 0; font-size: 0.9rem; }
+.show-reviews__header {
+  background: var(--color-accent); color: #fff;
+  font-weight: 700; font-size: 1rem;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 0.7rem 1rem;
+}
+.show-reviews__body { background: var(--color-soft); color: #000; padding: 0.9rem 1rem; }
+.show-reviews .review-list { list-style: none; padding: 0; margin: 0; }
+.show-reviews .review-list li { padding: 0.25rem 0; }
+.show-reviews .review-list li + li { border-top: 1px solid rgba(0,0,0,0.08); margin-top: 0.25rem; padding-top: 0.5rem; }
+.show-reviews .review-list a { color: var(--color-accent); font-weight: 600; text-decoration: none; }
+.show-reviews .review-list a:hover { text-decoration: underline; }
+.show-reviews .review-list a::after { content: " \2197"; font-weight: 400; }
 
 /* Decade-archive list: per-show row with photos/program buttons (no bullets). */
 .archive-list { list-style: none; padding: 0; margin: 0; max-width: 720px; margin-left: auto; margin-right: auto; }

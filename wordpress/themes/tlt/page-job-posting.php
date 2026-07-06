@@ -17,9 +17,14 @@ get_header();
 while ( have_posts() ) : the_post();
     $eyebrow      = get_post_meta( get_the_ID(), 'job_eyebrow', true ) ?: 'Now Hiring';
     $meta         = get_post_meta( get_the_ID(), 'job_meta', true );
-    $thumb        = get_post_meta( get_the_ID(), 'job_thumb', true );
+    // Prefer the ACF image picker (job_image); fall back to the legacy job_thumb URL.
+    $thumb        = ( function_exists( 'get_field' ) ? get_field( 'job_image' ) : '' ) ?: get_post_meta( get_the_ID(), 'job_thumb', true );
     $apply_url    = get_post_meta( get_the_ID(), 'job_apply_url', true );
     $apply_intro  = get_post_meta( get_the_ID(), 'job_apply_intro', true );
+    $deadline     = get_post_meta( get_the_ID(), 'job_deadline', true );
+    $deadline_ts  = $deadline ? strtotime( $deadline ) : 0;
+    $deadline_str = $deadline_ts ? date_i18n( 'F j, Y', $deadline_ts ) : '';
+    $is_expired   = $deadline_ts && $deadline_ts < strtotime( current_time( 'Y-m-d' ) );
 ?>
 
 <style>
@@ -39,12 +44,30 @@ while ( have_posts() ) : the_post();
   .jp-hero__meta { margin: 0; font-size: 0.88rem; color: var(--color-muted); line-height: 1.5; }
 
   .jp-body { font-size: 1rem; }
-  .jp-body h2, .jp-body h3 {
-    font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.08em;
+  /* Primary body header — bigger than section heads but softer than them.
+     Mixed-case and lighter weight so a multi-line metadata block
+     (Title / Position / Department / Reports to) reads cleanly. */
+  .jp-body h1 {
+    font-size: 1.4rem; color: var(--color-accent);
+    margin: 2.25rem 0 1rem; padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--color-accent);
+    font-weight: 600; line-height: 1.5; letter-spacing: 0;
+    text-transform: none;
+  }
+  /* Section header — e.g. ESSENTIAL DUTIES AND RESPONSIBILITIES. */
+  .jp-body h2 {
+    font-size: 1.2rem; text-transform: uppercase; letter-spacing: 0.08em;
     color: var(--color-accent); margin: 2rem 0 0.75rem;
     padding-bottom: 0.5rem; border-bottom: 1px solid var(--color-line);
+    font-weight: 700;
   }
-  .jp-body h2:first-child, .jp-body h3:first-child { margin-top: 0; }
+  /* Sub-header inside a section — e.g. individual essential duties. */
+  .jp-body h3 {
+    font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--color-accent); margin: 1.4rem 0 0.4rem;
+    font-weight: 700; border: none; padding: 0;
+  }
+  .jp-body h1:first-child, .jp-body h2:first-child, .jp-body h3:first-child { margin-top: 0; }
   .jp-body p { line-height: 1.65; margin: 0 0 1rem; }
 
   .jp-body ul.job-positions { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.5rem; margin: 0; padding: 0; list-style: none; }
@@ -59,6 +82,7 @@ while ( have_posts() ) : the_post();
   .jp-apply { background: linear-gradient(135deg, var(--color-soft) 0%, #fff 100%); border: 1px solid var(--color-line); border-radius: 6px; padding: 2rem; text-align: center; margin-top: 2rem; }
   .jp-apply h2 { color: var(--color-text); border: none; padding: 0; text-transform: none; letter-spacing: 0; font-size: 1.3rem; margin: 0 0 0.5rem; }
   .jp-apply p { margin: 0 0 1.25rem; color: var(--color-muted); font-size: 0.95rem; }
+  .jp-apply .jp-deadline { color: var(--color-accent); font-size: 1rem; }
 </style>
 
 <div class="jp-page">
@@ -86,6 +110,9 @@ while ( have_posts() ) : the_post();
         <h2>How to Apply</h2>
         <?php if ( $apply_intro ) : ?>
           <p><?php echo esc_html( $apply_intro ); ?></p>
+        <?php endif; ?>
+        <?php if ( $deadline_str ) : ?>
+          <p class="jp-deadline"><strong>Apply by <?php echo esc_html( $deadline_str ); ?></strong></p>
         <?php endif; ?>
         <a class="btn btn-primary" href="<?php echo esc_url( $apply_url ); ?>">Email Your Application</a>
       </div>

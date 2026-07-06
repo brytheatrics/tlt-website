@@ -57,7 +57,6 @@ function tlt_calendar_types() {
         'audition'    => [ 'label' => 'Audition',    'color' => '#1f6f8b' ], // teal-blue
         'education_performance' => [ 'label' => 'Education Performance', 'color' => '#ea580c' ], // orange
         'fundraiser'  => [ 'label' => 'Fundraiser',  'color' => '#8a5a00' ], // amber
-        'club_tlt'    => [ 'label' => 'ClubTLT',     'color' => '#5a3e85' ], // plum
         'off_the_shelf'=>[ 'label' => 'Off the Shelf','color' => '#3a7d44' ], // green
         'education'   => [ 'label' => 'Education',    'color' => '#2f6f9f' ], // blue
         'rental'      => [ 'label' => 'Rental',       'color' => '#777' ],
@@ -126,11 +125,24 @@ function tlt_calendar_entries( $from, $to ) {
         $url   = get_permalink( $show );
         $title = get_the_title( $show );
         $venue = get_post_meta( $show->ID, 'show_venue_name', true );
+        // Map the show's program type to a calendar entry type so non-mainstage
+        // shows (Off the Shelf, ClubTLT, Education, Special events, etc.) get
+        // their own colour + label on the calendar instead of looking like a
+        // mainstage performance.
+        $ptype = get_post_meta( $show->ID, 'show_program_type', true ) ?: 'mainstage';
+        $perf_type_map = [
+            'mainstage'             => 'performance',
+            'off_the_shelf'         => 'off_the_shelf',
+            'murder_mystery_dinner' => 'special',
+            'education'             => 'education_performance',
+            'special'               => 'special',
+        ];
+        $perf_type = $perf_type_map[ $ptype ] ?? 'performance';
         foreach ( tlt_parse_schedule( get_post_meta( $show->ID, 'show_performances', true ) ) as $p ) {
             if ( ! $in_range( $p['date'] ) ) continue;
             $entries[] = [
                 'date' => $p['date'], 'time' => $p['time'], 'minutes' => tlt_time_to_minutes( $p['time'] ),
-                'title' => $title, 'type' => 'performance', 'url' => $url, 'external' => false,
+                'title' => $title, 'type' => $perf_type, 'url' => $url, 'external' => false,
                 'location' => $p['location'] ?: ( $venue ?: 'Tacoma Little Theatre' ),
             ];
         }
@@ -180,6 +192,37 @@ function tlt_calendar_entries( $from, $to ) {
                 ];
             }
             $cursor->modify( '+1 day' );
+        }
+    }
+
+    // ---- Promotions flagged "Also show on the calendar" ----
+    $promos = get_posts( [
+        'post_type'      => 'tlt_promotion',
+        'post_status'    => 'publish',
+        'posts_per_page' => -1,
+        'meta_key'       => 'promo_on_calendar',
+        'meta_value'     => '1',
+    ] );
+    foreach ( $promos as $promo ) {
+        $schedule = tlt_parse_schedule( get_post_meta( $promo->ID, 'promo_event_schedule', true ) );
+        if ( ! $schedule ) continue;
+        $cat   = get_post_meta( $promo->ID, 'promo_event_category', true ) ?: 'special';
+        $loc   = get_post_meta( $promo->ID, 'promo_event_location', true ) ?: 'Tacoma Little Theatre';
+        $title = get_the_title( $promo );
+        // Link to the promo's button URL, else its linked show, else nothing.
+        $link = get_post_meta( $promo->ID, 'promo_cta_url', true );
+        if ( ! $link ) {
+            $ls = (int) get_post_meta( $promo->ID, 'promo_linked_show', true );
+            if ( $ls ) $link = get_permalink( $ls );
+        }
+        foreach ( $schedule as $s ) {
+            if ( ! $in_range( $s['date'] ) ) continue;
+            $entries[] = [
+                'date' => $s['date'], 'time' => $s['time'], 'minutes' => tlt_time_to_minutes( $s['time'] ),
+                'title' => $title, 'type' => $cat, 'url' => $link,
+                'external' => tlt_is_external_url( $link ),
+                'location' => $s['location'] ?: $loc,
+            ];
         }
     }
 

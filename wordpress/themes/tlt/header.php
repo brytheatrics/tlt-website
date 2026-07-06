@@ -4,6 +4,16 @@
 <meta charset="<?php bloginfo( 'charset' ); ?>">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="profile" href="https://gmpg.org/xfn/11">
+<?php
+// On the splash → home transition the browser sometimes paints a white frame
+// between unloading /splash/ and painting /home/, which reads as a flash
+// against the charcoal wipe. Setting the root background to the wipe color
+// in static CSS (BEFORE any JS runs) kills that race. Body is white and
+// covers html, so this has no visible effect during normal use.
+if ( is_page( 'splash' ) || is_page( 'home' ) || is_front_page() ) :
+?>
+<style>html { background: #272727; }</style>
+<?php endif; ?>
 <?php wp_head(); ?>
 </head>
 <body <?php body_class(); ?>>
@@ -11,20 +21,42 @@
 <?php if ( is_page( 'home' ) ) : ?>
 <script>
   // Splash → Home wipe: when we arrive from /splash/, insert a charcoal cover
-  // BEFORE the header markup renders, then collapse it down to header height
-  // once DOMContentLoaded fires. Inserting here (not on DOMContentLoaded) is
-  // what kills the flash — the wipe is in the DOM before the header paints.
+  // BEFORE the header markup renders, then collapse it down to the REAL
+  // header+banner height once DOMContentLoaded fires. Inserting here (not on
+  // DOMContentLoaded) is what kills the initial flash — the wipe is in the
+  // DOM before the header paints.
   (function () {
     try {
       if (sessionStorage.getItem('tlt_splash_to_home') !== '1') return;
       if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       sessionStorage.removeItem('tlt_splash_to_home');
 
+      // Paint the root background charcoal IMMEDIATELY. Browsers sometimes
+      // flash a white frame between unloading /splash/ and painting /home/;
+      // setting html bg to the same charcoal as the wipe makes that gap
+      // invisible (and also catches any sub-pixel mis-alignment later).
+      document.documentElement.style.background = '#272727';
+
       var w = document.createElement('div');
       w.id = 'homeWipe';
       document.body.appendChild(w);
 
+      function measuredHeaderH() {
+        // Measure real header (+ optional sitewide banner) so the wipe's final
+        // height matches what's actually there. Hardcoded --header-h was off
+        // by a few px at certain breakpoints, leaving a stripe of page content
+        // exposed during the opacity fade — that's the "flash" we want gone.
+        var hdr = document.querySelector('.site-header');
+        var banner = document.querySelector('.sitewide-banner');
+        var h = 0;
+        if (banner) h += banner.getBoundingClientRect().height;
+        if (hdr)    h += hdr.getBoundingClientRect().height;
+        return h ? Math.ceil(h) : 84; // fallback to CSS default
+      }
+
       document.addEventListener('DOMContentLoaded', function () {
+        // Lock the wipe's final height to the actual rendered chrome height.
+        w.style.setProperty('--wipe-h', measuredHeaderH() + 'px');
         requestAnimationFrame(function () {
           requestAnimationFrame(function () {
             w.classList.add('is-collapsing');
@@ -35,8 +67,10 @@
       function done(ev) {
         if (ev && ev.propertyName && ev.propertyName !== 'height') return;
         w.removeEventListener('transitionend', done);
-        w.classList.add('is-done');
-        setTimeout(function () { if (w.parentNode) w.remove(); }, 500);
+        // No fade — the wipe and header are the same charcoal and now
+        // pixel-aligned, so we just remove it. Removing instantly avoids the
+        // 0.35s opacity transition that was the source of the flash.
+        if (w.parentNode) w.remove();
       }
       w.addEventListener('transitionend', done);
       // Safety: kill the wipe after the longest reasonable duration

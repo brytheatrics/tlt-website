@@ -8,8 +8,8 @@ TLT website migration: Squarespace → self-hosted WordPress.
 
 - **Live site (Squarespace):** https://www.tacomalittletheatre.com — still receiving real traffic
 - **Local dev (Local Sites):** http://tlt.local — full migrated site, where all work happens
-- **Production host (planned):** Cloudways DigitalOcean Micro ($14/mo) — not yet provisioned
-- **Domain:** GoDaddy; will repoint DNS to Cloudways at cutover
+- **Production host:** Cloudways DigitalOcean Micro ($14/mo) — paid subscription active
+- **Domain:** `.com` is registered/DNS at **Squarespace** (repoint here at cutover). `.org` and `.net` are GoDaddy and auto-forward to `.com` — won't need touching unless we want them to hit the new host directly.
 
 ## Where things live
 
@@ -40,53 +40,109 @@ pymysql.connect(host='127.0.0.1', port=10005, user='root', password='root', data
 
 `page-home.php`, `page-splash.php`, `page-visit.php`, `page-contact.php`, `page-board-and-staff.php`, `page-auditions.php`, `page-ticketinfo.php`, `page-season-tickets.php`, `page-donation-request.php`, `page-press.php`, `page-press-post.php`, `page-job-openings.php`, `page-job-posting.php`, `page-off-the-shelf.php`, `page-education.php`, `page-prior-seasons.php`, `page-post-listing.php`, `page-ticketing.php`, `page-designed.php`, `page-campaign.php`, `page-styleguide.php`, `page-calendar.php`
 
-## Recent work (most recent session — May 29 2026)
+## Recent work (most recent session — late June 2026)
 
-- **Site calendar (NEW feature)** — `/calendar/` page (`page-calendar.php`): month grid + agenda, prev/next month nav via pretty URLs `/calendar/YYYY-MM/` (rewrite rule in `includes/calendar.php`; `?ym=` still works as fallback), color-coded by type. Data layer in theme `includes/calendar.php` (`tlt_calendar_entries($from,$to)`) merges three sources: show **performances** (`show_performances` meta), show **auditions** (`show_audition_schedule` meta), and **events** (`tlt_event`). Calendar icon added to the header next to search (`header.php`, `.site-cal-link`). Uses `tlt_today()` so it respects the pre-launch date override. All 7 **2026-27 shows have real performances + auditions** imported from the Callboard CSV via `wordpress/import/import_callboard_dates.py` (imports only `Performance` + `Auditions` rows; skips internal rehearsal/tech/meeting rows). Auditions default to TLT location; Outsider's Tuesday session overridden to STAR Center. Re-run the importer if the Callboard CSV updates (it matches names within the **2026-2027 season only**, so revivals like The Play That Goes Wrong — which also has a 2023-24 record — don't steal the match). Auditions link to Casting Manager (`TLT_AUDITION_SIGNUP_URL` in `calendar.php`, per-show override via `show_audition_signup_url`). Grid badges show just the name (colour = type); the agenda spells out "Performance:" / "Auditions:". **Education Performances** (category `education_performance`, distinct orange badge — reusable for camp showcases, fall class shows, etc.): summer-camp-2026 lineup (Oliver! JR., High School Musical JR., Trolls JR., Xanadu JR.) seeded as `tlt_event`s via `wordpress/import/import_summer_camp_2026.py` (sourced from the `/summer-camp-2026/` page; idempotent, clears prior `camp-2026-*` events first).
+- **Show page final layout** — `single-tlt_show.php` rewritten to a clean left/right split.
+  - **Left column:** poster + Videos (Cityline + show_video_urls) only. Minimizes the eye bouncing back and forth.
+  - **Right column, top-to-bottom:** Cancelled badge → Dates → Title → "by Playwright" → Tagline (bold italic) → Buy Tickets CTA → Credits → Presented At (when set) → Synopsis (body content) → **Showtimes & Tickets** card → **At A Glance** card → **Content Warning** card → Cast → View Program + View Dramaturgy buttons → **Reviews** card.
+  - Three structured card components share the same shell (red `--color-accent` header bar + grey `--color-soft` body): At A Glance, Content Warning, Reviews.
+  - Content Warning has its own internal structure: `CONTENT WARNING` red bar → `This production of [Show] includes the following:` subhead → warning body.
 
-- **ACF-ified hardcoded templates** — Education got the full treatment (5 tabs: Hero / Why / Programs / Scholarships / Policies, with repeaters for programs and policies). Visit / Off the Shelf / Auditions / Season Tickets / Ticket Info / Donation Request / Press / Job Openings got "hero-only" ACF (eyebrow pill + title + lede). Pattern: helpers `tlt_register_hero_acf_group()` and `tlt_hero_field()` in `includes/acf-page-templates.php`. Defaults baked in so pages render identically without Chris editing.
-- **Editor auto-reload after template switch** — when Chris picks an ACF-managed template and saves, page reloads automatically so the ACF panel appears (was: manually navigate back to Pages → re-open)
-- **Promotion fixes** — `promo_cta_url` field type changed from `url` (rejected `/board-and-staff/`) to `text`; date filter normalizes both `Ymd` (admin-saved) and `Y-m-d` (legacy/seeded)
-- **2627 posters extracted + wired** — all 7 shows in the 2026-2027 season have their poster PSDs extracted to `/wp-content/uploads/posters/2627/<slug>.jpg` and linked via `show_hero_image_url` + `_thumbnail_external_url`
-- **2627 hero animation refreshed** — new 6-layer PSD with added "Overlays" layer, renumbered so Overlays sits on top. Files at `/wp-content/uploads/hero-layers/the-outsider/`, old layers backed up to `the-outsider.bak/`
-- **Show photo gallery → slideshow** — `single-tlt_show.php` Production Photos section now renders as a slideshow (arrows, dots, counter, keyboard, swipe) instead of a wall of thumbnails
-- **Pre-2010 show mockup** — `/shows/1776-0506/` is the first proof-of-concept for option-1 (per-show pages for ancient shows). Photo gallery from `\\TLT-SERVER\TLT Photos\0506 Production Photos\1776`, program PDF linked
-- **Decade-archive button pattern** — `/2000-2010/` has 2005-06 mocked with `[📷 Photos] [📄 Program]` buttons per show (only when the source exists). `.archive-list` + `.archive-btn` CSS lives in theme `style.css`. Pattern ready to roll out to other seasons/decades
-- **Local ACF install fix** — ACF wasn't installed locally; `active_plugins` serialized length was also wrong (would silently break ALL plugins). Both fixed.
-- **Production photos imported (Job A)** — `wordpress/import/import_production_photos.py` copied/resized photos for all **92** matched DB shows → `/wp-content/uploads/productions/<slug>/NN.jpg` (cap 20, Marketing JPEG copied verbatim, TLT Photos resized to 1600px), set `show_photo_gallery` meta. 1,600 photos, 428 MB.
-- **Archival show pages created (Job B)** — `wordpress/import/create_archive_shows.py` created **52** new `tlt_show` pages (1776 pattern) for shows that had photos on `\\TLT-SERVER\TLT Photos` but no DB record, going back to Carnival (1966). Derives/dedups titles, assigns `tlt_season` taxonomy, imports photos (894 total). Dates: real month-span when the folder names a month, else a **season label** (`show_season_label`, e.g. "2006–2007 Season"). `single-tlt_show.php` now falls back to that label when exact dates are absent. 20 non-show folders (Education, galas, Off the Shelf, ClubTLT, promo) deliberately skipped. **Total now: 144 shows with galleries, 2,494 photos, 610 MB.**
-- **Fixed mis-matched galleries** — the photo-report matcher linked some folders to a same-titled but DIFFERENT production (by title, ignoring season). Found 5 live cases via an authoritative audit (`build_sources()` source-season vs show open-year): Arsenic 2026 ← Arsenic 2001-02, Annie 2010 ← Annie Get Your Gun 2004-05, Complete Works 2013 ← 2002-03, Six Dance 2012-13 ← 2009-10, Scrooge 2014 ← 2018 (already correct on scrooge-the-musical). `wordpress/import/fix_mismatched_galleries.py` cleared the wrong galleries and re-homed the photos to 4 new archival records (`*-0102/0405/0203/0910`). If more photos look wrong on a show, re-run that audit.
-- **Decade-archive rollout + /shows/ cutoff** — `includes/archive-decades.php` (new) parses each decade post's `<h2>season</h2><ul>` body and re-renders every season as the 2005-06-style `archive-list` with [📷 Photos] (links to the `tlt_show` page when one with photos exists) + [📄 Program] buttons. Wired into BOTH `single.php` (decade pages) AND the **Earlier Seasons** section of `archive-tlt_show.php` on `/shows/` (replaced the old compact name→PDF bullet grid). Decade pages with year-headed bullet content (1918-2010) render from the post body; modern decades whose body has no season bullets (e.g. 2010-2020) fall back to `tlt_decade_record_sections()` which builds the per-season lists from `tlt_show` records. `/shows/` card grids use the **has-poster** rule (+ pre-2010 season cutoff). Matching is season-start-year + normalized title (+ containment fallback) — ~34 of the pre-2010 galleries currently match a decade-list name; the rest miss on title differences (folder name vs listed name). The `.archive-list`/`.archive-row` CSS was un-scoped from `.page-content` so it styles correctly in both `.page-content` (decade pages) and `.container` (/shows/). Button icons are inline Material SVGs (`fill="currentColor"`, in `tlt_render_archive_list`). NOTE: migrated decade posts open with empty Squarespace wrapper `<div>`s whose closing tags get dropped during section extraction — `tlt_parse_decade_body` now blanks/​balances the intro so those don't leak and constrain the footer.
-- **2000-2010 visibility fixed** — it was missing from Past Decades (`page-prior-seasons.php`) and Earlier Seasons because its `_migration_legacy_url` is `/blog/tag/2000-2010` while the templates only matched `/blog/2015/`. Broadened both regexes to `/blog/(2015|tag)/`.
-- **Duplicate decade posts deduped** — 4 decade/year summaries had two published copies with identical slugs (1918-1930, 1940-1950, 1990-2000, 2012-2013), which made `single.php` render each season twice. Trashed the redundant copy (kept the `/blog/2015/` canonical) and appended `__trashed` to the trashed slug so the canonical owns the URL (raw-SQL trash without the rename 404s the page).
-- **Import gotchas fixed** — three classes, both scripts now handle them:
-  1. macOS `._` AppleDouble files (sort first, break PIL) → skipped.
-  2. Photos nested in subfolders (`corrected/`/`originals/`/by-date) → both scripts walk the tree.
-  3. **Wrong-content folders** — the report's `best_set` sometimes pointed at a show's `Headshots\JPEG` instead of `Production Photos\JPEG` (Luck of the Irish, Rocky, Seussical, A Christmas Story, A Doll's House Part 2 all pulled headshots originally). Fixed: `list_images` now SCORES every image folder under the show root — `Production Photos`/`Production Stills` +100, press/release +40, jpeg/web +10, and `Headshots`/`Bios`/`Lobby`/`Preview`/`Poster`/`Audition` −1000 — and picks the best. Job A passes the marketing show ROOT (not best_set) so the scorer can choose. Audited all 144: 0 wrong-content folders remain. Worth reusing for any future server import.
-- **Cityline interview integration** *(prior)* — `show_cityline_url` field; 43 historical interviews bulk-imported
-- **Splash → home wipe** *(prior)* — moved injection from page-home.php DOMContentLoaded to header.php right after wp_body_open()
-- **Mobile drawer + header z-index fix** *(prior)*
-- **Tickets consolidation** *(prior)* — `/tickets/` is the full ticket-info page; `/ticketinfo/` trashed
-- **PDF links** *(prior)* — `target="_blank"`
-- **Volunteer link** *(prior)* — external to tlt.ludus.com
+- **"Recommended for Ages" smart formatting** — `single-tlt_show.php` collapses to one inline line.
+  - `12+` → **"Recommended for Ages: 12+"**
+  - `All Ages` / `General Audiences` / `Family Friendly` → **"Recommended for All Ages"** etc. (the keyword inline, no "Ages:" prefix)
+  - Detection regex in the template; case-insensitive.
+
+- **Playwright field upgrade** — `show_playwright` is now a textarea (was single text input) that supports two formats:
+  - Single name (e.g. `Aaron Sorkin`) → auto-prefixed with "by " on the front end.
+  - Multi-line musical credits (`Book by …` / `Music by …` / `Lyrics by …`) → rendered verbatim with `<br>` between lines.
+  - Detection: regex catches lines starting with `Book|Music|Lyric|Word|Adapted|Based|Conceived|Story|Written|Libretto|by`. Otherwise prefixes "by".
+  - Save uses `sanitize_textarea_field` so newlines survive.
+
+- **Showtimes & Tickets free-form card** — new meta `show_performance_details` (textarea, in `tlt-post-types.php` show meta box). Practical info that used to clutter the body (performance times, ticket prices, double-cast schedule, ASL/PWYC nights) gets its own red-header card between the synopsis and At A Glance. Free-form, ~8 rows in admin; renders verbatim with `nl2br`.
+
+- **Top-of-page announcement ribbon** — new meta `show_announcement` (textarea). Renders as a TLT-red ribbon at the very top of the show page (`.show-announcement`) for limited-run events ("Join us on opening night for a talkback…"). Clearing the field hides the ribbon. Styling in `style.css`.
+
+- **Admin show meta box reorganized** — `tlt_render_show_meta()` now emits fields in the same order they appear on the front-end show page (Announcement → Cancelled → Dates → Hero → Credits → Presented At → Showtimes & Tickets → At A Glance → Content Warning → Cast → Program & Dramaturgy → Reviews → Videos → Poster & Photos → Promote on Homepage → Auditions → Calendar Schedules → Other/Admin). Inline helpers `$text_field()` and `$section()` declared at the top of the function.
+
+- **Home page ACF (Chris-editable headlines/buttons)** — `page-home.php` added to `tlt_acf_managed_templates()`. New ACF field group "Home Page — Sections" with 6 tabs (Onstage / Education / Special Events / Get Involved / Support / Sponsors). Each tab: eyebrow + headline + lede + "hide number badge" toggle + buttons textarea. Buttons format: `Label | URL | new` per line (the `| new` suffix opens in new tab). Defaults baked into `tlt_home_section_defaults()` so pages render identically without Chris editing. Helpers: `tlt_home_field()`, `tlt_home_hide_number()`, `tlt_parse_home_buttons()`, `tlt_render_home_buttons()`, `tlt_render_home_section_head()` in `includes/acf-page-templates.php`. `tlt_render_homepage_section()` (in `tlt-post-types/includes/promotions.php`) now consumes the ACF overrides and renders the buttons row.
+
+- **Calendar program-type → entry-type mapping** — show performances on the calendar now honor `show_program_type` for color/label (previously always rendered red "Performance"). Mapping in `includes/calendar.php`: mainstage → performance, off_the_shelf → off_the_shelf, murder_mystery_dinner → special, education → education_performance, special → special. **Removed unused types `club_tlt` and `childrens`** from both the show program-type dropdown AND the event-category dropdown (0 records using either).
+
+- **Splash → home wipe flash fix** — dynamic header height measurement in `header.php` (was hardcoded `--header-h: 84px`; real header is 77-83px depending on breakpoint, more if a sitewide banner is active). Replaced the `.is-done` opacity fade-out with instant removal (the fade was the source of the visible flash when the wipe was misaligned by even a few pixels). Plus `<style>html { background: #272727 }</style>` injected in `<head>` on splash/home pages so the inter-page navigation "white frame" can't show through (was an intermittent flash). See `header.php` lines 1-50 and `style.css` `#homeWipe` block.
+
+- **YouTube/Vimeo embed helper** — new `tlt_video_embed_url()` in `functions.php` normalizes any YouTube share URL (youtu.be/, watch?v=, /shorts/, /embed/) to the iframe-embeddable form. Fixes "refused to connect" when Chris pastes a share URL into `show_video_urls`. Preserves `?t=` start time. Applied in `single-tlt_show.php` videos loop.
+
+- **2627 posters re-extracted from server** — `C:/temp/extract_2627_posters.py` re-ran against the latest PSDs at `\\TLT-SERVER\Marketing\2627 Marketing\2627 Posters\` (most modified June 9 2026 — newer than my first extraction). All 7 show posters now at `/wp-content/uploads/posters/2627/` (1600×2400 each, ~600 KB).
+
+- **Mobile layered hero (in progress, blocker for launch — see Outstanding #5)** — implemented `<picture>`-element swap in `page-home.php` so a `mobile/` subfolder under `hero-layers/<slug>/` serves portrait-oriented versions of the layered PNGs to phones; desktop sees the original landscape layers. Browser picks via `<source media="(max-width: 700px)">`.
+  - **The Outsider** has its mobile layers extracted from `\\TLT-SERVER\Marketing\2627 Marketing\2627 Posters\1 The Outsider\Hero Animation\The Outsider Hero - Copy.psd` (2700×4269 canvas) to `/wp-content/uploads/hero-layers/the-outsider/mobile/`. **Extraction is iterating** — the user is tweaking the design.
+  - **Arsenic and Old Lace** mobile PSD is finished by the user and ready to test next (same workflow as The Outsider).
+  - **CRITICAL design rule for hero PSDs:** the visible canvas defines the composition Chris sees, BUT each animated layer needs to extend past the canvas in the direction it slides from (man enters from right → layer canvas needs transparent space to the right; podium rises from below → layer canvas extends below). **The crop must not cut off the animation.** Extraction script (`C:/temp/extract_outsider_mobile.py`) composites each layer onto a viewport ~50% wider than canvas in horizontal and ~12% taller — that's the bleed envelope. CSS in the mobile `@media` block scales layers natural-aspect height-fit, centered; slide distances reduced to 20% (X) and 5% (Y) so the IMG-box edge stays inside the bleed.
+
+- **Reviews archive recovery — MASSIVE** — Wayback Machine sweep recovered **451 review files** across 13 publications spanning 2007-2024.
+  - **`archive/reviews/`** (in repo, gitignored — copyright stays internal) — 247 reviews mentioning TLT productions, organized into per-publication subfolders.
+  - **`C:/Users/blake/Documents/Blake-Reviews/`** — 204 reviews mentioning Blake R. York across his career (TLT and other venues), also per-publication.
+  - Sources covered: The Suburban Times (defunct domain — Wayback only), Weekly Volcano, Tacoma Weekly, Heilman & Haver, Dresdner's Theatre Reviews, Drama in the Hood, The Sound on Stage, Alec Clayton, AXS, Tacoma News Tribune, OLY ARTS, Shows I've Seen, South Sound Arts.
+  - Build scripts at `C:/temp/`: `sweep_blake.py`, `sweep_curated.py`, `sweep_era.py`, `sweep_blogs.py`, `sweep_dith.py`, `sweep_extras.py`, `sweep_nt.py`, then `organize_by_pub.py`. Each markdown file has frontmatter: title / source / date / original URL / snapshot URL / body.
+  - **Index:** `archive/reviews/tlt_review_match.csv` — every show's stored review URLs vs. what content I recovered.
+
+- **96 review URLs swapped to Wayback in `show_reviews`** — `show_reviews` field on 62 shows now points at Wayback snapshots for dead URLs (Suburban Times domain entirely defunct, plus dead Tacoma Weekly / Weekly Volcano / Heilman & Haver paths). Two rounds: first used the local archive's snapshot URLs (51 URLs), second used the Wayback availability API for URLs not in our archive (45 URLs). **Audit log:** `archive/reviews/wayback_replacements.tsv` (97 rows, columns `show_id | title | reason | old_line | new_line`; reasons are `DEAD-DOMAIN` / `DEAD-PROBE` / `WAYBACK-API`). 26 reviews are truly gone (no Wayback snapshot exists) — left as-is.
+
+- **Cloudways deploy pipeline is live** — paid subscription active, SSH public key added, `deploy/cloudways.json` has real creds (`ssh_host: 64.23.180.12`, `ssh_user: master_vdrkzztcte`, `app_folder: dtvxxevyxd`, `temp_url: https://wordpress-1633814-6469148.cloudwaysapps.com`). Latest push done via the toolkit: theme + plugin + DB (160 shows, 8 events, 8 promos) + 2627 posters + The Outsider hero-layers (desktop + mobile). Search-replace `tlt.local` → temp URL ran cleanly. **Site is live at the temp URL** for testing.
+  - **⚠️ Cloudways has a server-level Full Page Cache** (identified as `CLOUDWAYS-CACHE-DE`) that runs above Varnish and WP-CLI can't purge it. After every code push you must **purge from the Cloudways dashboard** (Applications → your app → Application Management → Full Page Cache → Purge). While iterating, consider disabling that cache entirely; re-enable it just before real launch. Symptom of forgetting: recent code changes don't appear on the live temp URL; cache-busting query strings (`?nocache=…`) will show the fresh version.
+  - Uploads NOT synced this pass (unchanged since May 29 deploy): `uploads/productions/` (~600MB of gallery photos), `uploads/programs/`, `uploads/migrated/`. If a show page loads with broken photo/PDF links, targeted rsync of those subfolders will fix it.
+
+- **Prior work still live** *(unchanged this session)* — site calendar, ACF on Education + 8 hero-only templates, editor auto-reload, promotion fixes, 2627 hero animation desktop PSD, slideshow on show pages, decade-archive button pattern, 144 shows with photo galleries (2,494 photos / 610 MB), archival pre-2010 show pages, Cityline interviews, splash → home wipe baseline, mobile drawer/header z-index, tickets consolidation, PDF target=_blank, Ludus volunteer link.
 
 ## Outstanding work (highest priority first)
 
-1. *(resolved)* **The post-2010 photo-only shows** — RULE NOW: a show appears as a card on `/shows/` only if it has poster art (`archive-tlt_show.php` season loop skips poster-less shows + keeps the pre-2010 season cutoff). This hides the 8 youth/summer galleries (Godspell JR, Schoolhouse Rock JR, Aunt Maggity, Fractured Fairytales, Grease, Grunch, Midsummer, Murder at the Academy Awards) while keeping every real show. The Laramie Project was promoted to a full card (poster `uploads/posters/1213/the-laramie-project.jpg` + program `1213-The-Laramie-Project-Program.pdf` + 20 photos). The 8 hidden shows remain reachable by direct `/shows/<slug>/` URL only — not linked from /shows/ or the 2010-2020 decade page. Genuinely-missing programs (no file anywhere): Joy Luck Club (2012-13), Putnam County Spelling Bee (2011-12).
-2. **Improve archive Photos-button matching** — decade pages now auto-render [📷 Photos]/[📄 Program] per show (`includes/archive-decades.php`), matching decade-list names to `tlt_show` records by season + normalized title (+ containment fallback). Some don't match because the Job-B folder title differs from the real show name (e.g. folder "Cole Porter" vs listed "Red, Hot & Cole"). Fix by renaming those show records or adding aliases. ~20/26 match in 2000-2010, ~11/13 in 1990-2000.
-3. **Review the 52 archival pages** — auto-derived titles/dates; spot-check. Known rough edges: a few slugs with apostrophes (`broadway-s-fabulous-fifties`), `Once Upon A Mattress` keeps folder casing, ~34 show a season label rather than exact dates. Re-run `wordpress/import/create_archive_shows.py` (idempotent) after any tweaks.
-3. **~150 more pre-1996 / unmatched shows** — Job B covered the 61 real-show folders that had a clear title+season. Older/sparser `TLT Photos` folders remain. Lower priority.
-4. **Cloudways trial is DEAD** — as of 2026-05-29 the trial server (`deploy/cloudways.json`) no longer resolves in DNS and is unreachable on ports 80/22 — it was torn down, not just expired. Those creds are stale. Re-provision a fresh host (Cloudways paid or other) and update `deploy/cloudways.json` before deploy. Nothing local lost (theme/plugin/scripts in repo, DB on Local Sites, uploads on disk).
-5. **Mobile audit for top-traffic pages** — Splash (40% of pageviews) and Home are done. Remaining top 8: Show detail, Auditions, Education, "About the Program" (= Education).
-6. **Splash page focal point per image** — currently splash backgrounds use centered `background-position`; subjects get cropped on mobile portrait. Schema currently `show_splash_gallery` = JSON array of URLs. Need to support `[{url: "...", focal: "30% 50%"}]`.
-7. **ACF-ify the rest** — Education got the full treatment. The hero-only ACF on Visit/Off the Shelf/Auditions/Season Tickets/Ticket Info/Donation Request/Press/Job Openings only covers the top eyebrow+title+lede. Body content on these is still hardcoded. Decide which to deepen based on Chris's editing needs.
-8. **Production hardening** (see LAUNCH_CHECKLIST.md P0/P1) — SMTP, Flamingo, backups, security, search-replace at DNS cutover.
+1. **Mobile layered hero — finish the season** *(in progress this session)* — Outsider iteration ongoing; Arsenic and Old Lace mobile PSD ready to test next; 5 more shows (Hallmarked, Dot, Urinetown, The Importance of Being Earnest, The Play That Goes Wrong) still need mobile PSDs designed and extracted. Per-show workflow:
+   - Designer creates a portrait mobile PSD (recommended canvas **1080×1920 / 9:16**, with each animated layer's PNG extending past the canvas in the direction it slides from — see "Hero PSD design spec" below).
+   - Run `C:/temp/extract_outsider_mobile.py` (rename per show — uses 50% horizontal + 12% vertical bleed envelope) to write `hero-layers/<slug>/mobile/` PNGs + `composite.jpg`.
+   - Test on phone via Local Sites' Live Link.
+   - Each new show should be a copy-paste of the Outsider workflow once we lock the iteration on Outsider/Arsenic.
+2. **Test layered hero auto-rotation for all 7 shows** — verify every show in 2026-27 has its `hero-layers/<slug>/` populated (desktop AND mobile/) and that the auto-rotation works as each show closes (use `tlt_today()` date override to fast-forward). Details in LAUNCH_CHECKLIST.md → "Show transitions (layered animated heroes)". A broken hero is the first thing every visitor sees.
+3. **ACF-ify the rest** — Education got the full treatment. The hero-only ACF on Visit/Off the Shelf/Auditions/Season Tickets/Ticket Info/Donation Request/Press/Job Openings only covers the top eyebrow+title+lede. Body content on these is still hardcoded. Blake's working through these manually to verify Chris can edit each one without code.
+4. **Mobile audit for top-traffic pages** — Splash (40% of pageviews) and Home are done. Remaining top 8: Show detail, Auditions, Education, "About the Program" (= Education).
+5. **Splash page focal point per image** — currently splash backgrounds use centered `background-position`; subjects get cropped on mobile portrait. Schema currently `show_splash_gallery` = JSON array of URLs. Need to support `[{url: "...", focal: "30% 50%"}]`.
+6. **Production hardening** (see LAUNCH_CHECKLIST.md P0/P1) — SMTP, Flamingo, backups, security, search-replace at DNS cutover, redirects.
+7. **Sync remaining uploads to Cloudways** — `uploads/productions/`, `uploads/programs/`, `uploads/migrated/` weren't in the initial push (they haven't changed since the trial deploy, but the trial server was torn down). Do this once before DNS cutover so show pages have their photos + programs. Recommended: WinSCP directory-sync (local ↔ remote) is more reliable than `scp -r` for 1000+ files.
+8. *(lower priority, post-launch is fine)* **Improve archive Photos-button matching** — decade pages auto-render [📷 Photos]/[📄 Program] per show. Some don't match because the Job-B folder title differs from the real show name (e.g. folder "Cole Porter" vs listed "Red, Hot & Cole"). Fix by renaming those show records or adding aliases. ~20/26 match in 2000-2010, ~11/13 in 1990-2000.
+9. *(lower priority)* **Review the 52 archival pages** — auto-derived titles/dates; spot-check. Known rough edges: a few slugs with apostrophes (`broadway-s-fabulous-fifties`), `Once Upon A Mattress` keeps folder casing, ~34 show a season label rather than exact dates. Re-run `wordpress/import/create_archive_shows.py` (idempotent) after tweaks.
+10. *(lowest priority)* **~150 more pre-1996 / unmatched shows** — Job B covered the 61 real-show folders that had a clear title+season. Older/sparser `TLT Photos` folders remain.
+
+## Hero PSD design spec (the crop must not cut off the animation)
+
+The single most important rule for hero PSDs: **every animated layer needs the subject positioned at its final composed location, with extra transparent canvas extending past the visible viewport on the side it slides in from.** If the layer is exactly canvas-sized, sliding it in via CSS reveals the IMG box's hard left/right/top/bottom edge — which looks like a hard line scrolling across the hero. The bleed past the canvas is what hides that edge.
+
+**Canvas:**
+- **Desktop:** `1920 × 1080` (16:9 landscape). Matches the rendered hero aspect on most monitors.
+- **Mobile:** `1080 × 1920` (9:16 portrait). Standard mobile video/story aspect.
+
+**Per-layer bleed rules (transparent canvas extending past the visible composition):**
+
+| Layer slides | Where it needs bleed | Minimum bleed |
+|---|---|---|
+| **Background** (fades only) | nowhere | none |
+| **Person / man** (from right) | extend canvas RIGHT past the figure | 25-30% of canvas width |
+| **Front mics** (from left) | extend canvas LEFT | 25-30% of canvas width |
+| **Back mics** (rise from below) | extend canvas BELOW | 15-25% of canvas height |
+| **Podium** (rise from below) | extend canvas BELOW | 15-25% of canvas height |
+| **Overlays** (fades only) | nowhere | none |
+
+When the designer builds the PSD, each layer's natural rectangle should EXCEED the canvas in the listed direction. The PSD canvas itself stays at `1080×1920` (mobile) or `1920×1080` (desktop) — only the individual layer bboxes extend past. (Photoshop's "Reveal All" or canvas-extend feature works.)
+
+The extraction script (`C:/temp/extract_outsider_mobile.py`) composites each layer onto a viewport that's bigger than the canvas (currently `(-1350, -523, 4050, 4792)` for The Outsider's `2700×4269` canvas — 50% horizontal bleed each side, ~12% vertical bleed each side) so the off-canvas content survives extraction. **If layer bleed is missing from the PSD, the extraction can't invent it.**
+
+**CSS mirrors this contract:** the mobile `@media` block in `style.css` scales layers to natural-aspect height-fit and reduces slide distances to 20% (X) and 5% (Y) — calibrated so the IMG-box edge stays inside the bleed envelope during animation. If a new layer's slide direction or bleed amount differs, adjust the `--layer-from` values for that show.
 
 ## Domain / hosting status
 
-- Cloudways: original trial server is DEAD (deprovisioned ~2026-05-29; see Outstanding #4). User re-figuring out hosting. Deploy to a fresh host once provisioned.
-- **TODO — apply tax exemption to the Cloudways account.** TLT is a nonprofit; submitting tax-exempt info should drop sales tax off the hosting bill. Blake to supply the tax-exempt cert/details (doesn't have them handy yet). Do it when setting up the paid subscription.
-- DNS cutover: not done; tacomalittletheatre.com still on Squarespace
+- Cloudways: paid subscription active. Update `deploy/cloudways.json` with the live server creds and re-test the deploy toolkit before DNS cutover.
+- **TODO — apply tax exemption to the Cloudways account.** TLT is a nonprofit; submitting tax-exempt info should drop sales tax off the hosting bill. Blake to supply the tax-exempt cert/details when handy.
+- DNS cutover: not done; tacomalittletheatre.com still on Squarespace. `.com` is registered/DNS at Squarespace — that's where the A/CNAME repoint happens. `.org` and `.net` are on GoDaddy and auto-forward to `.com` (no action needed unless we want them to hit the new host directly).
+- **Launch is happening sooner than the close of Bedroom Farce** (was originally planning to wait until 2026-27 season opens). For launch: static non-animated hero for Bedroom Farce; layered animated heroes kick in with the 2026-27 season.
 - Email: Google Workspace on TLT's own domain; will NOT be touched by DNS changes (MX/SPF/DKIM stay)
 
 ## Quick recap of analytics from Squarespace (Jan 2026 YTD)
@@ -101,7 +157,7 @@ pymysql.connect(host='127.0.0.1', port=10005, user='root', password='root', data
 
 - **Git push/pull is pre-authorized.** When Blake says "push to git", commit any outstanding work with sensible messages and push to origin. When he says "pull from git", run `git pull`. Don't re-confirm routine cases. STILL pause and flag if: a new secret/credential would be committed, there's a merge conflict, or a push would need a force-push. Repo: github.com/brytheatrics/tlt-website.
 - **`tlt-manager/` is a SEPARATE project** that happens to live in this working dir (Google Apps Script: Ludus sync/casting/bios). It is gitignored and contains a Google service-account key — NEVER commit anything under it to the website repo.
-- **Cloudways deploy toolkit is in `deploy/`** (`export_db.py`, `sync_down.py`, `DEPLOY.md`). Site pushed to a Cloudways temp URL (see `deploy/cloudways.json`, gitignored). Started on a 3-day trial (~expires 2026-05-31) — verify the server still exists if working after that.
+- **Cloudways deploy toolkit is in `deploy/`** (`export_db.py`, `sync_down.py`, `DEPLOY.md`). `deploy/cloudways.json` is gitignored (per-machine credentials) and currently points at the live paid server. **After every code push, purge the Cloudways Full Page Cache from the dashboard** — WP-CLI cache flush does NOT clear it and code changes will appear stale without a manual purge.
 - User has two computers (home + work) and wants Claude Code to work from either. Plan: keep this repo in Git, Cloudways for DB/uploads, MDs synced via Git.
 - User prefers shorter responses. Don't over-explain. Don't run diagnostic bash for pure-question conversations.
 - DB is on Local Sites' MySQL; not in repo. Schema/content sync to Cloudways happens during deploy (one-time export-import).

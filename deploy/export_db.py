@@ -24,6 +24,11 @@ USER = "root"
 PASSWORD = "root"
 DATABASE = "local"
 
+# Tables to exclude from the dump. wp_users + wp_usermeta are excluded so a
+# deploy never clobbers Chris's (or any prod editor's) password with whatever
+# the local dev copy happens to have. Prod-side accounts are managed on prod.
+EXCLUDE_TABLES = ["wp_users", "wp_usermeta"]
+
 OUT_DIR = Path(__file__).resolve().parent / "dumps"
 
 
@@ -49,8 +54,11 @@ def main():
         "--routines",
         "--triggers",
         "--events",
-        DATABASE,                     # positional => tables only, no CREATE DATABASE/USE
-    ]                                 # (so it imports into any target DB name)
+    ]
+    for t in EXCLUDE_TABLES:
+        cmd.append(f"--ignore-table={DATABASE}.{t}")
+    cmd.append(DATABASE)              # positional => tables only, no CREATE DATABASE/USE
+                                      # (so it imports into any target DB name)
 
     env = dict(os.environ)
     env["MYSQL_PWD"] = PASSWORD  # avoids the insecure-password-on-CLI warning

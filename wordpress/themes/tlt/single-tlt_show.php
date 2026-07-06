@@ -15,6 +15,10 @@ while ( have_posts() ) : the_post();
     $warn      = get_post_meta( get_the_ID(), 'show_content_warning', true );
     $tix       = get_post_meta( get_the_ID(), 'show_ticket_url', true );
     $program   = get_post_meta( get_the_ID(), 'show_program_pdf_url', true );
+    $dramaturgy_url     = get_post_meta( get_the_ID(), 'show_dramaturgy_url', true );
+    $dramaturgy_raw     = get_post_meta( get_the_ID(), 'show_dramaturgy_gallery', true );
+    $dramaturgy_gallery = $dramaturgy_raw ? json_decode( $dramaturgy_raw, true ) : [];
+    if ( ! is_array( $dramaturgy_gallery ) ) $dramaturgy_gallery = [];
     $cancelled = get_post_meta( get_the_ID(), 'show_cancelled', true );
     $cast      = tlt_parse_cast( get_post_meta( get_the_ID(), 'show_cast', true ) );
     $img       = tlt_show_image_url( get_the_ID(), 'full' );
@@ -39,31 +43,62 @@ while ( have_posts() ) : the_post();
     $gallery_raw = get_post_meta( get_the_ID(), 'show_photo_gallery', true );
     $gallery     = $gallery_raw ? json_decode( $gallery_raw, true ) : [];
     if ( ! is_array( $gallery ) ) $gallery = [];
-    // Also fold in the splash-page photos Chris curates (show_splash_gallery,
-    // a JSON array of plain URLs). Read live so when he removes/replaces splash
-    // images next week, they drop out of this slideshow too — nothing stale sticks.
-    $splash_raw = get_post_meta( get_the_ID(), 'show_splash_gallery', true );
-    $splash     = $splash_raw ? json_decode( $splash_raw, true ) : [];
-    if ( is_array( $splash ) && $splash ) {
-        $seen = [];
-        foreach ( $gallery as $g ) { if ( ! empty( $g['url'] ) ) $seen[ $g['url'] ] = true; }
-        $splash_items = [];
-        foreach ( $splash as $s ) {
-            $url = is_array( $s ) ? ( $s['url'] ?? '' ) : $s; // splash items are usually plain URLs
-            if ( ! $url || isset( $seen[ $url ] ) ) continue;
-            $seen[ $url ] = true;
-            $splash_items[] = [ 'url' => $url, 'alt' => get_the_title() . ' production photo', 'caption' => '' ];
-        }
-        // Splash photos first (Chris's current curated set), then any imported extras.
-        $gallery = array_merge( $splash_items, $gallery );
-    }
 ?>
 
 <article class="show-detail">
+  <?php $announcement = get_post_meta( get_the_ID(), 'show_announcement', true ); ?>
+  <?php if ( $announcement ) : ?>
+    <div class="show-announcement">
+      <div class="container">
+        <p><?php echo nl2br( esc_html( $announcement ) ); ?></p>
+      </div>
+    </div>
+  <?php endif; ?>
   <div class="container">
     <div class="layout">
       <div class="poster">
         <?php if ( $img ) : ?><img src="<?php echo esc_url( $img ); ?>" alt="<?php echo esc_attr( get_the_title() ); ?>"><?php endif; ?>
+
+        <?php /* Left column = poster + videos only. All other content (CTAs,
+                reviews, fact sheet, warning, cast) lives in the right column
+                so the eye doesn't have to zig-zag across the page. */ ?>
+        <?php
+          $cityline_embed = '';
+          $cityline_iframe_src = '';
+          if ( $cityline_url ) {
+              $cityline_embed = wp_oembed_get( $cityline_url, [ 'width' => 600 ] );
+              if ( ! $cityline_embed && preg_match( '~(?:youtu\.be/|youtube\.com/(?:watch\?v=|embed/|v/|shorts/))([A-Za-z0-9_-]{6,})~', $cityline_url, $m ) ) {
+                  $cityline_iframe_src = 'https://www.youtube.com/embed/' . $m[1];
+              }
+          }
+          $has_cityline = $cityline_url && ( $cityline_embed || $cityline_iframe_src );
+          $has_other_videos = ! empty( $videos );
+        ?>
+        <?php if ( $has_cityline || $has_other_videos ) : ?>
+          <div class="show-videos" style="margin-top:1.5rem">
+            <h3 style="margin-bottom:0.75rem">Videos</h3>
+            <?php if ( $has_cityline ) : ?>
+              <div class="show-cityline video-wrap" style="position:relative;aspect-ratio:16/9;background:#000;border-radius:4px;overflow:hidden;margin-bottom:1rem">
+                <?php
+                if ( $cityline_embed ) {
+                    echo $cityline_embed;
+                } else {
+                    echo '<iframe src="' . esc_url( $cityline_iframe_src ) . '" title="Cityline interview" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen frameborder="0" style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe>';
+                }
+                ?>
+              </div>
+              <style>.show-cityline iframe { position:absolute; inset:0; width:100%; height:100%; border:0; }</style>
+            <?php endif; ?>
+            <?php if ( $has_other_videos ) : ?>
+              <?php foreach ( $videos as $v ) : ?>
+                <?php $embed_src = function_exists( 'tlt_video_embed_url' ) ? tlt_video_embed_url( $v ) : $v; ?>
+                <div class="video-wrap" style="margin-bottom:1rem">
+                  <iframe src="<?php echo esc_url( $embed_src ); ?>" allow="autoplay; fullscreen" allowfullscreen frameborder="0" style="width:100%; aspect-ratio:16/9; height:auto"></iframe>
+                </div>
+              <?php endforeach; ?>
+            <?php endif; ?>
+          </div>
+        <?php endif; ?>
       </div>
       <div class="info">
         <?php if ( $cancelled ) : ?>
@@ -77,11 +112,52 @@ while ( have_posts() ) : the_post();
         ?>
         <div class="dates"><?php echo esc_html( $datestr ); ?></div>
         <h1><?php the_title(); ?></h1>
+        <?php
+          $playwright = trim( (string) get_post_meta( get_the_ID(), 'show_playwright', true ) );
+          // Smart rendering: a plain name ("Aaron Sorkin") gets "by " prepended.
+          // A list or anything that already starts with a credit phrase
+          // ("Book by …", "Music by …", "Adapted by …", "by …") renders verbatim
+          // so musicals with multi-line credits work correctly.
+          $has_credit_prefix = (bool) preg_match(
+              '/^\s*(by|book by|music by|lyric(s)? by|words by|words and music by|music and lyrics by|adapted by|adapted from|based on|conceived by|story by|written by|libretto by|book and lyrics by|original (story|book) by)\b/i',
+              $playwright
+          );
+          $is_multiline = ( strpos( $playwright, "\n" ) !== false ) || ( strpos( $playwright, "\r" ) !== false );
+        ?>
+        <?php if ( $playwright ) : ?>
+          <p class="show-playwright"><?php
+            if ( $has_credit_prefix || $is_multiline ) {
+                echo nl2br( esc_html( $playwright ) );
+            } else {
+                echo 'by ' . esc_html( $playwright );
+            }
+          ?></p>
+        <?php endif; ?>
+        <?php $tagline = get_post_meta( get_the_ID(), 'show_tagline', true ); ?>
+        <?php if ( $tagline ) : ?>
+          <p class="tagline"><?php echo esc_html( $tagline ); ?></p>
+        <?php endif; ?>
+        <?php if ( $tix && ! $cancelled && ! $is_closed ) : ?>
+          <p class="show-buy-cta"><a href="<?php echo esc_url( $tix ); ?>" class="btn btn-primary">Buy Tickets</a></p>
+        <?php endif; ?>
+        <?php if ( ! $cancelled && function_exists( 'tlt_show_auditions_open' ) && tlt_show_auditions_open( get_the_ID() ) ) : ?>
+          <p class="show-audition-cta"><a href="/auditions/" class="btn btn-outline">Audition for this Show &rarr;</a></p>
+        <?php endif; ?>
         <p class="credits">
           <?php if ( $director ) echo 'Directed by ' . esc_html( $director ); ?>
           <?php if ( $music_dir ) echo '<br>Musically Directed by ' . esc_html( $music_dir ); ?>
           <?php if ( $choreo ) echo '<br>Choreographed by ' . esc_html( $choreo ); ?>
         </p>
+
+        <?php if ( $venue_name ) : ?>
+          <div class="show-venue" style="background:var(--color-soft);padding:1rem 1.25rem;border-left:4px solid var(--color-accent);margin:1.5rem 0">
+            <h3 style="color:var(--color-accent);font-size:0.95rem;letter-spacing:0.08em;margin:0 0 0.5rem">Presented At</h3>
+            <p style="margin:0;font-weight:600"><?php echo esc_html( $venue_name ); ?></p>
+            <?php if ( $venue_addr ) : ?>
+              <p style="margin:0.25rem 0 0;color:var(--color-muted)"><?php echo esc_html( $venue_addr ); ?></p>
+            <?php endif; ?>
+          </div>
+        <?php endif; ?>
 
         <div class="show-content">
           <?php
@@ -208,6 +284,47 @@ while ( have_posts() ) : the_post();
           ?>
         </div>
 
+        <?php $perf_details = get_post_meta( get_the_ID(), 'show_performance_details', true ); ?>
+        <?php if ( $perf_details ) : ?>
+          <div class="show-perf">
+            <div class="show-perf__header">Showtimes &amp; Tickets</div>
+            <div class="show-perf__body"><?php echo nl2br( esc_html( $perf_details ) ); ?></div>
+          </div>
+        <?php endif; ?>
+
+        <?php if ( $run_time || $age ) : ?>
+          <?php
+            // For broad-audience values ("All Ages", "General Audiences", etc.)
+            // collapse the header+value pair into one inline line so it reads
+            // naturally instead of "Recommended for Ages / General Audiences".
+            $age_broad   = preg_match( '/^\s*(all\s*ages|all|family\s*friendly|general\s*audiences?)\s*$/i', (string) $age );
+            $age_display = trim( (string) $age );
+          ?>
+          <div class="schedule">
+            <div class="schedule__header">At A Glance</div>
+            <div class="schedule__body">
+              <?php if ( $run_time ) : ?>
+                <p><strong>Run Time: <?php echo esc_html( $run_time ); ?></strong></p>
+              <?php endif; ?>
+              <?php if ( $age && $age_broad ) : ?>
+                <p><strong>Recommended for <?php echo esc_html( $age_display ); ?></strong></p>
+              <?php elseif ( $age ) : ?>
+                <p><strong>Recommended for Ages: <?php echo esc_html( $age_display ); ?></strong></p>
+              <?php endif; ?>
+            </div>
+          </div>
+        <?php endif; ?>
+
+        <?php if ( $warn ) : ?>
+          <div class="content-warning">
+            <div class="content-warning__header">Content Warning</div>
+            <div class="content-warning__body">
+              <p class="content-warning__subhead">This production of <?php echo esc_html( get_the_title() ); ?> includes the following:</p>
+              <p><?php echo esc_html( $warn ); ?></p>
+            </div>
+          </div>
+        <?php endif; ?>
+
         <?php if ( $cast ) : ?>
           <section class="show-cast">
             <h3 class="section-heading">Cast</h3>
@@ -222,70 +339,74 @@ while ( have_posts() ) : the_post();
           </section>
         <?php endif; ?>
 
-        <?php if ( $venue_name ) : ?>
-          <div class="show-venue" style="background:var(--color-soft);padding:1rem 1.25rem;border-left:4px solid var(--color-accent);margin:1.5rem 0">
-            <h3 style="color:var(--color-accent);font-size:0.95rem;letter-spacing:0.08em;margin:0 0 0.5rem">Presented At</h3>
-            <p style="margin:0;font-weight:600"><?php echo esc_html( $venue_name ); ?></p>
-            <?php if ( $venue_addr ) : ?>
-              <p style="margin:0.25rem 0 0;color:var(--color-muted)"><?php echo esc_html( $venue_addr ); ?></p>
-            <?php endif; ?>
-          </div>
-        <?php endif; ?>
-
-        <?php if ( $run_time || $age ) : ?>
-          <div class="schedule">
-            <?php if ( $run_time ) : ?><h3>Run Time</h3><p><?php echo esc_html( $run_time ); ?></p><?php endif; ?>
-            <?php if ( $age ) : ?><p><strong><?php echo esc_html( $age ); ?></strong></p><?php endif; ?>
-          </div>
-        <?php endif; ?>
-
-        <?php if ( $warn ) : ?>
-          <div class="content-warning"><?php echo esc_html( $warn ); ?></div>
-        <?php endif; ?>
-
-        <p>
-          <?php if ( $tix && ! $cancelled && ! $is_closed ) : ?>
-            <a href="<?php echo esc_url( $tix ); ?>" class="btn btn-primary">Buy Tickets</a>
-          <?php endif; ?>
+        <?php /* Secondary CTAs — read about the show first, then dig deeper. */ ?>
+        <p class="show-actions">
           <?php if ( $program ) : ?>
             <a href="<?php echo esc_url( $program ); ?>" class="btn btn-primary" target="_blank" rel="noopener" style="background:transparent;color:var(--color-accent);border:2px solid var(--color-accent)">View Program</a>
           <?php else : ?>
             <a href="#" class="btn btn-primary" style="background:transparent;color:var(--color-muted);border:2px solid var(--color-muted);cursor:not-allowed" title="Program PDF not yet linked — coming soon" onclick="event.preventDefault()">View Program</a>
           <?php endif; ?>
+          <?php if ( $dramaturgy_gallery ) : ?>
+            <button type="button" class="btn btn-primary dramaturgy-open" style="background:transparent;color:var(--color-accent);border:2px solid var(--color-accent)">View Dramaturgy</button>
+          <?php elseif ( $dramaturgy_url ) : ?>
+            <a href="<?php echo esc_url( $dramaturgy_url ); ?>" class="btn btn-primary" target="_blank" rel="noopener" style="background:transparent;color:var(--color-accent);border:2px solid var(--color-accent)">View Dramaturgy</a>
+          <?php endif; ?>
         </p>
 
-        <?php if ( $cityline_url ) :
-          $cityline_embed = wp_oembed_get( $cityline_url, [ 'width' => 600 ] );
-          // Build a clean embed src as a fallback
-          $cityline_iframe_src = '';
-          if ( ! $cityline_embed && preg_match( '~(?:youtu\.be/|youtube\.com/(?:watch\?v=|embed/|v/|shorts/))([A-Za-z0-9_-]{6,})~', $cityline_url, $m ) ) {
-              $cityline_iframe_src = 'https://www.youtube.com/embed/' . $m[1];
+        <?php
+          // Reviews — one per line: "Publication | https://url" (URL alone also ok).
+          $reviews_raw = get_post_meta( get_the_ID(), 'show_reviews', true );
+          $reviews = [];
+          if ( $reviews_raw ) {
+              foreach ( preg_split( '/\r\n|\r|\n/', $reviews_raw ) as $line ) {
+                  $line = trim( $line );
+                  if ( $line === '' ) continue;
+                  $parts = array_map( 'trim', explode( '|', $line, 2 ) );
+                  if ( ! empty( $parts[1] ) ) {
+                      $reviews[] = [ 'name' => $parts[0], 'url' => $parts[1] ];
+                  } elseif ( filter_var( $parts[0], FILTER_VALIDATE_URL ) ) {
+                      $reviews[] = [ 'name' => $parts[0], 'url' => $parts[0] ];
+                  }
+              }
           }
         ?>
-          <div class="show-cityline" style="margin-top:2rem">
-            <h3 style="margin-bottom:0.4rem;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--color-accent)">Cityline Interview</h3>
-            <div class="video-wrap" style="position:relative;aspect-ratio:16/9;background:#000;border-radius:4px;overflow:hidden">
-              <?php
-              if ( $cityline_embed ) {
-                  echo $cityline_embed;
-              } elseif ( $cityline_iframe_src ) {
-                  echo '<iframe src="' . esc_url( $cityline_iframe_src ) . '" title="Cityline interview" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen frameborder="0" style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe>';
-              }
-              ?>
+        <?php if ( $reviews ) : ?>
+          <section class="show-reviews">
+            <div class="show-reviews__header">Reviews</div>
+            <div class="show-reviews__body">
+              <ul class="review-list">
+                <?php foreach ( $reviews as $r ) : ?>
+                  <li><a href="<?php echo esc_url( $r['url'] ); ?>" target="_blank" rel="noopener"><?php echo esc_html( $r['name'] ); ?></a></li>
+                <?php endforeach; ?>
+              </ul>
             </div>
-          </div>
-          <style>.show-cityline .video-wrap iframe { position:absolute; inset:0; width:100%; height:100%; border:0; }</style>
+          </section>
         <?php endif; ?>
 
-        <?php if ( ! empty( $videos ) ) : ?>
-          <div class="show-videos" style="margin-top:2rem">
-            <h3 style="margin-bottom:0.75rem"><?php echo count( $videos ) > 1 ? 'Videos' : 'Video'; ?></h3>
-            <?php foreach ( $videos as $v ) : ?>
-              <div class="video-wrap" style="margin-bottom:1rem">
-                <iframe src="<?php echo esc_url( $v ); ?>" allow="autoplay; fullscreen" allowfullscreen frameborder="0" style="width:100%; aspect-ratio:16/9; height:auto"></iframe>
-              </div>
-            <?php endforeach; ?>
+        <?php /* Videos live in the left .poster column. The dramaturgy
+                lightbox modal lives here so the JS is alongside its markup. */ ?>
+
+        <?php if ( $dramaturgy_gallery ) : ?>
+          <div class="dramaturgy-lightbox" hidden>
+            <div class="dramaturgy-lightbox__inner">
+              <button type="button" class="dramaturgy-lightbox__close" aria-label="Close dramaturgy">&times;</button>
+              <?php echo tlt_render_slideshow( $dramaturgy_gallery, 'Dramaturgy' ); ?>
+            </div>
           </div>
+          <script>
+            (function () {
+              var openBtn = document.querySelector('.dramaturgy-open');
+              var box = document.querySelector('.dramaturgy-lightbox');
+              if (!openBtn || !box) return;
+              var closeBtn = box.querySelector('.dramaturgy-lightbox__close');
+              function open()  { box.hidden = false; document.body.style.overflow = 'hidden'; }
+              function close() { box.hidden = true;  document.body.style.overflow = ''; }
+              openBtn.addEventListener('click', open);
+              closeBtn.addEventListener('click', close);
+              box.addEventListener('click', function (e) { if (e.target === box) close(); });
+              document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !box.hidden) close(); });
+            })();
+          </script>
         <?php endif; ?>
       </div>
     </div>
@@ -297,89 +418,7 @@ while ( have_posts() ) : the_post();
       </section>
     <?php endif; ?>
 
-    <?php if ( is_array( $gallery ) && $gallery ) : ?>
-      <section class="show-photo-gallery" style="margin-top:3rem">
-        <h2 class="section-heading">Production Photos</h2>
-        <div class="show-slideshow" data-count="<?php echo count( $gallery ); ?>">
-          <div class="show-slideshow__viewport">
-            <?php foreach ( $gallery as $i => $g ) :
-              $url = isset( $g['url'] ) ? esc_url( $g['url'] ) : '';
-              $alt = isset( $g['alt'] ) ? esc_attr( $g['alt'] ) : '';
-              $cap = isset( $g['caption'] ) ? $g['caption'] : '';
-              if ( ! $url ) continue;
-            ?>
-              <figure class="show-slide<?php echo $i === 0 ? ' is-active' : ''; ?>">
-                <img src="<?php echo $url; ?>" alt="<?php echo $alt; ?>" loading="<?php echo $i === 0 ? 'eager' : 'lazy'; ?>">
-                <?php if ( $cap ) : ?><figcaption><?php echo esc_html( $cap ); ?></figcaption><?php endif; ?>
-              </figure>
-            <?php endforeach; ?>
-          </div>
-          <button type="button" class="show-slideshow__nav show-slideshow__nav--prev" aria-label="Previous photo">&#8592;</button>
-          <button type="button" class="show-slideshow__nav show-slideshow__nav--next" aria-label="Next photo">&#8594;</button>
-          <div class="show-slideshow__dots" role="tablist" aria-label="Slide selector">
-            <?php foreach ( $gallery as $i => $g ) : ?>
-              <button type="button" class="show-slideshow__dot<?php echo $i === 0 ? ' is-active' : ''; ?>" role="tab" aria-label="Photo <?php echo $i + 1; ?>" data-index="<?php echo $i; ?>"></button>
-            <?php endforeach; ?>
-          </div>
-          <div class="show-slideshow__counter"><span class="show-slideshow__current">1</span> / <?php echo count( $gallery ); ?></div>
-        </div>
-      </section>
-      <style>
-        .show-slideshow { position: relative; max-width: 1100px; margin: 0 auto; background: #000; border-radius: 6px; overflow: hidden; }
-        .show-slideshow__viewport { position: relative; aspect-ratio: 3/2; }
-        .show-slide { position: absolute; inset: 0; margin: 0; opacity: 0; transition: opacity 0.4s ease; display: flex; align-items: center; justify-content: center; background: #000; }
-        .show-slide.is-active { opacity: 1; z-index: 1; }
-        .show-slide img { width: 100%; height: 100%; object-fit: contain; display: block; }
-        .show-slide figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 0.85rem 1rem; background: linear-gradient(to top, rgba(0,0,0,0.75), transparent); color: #fff; font-size: 0.9rem; text-align: center; }
-        .show-slideshow__nav { position: absolute; top: 50%; transform: translateY(-50%); z-index: 5; background: rgba(255,255,255,0.85); border: 0; width: 44px; height: 44px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #000; transition: background 0.15s; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
-        .show-slideshow__nav:hover { background: #fff; }
-        .show-slideshow__nav--prev { left: 1rem; }
-        .show-slideshow__nav--next { right: 1rem; }
-        .show-slideshow__dots { position: absolute; left: 0; right: 0; bottom: 0.6rem; display: flex; justify-content: center; gap: 0.4rem; z-index: 5; flex-wrap: wrap; padding: 0 1rem; max-width: 80%; margin: 0 auto; }
-        .show-slideshow__dot { width: 8px; height: 8px; border-radius: 50%; border: 0; background: rgba(255,255,255,0.45); cursor: pointer; padding: 0; transition: background 0.15s, transform 0.15s; }
-        .show-slideshow__dot.is-active { background: #fff; transform: scale(1.3); }
-        .show-slideshow__dot:hover { background: rgba(255,255,255,0.75); }
-        .show-slideshow__counter { position: absolute; top: 1rem; right: 1rem; z-index: 5; background: rgba(0,0,0,0.55); color: #fff; padding: 0.25rem 0.65rem; border-radius: 999px; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.05em; }
-        @media (max-width: 600px) {
-          .show-slideshow__viewport { aspect-ratio: 4/3; }
-          .show-slideshow__nav { width: 36px; height: 36px; }
-          .show-slideshow__nav--prev { left: 0.4rem; }
-          .show-slideshow__nav--next { right: 0.4rem; }
-          .show-slideshow__dots { display: none; }
-        }
-      </style>
-      <script>
-        (function () {
-          var box = document.querySelector('.show-slideshow');
-          if (!box) return;
-          var slides = box.querySelectorAll('.show-slide');
-          var dots   = box.querySelectorAll('.show-slideshow__dot');
-          var counter= box.querySelector('.show-slideshow__current');
-          var idx = 0;
-          function go(n) {
-            idx = (n + slides.length) % slides.length;
-            slides.forEach(function (s, i) { s.classList.toggle('is-active', i === idx); });
-            dots.forEach(function (d, i) { d.classList.toggle('is-active', i === idx); });
-            if (counter) counter.textContent = (idx + 1);
-          }
-          box.querySelector('.show-slideshow__nav--prev').addEventListener('click', function () { go(idx - 1); });
-          box.querySelector('.show-slideshow__nav--next').addEventListener('click', function () { go(idx + 1); });
-          dots.forEach(function (d, i) { d.addEventListener('click', function () { go(i); }); });
-          // Keyboard arrows
-          document.addEventListener('keydown', function (e) {
-            if (e.key === 'ArrowLeft')  go(idx - 1);
-            if (e.key === 'ArrowRight') go(idx + 1);
-          });
-          // Swipe on touch
-          var startX = 0;
-          box.addEventListener('touchstart', function (e) { startX = e.touches[0].clientX; }, { passive: true });
-          box.addEventListener('touchend',   function (e) {
-            var dx = e.changedTouches[0].clientX - startX;
-            if (Math.abs(dx) > 50) go(idx + (dx < 0 ? 1 : -1));
-          });
-        })();
-      </script>
-    <?php endif; ?>
+    <?php echo tlt_render_slideshow( $gallery, 'Production Photos' ); ?>
   </div>
 </article>
 
@@ -404,7 +443,7 @@ if ( $open && ! $cancelled ) {
                 'addressCountry' => 'US',
             ],
         ],
-        'description' => wp_strip_all_tags( get_the_excerpt() ),
+        'description' => wp_strip_all_tags( get_post_meta( get_the_ID(), 'show_tagline', true ) ?: wp_trim_words( get_the_content(), 40 ) ),
         'image'       => $img,
         'offers'      => ( $tix && ! $is_closed ) ? [ '@type' => 'Offer', 'url' => $tix, 'availability' => 'https://schema.org/InStock' ] : null,
     ];

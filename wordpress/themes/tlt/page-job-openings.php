@@ -16,17 +16,22 @@
  */
 get_header();
 
-// Listing cards — add entries here as new postings go live
-$listings = [
-    [
-        'eyebrow'  => 'Now Hiring',
-        'title'    => 'Production Team Members for 2026–2027',
-        'permalink'=> '/job-openings/2627-production-team/',
-        'thumb'    => '/wp-content/uploads/migrated/orange-and-peach-simple-now-hiring-announcement-instagram-post.png',
-        'meta'     => 'Letters reviewed on a rolling basis · Positions filled by May 31, 2026',
-        'excerpt'  => 'TLT is seeking designers — stage managers, properties, sound, costume, and a scenic artist apprentice — for our 2026–2027 season. Collaborative artists with a passion for the craft are encouraged to apply.',
-    ],
-];
+// Listing cards auto-build from the Job Posting (Detail) pages — create a page
+// with that template and it appears here automatically; no array to edit.
+$posting_pages = function_exists( 'tlt_pages_using_template' ) ? tlt_pages_using_template( 'page-job-posting.php' ) : [];
+$listings = [];
+foreach ( $posting_pages as $pp ) {
+    $img = ( function_exists( 'get_field' ) ? get_field( 'job_image', $pp->ID ) : '' ) ?: get_post_meta( $pp->ID, 'job_thumb', true );
+    $excerpt = has_excerpt( $pp->ID ) ? get_the_excerpt( $pp ) : wp_trim_words( wp_strip_all_tags( $pp->post_content ), 40 );
+    $listings[] = [
+        'eyebrow'  => get_post_meta( $pp->ID, 'job_eyebrow', true ) ?: 'Now Hiring',
+        'title'    => get_the_title( $pp ),
+        'permalink'=> get_permalink( $pp ),
+        'thumb'    => $img,
+        'meta'     => get_post_meta( $pp->ID, 'job_meta', true ),
+        'excerpt'  => $excerpt,
+    ];
+}
 ?>
 
 <style>

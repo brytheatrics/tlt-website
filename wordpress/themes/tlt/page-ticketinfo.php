@@ -68,6 +68,63 @@ get_header(); ?>
   .policy-card ul { margin: 0.4rem 0 0; padding-left: 1.25rem; font-size: 0.92rem; line-height: 1.55; }
 </style>
 
+<?php
+$tif = function ( $n, $d = '' ) { $v = function_exists( 'get_field' ) ? get_field( $n ) : null; return ( $v === null || $v === '' ) ? $d : $v; };
+$ti_buy_label    = $tif( 'ti_buy_label', 'Buy Tickets' );
+$ti_buy_url      = $tif( 'ti_buy_url', 'https://tlt.ludus.com' );
+$ti_season_label = $tif( 'ti_season_label', 'Season Tickets' );
+$ti_season_url   = $tif( 'ti_season_url', '/season-tickets/' );
+$ti_musical_prices = $tif( 'ti_musical_prices' );
+$ti_play_prices    = $tif( 'ti_play_prices' );
+$ti_musical_group  = $tif( 'ti_musical_group' );
+$ti_play_group     = $tif( 'ti_play_group' );
+$ti_group_note     = $tif( 'ti_group_note' );
+$ti_info_cards     = function_exists( 'tlt_parse_heading_cards' ) ? tlt_parse_heading_cards( $tif( 'ti_info_cards' ) ) : [];
+$ti_season_intro   = $tif( 'ti_season_intro' );
+$ti_season_summary = $tif( 'ti_season_summary' );
+$ti_season_bullets = $tif( 'ti_season_bullets' );
+$ti_flex_summary   = $tif( 'ti_flex_summary' );
+$ti_flex_bullets   = $tif( 'ti_flex_bullets' );
+$ti_subscribe_heading   = $tif( 'ti_subscribe_heading', 'Ready to Subscribe?' );
+$ti_subscribe_intro     = $tif( 'ti_subscribe_intro' );
+$ti_mail_address        = $tif( 'ti_mail_address' );
+$ti_subscribe_btn_label = $tif( 'ti_subscribe_btn_label', 'Subscribe Online' );
+$ti_subscribe_btn_url   = $tif( 'ti_subscribe_btn_url', '/season-tickets/' );
+$ti_general_policies    = function_exists( 'tlt_parse_heading_cards' ) ? tlt_parse_heading_cards( $tif( 'ti_general_policies' ) ) : [];
+$ti_subscriber_policies = function_exists( 'tlt_parse_heading_cards' ) ? tlt_parse_heading_cards( $tif( 'ti_subscriber_policies' ) ) : [];
+
+// Season & FLEX prices come from the Season Tickets page (one canonical source).
+$st_page = get_page_by_path( 'season-tickets' );
+$st_pid  = $st_page ? $st_page->ID : 0;
+$ti_st_prices  = $st_pid ? get_post_meta( $st_pid, 'st_season_prices', true ) : '';
+$ti_flex_price = $st_pid ? get_post_meta( $st_pid, 'st_flex_price', true ) : '';
+if ( ! $ti_st_prices )  $ti_st_prices  = "\$171.20 | Adult\n\$160.00 | Senior / Student / Military\n\$132.00 | Child";
+if ( ! $ti_flex_price ) $ti_flex_price = '$160.00 | 6 punches';
+
+$ti_price_rows = function ( $text ) {
+    foreach ( preg_split( '/\r\n|\r|\n/', (string) $text ) as $line ) {
+        $line = trim( $line ); if ( $line === '' ) continue;
+        $p = array_map( 'trim', explode( '|', $line, 2 ) );
+        echo '<div class="price-row"><span class="who">' . esc_html( $p[1] ?? '' ) . '</span><span class="price">' . esc_html( $p[0] ) . '</span></div>';
+    }
+};
+$ti_price_tags = function ( $text ) {
+    foreach ( preg_split( '/\r\n|\r|\n/', (string) $text ) as $line ) {
+        $line = trim( $line ); if ( $line === '' ) continue;
+        $p = array_map( 'trim', explode( '|', $line, 2 ) );
+        echo '<span class="price-tag">' . esc_html( $p[0] );
+        if ( ! empty( $p[1] ) ) echo ' <span class="who">' . esc_html( $p[1] ) . '</span>';
+        echo '</span>';
+    }
+};
+$ti_bullets = function ( $text ) {
+    foreach ( preg_split( '/\r\n|\r|\n/', (string) $text ) as $line ) {
+        $line = trim( $line ); if ( $line === '' ) continue;
+        echo '<li>' . esc_html( $line ) . '</li>';
+    }
+};
+?>
+
 <div class="ti-page">
 
   <header class="ti-hero">
@@ -76,8 +133,8 @@ get_header(); ?>
     <h1><?php echo esc_html( function_exists( 'tlt_hero_field' ) ? tlt_hero_field( 'title', get_the_title() ) : get_the_title() ); ?></h1>
     <p class="lede"><?php echo esc_html( function_exists( 'tlt_hero_field' ) ? tlt_hero_field( 'lede', 'Everything you need to know about ticket prices, season passes, and the few house rules we have in place to keep everyone comfortable.' ) : 'Everything you need to know about ticket prices, season passes, and the few house rules we have in place to keep everyone comfortable.' ); ?></p>
     <div class="cta-row">
-      <a class="btn btn-primary" href="https://tlt.ludus.com" target="_blank" rel="noopener">Buy Tickets</a>
-      <a class="btn btn-outline" href="/season-tickets/">Season Tickets</a>
+      <a class="btn btn-primary" href="<?php echo esc_url( $ti_buy_url ); ?>" target="_blank" rel="noopener"><?php echo esc_html( $ti_buy_label ); ?></a>
+      <a class="btn btn-outline" href="<?php echo esc_url( $ti_season_url ); ?>"><?php echo esc_html( $ti_season_label ); ?></a>
     </div>
   </header>
 
@@ -89,94 +146,69 @@ get_header(); ?>
       <div class="pricing-card">
         <div class="pricing-card__head"><h3>Musicals</h3></div>
         <div class="pricing-card__body">
-          <div class="price-row"><span class="who">Adult</span><span class="price">$32.00</span></div>
-          <div class="price-row"><span class="who">Senior (60+) / Student / Military</span><span class="price">$30.00</span></div>
-          <div class="price-row"><span class="who">Child (12 and under)</span><span class="price">$25.00</span></div>
+          <?php $ti_price_rows( $ti_musical_prices ); ?>
+          <?php if ( $ti_musical_group ) : ?>
           <div class="group-note">
             <strong>Group Rates</strong>
-            10–24 tickets: $26.00 &middot; 25+ tickets: $25.00<br>
-            <em>Group rates available through the Box Office only.</em>
+            <?php echo esc_html( $ti_musical_group ); ?><br>
+            <?php if ( $ti_group_note ) : ?><em><?php echo esc_html( $ti_group_note ); ?></em><?php endif; ?>
           </div>
+          <?php endif; ?>
         </div>
       </div>
 
       <div class="pricing-card">
         <div class="pricing-card__head"><h3>Plays</h3></div>
         <div class="pricing-card__body">
-          <div class="price-row"><span class="who">Adult</span><span class="price">$30.00</span></div>
-          <div class="price-row"><span class="who">Senior (60+) / Student / Military</span><span class="price">$28.00</span></div>
-          <div class="price-row"><span class="who">Child (12 and under)</span><span class="price">$23.00</span></div>
+          <?php $ti_price_rows( $ti_play_prices ); ?>
+          <?php if ( $ti_play_group ) : ?>
           <div class="group-note">
             <strong>Group Rates</strong>
-            10–24 tickets: $24.00 &middot; 25+ tickets: $23.00<br>
-            <em>Group rates available through the Box Office only.</em>
+            <?php echo esc_html( $ti_play_group ); ?><br>
+            <?php if ( $ti_group_note ) : ?><em><?php echo esc_html( $ti_group_note ); ?></em><?php endif; ?>
           </div>
+          <?php endif; ?>
         </div>
       </div>
     </div>
 
     <div class="info-grid" style="margin-top:1.5rem">
-      <div class="info-card">
-        <h3>Pay What You Can</h3>
-        <p>PWYC performances are typically held on the third Thursday of a show's run. Suggested minimum donation is <strong>$5.00</strong>. Available in person, over the phone, or online.</p>
-      </div>
-      <div class="info-card">
-        <h3>Card Transaction Fees</h3>
-        <p>Credit/debit card orders carry a <strong>5% convenience fee + $0.85 per ticket/pass</strong>. No transaction fees for cash or check.</p>
-      </div>
-      <div class="info-card">
-        <h3>Gift Cards</h3>
-        <p>Available in any amount online, by phone, or in person. Redeemable for tickets, Season Tickets, FLEX Passes, and class enrollments. Not currently usable on concessions.</p>
-      </div>
+      <?php foreach ( $ti_info_cards as $card ) : ?>
+        <div class="info-card">
+          <h3><?php echo esc_html( $card['heading'] ); ?></h3>
+          <p><?php echo wp_kses_post( $card['body'] ); ?></p>
+        </div>
+      <?php endforeach; ?>
     </div>
   </section>
 
   <!-- SEASON TICKETS & FLEX PASS ============================================ -->
   <section class="ti-section" id="season">
     <h2>Season Tickets &amp; Flex Passes</h2>
-    <p style="max-width: 760px; line-height: 1.6;">Season tickets offer the same seat and date of your choice for all <strong>seven</strong> Main Stage shows. Flex passes are <strong>six</strong> admissions that can be used on any Main Stage show with advance reservations. Both options save you money over single tickets.</p>
+    <?php if ( $ti_season_intro ) : ?><p style="max-width: 760px; line-height: 1.6;"><?php echo esc_html( $ti_season_intro ); ?></p><?php endif; ?>
 
     <div class="compare-grid">
       <div class="compare-card">
         <h3>Season Ticket</h3>
-        <p class="summary">One seat to all seven regular Main Stage productions, same date and seat every show.</p>
-        <span class="price-tag">$171.20 <span class="who">Adult</span></span>
-        <span class="price-tag">$160.00 <span class="who">Senior / Student / Military</span></span>
-        <span class="price-tag">$132.00 <span class="who">Child</span></span>
-        <ul>
-          <li>Guaranteed same seat for every show in your package</li>
-          <li>Save per show over the single-ticket price</li>
-          <li>Free exchanges with at least 24 hours notice</li>
-          <li>Valid only for the season purchased</li>
-          <li>Does not include Special Events</li>
-        </ul>
+        <p class="summary"><?php echo esc_html( $ti_season_summary ); ?></p>
+        <?php $ti_price_tags( $ti_st_prices ); ?>
+        <ul><?php $ti_bullets( $ti_season_bullets ); ?></ul>
       </div>
 
       <div class="compare-card">
         <h3>FLEX Pass</h3>
-        <p class="summary">Six prepaid admissions you can use any way you want — bring a friend, double up, save for later.</p>
-        <span class="price-tag">$160.00 <span class="who">6 punches</span></span>
-        <ul>
-          <li>Save per show over the single-ticket price</li>
-          <li>Use punches in any combination (bring a friend!)</li>
-          <li>Reserve at least 24 hours before the performance</li>
-          <li>Many shows sell out — reserve 2+ weeks ahead when possible</li>
-          <li>Valid for Main Stage and Second Stage productions only</li>
-          <li>Not valid for Special Events &middot; 6 punches but 7 shows in a season</li>
-        </ul>
+        <p class="summary"><?php echo esc_html( $ti_flex_summary ); ?></p>
+        <?php $ti_price_tags( $ti_flex_price ); ?>
+        <ul><?php $ti_bullets( $ti_flex_bullets ); ?></ul>
       </div>
     </div>
 
     <div class="subscribe-cta">
-      <h3>Ready to Subscribe?</h3>
-      <p>Subscribe online, give us a call at <a href="tel:+12532722281">(253) 272-2281</a>, or mail an order form to:</p>
-      <div class="mail-address">
-        Tacoma Little Theatre<br>
-        210 N "I" Street<br>
-        Tacoma, WA 98403
-      </div>
+      <h3><?php echo esc_html( $ti_subscribe_heading ); ?></h3>
+      <?php if ( $ti_subscribe_intro ) : ?><p><?php echo esc_html( $ti_subscribe_intro ); ?></p><?php endif; ?>
+      <?php if ( $ti_mail_address ) : ?><div class="mail-address"><?php echo nl2br( esc_html( $ti_mail_address ) ); ?></div><?php endif; ?>
       <div style="margin-top:1.25rem">
-        <a class="btn btn-primary" href="/season-tickets/">Subscribe Online</a>
+        <a class="btn btn-primary" href="<?php echo esc_url( $ti_subscribe_btn_url ); ?>"><?php echo esc_html( $ti_subscribe_btn_label ); ?></a>
       </div>
     </div>
   </section>
@@ -186,60 +218,12 @@ get_header(); ?>
     <h2>General Policies</h2>
 
     <div class="policy-grid">
-      <div class="policy-card">
-        <h3>Lost Tickets</h3>
-        <p>Call the Box Office and we can reprint them for you. Reprints will be held at WILL CALL under your last name on the date of the performance.</p>
-      </div>
-
-      <div class="policy-card">
-        <h3>Ticket Sales</h3>
-        <ul>
-          <li>All sales final &mdash; no refunds, but we offer exchanges</li>
-          <li>Murder Mystery Dinners must be exchanged at least 5 days in advance</li>
-          <li>Online orders require a credit card and receive email confirmation</li>
-          <li>Added donations are charged together with your order</li>
-        </ul>
-      </div>
-
-      <div class="policy-card">
-        <h3>Babes in Arms</h3>
-        <p>For the comfort of other patrons, no babes in arms during our productions.</p>
-      </div>
-
-      <div class="policy-card">
-        <h3>Accessible Seating</h3>
-        <p>Wheelchair-accessible seating is available for every performance. Call the Box Office to arrange seating and confirm availability.</p>
-      </div>
-
-      <div class="policy-card">
-        <h3>Cameras &amp; Devices</h3>
-        <p>For the safety and comfort of the actors and audience, no cameras or recording devices. Please silence phones, watches, and any noise-making electronics before the show starts.</p>
-      </div>
-
-      <div class="policy-card">
-        <h3>Late Seating</h3>
-        <p>If you arrive after the show has started, you'll be seated at the back at the House Manager's discretion until intermission. Unclaimed seats may be released 15 minutes after curtain.</p>
-      </div>
-
-      <div class="policy-card">
-        <h3>Concessions</h3>
-        <p>Beer, wine, cocktails, soft drinks, coffee, tea, and snacks are available before the show and at intermission.</p>
-      </div>
-
-      <div class="policy-card">
-        <h3>Coat Check</h3>
-        <p>A self-serve coat check is located inside the auditorium. TLT is not responsible for lost or stolen articles.</p>
-      </div>
-
-      <div class="policy-card">
-        <h3>Weather</h3>
-        <p>All performances take place as scheduled, regardless of weather. Performances may only be cancelled in the event of a complete power outage.</p>
-      </div>
-
-      <div class="policy-card">
-        <h3>Right to Refuse Service</h3>
-        <p>Tacoma Little Theatre reserves the right to refuse service.</p>
-      </div>
+      <?php foreach ( $ti_general_policies as $card ) : ?>
+        <div class="policy-card">
+          <h3><?php echo esc_html( $card['heading'] ); ?></h3>
+          <?php echo wp_kses_post( wpautop( $card['body'] ) ); ?>
+        </div>
+      <?php endforeach; ?>
     </div>
   </section>
 
@@ -248,23 +232,12 @@ get_header(); ?>
     <h2>Season Ticket &amp; FLEX Pass Policies</h2>
 
     <div class="policy-grid">
-      <div class="policy-card">
-        <h3>Season Ticket Exchanges</h3>
-        <p>If necessary, you can exchange your Season Ticket by calling the Box Office at <a href="tel:+12532722281">(253) 272-2281</a> at least 24 hours in advance.</p>
-        <p>Season Tickets are only valid for the season for which they are purchased.</p>
-      </div>
-
-      <div class="policy-card">
-        <h3>FLEX Pass Reservations</h3>
-        <p>Reserve seats by calling the Box Office at least 24 hours before the performance.</p>
-        <p>Once reservations are made, there are no refunds &mdash; but we offer free exchanges.</p>
-      </div>
-
-      <div class="policy-card">
-        <h3>FLEX Pass Use</h3>
-        <p>FLEX Passes are valid for Main Stage and Second Stage productions. They are not valid for Special Events.</p>
-        <p>Each pass has 6 punches; use them however you prefer (including bringing guests). FLEX passes are only valid for the season in which they are purchased.</p>
-      </div>
+      <?php foreach ( $ti_subscriber_policies as $card ) : ?>
+        <div class="policy-card">
+          <h3><?php echo esc_html( $card['heading'] ); ?></h3>
+          <?php echo wp_kses_post( wpautop( $card['body'] ) ); ?>
+        </div>
+      <?php endforeach; ?>
     </div>
   </section>
 
