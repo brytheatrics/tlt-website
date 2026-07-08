@@ -786,16 +786,33 @@ add_action( 'admin_menu', function () {
     $move( 'tools.php',           'Tools' );
     $move( 'options-general.php', 'Settings' );
 
-    // ACF — match by label since its slug varies between versions.
-    foreach ( (array) $menu as $item ) {
-        if ( isset( $item[0], $item[2] ) && wp_strip_all_tags( $item[0] ) === 'ACF' ) {
-            $cap  = isset( $item[1] ) ? $item[1] : 'manage_options';
-            $slug = $item[2];
-            remove_menu_page( $slug );
-            add_submenu_page( 'tlt-system', 'ACF', 'ACF', $cap, $slug );
-            break;
+    // Newly-added plugins (Chris rarely touches these — bury them under System).
+    $move( 'wp-mail-smtp',         'Mail (SMTP)' );
+    $move( 'flamingo_inbound',     'Form Submissions (Flamingo)' );
+    $move( 'limit-login-attempts', 'Login Protection' );
+    $move( 'redirection.php',      'Redirects' );
+
+    // Menus whose slug varies between versions — match by label instead.
+    $move_by_label = function ( $label, $display = null ) use ( &$menu ) {
+        foreach ( (array) $menu as $item ) {
+            if ( ! isset( $item[0], $item[2] ) ) continue;
+            if ( wp_strip_all_tags( $item[0] ) === $label ) {
+                $cap  = isset( $item[1] ) ? $item[1] : 'manage_options';
+                $slug = $item[2];
+                $name = $display ?: $label;
+                remove_menu_page( $slug );
+                add_submenu_page( 'tlt-system', $name, $name, $cap, $slug );
+                return;
+            }
         }
-    }
+    };
+    $move_by_label( 'ACF' );
+    // Fallbacks in case the slug-based moves above missed (labels vary too).
+    $move_by_label( 'WP Mail SMTP',                 'Mail (SMTP)' );
+    $move_by_label( 'Flamingo',                     'Form Submissions (Flamingo)' );
+    $move_by_label( 'Limit Login Attempts',         'Login Protection' );
+    $move_by_label( 'Limit Login Attempts Reloaded','Login Protection' );
+    $move_by_label( 'Redirection',                  'Redirects' );
 }, 999 );
 
 /* ---------------------------------------------------------------------------

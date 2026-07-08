@@ -11,9 +11,15 @@
 get_header();
 
 // Small ACF reader with a baked-in default so the page renders unchanged.
+// Falls through to raw post_meta if ACF returns nothing/false — that lets
+// old plain-URL string values (from before st_brochure_url/st_order_form_url
+// switched from text to file field) keep working while Chris hasn't re-selected.
 $stf = function ( $name, $default = '' ) {
     $v = function_exists( 'get_field' ) ? get_field( $name ) : null;
-    return ( $v === null || $v === '' ) ? $default : $v;
+    if ( $v === null || $v === '' || $v === false ) {
+        $v = get_post_meta( get_the_ID(), $name, true );
+    }
+    return ( $v === null || $v === '' || $v === false ) ? $default : $v;
 };
 
 // --- Operational settings (editable) ---

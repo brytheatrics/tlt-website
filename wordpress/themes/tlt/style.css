@@ -483,15 +483,13 @@ body.mobile-nav-open { overflow: hidden; }
   100% { transform: scale(1.12) translate(-2%, 1.5%); }
 }
 
-/* Bedroom Farce — non-animated static hero with a Ken Burns pan.
-   The one layer (1-bg.jpg) covers the full hero, slowly zooms + drifts. */
+/* Bedroom Farce — static hero, no animation.
+   The one layer (1-bg.jpg) covers the full hero at full opacity. */
 .hero-slug-bedroom-farce .hero-layer-1 {
   position: absolute; inset: 0;
   width: 100%; height: 100%;
   object-fit: cover;
-  transform-origin: center center;
   opacity: 1;
-  animation: kenBurns 24s ease-in-out infinite alternate;
 }
 
 .hero-layered .hero-image-mobile { display: none; opacity: 1; }

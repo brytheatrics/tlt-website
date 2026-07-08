@@ -202,7 +202,10 @@ hard edge — see CLAUDE.md → "Hero PSD design spec" for the full contract.
 
 ## After launch
 
+- [ ] **Follow up on Search Console sitemap** — submitted `wp-sitemap.xml` on 2026-07-07, status was "Couldn't fetch" (normal for initial submission). Check back on 2026-07-09 to confirm it flipped to "Success" with a page count. If still failing, investigate. Property URL: https://search.google.com/search-console
 - [ ] Watch the Flamingo inbox for the first few days — confirm forms are flowing
 - [ ] Check Google Search Console after a week — verify pages are getting indexed
 - [ ] Check uptime monitor — confirm no spurious alerts
 - [ ] Take a final database backup once everything is settled, archive it as the "launch baseline"
+- [ ] **Re-enable Cloudways Varnish/FPC** once actively editing stops — was turned off during launch iteration. Turn back on via Application Settings → HTTPS Redirection section. **Do NOT re-enable Breeze** — leave that dead; Varnish is Cloudways' proper cache layer with dashboard purge.
+- [ ] **Delete the theme's duplicate redirect handler** — `wordpress/themes/tlt/functions.php` lines ~276-310 read `redirects.csv` directly. The Redirection plugin now handles the same job with admin UI + hit tracking. Remove the theme code + delete the CSV.

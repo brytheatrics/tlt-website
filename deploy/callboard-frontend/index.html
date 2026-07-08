@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TLT Callboard</title>
+  <link rel="icon" href="/favicon.ico">
+  <style>
+    :root {
+      --red: #a2242a;
+      --red-dark: #7a1b20;
+      --ink: #1a1a1a;
+      --muted: #666;
+      --line: #e5e5e5;
+      --bg: #f7f5f0;
+      --card: #fff;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--ink); }
+
+    /* ---------- Login ---------- */
+    .login-page { min-height: 100vh; display: grid; place-items: center; padding: 20px; }
+    .login-card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 32px; max-width: 380px; width: 100%; }
+    .login-card h1 { margin: 0 0 6px; font-size: 22px; }
+    .login-card p { margin: 0 0 24px; color: var(--muted); font-size: 14px; }
+    .login-card label { display: block; font-size: 12px; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; }
+    .login-card input[type=password] {
+      width: 100%; padding: 10px 12px; font-size: 15px; border: 1px solid var(--line);
+      border-radius: 4px; margin-bottom: 16px; -webkit-appearance: none; appearance: none;
+    }
+    .login-card input:focus { outline: none; border-color: var(--red); box-shadow: 0 0 0 3px rgba(162, 36, 42, 0.15); }
+    .login-card button { width: 100%; padding: 11px; background: var(--red); color: #fff; border: none; border-radius: 4px; font-size: 15px; font-weight: 600; cursor: pointer; letter-spacing: 0.4px; }
+    .login-card button:hover { background: var(--red-dark); }
+    .login-card button:disabled { opacity: 0.6; cursor: wait; }
+    .login-error { color: var(--red); font-size: 13px; margin-top: 12px; min-height: 18px; }
+
+    /* ---------- App shell ---------- */
+    .app-header { background: var(--red); color: #fff; padding: 14px 20px; display: flex; align-items: center; gap: 12px; }
+    .app-header .logo { font-weight: 700; letter-spacing: 0.8px; }
+    .app-header .subtitle { font-size: 14px; opacity: 0.85; }
+    .app-header .whoami { margin-left: auto; font-size: 13px; }
+    .app-header button { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.5); padding: 4px 10px; border-radius: 3px; font-size: 12px; cursor: pointer; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 24px 20px 48px; }
+
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 20px; margin-bottom: 16px; }
+    .card h2 { margin: 0 0 12px; font-size: 16px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--red); }
+    .kv { display: grid; grid-template-columns: max-content 1fr; column-gap: 12px; row-gap: 6px; font-size: 14px; }
+    .kv dt { color: var(--muted); }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; background: #ecebe6; color: #555; }
+    .badge.ok { background: #e0f0d9; color: #386127; }
+
+    ul.plain { list-style: none; padding: 0; margin: 0; }
+    ul.plain li { padding: 4px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+    ul.plain li:last-child { border-bottom: none; }
+
+    .todo { color: var(--muted); font-size: 13px; font-style: italic; }
+    .err { color: var(--red); font-size: 13px; }
+  </style>
+</head>
+
+<!-- =====================================================================
+     PHASE 1 SCAFFOLDING — a login gate + boot smoke test.
+     Ports your existing Index.html later. This exists just to prove auth
+     + API endpoints work end-to-end.
+     ===================================================================== -->
+<body>
+
+<div id="login" class="login-page" style="display:none">
+  <div class="login-card">
+    <h1>TLT Callboard</h1>
+    <p>Enter your Callboard password.</p>
+    <form id="loginForm">
+      <label for="pw">Password</label>
+      <input id="pw" type="password" autocomplete="current-password" required autofocus>
+      <button type="submit" id="loginBtn">Sign In</button>
+      <div class="login-error" id="loginErr"></div>
+    </form>
+  </div>
+</div>
+
+<div id="app" style="display:none">
+  <header class="app-header">
+    <span class="logo">TLT</span>
+    <span class="subtitle">Callboard</span>
+    <span class="whoami" id="whoami"></span>
+    <button id="logoutBtn">Sign out</button>
+  </header>
+  <main class="container">
+    <div class="card">
+      <h2>Session</h2>
+      <dl class="kv" id="userInfo"></dl>
+    </div>
+
+    <div class="card">
+      <h2>Current Season</h2>
+      <div id="seasonInfo">Loading…</div>
+    </div>
+
+    <div class="card">
+      <h2>Shows</h2>
+      <ul class="plain" id="showList"><li>Loading…</li></ul>
+    </div>
+
+    <div class="card">
+      <h2>Ported endpoints (Phase 1 pilot)</h2>
+      <p class="todo">Working: <code>/login</code>, <code>/whoami</code>, <code>/logout</code>, <code>/shows</code>, <code>/current-season</code>, <code>/roles</code>, <code>/show-roster</code>, <code>/actors-for-show</code>, <code>/verify-approval</code>.</p>
+      <p class="todo">Not yet ported: dashboard, actors, sales, bios, contacts, contracts, full-season, combinable-shows, schedule-link, contact-sheet-link, calendar-events, calendar-conflicts, program.</p>
+    </div>
+  </main>
+</div>
+
+<script>
+  const API_BASE = '/wp-json/callboard/v1';
+  const TOKEN_KEY = 'tlt_callboard_token';
+
+  function getToken() { return localStorage.getItem(TOKEN_KEY); }
+  function setToken(t) { localStorage.setItem(TOKEN_KEY, t); }
+  function clearToken() { localStorage.removeItem(TOKEN_KEY); }
+
+  async function api(path, opts = {}) {
+    const token = getToken();
+    const headers = Object.assign({ 'Accept': 'application/json' }, opts.headers || {});
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    if (opts.body && !(opts.body instanceof FormData)) headers['Content-Type'] = 'application/json';
+    const resp = await fetch(API_BASE + path, Object.assign({}, opts, { headers, body: opts.body ? JSON.stringify(opts.body) : undefined }));
+    let json = null;
+    try { json = await resp.json(); } catch (_) {}
+    if (!resp.ok) {
+      const err = new Error((json && (json.message || json.code)) || 'HTTP ' + resp.status);
+      err.status = resp.status;
+      err.body = json;
+      throw err;
+    }
+    return json;
+  }
+
+  /* ---------- Login flow ---------- */
+
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('loginBtn');
+    const err = document.getElementById('loginErr');
+    err.textContent = '';
+    btn.disabled = true; btn.textContent = 'Signing in…';
+    try {
+      const result = await api('/login', { method: 'POST', body: { password: document.getElementById('pw').value } });
+      setToken(result.token);
+      boot();
+    } catch (e) {
+      err.textContent = e.status === 401 ? 'Password not recognized.' : (e.message || 'Login failed.');
+      btn.disabled = false; btn.textContent = 'Sign In';
+    }
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    try { await api('/logout'); } catch (_) {}
+    clearToken();
+    showLogin();
+  });
+
+  /* ---------- Screens ---------- */
+
+  function showLogin() {
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('login').style.display = 'flex';
+    setTimeout(() => document.getElementById('pw').focus(), 50);
+  }
+
+  function showApp(user) {
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('whoami').textContent = user.name + (user.role ? ' · ' + user.role : '');
+    const info = document.getElementById('userInfo');
+    info.innerHTML = '';
+    const rows = [
+      ['Name', user.name || ''],
+      ['Role', user.role || ''],
+      ['Initials', user.initials || ''],
+      ['Approver?', user.is_approver ? 'Yes' : 'No'],
+    ];
+    for (const [k, v] of rows) {
+      const dt = document.createElement('dt'); dt.textContent = k;
+      const dd = document.createElement('dd'); dd.textContent = v;
+      info.append(dt, dd);
+    }
+    loadSeason();
+    loadShows();
+  }
+
+  async function loadSeason() {
+    const el = document.getElementById('seasonInfo');
+    try {
+      const { data } = await api('/current-season');
+      el.innerHTML = '<span class="badge ok">' + escapeHtml(data.season) + '</span> · ' + escapeHtml(data.long);
+    } catch (e) { el.innerHTML = '<span class="err">' + e.message + '</span>'; }
+  }
+
+  async function loadShows() {
+    const list = document.getElementById('showList');
+    try {
+      const { data } = await api('/shows');
+      list.innerHTML = '';
+      if (!data.length) { list.innerHTML = '<li class="todo">No shows.</li>'; return; }
+      for (const name of data) {
+        const li = document.createElement('li');
+        li.textContent = name;
+        list.append(li);
+      }
+    } catch (e) { list.innerHTML = '<li class="err">' + e.message + '</li>'; }
+  }
+
+  function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+  /* ---------- Boot ---------- */
+
+  async function boot() {
+    if (!getToken()) { showLogin(); return; }
+    try {
+      const { data } = await api('/whoami');
+      if (!data) { clearToken(); showLogin(); return; }
+      showApp(data);
+    } catch (e) {
+      // Any auth failure lands us at login.
+      clearToken();
+      showLogin();
+    }
+  }
+
+  boot();
+</script>
+
+</body>
+</html>
