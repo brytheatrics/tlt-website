@@ -135,9 +135,12 @@ Requires TLT_CALLBOARD_OPENSIGN_KEY + TLT_CALLBOARD_RESEND_KEY set.
 
 ## AI-audited concerns (need YOUR call)
 
-_(populated as I find things I'm unsure about)_
-
-_(none yet)_
+- **Contract conditional bracket sections inside table cells** — `[BudgetSection]…[/BudgetSection]`, `[SpecialConditionsSection]…[/SpecialConditionsSection]`, etc. work fine when the tags live in top-level body paragraphs. If your contract templates put them inside a table cell that spans the whole `[TAG]…[/TAG]` block, my `deleteContentRange` from opening-tag paragraph to closing-tag paragraph will work. **But if `[TAG]` and `[/TAG]` are in DIFFERENT cells or rows**, the delete spans a structural boundary and will 400. Check by opening a generated contract and searching for `[` — if any bracket markers remain, that's the case and I'll need to switch to per-paragraph delete-and-heal.
+- **Contract page count for OpenSign widgets** — I count pages by regexing `/Type /Page` (not `/Pages`) in the raw PDF bytes. This matches the GAS approach but is heuristic. If widgets land on the wrong page, that's the tell — switch to a real PDF library.
+- **Contract `<<Board>>` expansion drops paragraph styling** — my `replace_marker_with_lines` inserts plain-text paragraphs. GAS preserved the source paragraph's font family / size / bold / color when inserting each board member. If the Board list renders in the wrong font in a generated contract, we can either extend the expander to copy source text style or set the target font explicitly in the batchUpdate.
+- **Docs API rate limits** — Docs write requests are capped at 300/min per user for a service account. A single contract generation runs ~10 batchUpdate calls plus many small write requests inside those. Should be fine for one-at-a-time use. Bulk operations (e.g., regenerating every contract in the season) could hit limits.
+- **Bio doc created via `documents.create` then moved** — Bios doc uses no template. The SA creates the Doc in its own drive, then Drive `files.patch` moves it into the season subfolder under Bios root. If the "move" fails, the doc exists but is stranded in the SA's private space. My move-failure now returns a WP_Error with the doc ID, so you'll see it in the response and can look it up.
+- **Docs export PDF `docs.google.com/document/d/…/export?format=pdf` needs SA read on the Doc** — Since the SA creates/copies the Doc, this should just work. But if the folder is on a Shared Drive with unusual permissions, exports may 403. Failure surfaces as a WP_Error.
 
 ---
 
