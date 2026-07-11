@@ -1255,9 +1255,16 @@ function tlt_callboard_ep_get_contracts( WP_REST_Request $req ) {
     foreach ( $data["'Production Teams'!A2:S"] ?? [] as $r ) $emit( $r, false );
     foreach ( $data['Actors!A2:S']            ?? [] as $r ) $emit( $r, true );
 
-    // Frontend expects an array of contracts directly (it .map()s over data).
-    // Shows list is fetched separately via /shows. Suppress the wrapper here.
-    return tlt_cb_ok( $contracts );
+    // Two frontend callers hit this endpoint with different shape expectations:
+    //   getContractsPageData → wants { shows, contracts } (drives the page shell
+    //     including the show-filter dropdown).
+    //   getContractsData     → wants just the contracts array (post-mutation
+    //     refresh — the shell is already rendered).
+    // We return the wrapped shape unless ?shape=array is set. port_callboard.py
+    // routes getContractsData with ?shape=array; getContractsPageData without.
+    $shape = tlt_cb_s( $req->get_param( 'shape' ) );
+    if ( $shape === 'array' ) return tlt_cb_ok( $contracts );
+    return tlt_cb_ok( [ 'shows' => $shows, 'contracts' => $contracts ] );
 }
 
 /* ===========================================================================
@@ -1514,126 +1521,17 @@ function tlt_callboard_ep_get_calendar_conflicts( WP_REST_Request $req ) {
 
 /* ===========================================================================
  * ENDPOINT: GET /program?show=Foo
- * → { info, staff, cast, team } — everything the Programs tab needs.
+ * → getProgramData shape: { show, season, info, staff, productionTeam,
+ *   bios: {team, cast}, italicizeTitles }. Same payload used by
+ *   /program-export → InDesign consumer. Old Phase 2 stub always returned
+ *   empty bios; frontend then displayed "0 of N bios submitted".
  * ======================================================================== */
 function tlt_callboard_ep_get_program( WP_REST_Request $req ) {
     $show = tlt_cb_s( $req->get_param( 'show' ) );
     if ( $show === '' ) return new WP_Error( 'missing_show', 'show query param required', [ 'status' => 400 ] );
-
-    $data = tlt_callboard_sheets_get( TLT_CALLBOARD_SHEET_ID, [
-        'Season!A2:N',
-        'Theatre!A2:D200',
-        "'Production Teams'!A2:S",
-        'Actors!A2:S',
-        'Dates!A2:H',
-        'Programs!A1:Z',   // header row + one row per show — editable program fields
-    ] );
+    $data = tlt_cb_program_get_data( $show );
     if ( is_wp_error( $data ) ) return $data;
-
-    // Read the Programs tab — dynamic column layout keyed off the header row so
-    // Blake can add more editable fields (a1/a2/intermission/place/etc.) without
-    // needing a code change here. Match against snake-style keys the renderer
-    // expects.
-    $prog_row = [];
-    $prog_headers = $data['Programs!A1:Z'][0] ?? [];
-    foreach ( array_slice( $data['Programs!A1:Z'] ?? [], 1 ) as $r ) {
-        if ( tlt_cb_s( $r[0] ?? '' ) === $show ) { $prog_row = $r; break; }
-    }
-    $prog_field = function ( $label ) use ( $prog_headers, $prog_row ) {
-        $needle = strtolower( trim( $label ) );
-        foreach ( $prog_headers as $i => $h ) {
-            if ( strtolower( trim( (string) $h ) ) === $needle ) {
-                return tlt_cb_s( $prog_row[ $i ] ?? '' );
-            }
-        }
-        return '';
-    };
-
-    // Director from Production Teams (first row where role = "Director").
-    $director = '';
-    foreach ( $data["'Production Teams'!A2:S"] ?? [] as $r ) {
-        if ( tlt_cb_s( $r[0] ?? '' ) !== $show ) continue;
-        if ( strcasecmp( tlt_cb_s( $r[1] ?? '' ), 'Director' ) === 0 ) {
-            $director = trim( tlt_cb_s( $r[2] ?? '' ) . ' ' . tlt_cb_s( $r[4] ?? '' ) );
-            break;
-        }
-    }
-
-    // Run window (opening → closing) from Dates.
-    $open_date = ''; $close_date = '';
-    foreach ( $data['Dates!A2:H'] ?? [] as $r ) {
-        if ( tlt_cb_s( $r[0] ?? '' ) !== $show ) continue;
-        $type = tlt_cb_s( $r[1] ?? '' );
-        $date = tlt_cb_s( $r[4] ?? '' );
-        if ( $type === 'Opening Performance' && $date && ! $open_date )  $open_date = $date;
-        if ( $type === 'Closing Performance' && $date && ! $close_date ) $close_date = $date;
-    }
-    $run = trim( $open_date ) !== '' && trim( $close_date ) !== ''
-        ? ( $open_date . ' – ' . $close_date )
-        : ( $open_date ?: $close_date );
-
-    // Auto-pulled (title/director/run) + editable-from-Programs-tab (rest).
-    // Programs tab columns matched loosely by header name so Blake can add
-    // more without another code change.
-    $info = [
-        'title'        => $show,
-        'director'     => $director,
-        'run'          => $run,
-        'author'       => $prog_field( 'Author' ) ?: $prog_field( 'Playwright' ),
-        'legal'        => $prog_field( 'Legal' ) ?: $prog_field( 'Attribution' ) ?: $prog_field( 'Legal/Attribution' ),
-        'a1'           => $prog_field( 'Act 1' ) ?: $prog_field( 'A1' ) ?: $prog_field( 'Act 1 run time' ),
-        'a2'           => $prog_field( 'Act 2' ) ?: $prog_field( 'A2' ) ?: $prog_field( 'Act 2 run time' ),
-        'intermission' => $prog_field( 'Intermission' ),
-        'place'        => $prog_field( 'Place' ) ?: $prog_field( 'Setting' ),
-    ];
-
-    // Staff: Theatre tab rows with display order (col D not blank).
-    $staff = [];
-    foreach ( $data['Theatre!A2:D200'] ?? [] as $r ) {
-        $order = tlt_cb_s( $r[3] ?? '' );
-        if ( $order === '' ) continue;
-        $staff[] = [
-            'role'  => tlt_cb_s( $r[0] ?? '' ),
-            'name'  => tlt_cb_s( $r[1] ?? '' ),
-            'order' => (int) $order,
-        ];
-    }
-    usort( $staff, function ( $a, $b ) { return $a['order'] <=> $b['order']; } );
-
-    // Team: production team entries for this show.
-    $team = [];
-    foreach ( $data["'Production Teams'!A2:S"] ?? [] as $r ) {
-        if ( tlt_cb_s( $r[0] ?? '' ) !== $show ) continue;
-        if ( tlt_cb_s( $r[2] ?? '' ) === '' ) continue;
-        $team[] = [
-            'role'      => tlt_cb_s( $r[1] ?? '' ),
-            'firstName' => tlt_cb_s( $r[2] ?? '' ),
-            'lastName'  => tlt_cb_s( $r[4] ?? '' ),
-            'bio'       => '', // Phase 2: pull from Contactbook Bios tab
-        ];
-    }
-
-    // Cast: actors for this show.
-    $cast = [];
-    foreach ( $data['Actors!A2:S'] ?? [] as $r ) {
-        if ( tlt_cb_s( $r[0] ?? '' ) !== $show ) continue;
-        if ( tlt_cb_s( $r[2] ?? '' ) === '' ) continue;
-        $cast[] = [
-            'character' => tlt_cb_s( $r[1] ?? '' ),
-            'firstName' => tlt_cb_s( $r[2] ?? '' ),
-            'lastName'  => tlt_cb_s( $r[4] ?? '' ),
-            'bio'       => '', // Phase 2
-        ];
-    }
-
-    return tlt_cb_ok( [
-        'info'  => $info,
-        'staff' => $staff,
-        'bios'  => [
-            'cast' => $cast,
-            'team' => $team,
-        ],
-    ] );
+    return tlt_cb_ok( $data );
 }
 
 /* ===========================================================================
@@ -3470,7 +3368,9 @@ function tlt_cb_drive_folder_or_create( $parent_id, $name ) {
 
 /**
  * Create a fresh Google Doc directly (no template copy). Returns the doc ID.
- * Immediately moves it into $parent_folder_id (Docs are created in root by default).
+ * Moves it into $parent_folder_id — SAs don't have a My Drive so we can't
+ * assume the initial parent is literally "root"; look it up + remove
+ * whatever the current parents are.
  */
 function tlt_cb_docs_create( $title, $parent_folder_id ) {
     $token = tlt_callboard_google_access_token();
@@ -3488,15 +3388,37 @@ function tlt_cb_docs_create( $title, $parent_folder_id ) {
     $data = json_decode( $body, true );
     if ( empty( $data['documentId'] ) ) return new WP_Error( 'docs_create', "Docs create failed: $body" );
     $doc_id = $data['documentId'];
-    // Move into folder.
-    $mv = wp_remote_request( 'https://www.googleapis.com/drive/v3/files/' . $doc_id
-        . '?addParents=' . rawurlencode( $parent_folder_id )
-        . '&removeParents=root&supportsAllDrives=true&fields=id,parents', [
+
+    // Look up the doc's current parents so we can remove them explicitly.
+    $meta_resp = wp_remote_get(
+        'https://www.googleapis.com/drive/v3/files/' . $doc_id . '?fields=parents&supportsAllDrives=true',
+        [ 'timeout' => 15, 'headers' => [ 'Authorization' => 'Bearer ' . $token ] ]
+    );
+    $current_parents = [];
+    if ( ! is_wp_error( $meta_resp ) ) {
+        $meta = json_decode( wp_remote_retrieve_body( $meta_resp ), true );
+        if ( ! empty( $meta['parents'] ) && is_array( $meta['parents'] ) ) {
+            $current_parents = $meta['parents'];
+        }
+    }
+
+    // Move: addParents=target, removeParents=<current joined>.
+    $url = 'https://www.googleapis.com/drive/v3/files/' . $doc_id
+        . '?addParents=' . rawurlencode( $parent_folder_id );
+    if ( ! empty( $current_parents ) ) {
+        $url .= '&removeParents=' . rawurlencode( implode( ',', $current_parents ) );
+    }
+    $url .= '&supportsAllDrives=true&fields=id,parents';
+    $mv = wp_remote_request( $url, [
         'method'  => 'PATCH',
         'timeout' => 15,
         'headers' => [ 'Authorization' => 'Bearer ' . $token ],
     ] );
     if ( is_wp_error( $mv ) ) return $mv;
+    $mv_code = wp_remote_retrieve_response_code( $mv );
+    if ( $mv_code < 200 || $mv_code >= 300 ) {
+        return new WP_Error( 'docs_create_move', "Doc created but move to folder failed ($mv_code): " . wp_remote_retrieve_body( $mv ) . " — doc left at {$doc_id}" );
+    }
     return $doc_id;
 }
 
@@ -5258,6 +5180,17 @@ function tlt_cb_contract_fmt_currency( $val ) {
 function tlt_cb_contract_assemble( $show, $role, $character = '' ) {
     $named = tlt_cb_get_named_ranges( [ 'Mission', 'Vision', 'Board', 'CurrentSeason', 'CurrentSeasonLong' ] );
     if ( is_wp_error( $named ) ) return $named;
+
+    // If named ranges for CurrentSeason / CurrentSeasonLong don't exist, read
+    // the same values from the Season tab's label rows (col A = label, col B
+    // = value). GAS required the named ranges; port stays working either way.
+    if ( empty( $named['CurrentSeason'] ) || empty( $named['CurrentSeasonLong'] ) ) {
+        $season_rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, 'Season!A1:N' );
+        if ( ! is_wp_error( $season_rows ) ) {
+            if ( empty( $named['CurrentSeason'] ) )     $named['CurrentSeason']     = tlt_cb_season_setting( $season_rows, 'Current Season' );
+            if ( empty( $named['CurrentSeasonLong'] ) ) $named['CurrentSeasonLong'] = tlt_cb_season_setting( $season_rows, 'Current Season Long' );
+        }
+    }
 
     $theatre_rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, 'Theatre!A2:D200' );
     if ( is_wp_error( $theatre_rows ) ) return $theatre_rows;

@@ -1454,7 +1454,9 @@
     getBiosData:               () => '/bios',
     getContacts:               () => '/contacts',
     getContractsPageData:      (force) => '/contracts' + (force ? '?force=1' : ''),
-    getContractsData:          () => '/contracts',
+    // Same endpoint but tell it to return the array shape (frontend uses this
+    // after mutations to refresh — expects Array, not {shows, contracts}).
+    getContractsData:          () => '/contracts?shape=array',
     getFullSeasonData:         () => '/full-season',
     getCombinableShows:        (show, role, first, last) => '/combinable-shows'
                                  + '?show='      + encodeURIComponent(show  || '')
