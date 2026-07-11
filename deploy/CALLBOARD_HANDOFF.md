@@ -15,8 +15,10 @@ This is a one-page snapshot of what's ported, what needs your config, and what t
 Add these `define()` lines to `wp-config.php` on Cloudways (above the `/* That's all, stop editing! */` line):
 
 ```php
-// OpenSign — from ContractGenerator.js constant OPENSIGN_API_KEY
-define( 'TLT_CALLBOARD_OPENSIGN_KEY', 'opensign.6muDBQjxkt3oVIJC647zyr' );
+// OpenSign — value is hardcoded on line 18 of ContractGenerator.js in the
+// GAS Drive folder (deploy/callboard-gas-reference/ContractGenerator.js on
+// your local disk). Copy the string starting with "opensign." here.
+define( 'TLT_CALLBOARD_OPENSIGN_KEY', 'opensign.…REPLACE_ME…' );
 
 // Resend — was in GAS Script Properties as RESEND_API_KEY. Grab yours from
 // Resend's dashboard (or transfer the Script Properties value into here).
