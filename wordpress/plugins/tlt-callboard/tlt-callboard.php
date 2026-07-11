@@ -3971,7 +3971,7 @@ function tlt_cb_bios_doc_compile( $show ) {
         tlt_callboard_sheets_write( TLT_CALLBOARD_SHEET_ID, "Season!L{$data['season_row_num']}", [[ $url ]] );
     }
     $count = count( $data['team_entries'] ) + count( $data['actor_entries'] );
-    return [ 'url' => $url, 'count' => $count ];
+    return [ 'success' => true, 'docUrl' => $url, 'url' => $url, 'count' => $count ];
 }
 
 /* ===========================================================================
@@ -4860,7 +4860,7 @@ function tlt_callboard_ep_bios_resend( WP_REST_Request $req ) {
         $r = tlt_cb_send_bio_request_email( $email, $full, $first, $last, $show, $role );
     }
     if ( is_wp_error( $r ) ) return $r;
-    return tlt_cb_ok( [ 'sent' => true, 'combined' => count( $shows ) > 1, 'shows' => $shows ] );
+    return tlt_cb_ok( [ 'success' => true, 'sent' => true, 'combined' => count( $shows ) > 1, 'shows' => $shows ] );
 }
 
 /**

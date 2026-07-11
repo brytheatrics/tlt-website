@@ -128,6 +128,8 @@ Requires TLT_CALLBOARD_OPENSIGN_KEY + TLT_CALLBOARD_RESEND_KEY set.
 - **Docs fields masks in contract walker + tech schedule row delete** were suspect for paren balance; swapped to no-mask (full-doc fetch). Slightly slower, always works.
 - **`/program` was returning empty bios + missing `specialThanks`** — the old Phase 2 stub always set `bio: ''` and didn't fetch Contactbook bios. Programs tab renderer counts non-empty bios and would have shown "0 of N submitted" for every show. Fixed: `/program` now delegates to the same `tlt_cb_program_get_data()` used by the InDesign export, so both surfaces get the real data.
 - **`tlt_cb_docs_create` was passing `removeParents=root` blindly** — SAs don't necessarily have their new Doc parented at literal "root", so the move could silently fail or duplicate the doc. Fixed: fetch current parents first, remove those explicitly. Also now surfaces move failure as a WP_Error so Bio doc compilation reports it instead of leaving an orphan.
+- **Contract templates: `<<Staff>>`, `<<MC>>`, `<<ST>>` weren't replaced** — GAS had them in its replacements map as empty strings. Port omitted them; templates using those tags would render them literally. Fixed.
+- **`compileBiosDoc` + `resendBioRequest` responses missing `success` flag** — frontend does `if (result.success) { ...ok... } else { alert(result.error) }`. Missing flag → falsy → shows "Error: undefined". Fixed: both endpoints now return `{success: true, ...}` on the success path. (contract generate/send/delete already returned `success: true`.)
 
 ---
 
