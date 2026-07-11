@@ -5227,6 +5227,12 @@ function tlt_cb_contract_assemble( $show, $role, $character = '' ) {
         '<<PM>>'           => tlt_cb_contract_theatre_value( 'Production Manager',           $theatre_rows ),
         '<<Mission>>'      => $named['Mission'] ?? '',
         '<<Vision>>'       => $named['Vision']  ?? '',
+        // Staff/Marketing/Support-Team markers per GAS _STAFF_BLOCKS — always
+        // replaced with empty string. hide_empty_staff_blocks removes the
+        // adjacent label paragraph so nothing dangles.
+        '<<Staff>>'        => '',
+        '<<MC>>'           => '',
+        '<<ST>>'           => '',
         '<<Stipend>>'      => tlt_cb_contract_fmt_currency( $budget['stipend'] ),
         '<<Budget>>'       => tlt_cb_contract_fmt_currency( $budget['budget1'] ),
         '<<Budget2>>'      => tlt_cb_contract_fmt_currency( $budget['budget2'] ),
