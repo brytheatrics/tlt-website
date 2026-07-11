@@ -3114,26 +3114,25 @@ function tlt_cb_contact_sheet_build_doc( $doc_id, $show, $season, $season_long, 
     // target indices.
     usort( $inserts, function ( $a, $b ) { return $b['index'] - $a['index']; } );
 
-    $phase3_requests = [];
+    // Phase 3a — inserts only. Splitting from styling because inserts into
+    // table 0 grow the doc, shifting table 1's startIndex; if we ran cell/col
+    // styling in the same batch, table 1's styling would target a stale index.
+    $insert_requests = [];
     foreach ( $inserts as $ins ) {
-        $phase3_requests[] = [
+        $insert_requests[] = [
             'insertText' => [
                 'location' => [ 'index' => $ins['index'] ],
                 'text'     => $ins['text'],
             ],
         ];
     }
-
-    // Also set column widths and cell padding via updateTableColumnProperties
-    // and updateTableCellStyle. These need to know the table's startIndex.
-    // Padding for header rows: 4pt top/bottom, 6pt left/right; font 10 bold.
-    // Padding for data rows:   3pt top/bottom, 6pt left/right; font 10.
-    foreach ( $tables as $ti => $tbl ) {
-        // Column widths — need the table's startIndex, which we get from the
-        // enclosing content element. Re-walk to find it.
+    if ( ! empty( $insert_requests ) ) {
+        $r = tlt_cb_docs_batch_update( $doc_id, $insert_requests );
+        if ( is_wp_error( $r ) ) return $r;
     }
-    // The above needs the table start index — reload the body top-level list
-    // with startIndex on the table element too.
+
+    // Phase 3b — column widths + cell padding. Re-fetch table start indices
+    // now that inserts have shifted things.
     $doc2 = tlt_cb_docs_get( $doc_id, 'body(content(startIndex,table(tableStyle(tableColumnProperties))))' );
     if ( is_wp_error( $doc2 ) ) return $doc2;
     $table_start_indices = [];
@@ -3141,15 +3140,15 @@ function tlt_cb_contact_sheet_build_doc( $doc_id, $show, $season, $season_long, 
         if ( isset( $el['table'] ) ) $table_start_indices[] = $el['startIndex'] ?? null;
     }
 
+    $style_requests = [];
     foreach ( $table_start_indices as $ti => $start ) {
         if ( $start === null ) continue;
-        // Column widths.
         foreach ( $col_widths as $ci => $w ) {
-            $phase3_requests[] = [
+            $style_requests[] = [
                 'updateTableColumnProperties' => [
-                    'tableStartLocation'      => [ 'index' => $start ],
-                    'columnIndices'           => [ $ci ],
-                    'tableColumnProperties'   => [
+                    'tableStartLocation'    => [ 'index' => $start ],
+                    'columnIndices'         => [ $ci ],
+                    'tableColumnProperties' => [
                         'widthType' => 'FIXED_WIDTH',
                         'width'     => [ 'magnitude' => $w, 'unit' => 'PT' ],
                     ],
@@ -3157,8 +3156,7 @@ function tlt_cb_contact_sheet_build_doc( $doc_id, $show, $season, $season_long, 
                 ],
             ];
         }
-        // Header row (row 0): 4pt top/bottom, 6pt left/right padding.
-        $phase3_requests[] = [
+        $style_requests[] = [
             'updateTableCellStyle' => [
                 'tableStartLocation' => [ 'index' => $start ],
                 'tableRange' => [
@@ -3179,11 +3177,9 @@ function tlt_cb_contact_sheet_build_doc( $doc_id, $show, $season, $season_long, 
                 'fields' => 'paddingTop,paddingBottom,paddingLeft,paddingRight',
             ],
         ];
-        // Data rows: 3pt top/bottom, 6pt left/right. Only add if there ARE
-        // data rows (empty cast/team lists would break the tableRange).
         $data_count = ( $ti === 0 ) ? count( $cast ) : count( $team );
         if ( $data_count > 0 ) {
-            $phase3_requests[] = [
+            $style_requests[] = [
                 'updateTableCellStyle' => [
                     'tableStartLocation' => [ 'index' => $start ],
                     'tableRange' => [
@@ -3206,9 +3202,10 @@ function tlt_cb_contact_sheet_build_doc( $doc_id, $show, $season, $season_long, 
             ];
         }
     }
-
-    $r = tlt_cb_docs_batch_update( $doc_id, $phase3_requests );
-    if ( is_wp_error( $r ) ) return $r;
+    if ( ! empty( $style_requests ) ) {
+        $r = tlt_cb_docs_batch_update( $doc_id, $style_requests );
+        if ( is_wp_error( $r ) ) return $r;
+    }
 
     // -------------- Phase 4: text styling on filled cells --------------
     // GAS sets all cell text to font 10 (bold for header row, not bold for
@@ -3637,7 +3634,7 @@ function tlt_cb_tech_schedule_assemble( $show ) {
  * "<<TechRunLabel>>" placeholder and deletes it via Docs API deleteTableRow.
  */
 function tlt_cb_tech_schedule_delete_tech_run_row( $doc_id ) {
-    $doc = tlt_cb_docs_get( $doc_id, 'body(content(startIndex,table(rows,columns,tableRows(tableCells(content(paragraph(elements(textRun(content))))))))))' );
+    $doc = tlt_cb_docs_get( $doc_id );
     if ( is_wp_error( $doc ) ) return $doc;
     foreach ( ( $doc['body']['content'] ?? [] ) as $el ) {
         if ( empty( $el['table'] ) ) continue;
@@ -5335,7 +5332,10 @@ function tlt_cb_contract_assemble( $show, $role, $character = '' ) {
  * plain text. Returns [ [start, end, text], ... ] one entry per element.
  */
 function tlt_cb_contract_walk_paragraphs( $doc_id ) {
-    $doc = tlt_cb_docs_get( $doc_id, 'body(content(startIndex,endIndex,paragraph(elements(startIndex,endIndex,textRun(content))),table(tableRows(tableCells(content(startIndex,endIndex,paragraph(elements(startIndex,endIndex,textRun(content)))))))))' );
+    // No fields mask — the mask for a nested body(content(paragraph, table))
+    // structure is a source of subtle parse errors and Google returns 400 on
+    // any mismatch. Full-doc fetch is fine for the size docs we build.
+    $doc = tlt_cb_docs_get( $doc_id );
     if ( is_wp_error( $doc ) ) return $doc;
     $out = [];
     $walk = function ( $items, &$out ) use ( &$walk ) {
@@ -5767,17 +5767,66 @@ function tlt_cb_contract_generate( $show, $role, $first_name, $last_name, $chara
     $r = tlt_cb_contract_update_status( $show, $role, $first_name, 'Generated', $url );
     if ( is_wp_error( $r ) ) return $r;
 
+    // Look up email in Contactbook — the frontend takes `generated.email` from
+    // this response and passes it to /contract-send. If unset, the send fails
+    // with "missing email" downstream.
+    $email = tlt_cb_contact_email_lookup( $first_name, $last_name, $show ?? ( isset( $shows ) ? $shows[0] : '' ), $role );
+
     return [
         'success'      => true,
         'docId'        => $doc_id,
         'docUrl'       => $url,
         'docName'      => $doc_name,
+        'email'        => $email,
         'fullName'     => $full_name,
         'show'         => $show,
         'role'         => $role,
         'firstName'    => $first_name,
+        'lastName'     => $last_name,
         'templateType' => $data['template'],
     ];
+}
+
+/**
+ * Email lookup for a contract row. Tries Production Teams / Actors first
+ * (col H = index 7) then falls back to Contactbook first+last match.
+ * Returns '' if nothing found. Used by contract generate response so the
+ * frontend can pass email to /contract-send.
+ */
+function tlt_cb_contact_email_lookup( $first, $last, $show = '', $role = '' ) {
+    $first_lc = strtolower( tlt_cb_s( $first ) );
+    $last_lc  = strtolower( tlt_cb_s( $last ) );
+    $show_s   = tlt_cb_s( $show );
+    $role_s   = tlt_cb_s( $role );
+    $is_actor = strcasecmp( $role_s, 'Actor' ) === 0;
+
+    // 1. Try the row on Production Teams / Actors (canonical for that show).
+    if ( $show_s !== '' && $first !== '' ) {
+        $tab_range = $is_actor ? 'Actors!A2:H' : "'Production Teams'!A2:H";
+        $rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, $tab_range );
+        if ( ! is_wp_error( $rows ) ) {
+            foreach ( $rows as $r ) {
+                if ( tlt_cb_s( $r[0] ?? '' ) !== $show_s ) continue;
+                if ( strtolower( tlt_cb_s( $r[2] ?? '' ) ) !== $first_lc ) continue;
+                if ( $last_lc !== '' && strtolower( tlt_cb_s( $r[4] ?? '' ) ) !== $last_lc ) continue;
+                if ( ! $is_actor && $role_s !== '' && tlt_cb_s( $r[1] ?? '' ) !== $role_s ) continue;
+                $email = tlt_cb_s( $r[7] ?? '' );
+                if ( $email !== '' ) return $email;
+                break;
+            }
+        }
+    }
+
+    // 2. Fall back to Contactbook by first + last.
+    $rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_CONTACTBOOK_ID, 'Contactbook!A2:H' );
+    if ( is_wp_error( $rows ) ) return '';
+    foreach ( $rows as $r ) {
+        if ( strtolower( tlt_cb_s( $r[1] ?? '' ) ) === $first_lc
+          && strtolower( tlt_cb_s( $r[3] ?? '' ) ) === $last_lc ) {
+            return tlt_cb_s( $r[7] ?? '' );
+        }
+    }
+    return '';
 }
 
 /**
@@ -5901,15 +5950,19 @@ function tlt_cb_contract_generate_combined( array $shows, $role, $first_name, $l
         if ( is_wp_error( $r ) ) return $r;
     }
 
+    $email = tlt_cb_contact_email_lookup( $first_name, $last_name, $show ?? ( isset( $shows ) ? $shows[0] : '' ), $role );
+
     return [
         'success'            => true,
         'docId'              => $doc_id,
         'docUrl'             => $url,
         'docName'            => $doc_name,
+        'email'              => $email,
         'fullName'           => $full_name,
         'shows'              => $shows,
         'role'               => $role,
         'firstName'          => $first_name,
+        'lastName'           => $last_name,
         'templateType'       => $data['template'],
         'combinedContractId' => $combined_id,
     ];
