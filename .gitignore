@@ -41,3 +41,9 @@ venv/
 # Recovered third-party reviews — copyright belongs to the publications, kept
 # as an internal archive only. NEVER commit (would publish them publicly).
 /archive/reviews/
+
+# GAS Callboard reference files pulled from Drive as porting reference.
+# ContractGenerator.js contains the OpenSign API key hardcoded — do NOT
+# commit. If you need this snapshot, re-copy from
+# G:\My Drive\WebApp Production\Callboard Crossover\
+/deploy/callboard-gas-reference/

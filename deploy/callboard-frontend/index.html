@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
     <title>TLT Callboard</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -100,6 +101,54 @@
     .pill.sent { background: #fff8e1; color: #f57f17; }
     .pill.pending { background: #fce4ec; color: #c62828; }
     .pill.empty { background: #f5f5f5; color: #999; }
+    .pill.conflicts { background: #fdecea; color: #a2242a; }
+
+    .conflict-pill {
+      display: inline-block;
+      background: #fdecea;
+      color: #a2242a;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 99px;
+      margin-left: 8px;
+      cursor: pointer;
+      user-select: none;
+      vertical-align: middle;
+    }
+    .conflict-pill:hover { background: #fbdad4; }
+    .conflict-detail-list { display: flex; flex-direction: column; gap: 4px; }
+    .conflict-item { display: flex; align-items: center; gap: 14px; font-size: 13px; color: #333; padding: 3px 0; }
+    .conflict-item-date { font-weight: 600; min-width: 100px; color: #a2242a; font-variant-numeric: tabular-nums; }
+    .conflict-item-event { color: #333; }
+    .conflict-item-notes { color: #888; font-style: italic; font-size: 12px; margin-left: auto; }
+
+    /* Calendar day conflict badges */
+    .cal-day-conflict {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 1px 5px;
+      border-radius: 3px;
+      background: #a2242a;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 1px;
+    }
+    .cal-day.past .cal-day-conflict { opacity: 0.55; }
+    .cal-day-modal-conflict {
+      border-left: 4px solid #a2242a;
+      padding: 8px 12px;
+      margin-bottom: 8px;
+      background: #fdecea;
+      border-radius: 0 6px 6px 0;
+      font-size: 13px;
+    }
+    .cal-day-modal-conflict .name { font-weight: 600; color: #a2242a; }
+    .cal-day-modal-conflict .role { color: #666; font-size: 12px; margin-left: 6px; }
+    .cal-day-modal-conflict .event { font-size: 12px; color: #555; margin-top: 2px; }
+    .cal-day-modal-conflict .notes { font-size: 12px; color: #888; font-style: italic; margin-top: 2px; }
 
     .roster-header {
       display: flex;
@@ -1110,9 +1159,30 @@
   </div>
 </div>
 
+<!-- Combine Contracts Modal -->
+<div class="modal-overlay" id="combine-modal">
+  <div class="modal" style="max-width:520px; width:95%;">
+    <h3 style="margin:0 0 8px;">Combine Contracts?</h3>
+    <p style="font-size:13px; color:#666; margin:0 0 12px;">
+      <strong id="combine-modal-name"></strong> has other shows this season for the same role. Select any you want to include in one combined contract. One PDF, one signature.
+    </p>
+    <div style="background:#f5f5f5; padding:10px 14px; border-radius:6px; margin-bottom:14px;">
+      <div style="font-size:11px; color:#888; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">This show (always included)</div>
+      <div style="font-size:14px; font-weight:600; color:#333;" id="combine-modal-current-show"></div>
+    </div>
+    <div style="font-size:11px; color:#888; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">Other shows on this person's schedule</div>
+    <div id="combine-modal-list" style="max-height:280px; overflow-y:auto; margin-bottom:16px;"></div>
+    <div style="display:flex; gap:8px; justify-content:flex-end;">
+      <button class="btn btn-secondary" onclick="closeCombineModal()">Cancel</button>
+      <button class="btn btn-secondary" onclick="combineModalJustThis()">Just This Show</button>
+      <button class="btn btn-primary" onclick="combineModalGenerate()">Generate Combined</button>
+    </div>
+  </div>
+</div>
+
 <!-- Contactbook View -->
 <!-- Sales View -->
-<div id="sales-view" style="display:none;">
+<div id="sales-view" style="display:none; padding: 0 24px;">
   <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
     <h2>Ticket Sales</h2>
     <button class="btn btn-secondary" onclick="loadSales(true)">↻ Refresh</button>
@@ -1129,6 +1199,7 @@
         <option value="">All Roles</option>
       </select>
       <button class="btn btn-secondary" onclick="loadContacts(true)">↻ Refresh</button>
+      <button class="btn btn-secondary" id="cb-sync-btn" onclick="cbRunContactbookSync(this)" title="Push name/phone/email changes from Contactbook to every Production Teams + Actors row">↻ Sync from Contactbook</button>
       <button class="btn btn-primary" onclick="openAddContactModal()">+ Add Contact</button>
     </div>
   </div>
@@ -1267,6 +1338,10 @@
       <input type="email" id="contact-email">
     </div>
     <div class="form-group">
+      <label>Alt Email <span style="color:#888; font-weight:normal; font-size:12px;">(optional — for people with a separate personal / role email)</span></label>
+      <input type="email" id="contact-altEmail">
+    </div>
+    <div class="form-group">
       <label>Phone</label>
       <input type="tel" id="contact-phone" placeholder="10 digits" maxlength="10">
     </div>
@@ -1394,18 +1469,159 @@
     verifyApprovalPassword:    (pw)   => '/verify-approval?password=' + encodeURIComponent(pw || ''),
   };
 
-  // Every mutation not yet ported gets bounced with a clear message.
-  const CB_MUTATIONS = new Set([
-    'saveContact','deleteContact',
-    'addRole','updatePerson','deleteRole','removePerson',
-    'addActor','importActors','removeActor',
-    'setOkToSend',
-    'generateContractFromWebapp','generateCombinedContractFromWebapp',
-    'sendContractFromWebapp','sendCombinedContractFromWebapp',
-    'deleteGeneratedContract',
-    'compileBiosDoc','sendBioRequestsForShow','resendBioRequest',
-    'saveProgramFields','exportProgramFile',
-  ]);
+  // POST mutations (Phase 2) that are actually ported. Each maps a GAS method
+  // name → { path, buildBody(args) }. If the map has an entry, we POST to the
+  // WP endpoint instead of bouncing to the not-implemented fallback.
+  const CB_WRITE_ROUTES = {
+    setOkToSend: {
+      path: '/set-ok-to-send',
+      // GAS signature: setOkToSend(show, roleOrCharacter, firstName, initials, isActor)
+      body: function (show, role, firstName, initials, isActor) {
+        return { show: show, role: role, firstName: firstName, initials: initials, isActor: !!isActor };
+      },
+    },
+    saveContact: {
+      path: '/save-contact',
+      // GAS signature: saveContact(contactData) — full object
+      body: function (contactData) { return contactData || {}; },
+    },
+    deleteContact: {
+      path: '/delete-contact',
+      // GAS signature: deleteContact(firstName, lastName)
+      body: function (firstName, lastName) { return { firstName: firstName, lastName: lastName }; },
+    },
+    syncContactbook: {
+      // New endpoint (not in the original GAS callboard) — bulk-fanout every
+      // Contactbook row into Production Teams + Actors. Triggered by the
+      // manual "Sync from Contactbook" button we add on the Contacts tab.
+      path: '/sync-contactbook',
+      body: function () { return {}; },
+    },
+    addRole: {
+      path: '/add-role',
+      body: function (show, roleData) { return { show: show, roleData: roleData || {} }; },
+    },
+    updatePerson: {
+      path: '/update-person',
+      body: function (show, role, personData) { return { show: show, role: role, personData: personData || {} }; },
+    },
+    deleteRole: {
+      path: '/delete-role',
+      body: function (show, role) { return { show: show, role: role }; },
+    },
+    removePerson: {
+      path: '/remove-person',
+      body: function (show, role) { return { show: show, role: role }; },
+    },
+    addActor: {
+      path: '/add-actor',
+      body: function (show, actorData) { return { show: show, actorData: actorData || {} }; },
+    },
+    removeActor: {
+      path: '/remove-actor',
+      body: function (show, character, firstName, lastName) { return { show: show, character: character, firstName: firstName, lastName: lastName }; },
+    },
+    importActors: {
+      path: '/import-actors',
+      body: function (show, actors) { return { show: show, actors: actors || [] }; },
+    },
+    saveProgramFields: {
+      path: '/save-program-fields',
+      body: function (show, fields) { return { show: show, fields: fields || {} }; },
+    },
+    generateContactSheet: {
+      // First-time generation (no existing doc). Server copies the template,
+      // fills it via Docs API, caches URL in Season col M. Returns { url }.
+      path: '/contact-sheet-generate',
+      body: function (show) { return { show: show }; },
+    },
+    regenerateContactSheet: {
+      // Same as above but trashes existing doc(s) in the Drive folder first.
+      // Used by the "Regenerate" button in the contact sheet modal.
+      path: '/contact-sheet-regenerate',
+      body: function (show) { return { show: show }; },
+    },
+    // Tech schedule — GAS calls this getScheduleLink but the OLD behavior was
+    // to silently generate on missing cache. We wire the new modal on top and
+    // have generateTechSchedule map to the fresh-generate endpoint.
+    generateTechSchedule: {
+      path: '/tech-schedule-generate',
+      body: function (show) { return { show: show }; },
+    },
+    // Bios
+    compileBiosDoc: {
+      path: '/bios-doc-compile',
+      body: function (show) { return { show: show }; },
+    },
+    sendBioRequestsForShow: {
+      path: '/bios-send-requests',
+      body: function (show) { return { show: show }; },
+    },
+    resendBioRequest: {
+      path: '/bios-resend',
+      body: function (show, firstName, lastName, role) {
+        return { show: show, firstName: firstName, lastName: lastName, role: role };
+      },
+    },
+    // Program export
+    exportProgramFile: {
+      path: '/program-export',
+      body: function (show) { return { show: show }; },
+    },
+    // Contracts
+    generateContractFromWebapp: {
+      path: '/contract-generate',
+      // GAS signature: (show, role, firstName, lastName, character)
+      body: function (show, role, firstName, lastName, character) {
+        return { show: show, role: role, firstName: firstName, lastName: lastName, character: character };
+      },
+    },
+    generateCombinedContractFromWebapp: {
+      path: '/contract-generate-combined',
+      // GAS signature: (shows[], role, firstName, lastName, character)
+      body: function (shows, role, firstName, lastName, character) {
+        return { shows: shows || [], role: role, firstName: firstName, lastName: lastName, character: character };
+      },
+    },
+    sendContractFromWebapp: {
+      path: '/contract-send',
+      // GAS signature: (docId, docName, email, fullName, show, role, firstName, templateType)
+      body: function (docId, docName, email, fullName, show, role, firstName, templateType) {
+        return {
+          docId: docId, docName: docName, email: email, fullName: fullName,
+          show: show, role: role, firstName: firstName, lastName: '',
+          templateType: templateType || 'General',
+        };
+      },
+    },
+    sendCombinedContractFromWebapp: {
+      path: '/contract-send-combined',
+      // GAS signature: (docId, docName, email, fullName, shows[], role, firstName, templateType)
+      body: function (docId, docName, email, fullName, shows, role, firstName, templateType) {
+        return {
+          docId: docId, docName: docName, email: email, fullName: fullName,
+          shows: shows || [], role: role, firstName: firstName, lastName: '',
+          templateType: templateType || 'General',
+        };
+      },
+    },
+    deleteGeneratedContract: {
+      path: '/contract-delete',
+      // GAS signature: (docId, show, role, firstName)
+      body: function (docId, show, role, firstName) {
+        return { docId: docId, show: show, role: role, firstName: firstName };
+      },
+    },
+    purgeCache: {
+      path: '/purge-cache',
+      body: function () { return {}; },
+    },
+  };
+
+  // Every mutation not yet ported gets bounced with a clear message. All the
+  // contract / bios / program-export mutations are now handled by their
+  // WordPress endpoints — this set is only for anything explicitly unported.
+  const CB_MUTATIONS = new Set([]);
 
   function cbMutationFallback(method) {
     const msg = 'This action ("' + method + '") isn\'t ported to the new Callboard yet.\n\n' +
@@ -1434,6 +1650,18 @@
             if (CB_READ_ROUTES[prop]) {
               const path = CB_READ_ROUTES[prop].apply(null, args);
               cbApi(path)
+                .then(r => capturedSucc && capturedSucc(r.data))
+                .catch(e => {
+                  if (e.status === 401) { cbClearToken(); cbShowLogin(); return; }
+                  if (capturedFail) capturedFail(e);
+                  else console.error('[callboard] ' + prop + ' failed:', e);
+                });
+              return;
+            }
+            if (CB_WRITE_ROUTES[prop]) {
+              const spec = CB_WRITE_ROUTES[prop];
+              const body = spec.body.apply(null, args);
+              cbApi(spec.path, { method: 'POST', body: body })
                 .then(r => capturedSucc && capturedSucc(r.data))
                 .catch(e => {
                   if (e.status === 401) { cbClearToken(); cbShowLogin(); return; }
@@ -1538,17 +1766,32 @@
       contactList = init.contacts.sort((a, b) => a.lastName.localeCompare(b.lastName));
       document.getElementById('season-label').innerText = 'Season ' + init.season;
       dashboardData = init.dashboard;
-      const last = getLastTab();
-      if (last && last !== 'dashboard') {
-        switchTab(last);
-      } else {
-        renderDashboard(init.dashboard);
-      }
+      // Always land on dashboard so refresh load timing is predictable.
+      renderDashboard(init.dashboard);
+      // Background prefetch: warm every tab's data + the server-side caches so
+      // subsequent tab clicks (and even a full page refresh within 60s) return
+      // instantly. Each loadX(false) is a no-op if its data is already cached.
+      setTimeout(prefetchAllTabs, 300);
     })
     .withFailureHandler(function(err) {
       document.getElementById('cards-container').innerHTML = '<div class="loading">Error: ' + err.message + '</div>';
     })
     .getInitialData();
+
+  function prefetchAllTabs() {
+    const jobs = [
+      function() { try { if (typeof loadContracts === 'function') loadContracts(false); } catch(e) {} },
+      function() { try { if (typeof loadActors === 'function')    loadActors(false);    } catch(e) {} },
+      function() { try { if (typeof loadBios === 'function')      loadBios(false);      } catch(e) {} },
+      function() { try { if (typeof loadSales === 'function')     loadSales(false);     } catch(e) {} },
+      function() { try { if (typeof loadCalendar === 'function')  loadCalendar(false);  } catch(e) {} },
+      function() { try { if (typeof loadContacts === 'function')  loadContacts(false);  } catch(e) {} }
+    ];
+    // Stagger by 250ms so we don't fire 6 concurrent GAS requests at once
+    // (GAS caps at ~30 concurrent execs per user, but staggering keeps the
+    // first-clicked tab's request at the front of the queue).
+    jobs.forEach((fn, i) => setTimeout(fn, i * 250));
+  }
 
   function setupAutocomplete(inputId, dropdownId, fields) {
     const input = document.getElementById(inputId);
@@ -1685,6 +1928,7 @@
           ${show.generated > 0 ? `<span class="pill generated">📄 ${show.generated} Generated</span>` : ''}
           ${show.pending > 0   ? `<span class="pill pending">${show.pending} Not Started</span>`      : ''}
           ${show.filled === 0  ? `<span class="pill empty">No contracts yet</span>`                   : ''}
+          ${show.conflictCount > 0 ? `<span class="pill conflicts">⚠ ${show.conflictCount} Conflict${show.conflictCount === 1 ? '' : 's'}</span>` : ''}
         </div>
         ${salesHtml}
         <div style="margin-top:12px;">
@@ -1799,6 +2043,7 @@
                 <th>Name</th>
                 <th>Role</th>
                 <th>Bio Status</th>
+                <th>Emergency Info</th>
                 <th>Bio Type</th>
                 <th></th>
               </tr>
@@ -1809,12 +2054,18 @@
                 const badgeClass  = isSubmitted ? 'signed' : (p.linkSent ? 'sent' : 'not-started');
                 const badgeLabel  = isSubmitted ? 'Submitted' : (p.linkSent ? 'Awaiting' : 'Not Sent');
                 const btnLabel    = p.linkSent || isSubmitted ? 'Resend Link' : 'Send Link';
+                const emIsSubmitted = p.emergencyInfoStatus === 'Submitted';
+                const emClass  = emIsSubmitted ? 'signed' : (p.linkSent ? 'sent' : 'not-started');
+                const emLabel  = emIsSubmitted ? 'Submitted' : (p.linkSent ? 'Awaiting' : 'Not Sent');
                 return `
                 <tr>
                   <td>${p.firstName} ${p.lastName}</td>
                   <td>${p.role}${p.character ? ' — ' + p.character : ''}</td>
                   <td>
                     <span class="status-badge ${badgeClass}">${badgeLabel}</span>
+                  </td>
+                  <td>
+                    <span class="status-badge ${emClass}">${emLabel}</span>
                   </td>
                   <td style="font-size:12px; color:#888; text-transform:capitalize;">${p.bioType || '—'}</td>
                   <td>
@@ -2265,9 +2516,14 @@
         { label: 'Comp',          count: s.comp,         pct: s.compPct,       color: BUCKET_COLORS['Comp'] }
       ].filter(b => b.count > 0);
 
-      const stackedBars = buckets.map(b =>
-        `<div title="${b.label}: ${b.count} (${b.pct}%)" style="width:${Math.min(b.pct,100)}%; height:100%; background:${b.color}; display:inline-block;"></div>`
-      ).join('');
+      // Top bar: each bucket segment is a slice of house capacity, so the total
+      // filled portion equals capacityPct (matches the % shown at the top).
+      const stackedBars = buckets.map(function (b) {
+        const capShare = s.capacity > 0 ? Math.min((b.count / s.capacity) * 100, 100) : 0;
+        return '<div title="' + b.label + ': ' + b.count + ' (' + b.pct + '% of sold, '
+          + capShare.toFixed(1) + '% of capacity)" style="width:' + capShare
+          + '%; height:100%; background:' + b.color + '; display:inline-block;"></div>';
+      }).join('');
 
       const breakdownRows = buckets.map(b => `
         <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
@@ -2595,6 +2851,13 @@
     icon.classList.toggle('collapsed');
   }
 
+  function toggleConflictDetail(e, rowId) {
+    if (e) e.stopPropagation();
+    const row = document.getElementById(rowId);
+    if (!row) return;
+    row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
+  }
+
   function renderSeasonRoster(roster, show, tbodyId) {
     const tbody = document.getElementById(tbodyId);
     if (!tbody) return;
@@ -2641,9 +2904,15 @@
           askDelete(person.role, show);
         });
 
+        const conflictCount = (person.conflicts && person.conflicts.length) || 0;
+        const conflictRowId = 'conflict-detail-' + show.replace(/[^a-zA-Z0-9]/g, '-') + '-' + person.role.replace(/[^a-zA-Z0-9]/g, '-');
+        const conflictPill  = conflictCount > 0
+          ? `<span class="conflict-pill" onclick="toggleConflictDetail(event, '${conflictRowId}')">⚠ ${conflictCount} conflict${conflictCount === 1 ? '' : 's'}</span>`
+          : '';
+
         tr.innerHTML = `
           <td>${person.role}</td>
-          <td>${name}</td>
+          <td>${name} ${conflictPill}</td>
           <td><a href="mailto:${person.email}">${person.email}</a></td>
           <td>${formatPhone(person.phone)}</td>
           <td><span class="status-badge ${statusClass}">${person.contractStatus || 'Not Started'}</span></td>
@@ -2654,6 +2923,18 @@
         actionsCell.appendChild(editBtn);
         actionsCell.appendChild(removeBtn);
         actionsCell.appendChild(deleteBtn);
+
+        if (conflictCount > 0) {
+          const detailTr = document.createElement('tr');
+          detailTr.id = conflictRowId;
+          detailTr.className = 'conflict-detail-row';
+          detailTr.style.display = 'none';
+          const detailHtml = person.conflicts.map(c =>
+            `<div class="conflict-item"><span class="conflict-item-date">${c.dateLabel || c.date}</span><span class="conflict-item-event">${c.eventType}</span>${c.notes ? `<span class="conflict-item-notes">${c.notes}</span>` : ''}</div>`
+          ).join('');
+          detailTr.innerHTML = `<td colspan="6" style="background:#faf5f5; padding:12px 20px; border-top:1px solid #f0d5d5;"><div class="conflict-detail-list">${detailHtml}</div></td>`;
+          setTimeout(() => tr.parentNode && tr.parentNode.insertBefore(detailTr, tr.nextSibling), 0);
+        }
 
       } else {
         tr.innerHTML = `
@@ -3541,9 +3822,11 @@
     if (!force && allContractsData !== null) { renderContracts(allContractsData); return; }
     document.getElementById('contracts-container').innerHTML = '<div class="loading">Loading contracts...</div>';
 
-    // Populate show filter
     google.script.run
-      .withSuccessHandler(function(shows) {
+      .withSuccessHandler(function(payload) {
+        const shows = (payload && payload.shows) || [];
+        const contracts = (payload && payload.contracts) || [];
+
         const filter = document.getElementById('contracts-show-filter');
         filter.innerHTML = '<option value="">All Shows</option>';
         shows.forEach(show => {
@@ -3552,18 +3835,14 @@
           opt.innerText = show;
           filter.appendChild(opt);
         });
-      })
-      .getShows();
 
-    google.script.run
-      .withSuccessHandler(function(data) {
-        allContractsData = data;
-        renderContracts(data);
+        allContractsData = contracts;
+        renderContracts(contracts);
       })
       .withFailureHandler(function(err) {
         document.getElementById('contracts-container').innerHTML = '<div class="loading">Error: ' + err.message + '</div>';
       })
-      .getContractsData();
+      .getContractsPageData(!!force);
   }
 
   function renderContracts(data) {
@@ -3747,8 +4026,16 @@
           const docUrlMatch = contract.contractLink && contract.contractLink.match(/docs\.google\.com\/document\/d\/([^\/]+)/);
           if (docUrlMatch) {
             const docId   = docUrlMatch[1];
-            const docName = contract.fullName + ' - ' + contract.role + ' - ' + contract.show;
+            // If part of a combined contract, gather the sibling shows so Send routes combined
+            const combinedShows = contract.combinedContractId
+              ? (allContractsData || []).filter(c => c.combinedContractId === contract.combinedContractId).map(c => c.show)
+              : null;
+            const isCombined = combinedShows && combinedShows.length > 1;
+            const docName = isCombined
+              ? contract.fullName + ' - ' + contract.role + ' - Combined (' + combinedShows.length + ' shows)'
+              : contract.fullName + ' - ' + contract.role + ' - ' + contract.show;
             const restored = { docId, docUrl: contract.contractLink, docName, email: contract.email, fullName: contract.fullName, templateType: contract.templateType || 'General' };
+            if (isCombined) restored.shows = combinedShows;
 
             const previewBtn = document.createElement('a');
             previewBtn.href = contract.contractLink;
@@ -3832,7 +4119,31 @@
     document.getElementById('contracts-person-filter').oninput  = function() { renderContracts(allContractsData); };
   }
 
+  // Entry point when Chris clicks Generate. For production team members with
+  // other shows in the season, offers a "combine" modal. Actors and one-off
+  // rows skip the modal and go straight to single-show generation.
   function generateSingleContract(contract, tr) {
+    if (contract.isActor || contract.role === 'Actor') {
+      return _doGenerateSingle(contract, tr);
+    }
+    const actionsCell = tr.querySelector('.contract-actions');
+    actionsCell.innerHTML = '<span style="font-size:12px; color:#aaa;">Checking...</span>';
+    google.script.run
+      .withSuccessHandler(function(otherShows) {
+        if (!otherShows || otherShows.length === 0) {
+          _doGenerateSingle(contract, tr);
+        } else {
+          openCombineModal(contract, tr, otherShows);
+        }
+      })
+      .withFailureHandler(function(err) {
+        // If lookup fails, fall through to single-show generation
+        _doGenerateSingle(contract, tr);
+      })
+      .getCombinableShows(contract.show, contract.role, contract.firstName, contract.lastName);
+  }
+
+  function _doGenerateSingle(contract, tr) {
     const actionsCell = tr.querySelector('.contract-actions');
     actionsCell.innerHTML = '<span style="font-size:12px; color:#aaa;">Generating...</span>';
 
@@ -3842,35 +4153,9 @@
           const key = contract.show + '|' + contract.role + '|' + contract.firstName;
           generatedDocs[key] = result;
 
-          // Update just this row's action buttons without re-rendering
           actionsCell.innerHTML = '';
+          _renderPreviewSendButtons(actionsCell, tr, contract, result, false);
 
-          const previewBtn = document.createElement('a');
-          previewBtn.href = result.docUrl;
-          previewBtn.target = '_blank';
-          previewBtn.className = 'btn btn-secondary';
-          previewBtn.style.fontSize = '11px';
-          previewBtn.style.padding = '4px 10px';
-          previewBtn.innerText = 'Preview';
-
-          const sendBtn = document.createElement('button');
-          sendBtn.className = 'btn btn-primary';
-          sendBtn.style.fontSize = '11px';
-          sendBtn.style.padding = '4px 10px';
-          sendBtn.innerText = 'Send';
-          sendBtn.addEventListener('click', function() {
-            const okCheckbox = tr.querySelector('.ok-to-send-checkbox');
-            if (!okCheckbox || !okCheckbox.checked) {
-              showAlert('Please get approval from AAD before sending.');
-              return;
-            }
-            requireApproval(function() { sendSingleContract(contract, result, tr); });
-          });
-
-          actionsCell.appendChild(previewBtn);
-          actionsCell.appendChild(sendBtn);
-
-          // Update status badge in row
           const statusCell = tr.querySelector('.status-badge');
           if (statusCell) {
             statusCell.className = 'status-badge generated';
@@ -3886,20 +4171,27 @@
       .generateContractFromWebapp(contract.show, contract.role, contract.firstName, contract.lastName, contract.character || '');
   }
 
-  function sendSingleContract(contract, generated, tr) {
+  function _doGenerateCombined(contract, tr, shows) {
     const actionsCell = tr.querySelector('.contract-actions');
-    actionsCell.innerHTML = '<span style="font-size:12px; color:#aaa;">Sending...</span>';
+    actionsCell.innerHTML = '<span style="font-size:12px; color:#aaa;">Generating combined contract...</span>';
 
     google.script.run
       .withSuccessHandler(function(result) {
         if (result.success) {
-          delete generatedDocs[contract.show + '|' + contract.role + '|' + contract.firstName];
-          google.script.run
-            .withSuccessHandler(function(data) {
-              allContractsData = data;
-              renderContracts(data);
-            })
-            .getContractsData();
+          // Cache result for each show in the group so any of them can Send later
+          shows.forEach(function(s) {
+            const key = s + '|' + contract.role + '|' + contract.firstName;
+            generatedDocs[key] = Object.assign({}, result, { show: s, shows: shows });
+          });
+          // Refresh contracts so the other-row statuses update visually
+          setTimeout(function() {
+            google.script.run
+              .withSuccessHandler(function(data) {
+                allContractsData = data;
+                renderContracts(data);
+              })
+              .getContractsData();
+          }, 500);
         } else {
           actionsCell.innerHTML = '<span style="font-size:12px; color:#d93025;">' + result.error + '</span>';
         }
@@ -3907,16 +4199,176 @@
       .withFailureHandler(function(err) {
         actionsCell.innerHTML = '<span style="font-size:12px; color:#d93025;">Error: ' + err.message + '</span>';
       })
-      .sendContractFromWebapp(
-        generated.docId,
-        generated.docName,
-        generated.email,
-        generated.fullName,
-        contract.show,
-        contract.role,
-        contract.firstName,
-        generated.templateType
-      );
+      .generateCombinedContractFromWebapp(shows, contract.role, contract.firstName, contract.lastName, contract.character || '');
+  }
+
+  function _renderPreviewSendButtons(actionsCell, tr, contract, result, isCombined) {
+    const previewBtn = document.createElement('a');
+    previewBtn.href = result.docUrl;
+    previewBtn.target = '_blank';
+    previewBtn.className = 'btn btn-secondary';
+    previewBtn.style.fontSize = '11px';
+    previewBtn.style.padding = '4px 10px';
+    previewBtn.innerText = 'Preview';
+
+    const sendBtn = document.createElement('button');
+    sendBtn.className = 'btn btn-primary';
+    sendBtn.style.fontSize = '11px';
+    sendBtn.style.padding = '4px 10px';
+    sendBtn.innerText = isCombined ? 'Send Combined' : 'Send';
+    sendBtn.addEventListener('click', function() {
+      const okCheckbox = tr.querySelector('.ok-to-send-checkbox');
+      if (!okCheckbox || !okCheckbox.checked) {
+        showAlert('Please get approval from AAD before sending.');
+        return;
+      }
+      requireApproval(function() { sendSingleContract(contract, result, tr); });
+    });
+
+    actionsCell.appendChild(previewBtn);
+    actionsCell.appendChild(sendBtn);
+  }
+
+  // ── Combine Modal ──────────────────────────────────────────
+  let combineModalContract = null;
+  let combineModalTr = null;
+  let combineModalOtherShows = null;
+
+  function openCombineModal(contract, tr, otherShows) {
+    const actionsCell = tr.querySelector('.contract-actions');
+    actionsCell.innerHTML = '<span style="font-size:12px; color:#aaa;">Waiting…</span>';
+
+    combineModalContract = contract;
+    combineModalTr = tr;
+    combineModalOtherShows = otherShows;
+
+    document.getElementById('combine-modal-name').innerText =
+      contract.firstName + ' ' + contract.lastName + ' — ' + contract.role;
+    document.getElementById('combine-modal-current-show').innerText = contract.show;
+
+    const list = document.getElementById('combine-modal-list');
+    list.innerHTML = otherShows.map(function(s) {
+      const isSigned = s.contractStatus === 'Signed';
+      const isSent   = s.contractStatus === 'Sent for Signature';
+      const disabled = isSigned;
+      const label = isSigned
+        ? ' (already signed — cannot replace)'
+        : (isSent ? ' (already sent — will be replaced)' : '');
+      const id = 'combine-cb-' + s.show.replace(/[^a-zA-Z0-9]/g, '-');
+      return '<label style="display:flex; align-items:center; gap:8px; padding:6px 0; ' +
+             (disabled ? 'color:#aaa;' : 'color:#333;') + '">' +
+             '<input type="checkbox" id="' + id + '" value="' + s.show.replace(/"/g, '&quot;') + '" ' +
+             (disabled ? 'disabled' : '') + '>' +
+             '<span><strong>' + s.show + '</strong>' +
+             '<span style="font-size:11px; color:#888;">' + label + '</span></span>' +
+             '</label>';
+    }).join('');
+
+    document.getElementById('combine-modal').classList.add('active');
+  }
+
+  function closeCombineModal(action) {
+    document.getElementById('combine-modal').classList.remove('active');
+    if (!action && combineModalTr) {
+      // Restore action cell if user cancels
+      const cell = combineModalTr.querySelector('.contract-actions');
+      if (cell) {
+        cell.innerHTML = '';
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-primary';
+        btn.style.fontSize = '11px';
+        btn.style.padding = '4px 10px';
+        btn.innerText = 'Generate';
+        const c = combineModalContract, tr = combineModalTr;
+        btn.addEventListener('click', function() { generateSingleContract(c, tr); });
+        cell.appendChild(btn);
+      }
+    }
+    combineModalContract = null;
+    combineModalTr = null;
+    combineModalOtherShows = null;
+  }
+
+  function combineModalJustThis() {
+    const contract = combineModalContract;
+    const tr = combineModalTr;
+    document.getElementById('combine-modal').classList.remove('active');
+    combineModalContract = null; combineModalTr = null; combineModalOtherShows = null;
+    _doGenerateSingle(contract, tr);
+  }
+
+  function combineModalGenerate() {
+    const selectedShows = [combineModalContract.show];
+    const checkboxes = document.querySelectorAll('#combine-modal-list input[type="checkbox"]:checked');
+    checkboxes.forEach(function(cb) { selectedShows.push(cb.value); });
+
+    if (selectedShows.length < 2) {
+      combineModalJustThis();
+      return;
+    }
+
+    const contract = combineModalContract;
+    const tr = combineModalTr;
+    document.getElementById('combine-modal').classList.remove('active');
+    combineModalContract = null; combineModalTr = null; combineModalOtherShows = null;
+    _doGenerateCombined(contract, tr, selectedShows);
+  }
+
+  function sendSingleContract(contract, generated, tr) {
+    const actionsCell = tr.querySelector('.contract-actions');
+    actionsCell.innerHTML = '<span style="font-size:12px; color:#aaa;">Sending...</span>';
+
+    const successFn = function(result) {
+      if (result.success) {
+        // Clear cached generateds for all shows in the group (single = just one)
+        const affected = generated.shows && generated.shows.length ? generated.shows : [contract.show];
+        affected.forEach(function(s) {
+          delete generatedDocs[s + '|' + contract.role + '|' + contract.firstName];
+        });
+        google.script.run
+          .withSuccessHandler(function(data) {
+            allContractsData = data;
+            renderContracts(data);
+          })
+          .getContractsData();
+      } else {
+        actionsCell.innerHTML = '<span style="font-size:12px; color:#d93025;">' + result.error + '</span>';
+      }
+    };
+    const failureFn = function(err) {
+      actionsCell.innerHTML = '<span style="font-size:12px; color:#d93025;">Error: ' + err.message + '</span>';
+    };
+
+    const isCombined = generated.shows && generated.shows.length > 1;
+    if (isCombined) {
+      google.script.run
+        .withSuccessHandler(successFn)
+        .withFailureHandler(failureFn)
+        .sendCombinedContractFromWebapp(
+          generated.docId,
+          generated.docName,
+          generated.email,
+          generated.fullName,
+          generated.shows,
+          contract.role,
+          contract.firstName,
+          generated.templateType
+        );
+    } else {
+      google.script.run
+        .withSuccessHandler(successFn)
+        .withFailureHandler(failureFn)
+        .sendContractFromWebapp(
+          generated.docId,
+          generated.docName,
+          generated.email,
+          generated.fullName,
+          contract.show,
+          contract.role,
+          contract.firstName,
+          generated.templateType
+        );
+    }
   }
 
   function toggleSelectAll(checkbox) {
@@ -4278,6 +4730,7 @@
 
   // ── Calendar ────────────────────────────────────────────────
   let calendarEvents     = null;
+  let calendarConflicts  = {};
   let calendarView       = 'overview';        // 'overview' | 'month'
   let calendarMonthAnchor = null;             // {year, month} for Month view
   const CAL_SHOW_COLORS  = {};
@@ -4313,18 +4766,32 @@
   function loadCalendar(force) {
     if (!force && calendarEvents) { renderCalendar(); return; }
     document.getElementById('calendar-container').innerHTML = '<div class="loading">Loading calendar...</div>';
+    let evLoaded = false, cfLoaded = false;
+    function maybeRender() {
+      if (evLoaded && cfLoaded) renderCalendar();
+    }
     google.script.run
       .withSuccessHandler(function(events) {
         calendarEvents = events || [];
-        // Assign colors in order of first appearance
         calendarEvents.forEach(function(e) { calColorForShow(e.show); });
-        renderCalendar();
+        evLoaded = true; maybeRender();
       })
       .withFailureHandler(function(err) {
         document.getElementById('calendar-container').innerHTML =
           '<div class="loading">Error: ' + (err && err.message ? err.message : err) + '</div>';
       })
       .getSeasonCalendarEvents();
+    google.script.run
+      .withSuccessHandler(function(byDate) {
+        calendarConflicts = byDate || {};
+        cfLoaded = true; maybeRender();
+      })
+      .withFailureHandler(function(err) {
+        // Non-fatal — render without conflicts
+        calendarConflicts = {};
+        cfLoaded = true; maybeRender();
+      })
+      .getSeasonCalendarConflicts();
   }
 
   function setCalendarView(v) {
@@ -4502,9 +4969,26 @@
           ? '<div class="cal-event-more">+' + (evs.length - maxChips) + ' more</div>'
           : '';
 
+        // Conflict name badges — one per unique person on this day
+        const conflictList = calendarConflicts[iso] || [];
+        const seenNames = {};
+        const dedupedConflicts = [];
+        conflictList.forEach(function(c) {
+          const key = (c.firstName + '|' + c.lastName).toLowerCase();
+          if (seenNames[key]) return;
+          seenNames[key] = true;
+          dedupedConflicts.push(c);
+        });
+        const conflictBadges = dedupedConflicts.map(function(c) {
+          const nameLabel = c.firstName + ' ' + (c.lastName ? c.lastName.charAt(0) + '.' : '');
+          const title     = c.firstName + ' ' + c.lastName + ' (' + (c.role || 'Production Team') + ') — unavailable' +
+            (c.eventType ? ' for ' + c.eventType : '');
+          return '<div class="cal-day-conflict" title="' + calEscape(title) + '">' + calEscape(nameLabel) + '</div>';
+        }).join('');
+
         return '<div class="' + classes.join(' ') + '" onclick="openCalDayModal(\'' + iso + '\')">' +
           '<div class="cal-day-num">' + day.getDate() + '</div>' +
-          chips + more +
+          chips + more + conflictBadges +
           '</div>';
       }).join('');
     }).join('') + '</div>';
@@ -4516,15 +5000,18 @@
     const day = calParseISO(iso);
     if (!day) return;
     const evs = (calendarEvents || []).filter(function(e) { return e.date === iso; });
+    const cfs = calendarConflicts[iso] || [];
 
     const titleStr = day.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
     document.getElementById('cal-day-modal-title').innerText = titleStr;
 
     const body = document.getElementById('cal-day-modal-events');
-    if (evs.length === 0) {
-      body.innerHTML = '<div style="color:#888; font-size:14px;">No events scheduled.</div>';
+    let html = '';
+
+    if (evs.length === 0 && cfs.length === 0) {
+      html = '<div style="color:#888; font-size:14px;">No events scheduled.</div>';
     } else {
-      body.innerHTML = evs.map(function(e) {
+      html += evs.map(function(e) {
         const color = calColorForShow(e.show);
         const time = e.startTime
           ? (e.endTime ? e.startTime + ' – ' + e.endTime : e.startTime)
@@ -4539,7 +5026,23 @@
           (e.notes ? '<div class="ev-notes">' + calEscape(e.notes) + '</div>' : '') +
         '</div>';
       }).join('');
+
+      if (cfs.length > 0) {
+        html += '<div style="margin:16px 0 8px; font-size:12px; font-weight:700; color:#a2242a; text-transform:uppercase; letter-spacing:0.5px;">Conflicts</div>';
+        html += cfs.map(function(c) {
+          const fullName = (c.firstName + ' ' + c.lastName).trim();
+          return '<div class="cal-day-modal-conflict">' +
+            '<div><span class="name">' + calEscape(fullName) + '</span>' +
+              (c.role ? '<span class="role">' + calEscape(c.role) + (c.show ? ' · ' + calEscape(c.show) : '') + '</span>' : '') +
+            '</div>' +
+            (c.eventType ? '<div class="event">Unavailable for: ' + calEscape(c.eventType) + '</div>' : '') +
+            (c.notes ? '<div class="notes">"' + calEscape(c.notes) + '"</div>' : '') +
+          '</div>';
+        }).join('');
+      }
     }
+
+    body.innerHTML = html;
     document.getElementById('cal-day-modal').classList.add('active');
   }
 
@@ -4565,6 +5068,669 @@
       .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
       .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
   }
+
+  /* ==================================================================
+     Auto-collapse show cards for shows whose opening night has passed.
+     Shows can always be clicked to expand. Uses dashboardData (already
+     fetched at boot) as the source-of-truth for opening nights.
+     ================================================================== */
+  /* Wrap submitContact so its contactData payload includes altEmail. The
+     original grabs specific fields; we just spread ours on top. */
+  (function () {
+    var origSubmit = window.submitContact;
+    if (typeof origSubmit !== 'function') return;
+    window.submitContact = function () {
+      var altEl = document.getElementById('contact-altEmail');
+      var alt = altEl ? altEl.value.trim() : '';
+      // Monkey-patch google.script.run.saveContact ONCE to attach altEmail
+      // to the next call's contactData, then unpatch.
+      var runProxy = google.script.run;
+      var origSave = runProxy.saveContact;
+      var patched = false;
+      Object.defineProperty(runProxy, 'saveContact', {
+        configurable: true,
+        writable: true,
+        value: function (contactData) {
+          if (!patched) {
+            patched = true;
+            contactData = Object.assign({}, contactData || {}, { altEmail: alt });
+            // Restore original after this call.
+            delete runProxy.saveContact;
+          }
+          return origSave.call(this, contactData);
+        }
+      });
+      return origSubmit.apply(this, arguments);
+    };
+  })();
+
+  /* When populating the contact modal for editing, prefill altEmail too. */
+  (function () {
+    var origEdit = window.openEditContactModal;
+    if (typeof origEdit === 'function') {
+      window.openEditContactModal = function (contact) {
+        origEdit(contact);
+        var el = document.getElementById('contact-altEmail');
+        if (el) el.value = (contact && contact.altEmail) || '';
+      };
+    }
+    var origAdd = window.openAddContactModal;
+    if (typeof origAdd === 'function') {
+      window.openAddContactModal = function () {
+        origAdd.apply(this, arguments);
+        var el = document.getElementById('contact-altEmail');
+        if (el) el.value = '';
+      };
+    }
+  })();
+
+  /* Wrap every existing loadXxx(force) so that when the user clicks a
+     "↻ Refresh" button (which calls loadXxx(true)), we FIRST purge the
+     server-side cache. That way direct sheet edits show up immediately,
+     not after the 60s cache TTL. Called with no args (normal boot fetch),
+     the wrapper is a no-op and the original runs untouched. */
+  (function () {
+    var toWrap = ['loadFullSeason','loadContacts','loadContracts','loadBios',
+                   'loadActors','loadSales','loadCalendar','refreshDashboard'];
+    toWrap.forEach(function (name) {
+      var orig = window[name];
+      if (typeof orig !== 'function') return;
+      window[name] = function (force) {
+        var args = arguments;
+        if (!force) { return orig.apply(this, args); }
+        google.script.run
+          .withSuccessHandler(function () { orig.apply(null, args); })
+          .withFailureHandler(function () { orig.apply(null, args); })
+          .purgeCache();
+      };
+    });
+  })();
+
+  /* Manual Contactbook → shows fanout. Wired to the "Sync from Contactbook"
+     button on the Contacts tab. Runs in the background; refreshes contacts
+     when done. */
+  window.cbRunContactbookSync = function (btn) {
+    const orig = btn ? btn.textContent : '';
+    if (btn) { btn.disabled = true; btn.textContent = 'Syncing…'; }
+    google.script.run
+      .withSuccessHandler(function (result) {
+        if (btn) { btn.disabled = false; btn.textContent = orig || '↻ Sync from Contactbook'; }
+        const msg = 'Synced. Checked ' + (result.checked || 0) +
+                    ' show-rows, updated ' + (result.updated || 0) + '.';
+        if (typeof showAlert === 'function') showAlert(msg);
+        else alert(msg);
+        // Refresh the currently-visible tab data so the results show up.
+        if (typeof loadContacts === 'function') loadContacts(true);
+      })
+      .withFailureHandler(function (err) {
+        if (btn) { btn.disabled = false; btn.textContent = orig || '↻ Sync from Contactbook'; }
+        const msg = 'Sync failed: ' + (err && err.message ? err.message : err);
+        if (typeof showAlert === 'function') showAlert(msg); else alert(msg);
+      })
+      .syncContactbook();
+  };
+
+  /* "Now" respects ?as_of=YYYY-MM-DD in the URL so Blake can preview
+     how the layout will look at a future date. Same idea as the WP
+     tlt_today() override. Cookie-persisted for the session. */
+  function cbNow() {
+    const params = new URLSearchParams(location.search);
+    let raw = params.get('as_of');
+    if (raw === 'clear') {
+      document.cookie = 'tlt_cb_as_of=; Max-Age=0; path=/';
+      return Date.now();
+    }
+    if (!raw) {
+      const m = document.cookie.match(/(?:^|;\s*)tlt_cb_as_of=([^;]+)/);
+      if (m) raw = decodeURIComponent(m[1]);
+    }
+    if (raw && /^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+      // Save the override in a cookie so it survives page reloads within the
+      // same tab even after the query string is dropped (24h expiry).
+      if (params.get('as_of') === raw) {
+        document.cookie = 'tlt_cb_as_of=' + encodeURIComponent(raw) + '; Max-Age=86400; path=/';
+      }
+      const ts = Date.parse(raw + 'T12:00:00');
+      if (!isNaN(ts)) return ts;
+    }
+    return Date.now();
+  }
+
+  function cbShowHasOpened(showName) {
+    if (!dashboardData) return false;
+    const row = dashboardData.find(function (d) { return d.show === showName; });
+    if (!row || !row.openingNight) return false;
+    const ts = Date.parse(row.openingNight);
+    if (isNaN(ts)) return false;
+    return ts <= cbNow();
+  }
+
+  /* ==================================================================
+     renderContracts REWRITE — grouped by show, team first then actors,
+     each show is a collapsible card. Reuses the existing per-row action
+     button behavior via a compact row builder.
+
+     Uses `window.renderContracts = ...` (assignment) instead of a function
+     declaration so it definitively overrides the original renderContracts
+     declared earlier in the script.
+     ================================================================== */
+  window.renderContracts = function (data) {
+    if (!data) return;
+    const container = document.getElementById('contracts-container');
+    container.innerHTML = '';
+
+    // All four filters wired: show / role / status / person.
+    const showEl   = document.getElementById('contracts-show-filter');
+    const roleEl   = document.getElementById('contracts-role-filter');
+    const statusEl = document.getElementById('contracts-status-filter');
+    const personEl = document.getElementById('contracts-person-filter');
+    const showF   = (showEl   && showEl.value)   || '';
+    const roleF   = (roleEl   && roleEl.value)   || '';
+    const statusF = (statusEl && statusEl.value) || '';
+    const pf      = ((personEl && personEl.value) || '').toLowerCase().trim();
+
+    // Populate role dropdown from data. Includes a synthetic "Actor" option
+    // at the top whenever the payload has any actor contracts, since actors
+    // don't have a Production Teams "role" — they're identified by isActor.
+    if (roleEl) {
+      const currentRole = roleEl.value;
+      const hasActors = data.some(function (c) { return c.isActor; });
+      const roles = [...new Set(data.map(function (c) { return c.role; }).filter(Boolean))].sort();
+      roleEl.innerHTML = '<option value="">All Roles</option>';
+      if (hasActors) {
+        const opt = document.createElement('option');
+        opt.value = '__actor__';
+        opt.textContent = 'Actor';
+        if (currentRole === '__actor__') opt.selected = true;
+        roleEl.appendChild(opt);
+      }
+      roles.forEach(function (r) {
+        const opt = document.createElement('option');
+        opt.value = r; opt.textContent = r;
+        if (r === currentRole) opt.selected = true;
+        roleEl.appendChild(opt);
+      });
+    }
+
+    const filtered = data.filter(function (c) {
+      if (showF   && c.show           !== showF)   return false;
+      if (roleF === '__actor__') {
+        if (!c.isActor) return false;
+      } else if (roleF && c.role !== roleF) {
+        return false;
+      }
+      if (statusF && c.contractStatus !== statusF) return false;
+      if (pf      && (c.fullName || '').toLowerCase().indexOf(pf) === -1) return false;
+      return true;
+    });
+
+    // Preserve season order — use first-appearance order in the raw payload.
+    const showOrder = [];
+    data.forEach(function (c) { if (c.show && showOrder.indexOf(c.show) === -1) showOrder.push(c.show); });
+
+    // Group filtered rows.
+    const byShow = {};
+    filtered.forEach(function (c) {
+      if (!byShow[c.show]) byShow[c.show] = { team: [], actors: [] };
+      if (c.isActor) byShow[c.show].actors.push(c); else byShow[c.show].team.push(c);
+    });
+
+    showOrder.forEach(function (show) {
+      const groups = byShow[show];
+      if (!groups) return;
+      if (groups.team.length === 0 && groups.actors.length === 0) return;
+
+      const total  = groups.team.length + groups.actors.length;
+      const signed = [].concat(groups.team, groups.actors).filter(function (c) { return c.contractStatus === 'Signed'; }).length;
+      const pct = total > 0 ? Math.round(signed / total * 100) : 0;
+      const opened = cbShowHasOpened(show);
+
+      const block = document.createElement('div');
+      block.className = 'season-show-block';
+      block.innerHTML =
+        '<div class="season-show-header" onclick="toggleSeasonShow(this)">' +
+          '<div class="season-show-title">' +
+            '<h3>' + calEscape(show) + '</h3>' +
+            '<span style="font-size:13px; color:' + (opened ? '#aaa' : '#888') + ';">' + signed + ' of ' + total + ' signed' + (opened ? ' · open' : '') + '</span>' +
+          '</div>' +
+          '<div class="season-show-meta">' +
+            '<div style="width:80px; background:#f0f0f0; border-radius:99px; height:6px; overflow:hidden;">' +
+              '<div style="width:' + pct + '%; height:100%; background:#4caf50; border-radius:99px;"></div>' +
+            '</div>' +
+            '<span class="toggle-icon' + (opened ? ' collapsed' : '') + '">▼</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="season-show-body' + (opened ? ' hidden' : '') + '"></div>';
+
+      const body = block.querySelector('.season-show-body');
+      if (groups.team.length)   body.appendChild(cbSectionTable('Production Team', groups.team));
+      if (groups.actors.length) body.appendChild(cbSectionTable('Cast', groups.actors));
+      container.appendChild(block);
+    });
+
+    // Wire all four filter change listeners each render (idempotent —
+    // just reassigning oninput / onchange to the same closure).
+    const _rerender = function () { renderContracts(allContractsData); };
+    if (showEl)   showEl.onchange   = _rerender;
+    if (roleEl)   roleEl.onchange   = _rerender;
+    if (statusEl) statusEl.onchange = _rerender;
+    if (personEl) personEl.oninput  = _rerender;
+  }
+
+  function cbSectionTable(title, rows) {
+    const wrap = document.createElement('div');
+    wrap.style.padding = '10px 4px 4px';
+    const h4 = document.createElement('div');
+    h4.style.cssText = 'padding:6px 12px; font-size:11px; font-weight:700; letter-spacing:0.6px; text-transform:uppercase; color:#555;';
+    h4.textContent = title;
+    wrap.appendChild(h4);
+
+    const table = document.createElement('table');
+    table.className = 'contracts-table';
+    table.style.marginBottom = '4px';
+    table.innerHTML =
+      '<thead><tr>' +
+        '<th>' + (title === 'Cast' ? 'Character' : 'Role') + '</th>' +
+        '<th>Name</th>' +
+        '<th>Email</th>' +
+        '<th style="text-align:center;">OK to Send</th>' +
+        '<th>Status</th>' +
+        '<th>Sent</th>' +
+        '<th>Signed</th>' +
+        '<th>Actions</th>' +
+      '</tr></thead>' +
+      '<tbody></tbody>';
+
+    const tbody = table.querySelector('tbody');
+    rows.forEach(function (contract) { tbody.appendChild(cbContractRow(contract)); });
+    wrap.appendChild(table);
+    return wrap;
+  }
+
+  function cbContractRow(contract) {
+    const tr = document.createElement('tr');
+    const statusClass = contract.contractStatus === 'Signed'             ? 'signed'
+      : contract.contractStatus === 'Sent for Signature' ? 'sent'
+      : contract.contractStatus === 'Generated'          ? 'generated'
+      : 'not-started';
+    const label = contract.isActor ? (contract.character || '') : (contract.role || '');
+    tr.innerHTML =
+      '<td>' + calEscape(label) + '</td>' +
+      '<td>' + calEscape(contract.fullName || '') + '</td>' +
+      '<td>' + (contract.contact && contract.contact.email ? '<a href="mailto:' + calEscape(contract.contact.email) + '">' + calEscape(contract.contact.email) + '</a>' : '') + '</td>' +
+      '<td style="text-align:center; white-space:nowrap;">' +
+        '<input type="checkbox" class="ok-to-send-checkbox" ' + (contract.okToSend ? 'checked' : '') +
+          ' data-show="' + calEscape(contract.show) + '" data-role="' + calEscape(contract.role) + '" data-firstname="' + calEscape(contract.firstName) + '">' +
+        (contract.okToSend ? '<span class="approval-initials">' + calEscape(contract.okToSend) + '</span>' : '') +
+      '</td>' +
+      '<td><span class="status-badge ' + statusClass + '">' + calEscape(contract.contractStatus || 'Not Started') + '</span></td>' +
+      '<td style="font-size:12px; color:#888;">' + calEscape(contract.contractSentDate || '') + '</td>' +
+      '<td style="font-size:12px; color:#888;">' + calEscape(contract.contractSignedDate || '') + '</td>' +
+      '<td><div class="contract-actions"></div></td>';
+
+    const actionsCell = tr.querySelector('.contract-actions');
+    cbBuildActionButtons(actionsCell, contract, tr);
+    return tr;
+  }
+
+  function cbBuildActionButtons(actionsCell, contract, tr) {
+    if (!contract.hasTemplate) {
+      const noTemplate = document.createElement('span');
+      noTemplate.className = 'no-template';
+      noTemplate.textContent = 'No template yet';
+      actionsCell.appendChild(noTemplate);
+      return;
+    }
+    if (contract.contractStatus === 'Signed') {
+      if (contract.contractLink) {
+        const a = document.createElement('a');
+        a.href = contract.contractLink; a.target = '_blank';
+        a.className = 'btn btn-secondary';
+        a.style.cssText = 'font-size:11px; padding:4px 10px;';
+        a.textContent = 'View Signed';
+        actionsCell.appendChild(a);
+      }
+      return;
+    }
+    if (contract.contractStatus === 'Not Started' || !contract.contractStatus) {
+      const gen = document.createElement('button');
+      gen.className = 'btn btn-secondary';
+      gen.textContent = 'Generate';
+      gen.addEventListener('click', function () { generateSingleContract(contract, tr); });
+      actionsCell.appendChild(gen);
+      return;
+    }
+    // Generated / Sent for Signature — show Preview / Send / Regenerate / Delete
+    const key = contract.show + '|' + contract.role + '|' + contract.firstName;
+    const generated = generatedDocs[key];
+    if (generated) {
+      cbBtn(actionsCell, 'Preview', 'btn-secondary', function () { window.open(generated.docUrl, '_blank'); });
+      cbBtn(actionsCell, 'Send', 'btn-primary', function () {
+        const ok = tr.querySelector('.ok-to-send-checkbox');
+        if (!ok || !ok.checked) { showAlert('Please get approval from AAD before sending.'); return; }
+        requireApproval(function () { sendSingleContract(contract, generated, tr); });
+      });
+      cbBtn(actionsCell, 'Regenerate', 'btn-secondary', function () { generateSingleContract(contract, tr); });
+      cbBtn(actionsCell, 'Delete', 'btn-danger', function () {
+        showConfirm('Delete this generated contract? This cannot be undone.', function () {
+          actionsCell.innerHTML = '<span style="font-size:12px; color:#aaa;">Deleting...</span>';
+          google.script.run
+            .withSuccessHandler(function () {
+              delete generatedDocs[key];
+              google.script.run
+                .withSuccessHandler(function (data) { allContractsData = data; renderContracts(data); })
+                .getContractsData();
+            })
+            .deleteGeneratedContract(generated.docId, contract.show, contract.role, contract.firstName);
+        });
+      });
+    } else if (contract.contractLink) {
+      cbBtn(actionsCell, 'Preview', 'btn-secondary', function () { window.open(contract.contractLink, '_blank'); });
+      cbBtn(actionsCell, 'Regenerate', 'btn-secondary', function () { generateSingleContract(contract, tr); });
+    } else {
+      cbBtn(actionsCell, 'Regenerate', 'btn-secondary', function () { generateSingleContract(contract, tr); });
+    }
+  }
+  function cbBtn(parent, label, cls, onclick) {
+    const b = document.createElement('button');
+    b.className = 'btn ' + cls;
+    b.style.cssText = 'font-size:11px; padding:4px 10px;';
+    b.textContent = label;
+    b.addEventListener('click', onclick);
+    parent.appendChild(b);
+  }
+
+  /* ==================================================================
+     Bios tab — wrap the original renderer so that show blocks are
+     auto-collapsed for shows already open. Everything else is untouched.
+     ================================================================== */
+  const _origRenderBiosTab = window.renderBiosTab;
+  window.renderBiosTab = function (data) {
+    _origRenderBiosTab(data);
+    // Post-render collapse of open shows. Match by the header <h3> text.
+    const blocks = document.querySelectorAll('#bios-container .season-show-block');
+    blocks.forEach(function (block) {
+      const h3 = block.querySelector('.season-show-title h3');
+      if (!h3) return;
+      if (!cbShowHasOpened(h3.textContent.trim())) return;
+      const body = block.querySelector('.season-show-body');
+      const icon = block.querySelector('.toggle-icon');
+      if (body) body.classList.add('hidden');
+      if (icon) icon.classList.add('collapsed');
+    });
+  };
+
+  /* Same treatment for the Season / Production Teams tab. */
+  const _origRenderFullSeason = window.renderFullSeason;
+  window.renderFullSeason = function (data) {
+    _origRenderFullSeason(data);
+    const blocks = document.querySelectorAll('#season-container .season-show-block');
+    blocks.forEach(function (block) {
+      const h3 = block.querySelector('.season-show-title h3');
+      if (!h3) return;
+      if (!cbShowHasOpened(h3.textContent.trim())) return;
+      const body = block.querySelector('.season-show-body');
+      const icon = block.querySelector('.toggle-icon');
+      if (body) body.classList.add('hidden');
+      if (icon) icon.classList.add('collapsed');
+    });
+  };
+
+  /* Sales tab: cards use their own inline-styled layout (not season-show-block).
+     Wrap each card post-render into a collapsible structure by:
+       - making the card's own top row (h3 + capacity %) the click target
+       - moving everything below it into a hideable body wrapper
+       - auto-collapsing when the show has opened
+  */
+  const _origRenderSales = window.renderSales;
+  window.renderSales = function (data) {
+    _origRenderSales(data);
+    const cards = document.querySelectorAll('#sales-container > div');
+    cards.forEach(function (card) {
+      const header = card.querySelector('div[style*="justify-content:space-between"]');
+      if (!header) return;
+      const h3 = header.querySelector('h3');
+      if (!h3) return;
+      const showName = h3.textContent.trim();
+      // Wrap all siblings AFTER the header row into a single body div so we can hide them.
+      let body = card.querySelector('.sv-sales-body');
+      if (!body) {
+        body = document.createElement('div');
+        body.className = 'sv-sales-body';
+        // Move everything that comes after `header` inside `card` into `body`.
+        let next = header.nextSibling;
+        while (next) {
+          const toMove = next; next = next.nextSibling;
+          body.appendChild(toMove);
+        }
+        card.appendChild(body);
+        // Make the header clickable.
+        header.style.cursor = 'pointer';
+        header.style.userSelect = 'none';
+        header.addEventListener('click', function () {
+          body.style.display = (body.style.display === 'none') ? '' : 'none';
+        });
+      }
+      if (cbShowHasOpened(showName)) body.style.display = 'none';
+    });
+  };
+
+  /* ==================================================================
+     renderActors REWRITE — grouped by show as collapsible cards, matching
+     the Contracts/Bios/Season layout. Auto-collapses opened shows.
+     ================================================================== */
+  window.renderActors = function (data) {
+    if (!data) return;
+    const showFilter = (document.getElementById('actors-show-filter') || {}).value || '';
+    const container  = document.getElementById('actors-container');
+    if (!container) return;
+    container.innerHTML = '';
+
+    const filtered = showFilter ? data.filter(function (a) { return a.show === showFilter; }) : data;
+    if (filtered.length === 0) {
+      container.innerHTML = '<div class="loading">No actors found.</div>';
+      return;
+    }
+
+    // Preserve first-appearance order.
+    const showOrder = [];
+    data.forEach(function (a) { if (a.show && showOrder.indexOf(a.show) === -1) showOrder.push(a.show); });
+
+    const byShow = {};
+    filtered.forEach(function (a) { (byShow[a.show] = byShow[a.show] || []).push(a); });
+
+    showOrder.forEach(function (show) {
+      const list = byShow[show];
+      if (!list || !list.length) return;
+      const opened = cbShowHasOpened(show);
+
+      const signedCount = list.filter(function (a) { return a.contractStatus === 'Signed'; }).length;
+      const pct = list.length > 0 ? Math.round(signedCount / list.length * 100) : 0;
+
+      const block = document.createElement('div');
+      block.className = 'season-show-block';
+      block.innerHTML =
+        '<div class="season-show-header" onclick="toggleSeasonShow(this)">' +
+          '<div class="season-show-title">' +
+            '<h3>' + calEscape(show) + '</h3>' +
+            '<span style="font-size:13px; color:' + (opened ? '#aaa' : '#888') + ';">' +
+              list.length + ' cast · ' + signedCount + ' signed' + (opened ? ' · open' : '') +
+            '</span>' +
+          '</div>' +
+          '<div class="season-show-meta">' +
+            '<div style="width:80px; background:#f0f0f0; border-radius:99px; height:6px; overflow:hidden;">' +
+              '<div style="width:' + pct + '%; height:100%; background:#4caf50; border-radius:99px;"></div>' +
+            '</div>' +
+            '<span class="toggle-icon' + (opened ? ' collapsed' : '') + '">▼</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="season-show-body' + (opened ? ' hidden' : '') + '"></div>';
+
+      const body = block.querySelector('.season-show-body');
+      const table = document.createElement('table');
+      table.className = 'contracts-table';
+      table.style.marginBottom = '4px';
+      table.innerHTML =
+        '<thead><tr>' +
+          '<th>Character</th><th>Name</th><th>Phone</th><th>Email</th>' +
+          '<th>Contract Status</th><th>Actions</th>' +
+        '</tr></thead><tbody></tbody>';
+      const tbody = table.querySelector('tbody');
+
+      list.forEach(function (actor) {
+        const fullName = [actor.firstName, actor.middleName, actor.lastName, actor.suffix].filter(Boolean).join(' ');
+        const statusClass = actor.contractStatus === 'Signed' ? 'signed'
+          : actor.contractStatus === 'Sent for Signature' ? 'sent' : 'not-started';
+        const tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td>' + calEscape(actor.character || '') + '</td>' +
+          '<td>' + calEscape(fullName) + '</td>' +
+          '<td>' + (actor.phone ? calEscape(formatPhone(actor.phone)) : '') + '</td>' +
+          '<td>' + calEscape(actor.email || '') + '</td>' +
+          '<td><span class="status-badge ' + statusClass + '">' + calEscape(actor.contractStatus || '') + '</span></td>' +
+          '<td><div class="actor-actions"></div></td>';
+        const rm = document.createElement('button');
+        rm.className = 'btn btn-danger';
+        rm.style.cssText = 'font-size:11px; padding:4px 10px;';
+        rm.textContent = 'Remove';
+        rm.title = 'Remove this actor';
+        rm.addEventListener('click', function () { askRemoveActor(actor); });
+        tr.querySelector('.actor-actions').appendChild(rm);
+        tbody.appendChild(tr);
+      });
+      body.appendChild(table);
+      container.appendChild(block);
+    });
+  };
+
+
+  /* =====  Contact Sheet: View / Regenerate modal (overrides viewContactSheet)
+     Runs after the original declaration so this wins. ================== */
+  window.viewContactSheet = function (e, showName) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    showLoadingModal('Contact Sheet', 'Checking for ' + showName + '…');
+    google.script.run
+      .withSuccessHandler(function (info) {
+        hideLoadingModal();
+        // Shim now returns { url, exists, source }. If exists → modal.
+        if (info && info.exists && info.url) {
+          cbShowContactSheetModal(showName, info.url);
+        } else {
+          cbGenerateContactSheet(showName, false);
+        }
+      })
+      .withFailureHandler(function (err) {
+        hideLoadingModal();
+        showAlert('Error: ' + (err && err.message ? err.message : 'lookup failed'));
+      })
+      .getContactSheetLink(showName);
+  };
+
+  function cbShowContactSheetModal(showName, url) {
+    // Remove any leftover modal from a previous open so double-clicking the
+    // Contact Sheet button doesn't stack overlays.
+    var prior = document.getElementById('cb-cs-modal');
+    if (prior) prior.remove();
+
+    var overlay = document.createElement('div');
+    overlay.id = 'cb-cs-modal';
+    overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:99998; display:flex; align-items:center; justify-content:center;';
+    overlay.innerHTML =
+      '<div style="background:#fff; border-radius:10px; padding:24px; max-width:420px; width:calc(100% - 40px); box-shadow:0 4px 24px rgba(0,0,0,0.15);">' +
+        '<h3 style="margin:0 0 6px; font-size:18px; font-weight:600;">Contact Sheet</h3>' +
+        '<p style="margin:0 0 6px; color:#333; font-size:14px;"><strong>' + calEscape(showName) + '</strong> already has a contact sheet.</p>' +
+        '<p style="margin:0 0 20px; color:#666; font-size:13px;">Regenerate to pick up any recent cast or crew changes. The old one moves to trash.</p>' +
+        '<div style="display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap;">' +
+          '<button id="cb-cs-cancel" class="btn btn-secondary" style="font-size:13px; padding:6px 14px;">Cancel</button>' +
+          '<button id="cb-cs-regen"  class="btn btn-secondary" style="font-size:13px; padding:6px 14px;">Regenerate</button>' +
+          '<button id="cb-cs-view"   class="btn btn-primary"   style="font-size:13px; padding:6px 14px;">View</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(overlay);
+    var close = function () { overlay.remove(); };
+    // Click outside the panel = cancel.
+    overlay.addEventListener('click', function (ev) { if (ev.target === overlay) close(); });
+    document.getElementById('cb-cs-cancel').onclick = close;
+    document.getElementById('cb-cs-view').onclick   = function () { close(); window.open(url, '_blank'); };
+    document.getElementById('cb-cs-regen').onclick  = function () { close(); cbGenerateContactSheet(showName, true); };
+  }
+
+  function cbGenerateContactSheet(showName, regenerate) {
+    showLoadingModal(
+      regenerate ? 'Regenerating Contact Sheet' : 'Generating Contact Sheet',
+      showName + ' · This usually takes 15–30 seconds…'
+    );
+    var method = regenerate ? 'regenerateContactSheet' : 'generateContactSheet';
+    google.script.run
+      .withSuccessHandler(function (result) {
+        hideLoadingModal();
+        if (result && result.url) window.open(result.url, '_blank');
+        else showAlert('Could not generate contact sheet for ' + showName);
+      })
+      .withFailureHandler(function (err) {
+        hideLoadingModal();
+        showAlert('Error: ' + (err && err.message ? err.message : 'generation failed'));
+      })
+      [method](showName);
+  }
+
+  /* =====  Tech Schedule: View / Regenerate (parallel to contact sheet) ==== */
+  window.viewSchedule = function (e, showName) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    showLoadingModal('Tech Schedule', 'Checking for ' + showName + '…');
+    google.script.run
+      .withSuccessHandler(function (info) {
+        hideLoadingModal();
+        if (info && info.exists && info.url) cbShowScheduleModal(showName, info.url);
+        else cbGenerateSchedule(showName);
+      })
+      .withFailureHandler(function (err) {
+        hideLoadingModal();
+        showAlert('Error: ' + (err && err.message ? err.message : 'lookup failed'));
+      })
+      .getScheduleLink(showName);
+  };
+
+  function cbShowScheduleModal(showName, url) {
+    var prior = document.getElementById('cb-sched-modal');
+    if (prior) prior.remove();
+    var overlay = document.createElement('div');
+    overlay.id = 'cb-sched-modal';
+    overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:99998; display:flex; align-items:center; justify-content:center;';
+    overlay.innerHTML =
+      '<div style="background:#fff; border-radius:10px; padding:24px; max-width:420px; width:calc(100% - 40px); box-shadow:0 4px 24px rgba(0,0,0,0.15);">' +
+        '<h3 style="margin:0 0 6px; font-size:18px; font-weight:600;">Tech Schedule</h3>' +
+        '<p style="margin:0 0 6px; color:#333; font-size:14px;"><strong>' + calEscape(showName) + '</strong> already has a tech schedule.</p>' +
+        '<p style="margin:0 0 20px; color:#666; font-size:13px;">Regenerate to pull the latest dates from the sheet. The old schedule moves to trash.</p>' +
+        '<div style="display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap;">' +
+          '<button id="cb-sched-cancel" class="btn btn-secondary" style="font-size:13px; padding:6px 14px;">Cancel</button>' +
+          '<button id="cb-sched-regen"  class="btn btn-secondary" style="font-size:13px; padding:6px 14px;">Regenerate</button>' +
+          '<button id="cb-sched-view"   class="btn btn-primary"   style="font-size:13px; padding:6px 14px;">View</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(overlay);
+    var close = function () { overlay.remove(); };
+    overlay.addEventListener('click', function (ev) { if (ev.target === overlay) close(); });
+    document.getElementById('cb-sched-cancel').onclick = close;
+    document.getElementById('cb-sched-view').onclick   = function () { close(); window.open(url, '_blank'); };
+    document.getElementById('cb-sched-regen').onclick  = function () { close(); cbGenerateSchedule(showName); };
+  }
+
+  function cbGenerateSchedule(showName) {
+    showLoadingModal('Generating Tech Schedule', showName + ' · This usually takes 10–20 seconds…');
+    google.script.run
+      .withSuccessHandler(function (result) {
+        hideLoadingModal();
+        if (result && result.url) window.open(result.url, '_blank');
+        else showAlert('Could not generate tech schedule for ' + showName);
+      })
+      .withFailureHandler(function (err) {
+        hideLoadingModal();
+        showAlert('Error: ' + (err && err.message ? err.message : 'generation failed'));
+      })
+      .generateTechSchedule(showName);
+  }
+
 </script>
 
 <div class="tlt-dialog-overlay" id="tlt-password-dialog">

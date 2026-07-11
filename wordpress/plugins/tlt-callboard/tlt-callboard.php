@@ -38,6 +38,41 @@ if ( ! defined( 'TLT_CALLBOARD_CONTACTBOOK_ID' ) ) define( 'TLT_CALLBOARD_CONTAC
 // Cloudways home is /home/master/ (the SSH username differs; don't be fooled).
 if ( ! defined( 'TLT_CALLBOARD_SA_JSON' ) )        define( 'TLT_CALLBOARD_SA_JSON',        '/home/master/tlt-service-account.json' );
 
+// Drive folder + template used by /contact-sheet-generate. Both must be shared
+// as Editor with the SA email. Values match the GAS ContactSheet.gs constants.
+if ( ! defined( 'TLT_CALLBOARD_CS_FOLDER_ID' ) )   define( 'TLT_CALLBOARD_CS_FOLDER_ID',   '18CAXsUPT2WZgGBDbP-SGZeYbI0W-LSC_' );
+if ( ! defined( 'TLT_CALLBOARD_CS_TEMPLATE_ID' ) ) define( 'TLT_CALLBOARD_CS_TEMPLATE_ID', '1vFJOkb8GI4SVhjdNIELlhZ8K2BjpK9cJtkfEBVGnz7s' );
+
+// Tech schedule generator (from GAS TechScheduleGenerator.js constants).
+if ( ! defined( 'TLT_CALLBOARD_TS_FOLDER_ID' ) )   define( 'TLT_CALLBOARD_TS_FOLDER_ID',   '1eAk4aNXBdbBVG6pJt4GDd9rf3Qg37UJT' );
+if ( ! defined( 'TLT_CALLBOARD_TS_TEMPLATE_ID' ) ) define( 'TLT_CALLBOARD_TS_TEMPLATE_ID', '138nn2ZR_VKywXYakTWOchtNUzbwv_uebt7VQA5SKuEw' );
+
+// Bios doc compilation (GAS BiosManager.js).
+if ( ! defined( 'TLT_CALLBOARD_BIOS_FOLDER_ID' ) ) define( 'TLT_CALLBOARD_BIOS_FOLDER_ID', '1_hUkdeqSFZJtI49MPg52p22GmQnZ58Pq' );
+
+// Contract generation (GAS ContractGenerator.js).
+if ( ! defined( 'TLT_CALLBOARD_CONTRACT_ROOT_FOLDER_ID' ) ) define( 'TLT_CALLBOARD_CONTRACT_ROOT_FOLDER_ID', '1azafGrlfByl7kgVtUYBr3JhzVPO34pxZ' );
+if ( ! defined( 'TLT_CALLBOARD_DUTIES_DOC_ID' ) )          define( 'TLT_CALLBOARD_DUTIES_DOC_ID',          '1kEDGRgKmpyzxnop36L77AQXOGaeVYFbnScBh1R_KNLI' );
+if ( ! defined( 'TLT_CALLBOARD_TPL_GENERAL' ) )   define( 'TLT_CALLBOARD_TPL_GENERAL',   '1tfXC6fk7MiqJXMPUYoFPrShe380pV266psAzfGXq0V0' );
+if ( ! defined( 'TLT_CALLBOARD_TPL_DIRECTOR' ) )  define( 'TLT_CALLBOARD_TPL_DIRECTOR',  '11M2io31fUcaKyIyfaivxA2Yqm0hdbs2ae2WgKzP_KiQ' );
+if ( ! defined( 'TLT_CALLBOARD_TPL_ACTOR' ) )     define( 'TLT_CALLBOARD_TPL_ACTOR',     '1SD-bwwuwUMHulsOY1IIhjaK8xNGkek0HMOe8xrScmxw' );
+if ( ! defined( 'TLT_CALLBOARD_TPL_OPERATOR' ) )  define( 'TLT_CALLBOARD_TPL_OPERATOR',  '1bdL4jz0GM1gQ1haXQ8uYFvXvQMmhsmc_z2KXR_DJvpQ' );
+if ( ! defined( 'TLT_CALLBOARD_HANDBOOK_URL' ) )  define( 'TLT_CALLBOARD_HANDBOOK_URL',  'https://docs.google.com/document/d/1uVtm_ZC06MJel5WOW9bY0DSjMqETA6jWBTIbF9HXguk/preview' );
+
+// External API integrations. These MUST be defined in wp-config.php on the
+// production server — the plugin returns a clear config-missing error at
+// request time when unset. Never commit these values.
+//   TLT_CALLBOARD_OPENSIGN_KEY   — OpenSign REST API token (x-api-token header)
+//   TLT_CALLBOARD_RESEND_KEY     — Resend Bearer token for outbound email
+//   TLT_CALLBOARD_MAIL_FROM      — "Name <email@…>" — default "Tacoma Little Theatre <contracts@tacomalittletheatre.com>"
+//   TLT_CALLBOARD_MAIL_REPLY_TO  — reply-to header. Defaults to tlt@…
+//   TLT_CALLBOARD_MAIL_BCC       — bcc address on outbound messages
+if ( ! defined( 'TLT_CALLBOARD_OPENSIGN_URL' ) ) define( 'TLT_CALLBOARD_OPENSIGN_URL', 'https://app.opensignlabs.com/api/v1' );
+if ( ! defined( 'TLT_CALLBOARD_RESEND_URL' ) )   define( 'TLT_CALLBOARD_RESEND_URL',   'https://api.resend.com/emails' );
+if ( ! defined( 'TLT_CALLBOARD_MAIL_FROM' ) )    define( 'TLT_CALLBOARD_MAIL_FROM',    'Tacoma Little Theatre <contracts@tacomalittletheatre.com>' );
+if ( ! defined( 'TLT_CALLBOARD_MAIL_REPLY_TO' ) ) define( 'TLT_CALLBOARD_MAIL_REPLY_TO', 'tlt@tacomalittletheatre.com' );
+if ( ! defined( 'TLT_CALLBOARD_MAIL_BCC' ) )     define( 'TLT_CALLBOARD_MAIL_BCC',     'contracts@tacomalittletheatre.com' );
+
 const TLT_CALLBOARD_ROUTE_NS  = 'callboard/v1';
 const TLT_CALLBOARD_SESSION_TTL = 30 * DAY_IN_SECONDS;      // login persists per-device
 const TLT_CALLBOARD_CACHE_TTL   = 60;                        // read cache
@@ -47,7 +82,11 @@ const TLT_CALLBOARD_CONTACT_TTL = 600;                       // mirrors existing
  * Google service-account auth. Hand-rolled JWT → access token; cached 55 min.
  * ------------------------------------------------------------------------- */
 function tlt_callboard_google_access_token() {
-    $cached = get_transient( 'tlt_cb_google_token' );
+    // Token cache key is scope-versioned. Bump the suffix any time we widen
+    // scopes so old cached narrow tokens are ignored instead of causing
+    // silent 403s on the new endpoints.
+    $cache_key = 'tlt_cb_google_token_v2';
+    $cached = get_transient( $cache_key );
     if ( $cached ) return $cached;
 
     if ( ! is_readable( TLT_CALLBOARD_SA_JSON ) ) {
@@ -60,9 +99,17 @@ function tlt_callboard_google_access_token() {
 
     $now = time();
     $header = [ 'alg' => 'RS256', 'typ' => 'JWT' ];
+    // Sheets (read/write shows/actors/contacts), Drive (copy/list/trash contact
+    // sheet + tech schedule + bio + contract docs), Docs (build those docs via
+    // documents.batchUpdate). The SA must be shared as Editor on any target
+    // Drive folder + template file.
     $claims = [
         'iss'   => $sa['client_email'],
-        'scope' => 'https://www.googleapis.com/auth/spreadsheets.readonly',
+        'scope' => implode( ' ', [
+            'https://www.googleapis.com/auth/spreadsheets',
+            'https://www.googleapis.com/auth/drive',
+            'https://www.googleapis.com/auth/documents',
+        ] ),
         'aud'   => 'https://oauth2.googleapis.com/token',
         'iat'   => $now,
         'exp'   => $now + 3600,
@@ -88,7 +135,7 @@ function tlt_callboard_google_access_token() {
         return new WP_Error( 'token_exchange_failed', 'Google refused JWT: ' . wp_remote_retrieve_body( $resp ) );
     }
     // Cache slightly under Google's 1h expiry.
-    set_transient( 'tlt_cb_google_token', $data['access_token'], 55 * MINUTE_IN_SECONDS );
+    set_transient( $cache_key, $data['access_token'], 55 * MINUTE_IN_SECONDS );
     return $data['access_token'];
 }
 
@@ -102,7 +149,10 @@ function tlt_callboard_google_access_token() {
  * Returns [ 'RangeA1' => [ [rowvals], ... ], ... ] or WP_Error.
  * ------------------------------------------------------------------------- */
 function tlt_callboard_sheets_get( $spreadsheet_id, $ranges, $ttl = TLT_CALLBOARD_CACHE_TTL, $force = false ) {
-    $key = 'tlt_cb_range_' . md5( $spreadsheet_id . '|' . implode( ',', $ranges ) );
+    // Version-scoped cache key. Bumping the version orphans every prior cache
+    // entry without touching WP sessions / other transients. See tlt_cb_bump_cache().
+    $v = (int) get_option( 'tlt_cb_cache_version', 1 );
+    $key = 'tlt_cb_range_v' . $v . '_' . md5( $spreadsheet_id . '|' . implode( ',', $ranges ) );
     if ( ! $force ) {
         $cached = get_transient( $key );
         if ( is_array( $cached ) ) return $cached;
@@ -136,6 +186,16 @@ function tlt_callboard_sheets_get( $spreadsheet_id, $ranges, $ttl = TLT_CALLBOAR
     return $out;
 }
 
+/**
+ * Bump the cache version — instantly invalidates every read-cache key without
+ * touching sessions, Google tokens, or unrelated site transients. Safe to call
+ * from any mutation or the manual purge endpoint.
+ */
+function tlt_cb_bump_cache() {
+    $v = (int) get_option( 'tlt_cb_cache_version', 1 );
+    update_option( 'tlt_cb_cache_version', $v + 1, false );
+}
+
 /* Convenience: fetch a single range and return just the row array. */
 function tlt_callboard_sheet_rows( $spreadsheet_id, $range, $ttl = TLT_CALLBOARD_CACHE_TTL, $force = false ) {
     $result = tlt_callboard_sheets_get( $spreadsheet_id, [ $range ], $ttl, $force );
@@ -143,12 +203,244 @@ function tlt_callboard_sheet_rows( $spreadsheet_id, $range, $ttl = TLT_CALLBOARD
     return $result[ $range ] ?? [];
 }
 
+/**
+ * Write to a single cell/range in Sheets. Uses values.update (USER_ENTERED so
+ * dates + numbers behave sensibly). Purges any range-cache transients that
+ * overlap the touched range so subsequent reads see the fresh value.
+ *
+ * @param string $spreadsheet_id
+ * @param string $range   A1 notation, e.g. "'Production Teams'!P42"
+ * @param array  $values  2D array of rows; single cell = [[ 'BRY' ]]
+ * @return array|WP_Error  API response body on success
+ */
+function tlt_callboard_sheets_write( $spreadsheet_id, $range, $values ) {
+    $token = tlt_callboard_google_access_token();
+    if ( is_wp_error( $token ) ) return $token;
+
+    $url = "https://sheets.googleapis.com/v4/spreadsheets/{$spreadsheet_id}/values/"
+        . rawurlencode( $range ) . '?valueInputOption=USER_ENTERED';
+
+    $resp = wp_remote_request( $url, [
+        'method'  => 'PUT',
+        'timeout' => 30,
+        'headers' => [
+            'Authorization' => 'Bearer ' . $token,
+            'Content-Type'  => 'application/json',
+        ],
+        'body'    => wp_json_encode( [ 'values' => $values ] ),
+    ] );
+    if ( is_wp_error( $resp ) ) return $resp;
+    $code = wp_remote_retrieve_response_code( $resp );
+    if ( $code < 200 || $code >= 300 ) {
+        return new WP_Error( 'sheets_write_http', "Sheets write returned $code: " . wp_remote_retrieve_body( $resp ) );
+    }
+
+    // Invalidate every range cache safely — bumps a version number so
+    // sessions/tokens/other transients are untouched.
+    tlt_cb_bump_cache();
+    return json_decode( wp_remote_retrieve_body( $resp ), true );
+}
+
+/* ---------------------------------------------------------------------------
+ * Drive API v3 helpers.
+ *
+ * The SA needs Editor access to any folder we copy into and Reader access to
+ * any template file. Errors bubble up as WP_Errors so endpoint handlers can
+ * return them straight to the client.
+ * ------------------------------------------------------------------------- */
+
+/**
+ * Copy a Drive file (template) into a target folder with a new name.
+ *
+ * @param string $template_id Source file ID
+ * @param string $folder_id   Destination folder ID
+ * @param string $new_name    Name for the copy
+ * @return array|WP_Error     Decoded file resource ({ id, name, ... })
+ */
+function tlt_cb_drive_copy( $template_id, $folder_id, $new_name ) {
+    $token = tlt_callboard_google_access_token();
+    if ( is_wp_error( $token ) ) return $token;
+    $url  = 'https://www.googleapis.com/drive/v3/files/' . rawurlencode( $template_id )
+          . '/copy?supportsAllDrives=true&fields=id,name,webViewLink';
+    $resp = wp_remote_post( $url, [
+        'timeout' => 30,
+        'headers' => [
+            'Authorization' => 'Bearer ' . $token,
+            'Content-Type'  => 'application/json',
+        ],
+        'body' => wp_json_encode( [
+            'name'    => $new_name,
+            'parents' => [ $folder_id ],
+        ] ),
+    ] );
+    if ( is_wp_error( $resp ) ) return $resp;
+    $code = wp_remote_retrieve_response_code( $resp );
+    $body = wp_remote_retrieve_body( $resp );
+    if ( $code < 200 || $code >= 300 ) {
+        return new WP_Error( 'drive_copy_http', "Drive copy returned $code: $body" );
+    }
+    return json_decode( $body, true );
+}
+
+/**
+ * Find files in a folder by exact name. Returns array of {id, name} or empty.
+ *
+ * @param string $folder_id Parent folder ID
+ * @param string $name      Exact filename (untrashed only)
+ * @return array|WP_Error
+ */
+function tlt_cb_drive_find_in_folder( $folder_id, $name ) {
+    $token = tlt_callboard_google_access_token();
+    if ( is_wp_error( $token ) ) return $token;
+    // Escape single quotes in the name for the q= expression.
+    $escaped_name = str_replace( "'", "\\'", $name );
+    $q = "name = '{$escaped_name}' and '{$folder_id}' in parents and trashed = false";
+    $url  = 'https://www.googleapis.com/drive/v3/files?'
+          . 'q=' . rawurlencode( $q )
+          . '&fields=' . rawurlencode( 'files(id,name)' )
+          . '&supportsAllDrives=true&includeItemsFromAllDrives=true';
+    $resp = wp_remote_get( $url, [
+        'timeout' => 15,
+        'headers' => [ 'Authorization' => 'Bearer ' . $token ],
+    ] );
+    if ( is_wp_error( $resp ) ) return $resp;
+    $code = wp_remote_retrieve_response_code( $resp );
+    $body = wp_remote_retrieve_body( $resp );
+    if ( $code < 200 || $code >= 300 ) {
+        return new WP_Error( 'drive_list_http', "Drive list returned $code: $body" );
+    }
+    $data = json_decode( $body, true );
+    return isset( $data['files'] ) && is_array( $data['files'] ) ? $data['files'] : [];
+}
+
+/**
+ * Move a file to Drive trash. Non-destructive; user can un-trash from Drive UI.
+ *
+ * @param string $file_id
+ * @return true|WP_Error
+ */
+function tlt_cb_drive_trash( $file_id ) {
+    $token = tlt_callboard_google_access_token();
+    if ( is_wp_error( $token ) ) return $token;
+    $url = 'https://www.googleapis.com/drive/v3/files/' . rawurlencode( $file_id )
+         . '?supportsAllDrives=true';
+    $resp = wp_remote_request( $url, [
+        'method'  => 'PATCH',
+        'timeout' => 15,
+        'headers' => [
+            'Authorization' => 'Bearer ' . $token,
+            'Content-Type'  => 'application/json',
+        ],
+        'body' => wp_json_encode( [ 'trashed' => true ] ),
+    ] );
+    if ( is_wp_error( $resp ) ) return $resp;
+    $code = wp_remote_retrieve_response_code( $resp );
+    if ( $code < 200 || $code >= 300 ) {
+        return new WP_Error( 'drive_trash_http', 'Drive trash returned ' . $code . ': ' . wp_remote_retrieve_body( $resp ) );
+    }
+    return true;
+}
+
+/**
+ * Build the canonical open-in-tab URL for a Google Doc.
+ */
+function tlt_cb_doc_url( $doc_id ) {
+    return 'https://docs.google.com/document/d/' . $doc_id . '/edit';
+}
+
+/* ---------------------------------------------------------------------------
+ * Docs API v1 wrapper — documents.batchUpdate. All the doc-building endpoints
+ * feed lists of requests into this.
+ * ------------------------------------------------------------------------- */
+
+/**
+ * @param string $doc_id   Target document ID
+ * @param array  $requests List of batchUpdate Request objects
+ * @return array|WP_Error  Decoded response body
+ */
+function tlt_cb_docs_batch_update( $doc_id, array $requests ) {
+    if ( empty( $requests ) ) return [];
+    $token = tlt_callboard_google_access_token();
+    if ( is_wp_error( $token ) ) return $token;
+    $url  = 'https://docs.googleapis.com/v1/documents/' . rawurlencode( $doc_id ) . ':batchUpdate';
+    $resp = wp_remote_post( $url, [
+        'timeout' => 60,
+        'headers' => [
+            'Authorization' => 'Bearer ' . $token,
+            'Content-Type'  => 'application/json',
+        ],
+        'body' => wp_json_encode( [ 'requests' => $requests ] ),
+    ] );
+    if ( is_wp_error( $resp ) ) return $resp;
+    $code = wp_remote_retrieve_response_code( $resp );
+    $body = wp_remote_retrieve_body( $resp );
+    if ( $code < 200 || $code >= 300 ) {
+        return new WP_Error( 'docs_batch_http', "Docs batchUpdate returned $code: $body" );
+    }
+    return json_decode( $body, true );
+}
+
+/**
+ * Fetch a document (or subset via ?fields=) — used to discover current end
+ * index before appending, or to inspect header structure.
+ *
+ * @param string $doc_id
+ * @param string $fields Optional Google fields mask (e.g. "body(content(endIndex))")
+ * @return array|WP_Error
+ */
+function tlt_cb_docs_get( $doc_id, $fields = '' ) {
+    $token = tlt_callboard_google_access_token();
+    if ( is_wp_error( $token ) ) return $token;
+    $url = 'https://docs.googleapis.com/v1/documents/' . rawurlencode( $doc_id );
+    if ( $fields !== '' ) $url .= '?fields=' . rawurlencode( $fields );
+    $resp = wp_remote_get( $url, [
+        'timeout' => 15,
+        'headers' => [ 'Authorization' => 'Bearer ' . $token ],
+    ] );
+    if ( is_wp_error( $resp ) ) return $resp;
+    $code = wp_remote_retrieve_response_code( $resp );
+    $body = wp_remote_retrieve_body( $resp );
+    if ( $code < 200 || $code >= 300 ) {
+        return new WP_Error( 'docs_get_http', "Docs get returned $code: $body" );
+    }
+    return json_decode( $body, true );
+}
+
+/**
+ * Find the 1-based row number in a tab where cols match given values.
+ * Returns 0 if no match. Used to translate (show, role, firstName) tuples
+ * into a specific A1 row address for a targeted write.
+ *
+ * @param array $rows  Sheet rows starting at row 2 (headers stripped by caller).
+ * @param array $match Map of col-index → expected value (case-sensitive).
+ * @param int   $offset How many rows are above `$rows` in the sheet (typically 1 = header).
+ */
+function tlt_cb_find_row( $rows, array $match, $offset = 1 ) {
+    foreach ( $rows as $i => $r ) {
+        $all_ok = true;
+        foreach ( $match as $col => $expected ) {
+            if ( tlt_cb_s( $r[ $col ] ?? '' ) !== tlt_cb_s( $expected ) ) { $all_ok = false; break; }
+        }
+        if ( $all_ok ) return $i + 1 + $offset;
+    }
+    return 0;
+}
+
 /* ---------------------------------------------------------------------------
  * Auth. Passwords live in Theatre col C. Any row with non-empty col C can log in.
  * Sessions are 30-day WP transients keyed by a random 32-byte token.
  * ------------------------------------------------------------------------- */
 
-const TLT_CALLBOARD_APPROVER_ROLES = [ 'Managing Artistic Director', 'Associate Artistic Director' ];
+// Approver roles for Ok-to-Send checks. "Associate Producing Director" (APD)
+// replaced "Associate Artistic Director" (AAD) in the old callboard — keep
+// the old label recognised as a courtesy in case any Theatre rows still use it.
+// Technical Director included so Blake can test end-to-end; remove after cutover.
+const TLT_CALLBOARD_APPROVER_ROLES = [
+    'Managing Artistic Director',
+    'Associate Producing Director',
+    'Associate Artistic Director',
+    'Technical Director',
+];
 
 function tlt_callboard_login( $password ) {
     $password = trim( (string) $password );
@@ -207,6 +499,24 @@ function tlt_callboard_require_auth( WP_REST_Request $req ) {
 /** Trim and coerce sheet cell to string (Sheets returns numeric for numbers). */
 function tlt_cb_s( $v ) { return trim( (string) ( $v ?? '' ) ); }
 
+/**
+ * Normalize a Sheets date cell to ISO YYYY-MM-DD.
+ * Sheets returns FORMATTED_STRING values which follow the sheet's locale —
+ * usually M/D/YYYY on US locales. Convert so downstream JS parsing works.
+ * Empty / unparseable input → empty string (safe for stringly-typed callers).
+ */
+function tlt_cb_iso_date( $v ) {
+    $v = trim( (string) ( $v ?? '' ) );
+    if ( $v === '' ) return '';
+    // Already ISO — passthrough.
+    if ( preg_match( '/^\d{4}-\d{2}-\d{2}$/', $v ) ) return $v;
+    // Strip a trailing time so "8/28/2026 7:30 PM" also parses.
+    $head = preg_split( '/\s+/', $v, 2 )[0];
+    $ts = strtotime( $head );
+    if ( ! $ts ) return $v;   // best-effort — leave as-is if we can't parse
+    return date( 'Y-m-d', $ts );
+}
+
 /** Response wrapper that normalizes shape for the frontend. */
 function tlt_cb_ok( $data ) { return rest_ensure_response( [ 'ok' => true, 'data' => $data ] ); }
 
@@ -257,14 +567,54 @@ add_action( 'rest_api_init', function () {
     $auth_route( '/contracts',                  'tlt_callboard_ep_get_contracts' );
     $auth_route( '/full-season',                'tlt_callboard_ep_get_full_season' );
     $auth_route( '/combinable-shows',           'tlt_callboard_ep_get_combinable_shows' );
-    $auth_route( '/schedule-link',              'tlt_callboard_ep_get_schedule_link' );
+    $auth_route( '/schedule-link',              'tlt_callboard_ep_get_schedule_link_v2' );
     $auth_route( '/contact-sheet-link',         'tlt_callboard_ep_get_contact_sheet_link' );
     $auth_route( '/calendar-events',            'tlt_callboard_ep_get_calendar_events' );
     $auth_route( '/calendar-conflicts',         'tlt_callboard_ep_get_calendar_conflicts' );
     $auth_route( '/program',                    'tlt_callboard_ep_get_program' );
 
-    // ----- Approval helper — auth still required, but not implementing the write side yet -----
+    // ----- Approval helper -----
     $auth_route( '/verify-approval',            'tlt_callboard_ep_verify_approval' ); // ?password=...
+
+    // ---------- Phase 2 mutations ----------
+    $post_route = function ( $path, $handler ) use ( $ns ) {
+        register_rest_route( $ns, $path, [
+            'methods'             => 'POST',
+            'callback'            => $handler,
+            'permission_callback' => 'tlt_callboard_require_auth',
+        ] );
+    };
+    $post_route( '/set-ok-to-send',       'tlt_callboard_ep_set_ok_to_send' );
+    $post_route( '/save-contact',         'tlt_callboard_ep_save_contact' );
+    $post_route( '/delete-contact',       'tlt_callboard_ep_delete_contact' );
+    $post_route( '/sync-contactbook',     'tlt_callboard_ep_sync_contactbook' );
+    // Phase 2a-4/5/6
+    $post_route( '/add-role',             'tlt_callboard_ep_add_role' );
+    $post_route( '/update-person',        'tlt_callboard_ep_update_person' );
+    $post_route( '/delete-role',          'tlt_callboard_ep_delete_role' );
+    $post_route( '/remove-person',        'tlt_callboard_ep_remove_person' );
+    $post_route( '/add-actor',            'tlt_callboard_ep_add_actor' );
+    $post_route( '/remove-actor',         'tlt_callboard_ep_remove_actor' );
+    $post_route( '/import-actors',        'tlt_callboard_ep_import_actors' );
+    $post_route( '/save-program-fields',  'tlt_callboard_ep_save_program_fields' );
+    // Contact sheet generation (Docs API port of ContactSheetGenerator.gs)
+    $post_route( '/contact-sheet-generate',   'tlt_callboard_ep_contact_sheet_generate' );
+    $post_route( '/contact-sheet-regenerate', 'tlt_callboard_ep_contact_sheet_regenerate' );
+    // Tech schedule
+    $post_route( '/tech-schedule-generate',   'tlt_callboard_ep_tech_schedule_generate' );
+    // Bios
+    $post_route( '/bios-doc-compile',         'tlt_callboard_ep_bios_doc_compile' );
+    $post_route( '/bios-send-requests',       'tlt_callboard_ep_bios_send_requests' );
+    $post_route( '/bios-resend',              'tlt_callboard_ep_bios_resend' );
+    // Program export
+    $post_route( '/program-export',           'tlt_callboard_ep_program_export' );
+    // Contracts
+    $post_route( '/contract-generate',          'tlt_callboard_ep_contract_generate' );
+    $post_route( '/contract-generate-combined', 'tlt_callboard_ep_contract_generate_combined' );
+    $post_route( '/contract-send',              'tlt_callboard_ep_contract_send' );
+    $post_route( '/contract-send-combined',     'tlt_callboard_ep_contract_send_combined' );
+    $post_route( '/contract-delete',            'tlt_callboard_ep_contract_delete' );
+    $post_route( '/purge-cache',          'tlt_callboard_ep_purge_cache' );
 } );
 
 /* ---------------------------------------------------------------------------
@@ -413,8 +763,11 @@ function tlt_callboard_ep_get_actors_for_show( WP_REST_Request $req ) {
  * Artistic Director can approve. Used by Ok-to-send flow.
  * ------------------------------------------------------------------------- */
 function tlt_callboard_ep_verify_approval( WP_REST_Request $req ) {
+    // Force-refresh — the calling flow is user-triggered (they've just typed a
+    // password) so we want the freshest possible Theatre data, not a 60s-old
+    // cache. Cheap because it's one small range.
     $password = tlt_cb_s( $req->get_param( 'password' ) );
-    $rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, 'Theatre!A2:D200' );
+    $rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, 'Theatre!A2:D200', TLT_CALLBOARD_CACHE_TTL, true );
     if ( is_wp_error( $rows ) ) return $rows;
     foreach ( $rows as $r ) {
         $role = tlt_cb_s( $r[0] ?? '' );
@@ -424,9 +777,16 @@ function tlt_callboard_ep_verify_approval( WP_REST_Request $req ) {
         if ( ! in_array( $role, TLT_CALLBOARD_APPROVER_ROLES, true ) ) continue;
         $initials = '';
         foreach ( preg_split( '/\s+/', $name ) as $part ) if ( $part !== '' ) $initials .= strtoupper( $part[0] );
-        return tlt_cb_ok( [ 'ok' => true, 'role' => $role, 'initials' => $initials ] );
+        // Frontend checks result.valid — return BOTH `valid` and legacy `ok`
+        // so nothing breaks either way.
+        return tlt_cb_ok( [
+            'valid'    => true,
+            'ok'       => true,
+            'role'     => $role,
+            'initials' => $initials,
+        ] );
     }
-    return tlt_cb_ok( [ 'ok' => false ] );
+    return tlt_cb_ok( [ 'valid' => false, 'ok' => false ] );
 }
 
 /* ===========================================================================
@@ -435,32 +795,46 @@ function tlt_callboard_ep_verify_approval( WP_REST_Request $req ) {
 
 /** Load Contactbook and index by "firstlast" lowercase key for fast joins. */
 function tlt_cb_load_contactbook_index() {
-    $rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_CONTACTBOOK_ID, 'Contactbook!A2:O', TLT_CALLBOARD_CONTACT_TTL );
+    // Range widened to col P for the "Alt Email" column. Existing rows without
+    // that column just return empty strings — no breakage if the header hasn't
+    // been added yet.
+    $rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_CONTACTBOOK_ID, 'Contactbook!A2:P', TLT_CALLBOARD_CONTACT_TTL );
     if ( is_wp_error( $rows ) ) return [];
     $by_name = [];
     $by_email = [];
+    $all      = [];   // one entry per sheet row, in row order — used by /contacts.
     foreach ( $rows as $r ) {
         $first = tlt_cb_s( $r[1] ?? '' );
         $last  = tlt_cb_s( $r[3] ?? '' );
         $email = strtolower( tlt_cb_s( $r[7] ?? '' ) );
         $contact = [
-            'contactId'  => tlt_cb_s( $r[0] ?? '' ),
-            'firstName'  => $first,
-            'middleName' => tlt_cb_s( $r[2] ?? '' ),
-            'lastName'   => $last,
-            'suffix'     => tlt_cb_s( $r[4] ?? '' ),
-            'pronouns'   => tlt_cb_s( $r[5] ?? '' ),
-            'phone'      => tlt_cb_s( $r[6] ?? '' ),
-            'email'      => tlt_cb_s( $r[7] ?? '' ),
-            'notes'      => tlt_cb_s( $r[8] ?? '' ),
-            'skills'     => array_values( array_filter( array_map( 'trim', explode( ',', tlt_cb_s( $r[9] ?? '' ) ) ) ) ),
+            'contactId'     => tlt_cb_s( $r[0] ?? '' ),
+            'firstName'     => $first,
+            'middleName'    => tlt_cb_s( $r[2] ?? '' ),
+            'lastName'      => $last,
+            'suffix'        => tlt_cb_s( $r[4] ?? '' ),
+            'pronouns'      => tlt_cb_s( $r[5] ?? '' ),
+            'phone'         => tlt_cb_s( $r[6] ?? '' ),
+            'email'         => tlt_cb_s( $r[7] ?? '' ),
+            'notes'         => tlt_cb_s( $r[8] ?? '' ),
+            'skills'        => array_values( array_filter( array_map( 'trim', explode( ',', tlt_cb_s( $r[9] ?? '' ) ) ) ) ),
+            'bioToken'      => tlt_cb_s( $r[10] ?? '' ),
+            'tokenSentDate' => tlt_cb_s( $r[11] ?? '' ),
+            'lastBioLogin'  => tlt_cb_s( $r[12] ?? '' ),
+            'altEmail'      => tlt_cb_s( $r[15] ?? '' ),   // col P — set for people with two contexts (staff + actor, etc.)
         ];
         if ( $first !== '' && $last !== '' ) {
             $by_name[ strtolower( $first . '|' . $last ) ] = $contact;
         }
         if ( $email !== '' ) $by_email[ $email ] = $contact;
+        // Alt email indexes to the SAME contact so name-and-alt-email lookups
+        // hit as if it were the primary.
+        $alt_lc = strtolower( tlt_cb_s( $r[15] ?? '' ) );
+        if ( $alt_lc !== '' ) $by_email[ $alt_lc ] = $contact;
+        // Only add to `all` once per sheet row — skip completely-empty rows.
+        if ( $first !== '' || $last !== '' || $email !== '' ) $all[] = $contact;
     }
-    return [ 'byName' => $by_name, 'byEmail' => $by_email, 'all' => array_values( $by_email + $by_name ) ];
+    return [ 'byName' => $by_name, 'byEmail' => $by_email, 'all' => $all ];
 }
 
 /** Given a person row (firstName, lastName, email), find their Contactbook entry. */
@@ -576,11 +950,33 @@ function tlt_cb_build_dashboard() {
         $conflict[ $show ] = ( $conflict[ $show ] ?? 0 ) + 1;
     }
 
+    // Performance count from Dates tab (not Sales — Ludus template-inflates
+    // to 11 rows per show regardless of the actual run length).
+    $perf_count = [];
+    $performance_types = [ 'Performance', 'Opening Performance', 'Closing Performance' ];
+    foreach ( $data['Dates!A2:H'] ?? [] as $r ) {
+        $show = tlt_cb_s( $r[0] ?? '' );
+        $type = tlt_cb_s( $r[1] ?? '' );
+        if ( $show === '' || ! in_array( $type, $performance_types, true ) ) continue;
+        $perf_count[ $show ] = ( $perf_count[ $show ] ?? 0 ) + 1;
+    }
+
     $out = [];
     foreach ( $shows as $s ) {
         $row = [ 'show' => $s ] + $per[ $s ];
         $row['openingNight']  = $opening[ $s ]  ?? '';
-        $row['sales']         = $sold[ $s ]     ?? 0;
+        $total_sold = $sold[ $s ] ?? 0;
+        $perf_n     = $perf_count[ $s ] ?? 0;
+        $capacity   = $perf_n * 215;
+        // Renderer expects show.sales to be an OBJECT (destructured as `s`).
+        // Only expose it when we actually have performance rows — an empty
+        // `null` hides the ticket-sales panel on shows with no sales yet.
+        $row['sales'] = $perf_n > 0 ? [
+            'totalSold'   => $total_sold,
+            'perfCount'   => $perf_n,
+            'capacity'    => $capacity,
+            'capacityPct' => $capacity > 0 ? (int) round( $total_sold / $capacity * 100 ) : 0,
+        ] : null;
         $row['conflictCount'] = $conflict[ $s ] ?? 0;
         $out[] = $row;
     }
@@ -628,6 +1024,18 @@ function tlt_callboard_ep_get_sales( WP_REST_Request $req ) {
     ] );
     if ( is_wp_error( $data ) ) return $data;
 
+    // Real per-show performance count comes from the Dates tab (scheduled
+    // performances), not Sales (Ludus template-inflates to 11 rows per show
+    // regardless of the actual run length).
+    $dates_perf_count = [];
+    $performance_types = [ 'Performance', 'Opening Performance', 'Closing Performance' ];
+    foreach ( $data['Dates!A2:H'] ?? [] as $r ) {
+        $show = tlt_cb_s( $r[0] ?? '' );
+        $type = tlt_cb_s( $r[1] ?? '' );
+        if ( $show === '' || ! in_array( $type, $performance_types, true ) ) continue;
+        $dates_perf_count[ $show ] = ( $dates_perf_count[ $show ] ?? 0 ) + 1;
+    }
+
     // Bucket per show.
     $per = [];
     $init = function ( $show ) {
@@ -657,29 +1065,38 @@ function tlt_callboard_ep_get_sales( WP_REST_Request $req ) {
         if ( $type === 'Summary' ) {
             $per[ $show ]['totalSold'] = (int) ( $r[3] ?? 0 );
         } elseif ( $type === 'Performance' ) {
+            $sold_n = (int) ( $r[5] ?? 0 );
             $per[ $show ]['performances'][] = [
                 'date'      => tlt_cb_s( $r[4] ?? '' ),
-                'sold'      => (int) ( $r[5] ?? 0 ),
-                'remaining' => 0, // filled after Dates join below
+                'sold'      => $sold_n,
+                'remaining' => max( 0, 215 - $sold_n ),
             ];
-            $per[ $show ]['perfCount']++;
         } elseif ( $type === 'Payment' ) {
             $method = strtolower( tlt_cb_s( $r[6] ?? '' ) );
             $count  = (int) ( $r[7] ?? 0 );
-            if ( strpos( $method, 'season' ) !== false )      $per[ $show ]['seasonTicket']  = $count;
-            elseif ( strpos( $method, 'flex' ) !== false )    $per[ $show ]['flexPass']      = $count;
-            elseif ( strpos( $method, 'comp' ) !== false )    $per[ $show ]['comp']          = $count;
-            else                                              $per[ $show ]['individual']    = $count;
+            // Ludus emits multiple Payment rows per bucket (Season Ticket - Cash,
+            // Season Ticket - Credit, Season Ticket - Check, etc.). Accumulate,
+            // don't overwrite. Order matters: "Season Ticket - Comp" contains
+            // both "season" and "comp"; we want it to count as Season Ticket.
+            if ( strpos( $method, 'season' ) !== false )      $per[ $show ]['seasonTicket']  += $count;
+            elseif ( strpos( $method, 'flex' ) !== false )    $per[ $show ]['flexPass']      += $count;
+            elseif ( strpos( $method, 'comp' ) !== false )    $per[ $show ]['comp']          += $count;
+            else                                              $per[ $show ]['individual']    += $count;
         }
     }
 
-    // Percentages of totalSold.
+    // Percentages of totalSold + capacity from Dates-tab performance count × 215.
     foreach ( $per as &$row ) {
         $t = max( 1, $row['totalSold'] );
-        $row['seasonPct']     = round( $row['seasonTicket']  / $t * 100 );
-        $row['flexPct']       = round( $row['flexPass']      / $t * 100 );
-        $row['compPct']       = round( $row['comp']          / $t * 100 );
-        $row['individualPct'] = round( $row['individual']    / $t * 100 );
+        $row['seasonPct']     = (int) round( $row['seasonTicket']  / $t * 100 );
+        $row['flexPct']       = (int) round( $row['flexPass']      / $t * 100 );
+        $row['compPct']       = (int) round( $row['comp']          / $t * 100 );
+        $row['individualPct'] = (int) round( $row['individual']    / $t * 100 );
+        $row['perfCount']     = $dates_perf_count[ $row['show'] ] ?? 0;
+        $row['capacity']      = $row['perfCount'] * 215;
+        $row['capacityPct']   = $row['capacity'] > 0
+            ? (int) round( $row['totalSold'] / $row['capacity'] * 100 )
+            : 0;
     }
     unset( $row );
 
@@ -692,11 +1109,19 @@ function tlt_callboard_ep_get_sales( WP_REST_Request $req ) {
 function tlt_callboard_ep_get_bios( WP_REST_Request $req ) {
     $data = tlt_callboard_sheets_get( TLT_CALLBOARD_SHEET_ID, [
         'ShowList',
-        "'Production Teams'!A2:O",
-        'Actors!A2:O',
+        "'Production Teams'!A2:Q",
+        'Actors!A2:Q',
         'Season!A2:N',
     ] );
     if ( is_wp_error( $data ) ) return $data;
+
+    // Contactbook join — used to look up each person's Token Sent Date, which
+    // drives the linkSent flag the frontend reads for "Sent" vs "Not Sent".
+    $cb_idx = tlt_cb_load_contactbook_index();
+    $link_sent = function ( $first, $last, $email ) use ( $cb_idx ) {
+        $c = tlt_cb_lookup_contact( $cb_idx, $first, $last, $email );
+        return $c && ! empty( $c['tokenSentDate'] );
+    };
 
     // Show → cached bio doc URL (Season col L, index 11).
     $bio_doc_by_show = [];
@@ -711,34 +1136,46 @@ function tlt_callboard_ep_get_bios( WP_REST_Request $req ) {
         if ( $n ) $shows[ $n ] = [ 'show' => $n, 'submitted' => 0, 'total' => 0, 'team' => [], 'actors' => [], 'bioDocUrl' => $bio_doc_by_show[ $n ] ?? '' ];
     }
 
-    foreach ( $data["'Production Teams'!A2:O"] ?? [] as $r ) {
+    foreach ( $data["'Production Teams'!A2:Q"] ?? [] as $r ) {
         $show = tlt_cb_s( $r[0] ?? '' );
         if ( ! isset( $shows[ $show ] ) ) continue;
-        $bio_status = tlt_cb_s( $r[13] ?? '' );
         if ( tlt_cb_s( $r[2] ?? '' ) === '' ) continue; // no person = skip
+        $bio_status = tlt_cb_s( $r[13] ?? '' );
+        $first = tlt_cb_s( $r[2] ?? '' );
+        $last  = tlt_cb_s( $r[4] ?? '' );
+        $email = tlt_cb_s( $r[7] ?? '' );
         $shows[ $show ]['total']++;
         if ( strcasecmp( $bio_status, 'Submitted' ) === 0 ) $shows[ $show ]['submitted']++;
         $shows[ $show ]['team'][] = [
-            'firstName' => tlt_cb_s( $r[2] ?? '' ),
-            'lastName'  => tlt_cb_s( $r[4] ?? '' ),
-            'role'      => tlt_cb_s( $r[1] ?? '' ),
-            'bioStatus' => $bio_status,
-            'bioType'   => tlt_cb_s( $r[14] ?? '' ),
+            'firstName'        => $first,
+            'lastName'         => $last,
+            'role'             => tlt_cb_s( $r[1] ?? '' ),
+            'character'        => '',
+            'bioStatus'        => $bio_status,
+            'bioType'          => tlt_cb_s( $r[14] ?? '' ),
+            'emergencyStatus'  => tlt_cb_s( $r[16] ?? '' ),
+            'linkSent'         => $link_sent( $first, $last, $email ),
         ];
     }
-    foreach ( $data['Actors!A2:O'] ?? [] as $r ) {
+    foreach ( $data['Actors!A2:Q'] ?? [] as $r ) {
         $show = tlt_cb_s( $r[0] ?? '' );
         if ( ! isset( $shows[ $show ] ) ) continue;
-        $bio_status = tlt_cb_s( $r[13] ?? '' );
         if ( tlt_cb_s( $r[2] ?? '' ) === '' ) continue;
+        $bio_status = tlt_cb_s( $r[13] ?? '' );
+        $first = tlt_cb_s( $r[2] ?? '' );
+        $last  = tlt_cb_s( $r[4] ?? '' );
+        $email = tlt_cb_s( $r[7] ?? '' );
         $shows[ $show ]['total']++;
         if ( strcasecmp( $bio_status, 'Submitted' ) === 0 ) $shows[ $show ]['submitted']++;
         $shows[ $show ]['actors'][] = [
-            'firstName' => tlt_cb_s( $r[2] ?? '' ),
-            'lastName'  => tlt_cb_s( $r[4] ?? '' ),
-            'character' => tlt_cb_s( $r[1] ?? '' ),
-            'bioStatus' => $bio_status,
-            'bioType'   => tlt_cb_s( $r[14] ?? '' ),
+            'firstName'        => $first,
+            'lastName'         => $last,
+            'character'        => tlt_cb_s( $r[1] ?? '' ),
+            'role'             => '',
+            'bioStatus'        => $bio_status,
+            'bioType'          => tlt_cb_s( $r[14] ?? '' ),
+            'emergencyStatus'  => tlt_cb_s( $r[16] ?? '' ),
+            'linkSent'         => $link_sent( $first, $last, $email ),
         ];
     }
 
@@ -818,45 +1255,88 @@ function tlt_callboard_ep_get_contracts( WP_REST_Request $req ) {
     foreach ( $data["'Production Teams'!A2:S"] ?? [] as $r ) $emit( $r, false );
     foreach ( $data['Actors!A2:S']            ?? [] as $r ) $emit( $r, true );
 
-    return tlt_cb_ok( [ 'shows' => $shows, 'contracts' => $contracts ] );
+    // Frontend expects an array of contracts directly (it .map()s over data).
+    // Shows list is fetched separately via /shows. Suppress the wrapper here.
+    return tlt_cb_ok( $contracts );
 }
 
 /* ===========================================================================
- * ENDPOINT: GET /full-season  →  Season tab as show config objects.
- * Season tab first N rows = key/value config; rest = one row per show (col A
- * matches /^Show\s*\d+$/i).
+ * ENDPOINT: GET /full-season
+ *
+ * Returns an ARRAY of per-show blocks — one per show in ShowList — with the
+ * shape the Season tab (renderFullSeason) actually consumes:
+ *   [ { show, total, filled, openingNight, roster: [ …rows… ] }, … ]
+ *
+ * "Roster" here is the same shape as /show-roster (Production Teams rows for
+ * that show). filled = count where firstName is non-empty. openingNight is
+ * the first Opening Performance date from Dates tab.
  * ======================================================================== */
 function tlt_callboard_ep_get_full_season( WP_REST_Request $req ) {
-    $rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, 'Season!A2:N' );
-    if ( is_wp_error( $rows ) ) return $rows;
+    $data = tlt_callboard_sheets_get( TLT_CALLBOARD_SHEET_ID, [
+        'ShowList',
+        "'Production Teams'!A2:S",
+        'Dates!A2:H',
+    ] );
+    if ( is_wp_error( $data ) ) return $data;
 
-    $config = [];
-    $shows  = [];
-    foreach ( $rows as $r ) {
-        $label = tlt_cb_s( $r[0] ?? '' );
-        if ( $label === '' ) continue;
-        if ( preg_match( '/^Show\s*\d+$/i', $label ) ) {
-            $shows[] = [
-                'slot'                => $label,
-                'name'                => tlt_cb_s( $r[1] ?? '' ),
-                'compCode1'           => tlt_cb_s( $r[2] ?? '' ),
-                'compCode2'           => tlt_cb_s( $r[3] ?? '' ),
-                'smEmail'             => tlt_cb_s( $r[4] ?? '' ),
-                'actorBioWordCount'   => tlt_cb_s( $r[5] ?? '' ),
-                'directorBioCount'    => tlt_cb_s( $r[6] ?? '' ),
-                'designerBioCount'    => tlt_cb_s( $r[7] ?? '' ),
-                'ludusId'             => tlt_cb_s( $r[8] ?? '' ),
-                'castingManagerId'    => tlt_cb_s( $r[9] ?? '' ),
-                'sharedDriveUrl'      => tlt_cb_s( $r[10] ?? '' ),
-                'bioDocUrl'           => tlt_cb_s( $r[11] ?? '' ),
-                'contactSheetUrl'     => tlt_cb_s( $r[12] ?? '' ),
-                'techScheduleUrl'     => tlt_cb_s( $r[13] ?? '' ),
-            ];
-        } else {
-            $config[ $label ] = tlt_cb_s( $r[1] ?? '' );
+    $shows = [];
+    foreach ( $data['ShowList'] ?? [] as $r ) {
+        $n = tlt_cb_s( $r[0] ?? '' );
+        if ( $n !== '' ) $shows[] = $n;
+    }
+
+    // Roster rows per show, matching /show-roster shape.
+    $roster_by_show = [];
+    foreach ( $shows as $s ) $roster_by_show[ $s ] = [];
+    foreach ( $data["'Production Teams'!A2:S"] ?? [] as $r ) {
+        $show = tlt_cb_s( $r[0] ?? '' );
+        if ( ! isset( $roster_by_show[ $show ] ) ) continue;
+        $roster_by_show[ $show ][] = [
+            'role'                => tlt_cb_s( $r[1] ?? '' ),
+            'firstName'           => tlt_cb_s( $r[2] ?? '' ),
+            'middleName'          => tlt_cb_s( $r[3] ?? '' ),
+            'lastName'            => tlt_cb_s( $r[4] ?? '' ),
+            'suffix'              => tlt_cb_s( $r[5] ?? '' ),
+            'phone'               => tlt_cb_s( $r[6] ?? '' ),
+            'email'               => tlt_cb_s( $r[7] ?? '' ),
+            'contractStatus'      => tlt_cb_s( $r[8] ?? '' ),
+            'contractSentDate'    => tlt_cb_s( $r[9] ?? '' ),
+            'contractSignedDate'  => tlt_cb_s( $r[10] ?? '' ),
+            'contractLink'        => tlt_cb_s( $r[11] ?? '' ),
+            'notes'               => tlt_cb_s( $r[12] ?? '' ),
+            'bioStatus'           => tlt_cb_s( $r[13] ?? '' ),
+            'bioType'             => tlt_cb_s( $r[14] ?? '' ),
+            'okToSend'            => tlt_cb_s( $r[15] ?? '' ),
+            'emergencyStatus'     => tlt_cb_s( $r[16] ?? '' ),
+        ];
+    }
+
+    // Opening night per show (first Opening Performance row).
+    $opening = [];
+    foreach ( $data['Dates!A2:H'] ?? [] as $r ) {
+        $show = tlt_cb_s( $r[0] ?? '' );
+        $type = tlt_cb_s( $r[1] ?? '' );
+        $date = tlt_cb_s( $r[4] ?? '' );
+        if ( $show && $type === 'Opening Performance' && $date && empty( $opening[ $show ] ) ) {
+            $opening[ $show ] = $date;
         }
     }
-    return tlt_cb_ok( [ 'config' => $config, 'shows' => $shows ] );
+
+    // Assemble the array in ShowList order.
+    $out = [];
+    foreach ( $shows as $s ) {
+        $roster = $roster_by_show[ $s ];
+        $filled = 0;
+        foreach ( $roster as $row ) if ( $row['firstName'] !== '' ) $filled++;
+        $out[] = [
+            'show'         => $s,
+            'total'        => count( $roster ),
+            'filled'       => $filled,
+            'openingNight' => $opening[ $s ] ?? '',
+            'roster'       => $roster,
+        ];
+    }
+    return tlt_cb_ok( $out );
 }
 
 /* ===========================================================================
@@ -899,11 +1379,58 @@ function tlt_callboard_ep_get_schedule_link( WP_REST_Request $req ) {
 }
 
 /* ===========================================================================
- * ENDPOINT: GET /contact-sheet-link?show=Foo  →  { url, cached }
- * Same pattern — Season col M (index 12).
+ * ENDPOINT: GET /contact-sheet-link?show=Foo  →  { url, exists, source }
+ *
+ * Distinct from /schedule-link because contact sheets now support "does one
+ * already exist" checks — the frontend uses this to decide between showing
+ * the View/Regenerate modal (exists) vs auto-generating (missing).
+ *
+ * source is one of:
+ *   'cache' — URL was in Season col M
+ *   'drive' — Season col M was empty but a matching doc lives in the folder
+ *             (URL gets back-filled to col M as a side-effect)
+ *   'none'  — no existing doc anywhere
  * ======================================================================== */
 function tlt_callboard_ep_get_contact_sheet_link( WP_REST_Request $req ) {
-    return tlt_cb_get_season_link( $req, 12, 'contactSheetUrl' );
+    $show = tlt_cb_s( $req->get_param( 'show' ) );
+    if ( $show === '' ) return new WP_Error( 'missing_show', 'show query param required', [ 'status' => 400 ] );
+
+    $season_rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, 'Season!A1:N' );
+    if ( is_wp_error( $season_rows ) ) return $season_rows;
+
+    $season_long    = '';
+    $cached_url     = '';
+    $season_row_num = 0;
+    foreach ( $season_rows as $i => $r ) {
+        $label = tlt_cb_s( $r[0] ?? '' );
+        if ( $label === 'Current Season Long' ) $season_long = tlt_cb_s( $r[1] ?? '' );
+        if ( tlt_cb_s( $r[1] ?? '' ) === $show ) {
+            $cached_url     = tlt_cb_s( $r[12] ?? '' );
+            $season_row_num = $i + 1;
+        }
+    }
+
+    if ( $cached_url !== '' ) {
+        return tlt_cb_ok( [ 'url' => $cached_url, 'exists' => true, 'source' => 'cache' ] );
+    }
+
+    // Drive scan fallback — same as GAS getOrGenerateContactSheet() when the
+    // Season cache is empty but a doc happens to exist in the folder already.
+    // We back-fill the cache so the next check hits the fast path.
+    if ( $season_long !== '' ) {
+        $doc_name = tlt_cb_contact_sheet_doc_name( $show, $season_long );
+        $files    = tlt_cb_drive_find_in_folder( TLT_CALLBOARD_CS_FOLDER_ID, $doc_name );
+        if ( is_wp_error( $files ) ) return $files;
+        if ( ! empty( $files ) ) {
+            $url = tlt_cb_doc_url( $files[0]['id'] );
+            if ( $season_row_num > 0 ) {
+                tlt_callboard_sheets_write( TLT_CALLBOARD_SHEET_ID, "Season!M{$season_row_num}", [[ $url ]] );
+            }
+            return tlt_cb_ok( [ 'url' => $url, 'exists' => true, 'source' => 'drive' ] );
+        }
+    }
+
+    return tlt_cb_ok( [ 'url' => '', 'exists' => false, 'source' => 'none' ] );
 }
 
 function tlt_cb_get_season_link( $req, $col_index, $label ) {
@@ -913,15 +1440,12 @@ function tlt_cb_get_season_link( $req, $col_index, $label ) {
     if ( is_wp_error( $rows ) ) return $rows;
     foreach ( $rows as $r ) {
         if ( tlt_cb_s( $r[1] ?? '' ) !== $show ) continue;
-        $url = tlt_cb_s( $r[ $col_index ] ?? '' );
-        return tlt_cb_ok( [
-            'url'         => $url,
-            'cached'      => $url !== '',
-            'label'       => $label,
-            'generateHint'=> $url === '' ? 'Not yet generated. Use the old Callboard to generate for the first time.' : null,
-        ] );
+        // Return the URL directly (empty string if not cached) so the frontend
+        // can call `window.open(url)` without unwrapping — matches the original
+        // GAS getScheduleLink / getContactSheetLink return shape.
+        return tlt_cb_ok( tlt_cb_s( $r[ $col_index ] ?? '' ) );
     }
-    return tlt_cb_ok( [ 'url' => '', 'cached' => false, 'label' => $label, 'generateHint' => 'Show not found in Season tab.' ] );
+    return tlt_cb_ok( '' );
 }
 
 /* ===========================================================================
@@ -935,18 +1459,21 @@ function tlt_callboard_ep_get_calendar_events( WP_REST_Request $req ) {
     foreach ( $rows as $r ) {
         $show = tlt_cb_s( $r[0] ?? '' );
         $type = tlt_cb_s( $r[1] ?? '' );
-        $date = tlt_cb_s( $r[4] ?? '' );
-        if ( $show === '' || $date === '' ) continue;
+        $date_iso = tlt_cb_iso_date( $r[4] ?? '' );
+        if ( $show === '' || $date_iso === '' ) continue;
         $out[] = [
             'show'          => $show,
             'eventType'     => $type,
             'notes'         => tlt_cb_s( $r[2] ?? '' ),
-            'date'          => $date,
+            'date'          => $date_iso,
             'time'          => tlt_cb_s( $r[5] ?? '' ),
             'endTime'       => tlt_cb_s( $r[7] ?? '' ),
             'isPerformance' => in_array( $type, $performance_types, true ),
         ];
     }
+    // Frontend uses `calendarEvents[0].date` / `[last].date` as season bounds,
+    // so sort ascending by ISO date (string sort is fine on YYYY-MM-DD).
+    usort( $out, function ( $a, $b ) { return strcmp( $a['date'], $b['date'] ); } );
     return tlt_cb_ok( $out );
 }
 
@@ -955,21 +1482,31 @@ function tlt_callboard_ep_get_calendar_events( WP_REST_Request $req ) {
  * → { "YYYY-MM-DD": [ { show, firstName, lastName, role, eventType, notes }, ... ] }
  * ======================================================================== */
 function tlt_callboard_ep_get_calendar_conflicts( WP_REST_Request $req ) {
-    // Conflicts tab schema: A=show, B=firstName, C=lastName, D=role, E=date,
-    // F=eventType, G=notes  (adjust if the real schema differs — see quirks).
-    $rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, 'Conflicts!A2:H' );
+    // Read from "Production Team Conflicts" tab — production team members
+    // flagging dates they can't attend. Schema:
+    //   A: Show           B: Contact ID   C: First Name   D: Last Name
+    //   E: Role           F: Event Type   G: Event Date   H: Notes
+    //   I: Submitted At   J: Last Updated
+    // (Actor conflicts live in the separate "Conflicts" tab — those are for
+    //  CastingManager audition scheduling, NOT what the calendar renders.)
+    $rows = tlt_callboard_sheet_rows(
+        TLT_CALLBOARD_SHEET_ID,
+        "'Production Team Conflicts'!A2:J"
+    );
     if ( is_wp_error( $rows ) ) return $rows;
+
     $by_date = [];
     foreach ( $rows as $r ) {
-        $date = tlt_cb_s( $r[4] ?? '' );
+        $date = tlt_cb_iso_date( $r[6] ?? '' );
         if ( $date === '' ) continue;
         $by_date[ $date ][] = [
             'show'      => tlt_cb_s( $r[0] ?? '' ),
-            'firstName' => tlt_cb_s( $r[1] ?? '' ),
-            'lastName'  => tlt_cb_s( $r[2] ?? '' ),
-            'role'      => tlt_cb_s( $r[3] ?? '' ),
+            'contactId' => tlt_cb_s( $r[1] ?? '' ),
+            'firstName' => tlt_cb_s( $r[2] ?? '' ),
+            'lastName'  => tlt_cb_s( $r[3] ?? '' ),
+            'role'      => tlt_cb_s( $r[4] ?? '' ),
             'eventType' => tlt_cb_s( $r[5] ?? '' ),
-            'notes'     => tlt_cb_s( $r[6] ?? '' ),
+            'notes'     => tlt_cb_s( $r[7] ?? '' ),
         ];
     }
     return tlt_cb_ok( $by_date );
@@ -989,23 +1526,66 @@ function tlt_callboard_ep_get_program( WP_REST_Request $req ) {
         "'Production Teams'!A2:S",
         'Actors!A2:S',
         'Dates!A2:H',
+        'Programs!A1:Z',   // header row + one row per show — editable program fields
     ] );
     if ( is_wp_error( $data ) ) return $data;
 
-    // Info: Season row for this show + related season config.
-    $info = null;
-    foreach ( $data['Season!A2:N'] ?? [] as $r ) {
-        if ( tlt_cb_s( $r[1] ?? '' ) === $show ) {
-            $info = [
-                'name'            => $show,
-                'sharedDriveUrl'  => tlt_cb_s( $r[10] ?? '' ),
-                'bioDocUrl'       => tlt_cb_s( $r[11] ?? '' ),
-                'contactSheetUrl' => tlt_cb_s( $r[12] ?? '' ),
-                'techScheduleUrl' => tlt_cb_s( $r[13] ?? '' ),
-            ];
+    // Read the Programs tab — dynamic column layout keyed off the header row so
+    // Blake can add more editable fields (a1/a2/intermission/place/etc.) without
+    // needing a code change here. Match against snake-style keys the renderer
+    // expects.
+    $prog_row = [];
+    $prog_headers = $data['Programs!A1:Z'][0] ?? [];
+    foreach ( array_slice( $data['Programs!A1:Z'] ?? [], 1 ) as $r ) {
+        if ( tlt_cb_s( $r[0] ?? '' ) === $show ) { $prog_row = $r; break; }
+    }
+    $prog_field = function ( $label ) use ( $prog_headers, $prog_row ) {
+        $needle = strtolower( trim( $label ) );
+        foreach ( $prog_headers as $i => $h ) {
+            if ( strtolower( trim( (string) $h ) ) === $needle ) {
+                return tlt_cb_s( $prog_row[ $i ] ?? '' );
+            }
+        }
+        return '';
+    };
+
+    // Director from Production Teams (first row where role = "Director").
+    $director = '';
+    foreach ( $data["'Production Teams'!A2:S"] ?? [] as $r ) {
+        if ( tlt_cb_s( $r[0] ?? '' ) !== $show ) continue;
+        if ( strcasecmp( tlt_cb_s( $r[1] ?? '' ), 'Director' ) === 0 ) {
+            $director = trim( tlt_cb_s( $r[2] ?? '' ) . ' ' . tlt_cb_s( $r[4] ?? '' ) );
             break;
         }
     }
+
+    // Run window (opening → closing) from Dates.
+    $open_date = ''; $close_date = '';
+    foreach ( $data['Dates!A2:H'] ?? [] as $r ) {
+        if ( tlt_cb_s( $r[0] ?? '' ) !== $show ) continue;
+        $type = tlt_cb_s( $r[1] ?? '' );
+        $date = tlt_cb_s( $r[4] ?? '' );
+        if ( $type === 'Opening Performance' && $date && ! $open_date )  $open_date = $date;
+        if ( $type === 'Closing Performance' && $date && ! $close_date ) $close_date = $date;
+    }
+    $run = trim( $open_date ) !== '' && trim( $close_date ) !== ''
+        ? ( $open_date . ' – ' . $close_date )
+        : ( $open_date ?: $close_date );
+
+    // Auto-pulled (title/director/run) + editable-from-Programs-tab (rest).
+    // Programs tab columns matched loosely by header name so Blake can add
+    // more without another code change.
+    $info = [
+        'title'        => $show,
+        'director'     => $director,
+        'run'          => $run,
+        'author'       => $prog_field( 'Author' ) ?: $prog_field( 'Playwright' ),
+        'legal'        => $prog_field( 'Legal' ) ?: $prog_field( 'Attribution' ) ?: $prog_field( 'Legal/Attribution' ),
+        'a1'           => $prog_field( 'Act 1' ) ?: $prog_field( 'A1' ) ?: $prog_field( 'Act 1 run time' ),
+        'a2'           => $prog_field( 'Act 2' ) ?: $prog_field( 'A2' ) ?: $prog_field( 'Act 2 run time' ),
+        'intermission' => $prog_field( 'Intermission' ),
+        'place'        => $prog_field( 'Place' ) ?: $prog_field( 'Setting' ),
+    ];
 
     // Staff: Theatre tab rows with display order (col D not blank).
     $staff = [];
@@ -1020,7 +1600,7 @@ function tlt_callboard_ep_get_program( WP_REST_Request $req ) {
     }
     usort( $staff, function ( $a, $b ) { return $a['order'] <=> $b['order']; } );
 
-    // Team: this show's Production Teams entries.
+    // Team: production team entries for this show.
     $team = [];
     foreach ( $data["'Production Teams'!A2:S"] ?? [] as $r ) {
         if ( tlt_cb_s( $r[0] ?? '' ) !== $show ) continue;
@@ -1029,10 +1609,11 @@ function tlt_callboard_ep_get_program( WP_REST_Request $req ) {
             'role'      => tlt_cb_s( $r[1] ?? '' ),
             'firstName' => tlt_cb_s( $r[2] ?? '' ),
             'lastName'  => tlt_cb_s( $r[4] ?? '' ),
+            'bio'       => '', // Phase 2: pull from Contactbook Bios tab
         ];
     }
 
-    // Cast: this show's Actors entries.
+    // Cast: actors for this show.
     $cast = [];
     foreach ( $data['Actors!A2:S'] ?? [] as $r ) {
         if ( tlt_cb_s( $r[0] ?? '' ) !== $show ) continue;
@@ -1041,13 +1622,4568 @@ function tlt_callboard_ep_get_program( WP_REST_Request $req ) {
             'character' => tlt_cb_s( $r[1] ?? '' ),
             'firstName' => tlt_cb_s( $r[2] ?? '' ),
             'lastName'  => tlt_cb_s( $r[4] ?? '' ),
+            'bio'       => '', // Phase 2
         ];
     }
 
     return tlt_cb_ok( [
         'info'  => $info,
         'staff' => $staff,
-        'team'  => $team,
-        'cast'  => $cast,
+        'bios'  => [
+            'cast' => $cast,
+            'team' => $team,
+        ],
     ] );
+}
+
+/* ===========================================================================
+ * PHASE 2 MUTATIONS
+ * ======================================================================== */
+
+/**
+ * ENDPOINT: POST /set-ok-to-send
+ * Body: { show, role, firstName, initials, isActor }
+ *   - Production Teams: match by (show, role, firstName), write to col P (index 15).
+ *   - Actors:           match by (show, character, firstName), same col P.
+ *
+ * Returns: { ok, wroteTo: "SheetTab!P<row>", initials }
+ *
+ * The frontend usually calls this after verify-approval succeeds so we trust
+ * the initials it passes. Auth-required — only logged-in staff can write.
+ */
+function tlt_callboard_ep_set_ok_to_send( WP_REST_Request $req ) {
+    $body = $req->get_json_params();
+    if ( ! is_array( $body ) ) $body = [];
+    $show      = tlt_cb_s( $body['show']      ?? '' );
+    $role      = tlt_cb_s( $body['role']      ?? '' );  // role (team) OR character (actor); may be empty for actors
+    $first     = tlt_cb_s( $body['firstName'] ?? '' );
+    $initials  = tlt_cb_s( $body['initials']  ?? '' ); // empty string = uncheck (clear cell)
+
+    if ( $show === '' || $first === '' ) {
+        return new WP_Error( 'missing_params', 'show + firstName required.', [ 'status' => 400 ] );
+    }
+    if ( $initials !== '' && ! preg_match( '/^[A-Z]{1,4}$/', $initials ) ) {
+        return new WP_Error( 'bad_initials', 'initials must be 1-4 uppercase letters (or empty to clear).', [ 'status' => 400 ] );
+    }
+
+    // Try Production Teams first (match by show + role + firstName), then fall
+    // back to Actors (match by show + firstName, optionally + character if the
+    // caller passed one). This lets the existing frontend call with just role
+    // OR character interchangeably.
+    $team_rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, "'Production Teams'!A2:Q", TLT_CALLBOARD_CACHE_TTL, true );
+    if ( is_wp_error( $team_rows ) ) return $team_rows;
+
+    $found_tab = ''; $row_1based = 0;
+    if ( $role !== '' ) {
+        $row_1based = tlt_cb_find_row( $team_rows, [ 0 => $show, 1 => $role, 2 => $first ], 1 );
+        if ( $row_1based ) $found_tab = "'Production Teams'";
+    }
+
+    if ( ! $row_1based ) {
+        $actor_rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, 'Actors!A2:Q', TLT_CALLBOARD_CACHE_TTL, true );
+        if ( is_wp_error( $actor_rows ) ) return $actor_rows;
+        $match = [ 0 => $show, 2 => $first ];
+        if ( $role !== '' ) $match[1] = $role;   // col B on Actors = character
+        $row_1based = tlt_cb_find_row( $actor_rows, $match, 1 );
+        if ( $row_1based ) $found_tab = 'Actors';
+    }
+
+    if ( ! $row_1based ) {
+        return new WP_Error( 'row_not_found', 'No row matched the given show / role / firstName.', [ 'status' => 404 ] );
+    }
+
+    $cell = $found_tab . '!P' . $row_1based;
+    $write = tlt_callboard_sheets_write( TLT_CALLBOARD_SHEET_ID, $cell, [ [ $initials ] ] );
+    if ( is_wp_error( $write ) ) return $write;
+
+    return tlt_cb_ok( [
+        'wroteTo'  => $cell,
+        'initials' => $initials,
+    ] );
+}
+
+/* ---------------------------------------------------------------------------
+ * Internal helper — fanout a contact's phone/email/name to every Production
+ * Teams + Actors row that matches. Match key: prefer email (case-insensitive)
+ * so a name-change is safe; fall back to firstName+lastName so a first-time
+ * email add still finds the person.
+ *
+ * Returns int count of updated rows (0 if none matched).
+ * ------------------------------------------------------------------------- */
+function tlt_cb_sync_contact_to_shows( $first, $last, $new_email, $new_phone, $prev_email = '', $prev_first = '', $prev_last = '', $new_alt = '', $prev_alt = '' ) {
+    // Case-insensitive versions of every candidate email for matching.
+    $prev_primary_lc = strtolower( trim( (string) $prev_email ) );
+    $prev_alt_lc     = strtolower( trim( (string) $prev_alt ) );
+    $new_primary_lc  = strtolower( trim( (string) $new_email ) );
+    $new_alt_lc      = strtolower( trim( (string) $new_alt ) );
+    $need_first = strtolower( trim( (string) $prev_first ?: $first ) );
+    $need_last  = strtolower( trim( (string) $prev_last  ?: $last ) );
+
+    $updated = 0;
+    $targets = [
+        [ 'tab' => "'Production Teams'", 'range' => "'Production Teams'!A2:S" ],
+        [ 'tab' => 'Actors',             'range' => 'Actors!A2:S' ],
+    ];
+    foreach ( $targets as $t ) {
+        $rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, $t['range'], TLT_CALLBOARD_CACHE_TTL, true );
+        if ( is_wp_error( $rows ) ) continue;
+        foreach ( $rows as $i => $r ) {
+            $row_email_lc = strtolower( tlt_cb_s( $r[7] ?? '' ) );
+            $row_first_lc = strtolower( tlt_cb_s( $r[2] ?? '' ) );
+            $row_last_lc  = strtolower( tlt_cb_s( $r[4] ?? '' ) );
+
+            // How does this row match the contact?
+            //   1. Row's email == primary (or was previously primary)  → this is a "primary-context" row (staff role, etc.)
+            //   2. Row's email == alt (or was previously alt)          → "alt-context" row (personal-email role)
+            //   3. Row matches by name and email is empty              → primary-context by default
+            //   4. Row matches by name but has a totally different email → skip; don't clobber intentional divergence
+            $context = null;
+            if ( $row_email_lc !== '' && (
+                    $row_email_lc === $prev_primary_lc || $row_email_lc === $new_primary_lc
+                 ) ) {
+                $context = 'primary';
+            } elseif ( $row_email_lc !== '' && $prev_alt_lc !== '' && (
+                    $row_email_lc === $prev_alt_lc || $row_email_lc === $new_alt_lc
+                 ) ) {
+                $context = 'alt';
+            } elseif ( $row_email_lc === '' && $row_first_lc === $need_first && $row_last_lc === $need_last ) {
+                $context = 'primary';   // fresh assign — assume primary
+            }
+            if ( $context === null ) continue;
+
+            // Choose the email to write based on the row's context.
+            $email_to_write = $context === 'alt' ? $new_email : $new_email;
+            if ( $context === 'alt' && $new_alt !== '' ) $email_to_write = $new_alt;
+
+            $row_1based = $i + 2;
+            $range = $t['tab'] . '!C' . $row_1based . ':H' . $row_1based;
+            $write = tlt_callboard_sheets_write( TLT_CALLBOARD_SHEET_ID, $range, [ [
+                $first,
+                tlt_cb_s( $r[3] ?? '' ),   // preserve middle
+                $last,
+                tlt_cb_s( $r[5] ?? '' ),   // preserve suffix
+                $new_phone,
+                $email_to_write,
+            ] ] );
+            if ( ! is_wp_error( $write ) ) $updated++;
+        }
+    }
+    return $updated;
+}
+
+/* ===========================================================================
+ * ENDPOINT: POST /save-contact
+ * Body: contactData — { firstName, middleName?, lastName, suffix?, pronouns?,
+ *                       phone?, email, notes?, skills? }
+ *
+ * Upsert to Contactbook keyed by email (case-insensitive). If no email match,
+ * fall back to firstName+lastName. If still no match, assign the next
+ * TLT-NNNN ID and append a new row. Preserves K/L/M (bio token, sent, login)
+ * on existing rows. Then fans out to Production Teams + Actors.
+ * ======================================================================== */
+function tlt_callboard_ep_save_contact( WP_REST_Request $req ) {
+    $body = $req->get_json_params();
+    if ( ! is_array( $body ) ) return new WP_Error( 'bad_body', 'JSON body required.', [ 'status' => 400 ] );
+
+    $first  = tlt_cb_s( $body['firstName']  ?? '' );
+    $last   = tlt_cb_s( $body['lastName']   ?? '' );
+    $email  = tlt_cb_s( $body['email']      ?? '' );
+
+    if ( $first === '' || $last === '' ) {
+        return new WP_Error( 'missing_names', 'firstName + lastName required.', [ 'status' => 400 ] );
+    }
+    if ( $email === '' ) {
+        return new WP_Error( 'missing_email', 'email required (used for identity + fanout matching).', [ 'status' => 400 ] );
+    }
+
+    $middle    = tlt_cb_s( $body['middleName'] ?? '' );
+    $suffix    = tlt_cb_s( $body['suffix']     ?? '' );
+    $pronouns  = tlt_cb_s( $body['pronouns']   ?? '' );
+    $phone     = tlt_cb_s( $body['phone']      ?? '' );
+    $notes     = tlt_cb_s( $body['notes']      ?? '' );
+    $alt_email = tlt_cb_s( $body['altEmail']   ?? '' );  // optional — col P
+    $skills   = $body['skills'] ?? '';
+    if ( is_array( $skills ) ) $skills = implode( ',', array_map( 'trim', $skills ) );
+    else                        $skills = tlt_cb_s( $skills );
+
+    $email_lc = strtolower( $email );
+
+    $rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_CONTACTBOOK_ID, 'Contactbook!A2:P', TLT_CALLBOARD_CACHE_TTL, true );
+    if ( is_wp_error( $rows ) ) return $rows;
+
+    $existing_row_1based = 0;
+    $existing_id = ''; $prev_first = ''; $prev_last = ''; $prev_email = ''; $prev_alt = '';
+    $prev_token = ''; $prev_token_sent = ''; $prev_last_login = '';
+    $prev_date_added = ''; $prev_added_by = '';
+
+    // Match by primary email → alt email → name+last, in that order.
+    foreach ( $rows as $i => $r ) {
+        $row_email_lc = strtolower( tlt_cb_s( $r[7] ?? '' ) );
+        $row_alt_lc   = strtolower( tlt_cb_s( $r[15] ?? '' ) );
+        $row_first_lc = strtolower( tlt_cb_s( $r[1] ?? '' ) );
+        $row_last_lc  = strtolower( tlt_cb_s( $r[3] ?? '' ) );
+        $hit = ( $email_lc !== '' && $row_email_lc === $email_lc )
+            || ( $email_lc !== '' && $row_alt_lc   === $email_lc )
+            || ( $row_first_lc === strtolower( $first ) && $row_last_lc === strtolower( $last ) );
+        if ( ! $hit ) continue;
+        // Prefer the strongest match: email > name.
+        $email_matched = ( $email_lc !== '' && ( $row_email_lc === $email_lc || $row_alt_lc === $email_lc ) );
+        if ( $existing_row_1based && ! $email_matched ) continue; // already have a match
+        $existing_row_1based = $i + 2;
+        $existing_id     = tlt_cb_s( $r[0] ?? '' );
+        $prev_first      = tlt_cb_s( $r[1] ?? '' );
+        $prev_last       = tlt_cb_s( $r[3] ?? '' );
+        $prev_email      = tlt_cb_s( $r[7] ?? '' );
+        $prev_alt        = tlt_cb_s( $r[15] ?? '' );
+        $prev_token      = tlt_cb_s( $r[10] ?? '' );
+        $prev_token_sent = tlt_cb_s( $r[11] ?? '' );
+        $prev_last_login = tlt_cb_s( $r[12] ?? '' );
+        $prev_date_added = tlt_cb_s( $r[13] ?? '' );
+        $prev_added_by   = tlt_cb_s( $r[14] ?? '' );
+        if ( $email_matched ) break;
+    }
+
+    if ( ! $existing_row_1based ) {
+        // Assign next TLT-NNNN id (numeric max + 1, 4-digit padded).
+        $max_id = 0;
+        foreach ( $rows as $r ) {
+            if ( preg_match( '/^TLT-(\d+)$/', tlt_cb_s( $r[0] ?? '' ), $m ) ) {
+                $max_id = max( $max_id, (int) $m[1] );
+            }
+        }
+        $new_id = 'TLT-' . str_pad( (string)( $max_id + 1 ), 4, '0', STR_PAD_LEFT );
+        $current_user = tlt_callboard_current_user( $req );
+        $row = [
+            $new_id, $first, $middle, $last, $suffix, $pronouns, $phone, $email, $notes, $skills,
+            '', '', '',                       // bio token, sent, login — blank on new
+            date( 'Y-m-d' ),                  // date added
+            $current_user ? tlt_cb_s( $current_user['name'] ) : '',
+            $alt_email,                       // col P
+        ];
+        $write = tlt_callboard_sheets_write(
+            TLT_CALLBOARD_CONTACTBOOK_ID,
+            'Contactbook!A' . ( count( $rows ) + 2 ),
+            [ $row ]
+        );
+        if ( is_wp_error( $write ) ) return $write;
+        $existing_id = $new_id;
+    } else {
+        // Preserve prev_alt if the caller didn't send an altEmail field.
+        $save_alt = array_key_exists( 'altEmail', $body ) ? $alt_email : $prev_alt;
+        $row = [
+            $existing_id, $first, $middle, $last, $suffix, $pronouns, $phone, $email, $notes, $skills,
+            $prev_token, $prev_token_sent, $prev_last_login, $prev_date_added, $prev_added_by,
+            $save_alt,
+        ];
+        $write = tlt_callboard_sheets_write(
+            TLT_CALLBOARD_CONTACTBOOK_ID,
+            'Contactbook!A' . $existing_row_1based . ':P' . $existing_row_1based,
+            [ $row ]
+        );
+        if ( is_wp_error( $write ) ) return $write;
+    }
+
+    // Fanout — passes both emails so the fanout keeps each show-row on its
+    // original "context" (primary-email row stays primary; alt row stays alt).
+    $save_alt = isset( $save_alt ) ? $save_alt : ( array_key_exists( 'altEmail', $body ) ? $alt_email : $prev_alt );
+    $updated_show_rows = tlt_cb_sync_contact_to_shows(
+        $first, $last, $email, $phone,
+        $prev_email, $prev_first, $prev_last,
+        $save_alt, $prev_alt
+    );
+
+    return tlt_cb_ok( [
+        'contactId'         => $existing_id,
+        'created'           => ! $existing_row_1based ? false : true,   // false = new row was appended
+        'updatedShowRows'   => $updated_show_rows,
+    ] );
+}
+
+/* ===========================================================================
+ * ENDPOINT: POST /delete-contact
+ * Body: { firstName, lastName }
+ *
+ * Deletes the Contactbook row for that person. Uses spreadsheets.batchUpdate
+ * with deleteDimension so the sheet doesn't get a hole. Does NOT touch
+ * Production Teams / Actors rows — deleting a Contactbook entry is metadata
+ * cleanup; existing show assignments stay intact.
+ * ======================================================================== */
+function tlt_callboard_ep_delete_contact( WP_REST_Request $req ) {
+    $body = $req->get_json_params();
+    if ( ! is_array( $body ) ) return new WP_Error( 'bad_body', 'JSON body required.', [ 'status' => 400 ] );
+    $first = tlt_cb_s( $body['firstName'] ?? '' );
+    $last  = tlt_cb_s( $body['lastName']  ?? '' );
+    if ( $first === '' || $last === '' ) {
+        return new WP_Error( 'missing_names', 'firstName + lastName required.', [ 'status' => 400 ] );
+    }
+    $rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_CONTACTBOOK_ID, 'Contactbook!A2:O', TLT_CALLBOARD_CACHE_TTL, true );
+    if ( is_wp_error( $rows ) ) return $rows;
+
+    $first_lc = strtolower( $first );
+    $last_lc  = strtolower( $last );
+    $row_1based = 0;
+    foreach ( $rows as $i => $r ) {
+        if ( strtolower( tlt_cb_s( $r[1] ?? '' ) ) !== $first_lc ) continue;
+        if ( strtolower( tlt_cb_s( $r[3] ?? '' ) ) !== $last_lc  ) continue;
+        $row_1based = $i + 2; break;
+    }
+    if ( ! $row_1based ) {
+        return new WP_Error( 'not_found', 'No contact matched.', [ 'status' => 404 ] );
+    }
+
+    // Look up the Contactbook sheet's numeric sheetId (needed for batchUpdate).
+    $token = tlt_callboard_google_access_token();
+    if ( is_wp_error( $token ) ) return $token;
+    $meta = wp_remote_get(
+        'https://sheets.googleapis.com/v4/spreadsheets/' . TLT_CALLBOARD_CONTACTBOOK_ID
+        . '?fields=sheets(properties(sheetId,title))',
+        [ 'timeout' => 15, 'headers' => [ 'Authorization' => 'Bearer ' . $token ] ]
+    );
+    if ( is_wp_error( $meta ) ) return $meta;
+    $meta_data = json_decode( wp_remote_retrieve_body( $meta ), true );
+    $sheet_id = null;
+    foreach ( $meta_data['sheets'] ?? [] as $s ) {
+        if ( ( $s['properties']['title'] ?? '' ) === 'Contactbook' ) {
+            $sheet_id = $s['properties']['sheetId']; break;
+        }
+    }
+    if ( $sheet_id === null ) return new WP_Error( 'sheet_missing', 'Contactbook tab not found.', [ 'status' => 500 ] );
+
+    // Delete the row via batchUpdate.
+    $body_req = [
+        'requests' => [ [
+            'deleteDimension' => [
+                'range' => [
+                    'sheetId'    => $sheet_id,
+                    'dimension'  => 'ROWS',
+                    'startIndex' => $row_1based - 1,   // 0-based, exclusive-end
+                    'endIndex'   => $row_1based,
+                ],
+            ],
+        ] ],
+    ];
+    $resp = wp_remote_post(
+        'https://sheets.googleapis.com/v4/spreadsheets/' . TLT_CALLBOARD_CONTACTBOOK_ID . ':batchUpdate',
+        [
+            'timeout' => 30,
+            'headers' => [ 'Authorization' => 'Bearer ' . $token, 'Content-Type' => 'application/json' ],
+            'body'    => wp_json_encode( $body_req ),
+        ]
+    );
+    if ( is_wp_error( $resp ) ) return $resp;
+    $code = wp_remote_retrieve_response_code( $resp );
+    if ( $code < 200 || $code >= 300 ) {
+        return new WP_Error( 'delete_failed', 'batchUpdate returned ' . $code . ': ' . wp_remote_retrieve_body( $resp ) );
+    }
+
+    // Purge range cache so subsequent /contacts reads reflect the delete.
+    global $wpdb;
+    tlt_cb_bump_cache();
+
+    return tlt_cb_ok( [ 'deleted' => true, 'rowIndex' => $row_1based ] );
+}
+
+/* ---------------------------------------------------------------------------
+ * SHARED WRITE HELPERS (used by the 2a-4/5/6 endpoints below).
+ * ------------------------------------------------------------------------- */
+
+/** Look up the numeric sheetId for a tab. Needed for row-delete via batchUpdate. */
+function tlt_cb_get_sheet_id( $spreadsheet_id, $tab_title ) {
+    $token = tlt_callboard_google_access_token();
+    if ( is_wp_error( $token ) ) return $token;
+    $resp = wp_remote_get(
+        'https://sheets.googleapis.com/v4/spreadsheets/' . $spreadsheet_id
+        . '?fields=sheets(properties(sheetId,title))',
+        [ 'timeout' => 15, 'headers' => [ 'Authorization' => 'Bearer ' . $token ] ]
+    );
+    if ( is_wp_error( $resp ) ) return $resp;
+    $data = json_decode( wp_remote_retrieve_body( $resp ), true );
+    foreach ( $data['sheets'] ?? [] as $s ) {
+        if ( ( $s['properties']['title'] ?? '' ) === $tab_title ) {
+            return (int) $s['properties']['sheetId'];
+        }
+    }
+    return new WP_Error( 'tab_missing', "Tab '$tab_title' not found." );
+}
+
+/** Delete a specific row via batchUpdate deleteDimension. Purges range caches. */
+function tlt_cb_delete_row( $spreadsheet_id, $tab_title, $row_1based ) {
+    $sheet_id = tlt_cb_get_sheet_id( $spreadsheet_id, $tab_title );
+    if ( is_wp_error( $sheet_id ) ) return $sheet_id;
+    $token = tlt_callboard_google_access_token();
+    if ( is_wp_error( $token ) ) return $token;
+
+    $body = [ 'requests' => [ [ 'deleteDimension' => [ 'range' => [
+        'sheetId'    => $sheet_id,
+        'dimension'  => 'ROWS',
+        'startIndex' => $row_1based - 1,
+        'endIndex'   => $row_1based,
+    ] ] ] ] ];
+    $resp = wp_remote_post(
+        'https://sheets.googleapis.com/v4/spreadsheets/' . $spreadsheet_id . ':batchUpdate',
+        [
+            'timeout' => 30,
+            'headers' => [ 'Authorization' => 'Bearer ' . $token, 'Content-Type' => 'application/json' ],
+            'body'    => wp_json_encode( $body ),
+        ]
+    );
+    if ( is_wp_error( $resp ) ) return $resp;
+    $code = wp_remote_retrieve_response_code( $resp );
+    if ( $code < 200 || $code >= 300 ) {
+        return new WP_Error( 'delete_row_failed', 'batchUpdate ' . $code . ': ' . wp_remote_retrieve_body( $resp ) );
+    }
+    global $wpdb;
+    tlt_cb_bump_cache();
+    return true;
+}
+
+/**
+ * Upsert to Contactbook by email (then name). Same logic as ep_save_contact
+ * but callable internally from other mutations (addRole / addActor / update).
+ * Returns the Contact ID (existing or newly assigned).
+ */
+function tlt_cb_upsert_contact( $first, $middle, $last, $suffix, $email, $phone, $notes = '', $pronouns = '', $skills = '', $added_by = '' ) {
+    if ( $first === '' || $last === '' || $email === '' ) return ''; // caller-side sanity
+    $email_lc = strtolower( $email );
+    $rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_CONTACTBOOK_ID, 'Contactbook!A2:P', TLT_CALLBOARD_CACHE_TTL, true );
+    if ( is_wp_error( $rows ) ) return '';
+
+    $existing_row = 0;
+    $existing_id = ''; $prev_email = ''; $prev_alt = ''; $prev_phone = '';
+    $prev_middle = ''; $prev_suffix = ''; $prev_notes = ''; $prev_pronouns = ''; $prev_skills = '';
+    $prev_tok = ''; $prev_sent = ''; $prev_login = ''; $prev_added = ''; $prev_by = '';
+    $matched_by_email = false;
+    foreach ( $rows as $i => $r ) {
+        $row_email = strtolower( tlt_cb_s( $r[7] ?? '' ) );
+        $row_alt   = strtolower( tlt_cb_s( $r[15] ?? '' ) );
+        $row_first = strtolower( tlt_cb_s( $r[1] ?? '' ) );
+        $row_last  = strtolower( tlt_cb_s( $r[3] ?? '' ) );
+        $hit_email = ( $row_email === $email_lc || $row_alt === $email_lc );
+        $hit_name  = ( $row_first === strtolower( $first ) && $row_last === strtolower( $last ) );
+        if ( ! $hit_email && ! $hit_name ) continue;
+        if ( $existing_row && ! $hit_email ) continue; // already have a match; only email-hit beats it
+        $existing_row = $i + 2;
+        $existing_id  = tlt_cb_s( $r[0] ?? '' );
+        $prev_middle  = tlt_cb_s( $r[2] ?? '' );
+        $prev_suffix  = tlt_cb_s( $r[4] ?? '' );
+        $prev_pronouns= tlt_cb_s( $r[5] ?? '' );
+        $prev_phone   = tlt_cb_s( $r[6] ?? '' );
+        $prev_email   = tlt_cb_s( $r[7] ?? '' );
+        $prev_notes   = tlt_cb_s( $r[8] ?? '' );
+        $prev_skills  = tlt_cb_s( $r[9] ?? '' );
+        $prev_tok     = tlt_cb_s( $r[10] ?? '' );
+        $prev_sent    = tlt_cb_s( $r[11] ?? '' );
+        $prev_login   = tlt_cb_s( $r[12] ?? '' );
+        $prev_added   = tlt_cb_s( $r[13] ?? '' );
+        $prev_by      = tlt_cb_s( $r[14] ?? '' );
+        $prev_alt     = tlt_cb_s( $r[15] ?? '' );
+        $matched_by_email = $hit_email;
+        if ( $hit_email ) break;
+    }
+
+    if ( $existing_row ) {
+        // Rule: the new email overwrites primary UNLESS it matches primary or alt.
+        //   - matches primary → no change (import confirming known info)
+        //   - matches alt     → no change (import is using their "second-context" email like Frank's personal)
+        //   - anything else   → overwrite primary (email actually changed; import is authoritative)
+        // For the "preserve on second context" case to work, the alt column
+        // must have been pre-set. This puts the burden on Blake to set alt for
+        // staff-who-also-act BEFORE the CastingManager sync runs.
+        $prev_email_lc = strtolower( $prev_email );
+        $prev_alt_lc   = strtolower( $prev_alt );
+        $email_lc_arg  = strtolower( $email );
+        if ( $email_lc_arg === $prev_email_lc || ( $prev_alt_lc !== '' && $email_lc_arg === $prev_alt_lc ) ) {
+            $save_primary = $prev_email;
+            $save_alt     = $prev_alt;
+        } else {
+            $save_primary = $email;
+            $save_alt     = $prev_alt;
+        }
+        // For OTHER fields, if the caller supplied one, use it; else preserve existing.
+        $save_phone  = $phone    !== '' ? $phone    : $prev_phone;
+        $save_middle = $middle   !== '' ? $middle   : $prev_middle;
+        $save_suffix = $suffix   !== '' ? $suffix   : $prev_suffix;
+        $save_notes  = $notes    !== '' ? $notes    : $prev_notes;
+        $save_skills = $skills   !== '' ? $skills   : $prev_skills;
+        $save_pron   = $pronouns !== '' ? $pronouns : $prev_pronouns;
+        $row = [
+            $existing_id, $first, $save_middle, $last, $save_suffix, $save_pron, $save_phone,
+            $save_primary, $save_notes, $save_skills,
+            $prev_tok, $prev_sent, $prev_login, $prev_added, $prev_by,
+            $save_alt,
+        ];
+        tlt_callboard_sheets_write( TLT_CALLBOARD_CONTACTBOOK_ID, 'Contactbook!A' . $existing_row . ':P' . $existing_row, [ $row ] );
+        return $existing_id;
+    }
+    // New: assign next TLT-NNNN.
+    $max_id = 0;
+    foreach ( $rows as $r ) {
+        if ( preg_match( '/^TLT-(\d+)$/', tlt_cb_s( $r[0] ?? '' ), $m ) ) $max_id = max( $max_id, (int) $m[1] );
+    }
+    $new_id = 'TLT-' . str_pad( (string)( $max_id + 1 ), 4, '0', STR_PAD_LEFT );
+    $row = [ $new_id, $first, $middle, $last, $suffix, $pronouns, $phone, $email, $notes, $skills, '', '', '', date( 'Y-m-d' ), $added_by, '' /* alt */ ];
+    tlt_callboard_sheets_write( TLT_CALLBOARD_CONTACTBOOK_ID, 'Contactbook!A' . ( count( $rows ) + 2 ), [ $row ] );
+    return $new_id;
+}
+
+/* ===========================================================================
+ * ENDPOINT: POST /add-role
+ * Body: { show, roleData: { role, firstName?, middleName?, lastName?, suffix?, email?, phone? } }
+ * ======================================================================== */
+function tlt_callboard_ep_add_role( WP_REST_Request $req ) {
+    $body = $req->get_json_params(); if ( ! is_array( $body ) ) return new WP_Error( 'bad_body', 'JSON required.', [ 'status' => 400 ] );
+    $show = tlt_cb_s( $body['show'] ?? '' );
+    $rd   = $body['roleData'] ?? [];
+    $role = tlt_cb_s( $rd['role'] ?? '' );
+    if ( $show === '' || $role === '' ) return new WP_Error( 'missing_params', 'show + roleData.role required.', [ 'status' => 400 ] );
+
+    $rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, "'Production Teams'!A2:S", TLT_CALLBOARD_CACHE_TTL, true );
+    if ( is_wp_error( $rows ) ) return $rows;
+
+    $first  = tlt_cb_s( $rd['firstName']  ?? '' );
+    $middle = tlt_cb_s( $rd['middleName'] ?? '' );
+    $last   = tlt_cb_s( $rd['lastName']   ?? '' );
+    $suffix = tlt_cb_s( $rd['suffix']     ?? '' );
+    $email  = tlt_cb_s( $rd['email']      ?? '' );
+    $phone  = tlt_cb_s( $rd['phone']      ?? '' );
+
+    $new_row = [ $show, $role, $first, $middle, $last, $suffix, $phone, $email, 'Not Started' ];
+    $range = "'Production Teams'!A" . ( count( $rows ) + 2 );
+    $write = tlt_callboard_sheets_write( TLT_CALLBOARD_SHEET_ID, $range, [ $new_row ] );
+    if ( is_wp_error( $write ) ) return $write;
+
+    if ( $first !== '' && $last !== '' && $email !== '' ) {
+        $user = tlt_callboard_current_user( $req );
+        tlt_cb_upsert_contact( $first, $middle, $last, $suffix, $email, $phone, '', '', '', $user ? tlt_cb_s( $user['name'] ) : '' );
+    }
+    return tlt_cb_ok( [ 'added' => true, 'atRow' => count( $rows ) + 2 ] );
+}
+
+/* ===========================================================================
+ * ENDPOINT: POST /update-person
+ * Body: { show, role, personData: { firstName, middleName, lastName, suffix, email, phone, notes? } }
+ * Updates Production Teams cols C..H (name+contact) and M (notes) for the
+ * row matching (show, role).
+ * ======================================================================== */
+function tlt_callboard_ep_update_person( WP_REST_Request $req ) {
+    $body = $req->get_json_params(); if ( ! is_array( $body ) ) return new WP_Error( 'bad_body', 'JSON required.', [ 'status' => 400 ] );
+    $show = tlt_cb_s( $body['show'] ?? '' );
+    $role = tlt_cb_s( $body['role'] ?? '' );
+    $pd   = $body['personData'] ?? [];
+    if ( $show === '' || $role === '' ) return new WP_Error( 'missing_params', 'show + role required.', [ 'status' => 400 ] );
+
+    $rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, "'Production Teams'!A2:S", TLT_CALLBOARD_CACHE_TTL, true );
+    if ( is_wp_error( $rows ) ) return $rows;
+
+    $row_1based = tlt_cb_find_row( $rows, [ 0 => $show, 1 => $role ], 1 );
+    if ( ! $row_1based ) return new WP_Error( 'row_not_found', 'No matching Production Teams row.', [ 'status' => 404 ] );
+
+    $first  = tlt_cb_s( $pd['firstName']  ?? '' );
+    $middle = tlt_cb_s( $pd['middleName'] ?? '' );
+    $last   = tlt_cb_s( $pd['lastName']   ?? '' );
+    $suffix = tlt_cb_s( $pd['suffix']     ?? '' );
+    $email  = tlt_cb_s( $pd['email']      ?? '' );
+    $phone  = tlt_cb_s( $pd['phone']      ?? '' );
+    $notes  = array_key_exists( 'notes', $pd ) ? tlt_cb_s( $pd['notes'] ) : null;
+
+    // Cols C..H = name + contact
+    $write = tlt_callboard_sheets_write(
+        TLT_CALLBOARD_SHEET_ID,
+        "'Production Teams'!C" . $row_1based . ':H' . $row_1based,
+        [ [ $first, $middle, $last, $suffix, $phone, $email ] ]
+    );
+    if ( is_wp_error( $write ) ) return $write;
+    if ( $notes !== null ) {
+        tlt_callboard_sheets_write(
+            TLT_CALLBOARD_SHEET_ID, "'Production Teams'!M" . $row_1based, [ [ $notes ] ]
+        );
+    }
+    if ( $first !== '' && $last !== '' && $email !== '' ) {
+        $user = tlt_callboard_current_user( $req );
+        tlt_cb_upsert_contact( $first, $middle, $last, $suffix, $email, $phone, $notes ?: '', '', '', $user ? tlt_cb_s( $user['name'] ) : '' );
+    }
+    return tlt_cb_ok( [ 'updated' => true, 'row' => $row_1based ] );
+}
+
+/* ===========================================================================
+ * ENDPOINT: POST /delete-role  →  Body: { show, role }
+ * ======================================================================== */
+function tlt_callboard_ep_delete_role( WP_REST_Request $req ) {
+    $body = $req->get_json_params(); if ( ! is_array( $body ) ) return new WP_Error( 'bad_body', 'JSON required.', [ 'status' => 400 ] );
+    $show = tlt_cb_s( $body['show'] ?? '' );
+    $role = tlt_cb_s( $body['role'] ?? '' );
+    if ( $show === '' || $role === '' ) return new WP_Error( 'missing_params', 'show + role required.', [ 'status' => 400 ] );
+    $rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, "'Production Teams'!A2:S", TLT_CALLBOARD_CACHE_TTL, true );
+    if ( is_wp_error( $rows ) ) return $rows;
+    $row = tlt_cb_find_row( $rows, [ 0 => $show, 1 => $role ], 1 );
+    if ( ! $row ) return new WP_Error( 'row_not_found', 'No matching row.', [ 'status' => 404 ] );
+    $del = tlt_cb_delete_row( TLT_CALLBOARD_SHEET_ID, 'Production Teams', $row );
+    if ( is_wp_error( $del ) ) return $del;
+    return tlt_cb_ok( [ 'deleted' => true, 'row' => $row ] );
+}
+
+/* ===========================================================================
+ * ENDPOINT: POST /remove-person  →  Body: { show, role }
+ * Clears cols C..H (name/contact) + M (notes) but keeps the role slot.
+ * ======================================================================== */
+function tlt_callboard_ep_remove_person( WP_REST_Request $req ) {
+    $body = $req->get_json_params(); if ( ! is_array( $body ) ) return new WP_Error( 'bad_body', 'JSON required.', [ 'status' => 400 ] );
+    $show = tlt_cb_s( $body['show'] ?? '' );
+    $role = tlt_cb_s( $body['role'] ?? '' );
+    if ( $show === '' || $role === '' ) return new WP_Error( 'missing_params', 'show + role required.', [ 'status' => 400 ] );
+    $rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, "'Production Teams'!A2:S", TLT_CALLBOARD_CACHE_TTL, true );
+    if ( is_wp_error( $rows ) ) return $rows;
+    $row_1based = tlt_cb_find_row( $rows, [ 0 => $show, 1 => $role ], 1 );
+    if ( ! $row_1based ) return new WP_Error( 'row_not_found', 'No matching row.', [ 'status' => 404 ] );
+
+    $write = tlt_callboard_sheets_write(
+        TLT_CALLBOARD_SHEET_ID,
+        "'Production Teams'!C" . $row_1based . ':H' . $row_1based,
+        [ [ '', '', '', '', '', '' ] ]
+    );
+    if ( is_wp_error( $write ) ) return $write;
+    tlt_callboard_sheets_write( TLT_CALLBOARD_SHEET_ID, "'Production Teams'!M" . $row_1based, [ [ '' ] ] );
+    return tlt_cb_ok( [ 'removed' => true, 'row' => $row_1based ] );
+}
+
+/* ===========================================================================
+ * ENDPOINT: POST /add-actor
+ * Body: { show, actorData: { character, firstName, middleName?, lastName, suffix?, email, phone? } }
+ * ======================================================================== */
+function tlt_callboard_ep_add_actor( WP_REST_Request $req ) {
+    $body = $req->get_json_params(); if ( ! is_array( $body ) ) return new WP_Error( 'bad_body', 'JSON required.', [ 'status' => 400 ] );
+    $show = tlt_cb_s( $body['show'] ?? '' );
+    $ad   = $body['actorData'] ?? [];
+    $character = tlt_cb_s( $ad['character'] ?? '' );
+    $first     = tlt_cb_s( $ad['firstName'] ?? '' );
+    $last      = tlt_cb_s( $ad['lastName']  ?? '' );
+    $email     = tlt_cb_s( $ad['email']     ?? '' );
+    if ( $show === '' || $character === '' || $first === '' || $last === '' || $email === '' ) {
+        return new WP_Error( 'missing_params', 'show + character + first/last/email required.', [ 'status' => 400 ] );
+    }
+    $middle = tlt_cb_s( $ad['middleName'] ?? '' );
+    $suffix = tlt_cb_s( $ad['suffix']     ?? '' );
+    $phone  = tlt_cb_s( $ad['phone']      ?? '' );
+
+    $rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, 'Actors!A2:S', TLT_CALLBOARD_CACHE_TTL, true );
+    if ( is_wp_error( $rows ) ) return $rows;
+    $new_row = [ $show, $character, $first, $middle, $last, $suffix, $phone, $email, 'Not Started' ];
+    $write = tlt_callboard_sheets_write( TLT_CALLBOARD_SHEET_ID, 'Actors!A' . ( count( $rows ) + 2 ), [ $new_row ] );
+    if ( is_wp_error( $write ) ) return $write;
+
+    $user = tlt_callboard_current_user( $req );
+    tlt_cb_upsert_contact( $first, $middle, $last, $suffix, $email, $phone, '', '', '', $user ? tlt_cb_s( $user['name'] ) : '' );
+    return tlt_cb_ok( [ 'added' => true, 'atRow' => count( $rows ) + 2 ] );
+}
+
+/* ===========================================================================
+ * ENDPOINT: POST /remove-actor
+ * Body: { show, character, firstName, lastName }
+ * ======================================================================== */
+function tlt_callboard_ep_remove_actor( WP_REST_Request $req ) {
+    $body = $req->get_json_params(); if ( ! is_array( $body ) ) return new WP_Error( 'bad_body', 'JSON required.', [ 'status' => 400 ] );
+    $show      = tlt_cb_s( $body['show']      ?? '' );
+    $character = tlt_cb_s( $body['character'] ?? '' );
+    $first     = tlt_cb_s( $body['firstName'] ?? '' );
+    $last      = tlt_cb_s( $body['lastName']  ?? '' );
+    if ( $show === '' || $first === '' || $last === '' ) {
+        return new WP_Error( 'missing_params', 'show + firstName + lastName required.', [ 'status' => 400 ] );
+    }
+    $rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, 'Actors!A2:S', TLT_CALLBOARD_CACHE_TTL, true );
+    if ( is_wp_error( $rows ) ) return $rows;
+    // Match on show + first + last; also character if provided (character alone
+    // isn't reliable — same character name in multiple shows).
+    $match = [ 0 => $show, 2 => $first, 4 => $last ];
+    if ( $character !== '' ) $match[1] = $character;
+    $row_1based = tlt_cb_find_row( $rows, $match, 1 );
+    if ( ! $row_1based ) return new WP_Error( 'row_not_found', 'No matching actor.', [ 'status' => 404 ] );
+    $del = tlt_cb_delete_row( TLT_CALLBOARD_SHEET_ID, 'Actors', $row_1based );
+    if ( is_wp_error( $del ) ) return $del;
+    return tlt_cb_ok( [ 'removed' => true, 'row' => $row_1based ] );
+}
+
+/* ===========================================================================
+ * ENDPOINT: POST /import-actors
+ * Body: { show, actors: [ { character, firstName, middleName?, lastName, suffix?, email?, phone? }, ... ] }
+ * Bulk-appends rows to Actors + upserts each contact. Used by the "Import from
+ * CastingManager paste" flow. Returns { imported, contactbookAdded }.
+ * ======================================================================== */
+function tlt_callboard_ep_import_actors( WP_REST_Request $req ) {
+    $body = $req->get_json_params(); if ( ! is_array( $body ) ) return new WP_Error( 'bad_body', 'JSON required.', [ 'status' => 400 ] );
+    $show = tlt_cb_s( $body['show'] ?? '' );
+    $actors = $body['actors'] ?? [];
+    if ( $show === '' || ! is_array( $actors ) || count( $actors ) === 0 ) {
+        return new WP_Error( 'missing_params', 'show + non-empty actors[] required.', [ 'status' => 400 ] );
+    }
+    $rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, 'Actors!A2:S', TLT_CALLBOARD_CACHE_TTL, true );
+    if ( is_wp_error( $rows ) ) return $rows;
+
+    $new_rows = [];
+    $upserts = 0;
+    $user = tlt_callboard_current_user( $req );
+    $added_by = $user ? tlt_cb_s( $user['name'] ) : '';
+    foreach ( $actors as $a ) {
+        $first = tlt_cb_s( $a['firstName'] ?? '' );
+        $last  = tlt_cb_s( $a['lastName']  ?? '' );
+        if ( $first === '' || $last === '' ) continue;
+        $character = tlt_cb_s( $a['character']  ?? '' );
+        $middle    = tlt_cb_s( $a['middleName'] ?? '' );
+        $suffix    = tlt_cb_s( $a['suffix']     ?? '' );
+        $email     = tlt_cb_s( $a['email']      ?? '' );
+        $phone     = tlt_cb_s( $a['phone']      ?? '' );
+        $new_rows[] = [ $show, $character, $first, $middle, $last, $suffix, $phone, $email, 'Not Started' ];
+        if ( $email !== '' ) {
+            tlt_cb_upsert_contact( $first, $middle, $last, $suffix, $email, $phone, '', '', '', $added_by );
+            $upserts++;
+        }
+    }
+    if ( count( $new_rows ) === 0 ) return new WP_Error( 'no_valid_rows', 'No actor rows had first+last name.', [ 'status' => 400 ] );
+
+    // Append via values.append so Sheets picks the right start row automatically.
+    $token = tlt_callboard_google_access_token();
+    if ( is_wp_error( $token ) ) return $token;
+    $resp = wp_remote_post(
+        'https://sheets.googleapis.com/v4/spreadsheets/' . TLT_CALLBOARD_SHEET_ID
+        . '/values/' . rawurlencode( 'Actors!A2' ) . ':append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS',
+        [
+            'timeout' => 60,
+            'headers' => [ 'Authorization' => 'Bearer ' . $token, 'Content-Type' => 'application/json' ],
+            'body'    => wp_json_encode( [ 'values' => $new_rows ] ),
+        ]
+    );
+    if ( is_wp_error( $resp ) ) return $resp;
+    $code = wp_remote_retrieve_response_code( $resp );
+    if ( $code < 200 || $code >= 300 ) {
+        return new WP_Error( 'append_failed', 'append ' . $code . ': ' . wp_remote_retrieve_body( $resp ) );
+    }
+    global $wpdb;
+    tlt_cb_bump_cache();
+    return tlt_cb_ok( [ 'imported' => count( $new_rows ), 'contactbookAdded' => $upserts ] );
+}
+
+/* ===========================================================================
+ * ENDPOINT: POST /save-program-fields
+ * Body: { show, fields: { author?, legal?, a1?, a2?, intermission?, place?, ... } }
+ * Writes to the Programs tab. Matches columns dynamically by header name so
+ * Blake can add more editable fields without a code change.
+ * ======================================================================== */
+function tlt_callboard_ep_save_program_fields( WP_REST_Request $req ) {
+    $body = $req->get_json_params(); if ( ! is_array( $body ) ) return new WP_Error( 'bad_body', 'JSON required.', [ 'status' => 400 ] );
+    $show = tlt_cb_s( $body['show'] ?? '' );
+    $fields = $body['fields'] ?? [];
+    if ( $show === '' || ! is_array( $fields ) ) return new WP_Error( 'missing_params', 'show + fields required.', [ 'status' => 400 ] );
+
+    $rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, 'Programs!A1:Z', TLT_CALLBOARD_CACHE_TTL, true );
+    if ( is_wp_error( $rows ) ) return $rows;
+
+    $headers = $rows[0] ?? [];
+    // Frontend field name → possible column-header labels (loose match).
+    $field_to_labels = [
+        'author'       => [ 'Author', 'Playwright' ],
+        'legal'        => [ 'Legal', 'Attribution', 'Legal/Attribution' ],
+        'a1'           => [ 'Act 1', 'A1', 'Act 1 run time' ],
+        'a2'           => [ 'Act 2', 'A2', 'Act 2 run time' ],
+        'intermission' => [ 'Intermission' ],
+        'place'        => [ 'Place', 'Setting' ],
+    ];
+    $col_index_for_field = function ( $field ) use ( $headers, $field_to_labels ) {
+        $labels = $field_to_labels[ $field ] ?? [ $field ];
+        foreach ( $labels as $label ) {
+            $target = strtolower( trim( $label ) );
+            foreach ( $headers as $i => $h ) {
+                if ( strtolower( trim( (string) $h ) ) === $target ) return (int) $i;
+            }
+        }
+        return -1;
+    };
+
+    // Find (or create) the show's row.
+    $row_1based = 0;
+    foreach ( array_slice( $rows, 1 ) as $i => $r ) {
+        if ( tlt_cb_s( $r[0] ?? '' ) === $show ) { $row_1based = $i + 2; break; }
+    }
+    if ( ! $row_1based ) {
+        // Append a new row with the show name in col A + provided fields.
+        $new_row = [ $show ];
+        // Pad up to max header column.
+        for ( $i = 1; $i < count( $headers ); $i++ ) $new_row[] = '';
+        foreach ( $fields as $k => $v ) {
+            $idx = $col_index_for_field( $k );
+            if ( $idx >= 0 ) $new_row[ $idx ] = tlt_cb_s( $v );
+        }
+        $write = tlt_callboard_sheets_write(
+            TLT_CALLBOARD_SHEET_ID, 'Programs!A' . ( count( $rows ) + 1 ), [ $new_row ]
+        );
+        if ( is_wp_error( $write ) ) return $write;
+        return tlt_cb_ok( [ 'created' => true, 'row' => count( $rows ) + 1 ] );
+    }
+
+    // Update: write each provided field to its column.
+    $updated = 0; $skipped = [];
+    foreach ( $fields as $k => $v ) {
+        $idx = $col_index_for_field( $k );
+        if ( $idx < 0 ) { $skipped[] = $k; continue; }
+        $col_letter = chr( ord( 'A' ) + $idx );
+        $write = tlt_callboard_sheets_write(
+            TLT_CALLBOARD_SHEET_ID,
+            'Programs!' . $col_letter . $row_1based,
+            [ [ tlt_cb_s( $v ) ] ]
+        );
+        if ( ! is_wp_error( $write ) ) $updated++;
+    }
+    return tlt_cb_ok( [ 'updated' => $updated, 'row' => $row_1based, 'skipped' => $skipped ] );
+}
+
+/* ===========================================================================
+ * ENDPOINT: POST /sync-contactbook
+ *
+ * Walks every Contactbook row and pushes name/phone/email into any matching
+ * Production Teams + Actors rows. Batches all updates into one Sheets
+ * batchUpdate call for speed (66 contacts × 2 tabs = <30s cold).
+ *
+ * Returns { checked, updated } counts.
+ * ======================================================================== */
+function tlt_callboard_ep_sync_contactbook( WP_REST_Request $req ) {
+    // Fresh reads — user just triggered the sync, they want current data.
+    $contacts = tlt_callboard_sheet_rows( TLT_CALLBOARD_CONTACTBOOK_ID, 'Contactbook!A2:P', TLT_CALLBOARD_CACHE_TTL, true );
+    if ( is_wp_error( $contacts ) ) return $contacts;
+    $pt = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, "'Production Teams'!A2:S", TLT_CALLBOARD_CACHE_TTL, true );
+    if ( is_wp_error( $pt ) ) return $pt;
+    $ac = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, 'Actors!A2:S', TLT_CALLBOARD_CACHE_TTL, true );
+    if ( is_wp_error( $ac ) ) return $ac;
+
+    // Build lookup keyed by lowercase email + (first|last) for O(1) hits.
+    $by_email = [];
+    $by_name  = [];
+    foreach ( $contacts as $r ) {
+        $first = tlt_cb_s( $r[1] ?? '' );
+        $last  = tlt_cb_s( $r[3] ?? '' );
+        $email = tlt_cb_s( $r[7] ?? '' );
+        $alt   = tlt_cb_s( $r[15] ?? '' );
+        $phone = tlt_cb_s( $r[6] ?? '' );
+        $middle= tlt_cb_s( $r[2] ?? '' );
+        $suffix= tlt_cb_s( $r[4] ?? '' );
+        if ( $first === '' && $last === '' && $email === '' ) continue;
+        $c = compact( 'first', 'middle', 'last', 'suffix', 'phone', 'email', 'alt' );
+        if ( $email !== '' ) $by_email[ strtolower( $email ) ] = $c;
+        if ( $alt   !== '' ) $by_email[ strtolower( $alt ) ]   = $c;
+        if ( $first !== '' || $last !== '' ) $by_name[ strtolower( $first . '|' . $last ) ] = $c;
+    }
+
+    // Build one batchUpdate request per mismatched row. Use values.batchUpdate
+    // rather than looping tlt_callboard_sheets_write() so this stays fast.
+    $data = [];
+    $checked = 0;
+    $updated = 0;
+
+    $walk = function ( $tab, $rows ) use ( &$data, &$checked, &$updated, $by_email, $by_name ) {
+        foreach ( $rows as $i => $r ) {
+            $first = tlt_cb_s( $r[2] ?? '' );
+            $last  = tlt_cb_s( $r[4] ?? '' );
+            $email = tlt_cb_s( $r[7] ?? '' );
+            $phone = tlt_cb_s( $r[6] ?? '' );
+            if ( $first === '' && $last === '' && $email === '' ) continue;
+            $checked++;
+
+            $c = null;
+            $matched_context = null;   // 'primary' | 'alt' | null
+            $email_lc = strtolower( $email );
+            $name_key = strtolower( $first . '|' . $last );
+            if ( $email_lc !== '' && isset( $by_email[ $email_lc ] ) ) {
+                $c = $by_email[ $email_lc ];
+                $matched_context = ( strtolower( $c['alt'] ?? '' ) === $email_lc ) ? 'alt' : 'primary';
+            } elseif ( isset( $by_name[ $name_key ] ) ) {
+                $c = $by_name[ $name_key ];
+                $matched_context = 'primary'; // default when the row has no email yet
+            }
+            if ( ! $c ) continue;
+
+            // The email we push depends on whether the row was "primary-context" or "alt-context".
+            $push_email = ( $matched_context === 'alt' && ! empty( $c['alt'] ) ) ? $c['alt'] : $c['email'];
+
+            // Compare and, if any of name/phone/email differs, queue an update.
+            if ( $first === $c['first'] && $last === $c['last']
+              && $email === $push_email && $phone === $c['phone'] ) continue;
+
+            $row_1based = $i + 2;
+            $data[] = [
+                'range'  => $tab . '!C' . $row_1based . ':H' . $row_1based,
+                'values' => [ [
+                    $c['first'],
+                    tlt_cb_s( $r[3] ?? '' ),   // preserve middle from show row
+                    $c['last'],
+                    tlt_cb_s( $r[5] ?? '' ),   // preserve suffix from show row
+                    $c['phone'],
+                    $push_email,
+                ] ],
+            ];
+            $updated++;
+        }
+    };
+    $walk( "'Production Teams'", $pt );
+    $walk( 'Actors',              $ac );
+
+    if ( $updated > 0 ) {
+        $token = tlt_callboard_google_access_token();
+        if ( is_wp_error( $token ) ) return $token;
+        $resp = wp_remote_post(
+            'https://sheets.googleapis.com/v4/spreadsheets/' . TLT_CALLBOARD_SHEET_ID . '/values:batchUpdate',
+            [
+                'timeout' => 60,
+                'headers' => [ 'Authorization' => 'Bearer ' . $token, 'Content-Type' => 'application/json' ],
+                'body'    => wp_json_encode( [ 'valueInputOption' => 'USER_ENTERED', 'data' => $data ] ),
+            ]
+        );
+        if ( is_wp_error( $resp ) ) return $resp;
+        $code = wp_remote_retrieve_response_code( $resp );
+        if ( $code < 200 || $code >= 300 ) {
+            return new WP_Error( 'batch_failed', 'Sheets batchUpdate returned ' . $code . ': ' . wp_remote_retrieve_body( $resp ) );
+        }
+        // Clear range caches so subsequent reads see the fresh state.
+        global $wpdb;
+    tlt_cb_bump_cache();
+    }
+
+    return tlt_cb_ok( [ 'checked' => $checked, 'updated' => $updated ] );
+}
+
+/* ===========================================================================
+ * ENDPOINT: POST /purge-cache
+ * Clears every WP transient this plugin uses to cache Sheets reads. The next
+ * request will re-fetch from Google (whatever your sheet currently contains).
+ * Used by the "Refresh from Sheet" buttons on tabs when Chris edits the sheet
+ * directly and wants that to show up in the callboard without waiting for
+ * the 60s TTL to expire.
+ * ======================================================================== */
+function tlt_callboard_ep_purge_cache( WP_REST_Request $req ) {
+    global $wpdb;
+    tlt_cb_bump_cache();
+    // Object cache too (in case a caching plugin is layered over WP transients).
+    return tlt_cb_ok( [ 'purged' => true ] );
+}
+
+/* ===========================================================================
+ * ============  CONTACT SHEET GENERATOR  ====================================
+ *
+ * Port of ContactSheetGenerator.js. Copies a template Doc into a Drive folder,
+ * populates it with a CAST table and a PRODUCTION TEAM table via the Docs API,
+ * caches the URL in Season col M, and returns the URL.
+ *
+ * Flow:
+ *   /contact-sheet-link      → { url, exists }  (checks cache + drive scan)
+ *   /contact-sheet-generate  → generates without deleting existing (first time)
+ *   /contact-sheet-regenerate → trashes existing then regenerates
+ *
+ * Requires SA Editor access to TLT_CALLBOARD_CS_FOLDER_ID and Reader access
+ * to TLT_CALLBOARD_CS_TEMPLATE_ID.
+ * ======================================================================== */
+
+/**
+ * Format a phone number the same way GAS ContactSheetGenerator does.
+ * Strips non-digits, drops a leading 1, and produces "(206) 555-1212".
+ * If the input is not a recognizable US number, returns the original.
+ */
+function tlt_cb_contact_sheet_format_phone( $phone ) {
+    $phone = tlt_cb_s( $phone );
+    if ( $phone === '' ) return '';
+    $digits = preg_replace( '/\D/', '', $phone );
+    if ( strlen( $digits ) === 11 && $digits[0] === '1' ) $digits = substr( $digits, 1 );
+    if ( strlen( $digits ) === 10 ) {
+        return '(' . substr( $digits, 0, 3 ) . ') '
+             . substr( $digits, 3, 3 ) . '-'
+             . substr( $digits, 6 );
+    }
+    return $phone;
+}
+
+/**
+ * Read every source tab we need to build a contact sheet for one show and
+ * assemble the cast + production-team arrays.
+ *
+ * @param string $show
+ * @return array|WP_Error {
+ *   season, season_long, show_sm_email, season_row_num,
+ *   cast: [ { name, pronouns, role, phone, email }, ... ],
+ *   team: [ { name, pronouns, role, phone, email }, ... ],
+ * }
+ */
+function tlt_cb_contact_sheet_assemble_data( $show ) {
+    $show = tlt_cb_s( $show );
+    if ( $show === '' ) return new WP_Error( 'missing_show', 'show is required' );
+
+    // Callboard sheet — read all the tabs we need in one batchGet.
+    $ranges = tlt_callboard_sheets_get( TLT_CALLBOARD_SHEET_ID, [
+        'Season!A1:N',
+        'Actors!A2:H',
+        'Production Teams!A2:E',
+        'Theatre!A2:D',
+    ] );
+    if ( is_wp_error( $ranges ) ) return $ranges;
+
+    $season_rows  = $ranges['Season!A1:N']            ?? [];
+    $actor_rows   = $ranges['Actors!A2:H']            ?? [];
+    $team_rows    = $ranges['Production Teams!A2:E'] ?? [];
+    $theatre_rows = $ranges['Theatre!A2:D']           ?? [];
+
+    // Contactbook — separate spreadsheet. First col is Contact ID (col A).
+    // First name is col B; skip rows with empty first name.
+    $contactbook_rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_CONTACTBOOK_ID, 'Contactbook!A2:H' );
+    if ( is_wp_error( $contactbook_rows ) ) return $contactbook_rows;
+
+    // Pull "Current Season" + "Current Season Long" out of Season key/value rows.
+    // The Season tab holds config in col A/B until "Show1..N" rows appear.
+    $season       = '';
+    $season_long  = '';
+    foreach ( $season_rows as $r ) {
+        $label = tlt_cb_s( $r[0] ?? '' );
+        $val   = tlt_cb_s( $r[1] ?? '' );
+        if ( $label === 'Current Season' )      $season      = $val;
+        if ( $label === 'Current Season Long' ) $season_long = $val;
+    }
+
+    // Find the show's row in Season for SM email (col E, index 4) and the
+    // 1-based row number so we can write the URL back after generation.
+    $show_sm_email  = '';
+    $season_row_num = 0;
+    foreach ( $season_rows as $i => $r ) {
+        if ( tlt_cb_s( $r[1] ?? '' ) !== $show ) continue;
+        $show_sm_email  = tlt_cb_s( $r[4] ?? '' );
+        $season_row_num = $i + 1; // A1:N started at row 1
+        break;
+    }
+
+    // Build a case-insensitive first+last → contactbook row lookup.
+    $contact_lookup = [];
+    foreach ( $contactbook_rows as $r ) {
+        $first = tlt_cb_s( $r[1] ?? '' );
+        if ( $first === '' ) continue;
+        $last  = tlt_cb_s( $r[3] ?? '' );
+        $key   = strtolower( $first ) . '|' . strtolower( $last );
+        // Only take the first match (matches GAS Array.find semantics).
+        if ( isset( $contact_lookup[ $key ] ) ) continue;
+        $contact_lookup[ $key ] = [
+            'first'    => $first,
+            'middle'   => tlt_cb_s( $r[2] ?? '' ),
+            'last'     => $last,
+            'suffix'   => tlt_cb_s( $r[4] ?? '' ),
+            'pronouns' => tlt_cb_s( $r[5] ?? '' ),
+            'phone'    => tlt_cb_s( $r[6] ?? '' ),
+            'email'    => tlt_cb_s( $r[7] ?? '' ),
+        ];
+    }
+    $find_contact = function ( $first, $last ) use ( $contact_lookup ) {
+        $key = strtolower( tlt_cb_s( $first ) ) . '|' . strtolower( tlt_cb_s( $last ) );
+        return $contact_lookup[ $key ] ?? [];
+    };
+
+    // Theatre tab — role label → person name.
+    $theatre_by_label = [];
+    foreach ( $theatre_rows as $r ) {
+        $label = tlt_cb_s( $r[0] ?? '' );
+        if ( $label === '' ) continue;
+        $theatre_by_label[ $label ] = tlt_cb_s( $r[1] ?? '' );
+    }
+    $get_setting = function ( $label ) use ( $theatre_by_label ) {
+        return $theatre_by_label[ $label ] ?? '';
+    };
+
+    // --- CAST from Actors tab ---
+    $cast = [];
+    foreach ( $actor_rows as $r ) {
+        if ( tlt_cb_s( $r[0] ?? '' ) !== $show ) continue;
+        $first = tlt_cb_s( $r[2] ?? '' );
+        $mid   = tlt_cb_s( $r[3] ?? '' );
+        $last  = tlt_cb_s( $r[4] ?? '' );
+        $suf   = tlt_cb_s( $r[5] ?? '' );
+        $name_parts = array_filter( [ $first, $mid, $last, $suf ], function ( $x ) { return $x !== ''; } );
+        $cast[] = [
+            'name'     => implode( ' ', $name_parts ),
+            'pronouns' => '',
+            'role'     => tlt_cb_s( $r[1] ?? '' ),
+            'phone'    => tlt_cb_contact_sheet_format_phone( tlt_cb_s( $r[6] ?? '' ) ),
+            'email'    => tlt_cb_s( $r[7] ?? '' ),
+        ];
+    }
+
+    // --- Production team from Production Teams tab, merged by full name ---
+    // teamMap key = lowercased "First Middle Last" so the Theatre-tab join
+    // below can find the same person even if a middle name is present.
+    $team_map = [];
+    foreach ( $team_rows as $r ) {
+        if ( tlt_cb_s( $r[0] ?? '' ) !== $show ) continue;
+        $first = tlt_cb_s( $r[2] ?? '' );
+        $last  = tlt_cb_s( $r[4] ?? '' );
+        if ( $first === '' || $last === '' ) continue;
+
+        $role    = tlt_cb_s( $r[1] ?? '' );
+        $contact = $find_contact( $first, $last );
+        $full    = implode( ' ', array_filter( [ $first, $contact['middle'] ?? '', $last ], function ( $x ) { return $x !== ''; } ) );
+        $key     = strtolower( $full );
+
+        // Stage Managers use the show-specific SM email (Season col E) instead
+        // of their personal contactbook email.
+        $email_for_role = ( $role === 'Stage Manager' && $show_sm_email !== '' )
+            ? $show_sm_email
+            : ( $contact['email'] ?? '' );
+
+        if ( isset( $team_map[ $key ] ) ) {
+            $team_map[ $key ]['role'] .= ' / ' . $role;
+            if ( $role === 'Stage Manager' && $show_sm_email !== '' ) {
+                $team_map[ $key ]['email'] = $show_sm_email;
+            }
+        } else {
+            $team_map[ $key ] = [
+                'name'     => $full,
+                'pronouns' => $contact['pronouns'] ?? '',
+                'role'     => $role,
+                'phone'    => tlt_cb_contact_sheet_format_phone( $contact['phone'] ?? '' ),
+                'email'    => $email_for_role,
+            ];
+        }
+    }
+
+    // --- Staff from Theatre tab, merged if already in team_map ---
+    $staff_roles = [
+        [ 'label' => 'Managing Artistic Director',   'role' => 'Managing Artistic Director'   ],
+        [ 'label' => 'Technical Director',           'role' => 'Technical Director'           ],
+        [ 'label' => 'Associate Producing Director', 'role' => 'Associate Producing Director' ],
+        [ 'label' => 'Production Manager',           'role' => 'Production Manager'           ],
+        [ 'label' => 'Lead Carpenter',               'role' => 'Lead Carpenter'               ],
+        [ 'label' => 'Shop Technician',              'role' => 'Shop Technician'              ],
+    ];
+    foreach ( $staff_roles as $s ) {
+        $full_name = $get_setting( $s['label'] );
+        if ( $full_name === '' ) continue;
+        $parts   = preg_split( '/\s+/', trim( $full_name ) );
+        $first   = $parts[0] ?? '';
+        $last    = $parts[ count( $parts ) - 1 ] ?? '';
+        $contact = $find_contact( $first, $last );
+
+        // Find existing team member by first+last (ignoring any middle name in the key).
+        $existing_key = null;
+        $first_lc = strtolower( $first );
+        $last_lc  = strtolower( $last );
+        foreach ( array_keys( $team_map ) as $k ) {
+            $kp = explode( ' ', $k );
+            if ( ( $kp[0] ?? '' ) === $first_lc && ( $kp[ count( $kp ) - 1 ] ?? '' ) === $last_lc ) {
+                $existing_key = $k;
+                break;
+            }
+        }
+
+        if ( $existing_key !== null ) {
+            $team_map[ $existing_key ]['role'] .= ' / ' . $s['role'];
+        } else {
+            $team_map[ strtolower( $full_name ) ] = [
+                'name'     => $full_name,
+                'pronouns' => $contact['pronouns'] ?? '',
+                'role'     => $s['role'],
+                'phone'    => tlt_cb_contact_sheet_format_phone( $contact['phone'] ?? '' ),
+                'email'    => $contact['email'] ?? '',
+            ];
+        }
+    }
+
+    return [
+        'season'         => $season,
+        'season_long'    => $season_long,
+        'show_sm_email'  => $show_sm_email,
+        'season_row_num' => $season_row_num,
+        'cast'           => $cast,
+        'team'           => array_values( $team_map ),
+    ];
+}
+
+/**
+ * Compute the doc name for a show — used both for creating the new doc and
+ * for finding + trashing an existing one during regenerate.
+ */
+function tlt_cb_contact_sheet_doc_name( $show, $season_long ) {
+    return $show . ' - ' . $season_long . ' Contact Sheet';
+}
+
+/**
+ * Trash every doc in the contact sheet folder whose name matches this show.
+ * Called by /contact-sheet-regenerate before generating a fresh copy.
+ *
+ * @return int|WP_Error Count of files trashed
+ */
+function tlt_cb_contact_sheet_trash_existing( $show, $season_long ) {
+    $name  = tlt_cb_contact_sheet_doc_name( $show, $season_long );
+    $files = tlt_cb_drive_find_in_folder( TLT_CALLBOARD_CS_FOLDER_ID, $name );
+    if ( is_wp_error( $files ) ) return $files;
+    $count = 0;
+    foreach ( $files as $f ) {
+        $r = tlt_cb_drive_trash( $f['id'] );
+        if ( is_wp_error( $r ) ) return $r;
+        $count++;
+    }
+    return $count;
+}
+
+/**
+ * Build a "Range" object for a Docs API request that covers the given
+ * inclusive-start / exclusive-end indices. Extracted so the doc-building
+ * code below reads cleaner.
+ */
+function tlt_cb_docs_range( $start, $end ) {
+    return [ 'startIndex' => $start, 'endIndex' => $end ];
+}
+
+/**
+ * Populate a freshly-copied template doc with the CAST + PRODUCTION TEAM
+ * tables. Runs in three phases (three batchUpdate round trips) so index
+ * math stays local to each phase:
+ *
+ *   Phase 1: Set body margins, insert all header/title text + section
+ *            headers (as plain paragraphs, no tables yet), apply their
+ *            paragraph and text styles.
+ *   Phase 2: Insert the two tables at the correct spots between the
+ *            section headers. Reads the doc back to find exact positions.
+ *   Phase 3: Fill each table's cells with row content + style them.
+ *
+ * @return true|WP_Error
+ */
+function tlt_cb_contact_sheet_build_doc( $doc_id, $show, $season, $season_long, array $cast, array $team ) {
+    // -------------- Phase 1: text scaffolding + margins + top styling --
+    // Structure we're building at the top of the body (each line = paragraph):
+    //   L1: {show}: Contact Sheet     (font 14, bold, centered)
+    //   L2: Season {season}            (font 12, centered)
+    //   L3: (blank)
+    //   L4: CAST                       (font 12, bold, centered, spacingBefore=12, spacingAfter=4)
+    //   L5: (blank — will be replaced by table in phase 2)
+    //   L6: PRODUCTION TEAM            (same style as L4)
+    //   L7: (blank — will be replaced by table in phase 2)
+    //
+    // We insert everything at index 1 (the top of the body, right after the
+    // implicit section break). To keep index math simple we insert LAST-first
+    // so each earlier insert doesn't shift the ones we've already recorded.
+
+    $title_text  = $show . ': Contact Sheet';
+    $season_text = 'Season ' . $season;
+    $cast_hdr    = 'CAST';
+    $team_hdr    = 'PRODUCTION TEAM';
+
+    // Order the lines top-to-bottom, then reverse the request order below so
+    // the last line is inserted first (subsequent inserts push it down).
+    $lines = [
+        [ 'text' => $title_text ],  // L1
+        [ 'text' => $season_text ], // L2
+        [ 'text' => '' ],           // L3 blank
+        [ 'text' => $cast_hdr ],    // L4
+        [ 'text' => '' ],           // L5 blank (cast table target)
+        [ 'text' => $team_hdr ],    // L6
+        [ 'text' => '' ],           // L7 blank (team table target)
+    ];
+
+    // Build reverse-order insert requests; each inserts at index 1 with a
+    // trailing "\n" so it becomes its own paragraph.
+    $insert_reqs = [];
+    for ( $i = count( $lines ) - 1; $i >= 0; $i-- ) {
+        $insert_reqs[] = [
+            'insertText' => [
+                'location' => [ 'index' => 1 ],
+                'text'     => $lines[ $i ]['text'] . "\n",
+            ],
+        ];
+    }
+
+    // Now compute the final start/end indices of each paragraph so we can
+    // apply styling in the same batchUpdate. Because we inserted top-down
+    // conceptually, the FIRST line starts at index 1 and each subsequent
+    // line starts after the previous line's text + its newline.
+    $line_ranges = [];
+    $cursor = 1;
+    foreach ( $lines as $line ) {
+        $len = strlen( $line['text'] );
+        // The paragraph occupies indices [cursor, cursor + len + 1)
+        //   — cursor..cursor+len is the text, cursor+len is the newline.
+        $line_ranges[] = [
+            'text_start' => $cursor,
+            'text_end'   => $cursor + $len,       // exclusive
+            'para_start' => $cursor,
+            'para_end'   => $cursor + $len + 1,   // include newline
+        ];
+        $cursor += $len + 1;
+    }
+
+    // Margin update — 18pt on all sides (matches GAS behavior).
+    $margin_req = [
+        'updateDocumentStyle' => [
+            'documentStyle' => [
+                'marginTop'    => [ 'magnitude' => 18, 'unit' => 'PT' ],
+                'marginBottom' => [ 'magnitude' => 18, 'unit' => 'PT' ],
+                'marginLeft'   => [ 'magnitude' => 18, 'unit' => 'PT' ],
+                'marginRight'  => [ 'magnitude' => 18, 'unit' => 'PT' ],
+            ],
+            'fields' => 'marginTop,marginBottom,marginLeft,marginRight',
+        ],
+    ];
+
+    // Styling requests. We build these in a fixed order — Docs API applies
+    // them post-inserts.
+    $style_reqs = [];
+
+    // L1: title — font 14, bold, centered.
+    $style_reqs[] = [
+        'updateTextStyle' => [
+            'range'     => tlt_cb_docs_range( $line_ranges[0]['text_start'], $line_ranges[0]['text_end'] ),
+            'textStyle' => [
+                'fontSize' => [ 'magnitude' => 14, 'unit' => 'PT' ],
+                'bold'     => true,
+            ],
+            'fields' => 'fontSize,bold',
+        ],
+    ];
+    $style_reqs[] = [
+        'updateParagraphStyle' => [
+            'range'          => tlt_cb_docs_range( $line_ranges[0]['para_start'], $line_ranges[0]['para_end'] ),
+            'paragraphStyle' => [ 'alignment' => 'CENTER' ],
+            'fields'         => 'alignment',
+        ],
+    ];
+    // L2: season — font 12, not bold, centered.
+    $style_reqs[] = [
+        'updateTextStyle' => [
+            'range'     => tlt_cb_docs_range( $line_ranges[1]['text_start'], $line_ranges[1]['text_end'] ),
+            'textStyle' => [
+                'fontSize' => [ 'magnitude' => 12, 'unit' => 'PT' ],
+                'bold'     => false,
+            ],
+            'fields' => 'fontSize,bold',
+        ],
+    ];
+    $style_reqs[] = [
+        'updateParagraphStyle' => [
+            'range'          => tlt_cb_docs_range( $line_ranges[1]['para_start'], $line_ranges[1]['para_end'] ),
+            'paragraphStyle' => [ 'alignment' => 'CENTER' ],
+            'fields'         => 'alignment',
+        ],
+    ];
+    // L4 + L6: section headers — font 12, bold, centered, spacingBefore=12, spacingAfter=4.
+    foreach ( [ 3, 5 ] as $li ) {
+        $style_reqs[] = [
+            'updateTextStyle' => [
+                'range'     => tlt_cb_docs_range( $line_ranges[ $li ]['text_start'], $line_ranges[ $li ]['text_end'] ),
+                'textStyle' => [
+                    'fontSize' => [ 'magnitude' => 12, 'unit' => 'PT' ],
+                    'bold'     => true,
+                ],
+                'fields' => 'fontSize,bold',
+            ],
+        ];
+        $style_reqs[] = [
+            'updateParagraphStyle' => [
+                'range'          => tlt_cb_docs_range( $line_ranges[ $li ]['para_start'], $line_ranges[ $li ]['para_end'] ),
+                'paragraphStyle' => [
+                    'alignment'     => 'CENTER',
+                    'spaceAbove'    => [ 'magnitude' => 12, 'unit' => 'PT' ],
+                    'spaceBelow'    => [ 'magnitude' => 4,  'unit' => 'PT' ],
+                ],
+                'fields' => 'alignment,spaceAbove,spaceBelow',
+            ],
+        ];
+    }
+
+    // Phase 1 batchUpdate: margins + all inserts + styling.
+    $requests = array_merge( [ $margin_req ], $insert_reqs, $style_reqs );
+    $r = tlt_cb_docs_batch_update( $doc_id, $requests );
+    if ( is_wp_error( $r ) ) return $r;
+
+    // -------------- Phase 2: insert both tables ------------------------
+    // Re-fetch the doc to find where the CAST + PRODUCTION TEAM paragraphs
+    // now live. We insert each table just AFTER the corresponding section
+    // header (into what will become the blank paragraph after it).
+
+    $doc = tlt_cb_docs_get( $doc_id, 'body(content(startIndex,endIndex,paragraph(elements(startIndex,endIndex,textRun(content)))))' );
+    if ( is_wp_error( $doc ) ) return $doc;
+
+    // Find the paragraph containing the CAST header (exact text match).
+    $cast_para_end = null;
+    $team_para_end = null;
+    foreach ( ( $doc['body']['content'] ?? [] ) as $el ) {
+        if ( empty( $el['paragraph']['elements'] ) ) continue;
+        $text = '';
+        foreach ( $el['paragraph']['elements'] as $pe ) {
+            $text .= $pe['textRun']['content'] ?? '';
+        }
+        $trimmed = rtrim( $text, "\n" );
+        if ( $trimmed === $cast_hdr && $cast_para_end === null ) $cast_para_end = $el['endIndex'];
+        if ( $trimmed === $team_hdr && $team_para_end === null ) $team_para_end = $el['endIndex'];
+    }
+    if ( $cast_para_end === null || $team_para_end === null ) {
+        return new WP_Error( 'cs_marker_missing', 'Could not find CAST or PRODUCTION TEAM header in the copied doc.' );
+    }
+
+    // Insert TEAM table first (it's later in the doc) so its index isn't
+    // shifted by the CAST table insertion.
+    $team_rows_count = 1 + count( $team ); // header + data rows
+    $cast_rows_count = 1 + count( $cast );
+    $cols            = 5;
+
+    // The "blank paragraph after the header" occupies indices
+    // [para_end, para_end + 1) — a single "\n". Inserting a table at
+    // para_end places it BEFORE that newline, which is what we want.
+    $phase2 = [
+        [
+            'insertTable' => [
+                'rows'     => $team_rows_count,
+                'columns'  => $cols,
+                'location' => [ 'index' => $team_para_end ],
+            ],
+        ],
+        [
+            'insertTable' => [
+                'rows'     => $cast_rows_count,
+                'columns'  => $cols,
+                'location' => [ 'index' => $cast_para_end ],
+            ],
+        ],
+    ];
+    $r = tlt_cb_docs_batch_update( $doc_id, $phase2 );
+    if ( is_wp_error( $r ) ) return $r;
+
+    // -------------- Phase 3: fill both tables' cells -------------------
+    // Re-fetch the doc — now we walk body.content, find the two tables (in
+    // document order they're CAST then PRODUCTION TEAM), and for each cell
+    // read its first paragraph's startIndex — that's where we insert text.
+
+    $doc = tlt_cb_docs_get( $doc_id, 'body(content(startIndex,endIndex,table(rows,columns,tableRows(tableCells(content(startIndex,endIndex,paragraph(elements(startIndex,endIndex))))))))' );
+    if ( is_wp_error( $doc ) ) return $doc;
+
+    $tables = [];
+    foreach ( ( $doc['body']['content'] ?? [] ) as $el ) {
+        if ( isset( $el['table'] ) ) $tables[] = $el['table'];
+    }
+    if ( count( $tables ) < 2 ) {
+        return new WP_Error( 'cs_tables_missing', 'Expected 2 tables after insert, found ' . count( $tables ) );
+    }
+
+    $header_row  = [ 'Name', 'Pronouns', 'Role', 'Phone', 'Email' ];
+    $col_widths  = [ 105, 65, 138, 83, 185 ]; // matches GAS
+
+    // Build the ordered list of (cell start index, text to insert) pairs for
+    // BOTH tables. We collect them ALL first, sort by index DESCENDING, and
+    // insert in that order — that way each insert doesn't shift the indices
+    // of the still-pending inserts. Classic backwards-insert trick.
+    $inserts = [];
+
+    // Table 0 = CAST, Table 1 = PRODUCTION TEAM (document order matches
+    // phase-2 insertion order because CAST is earlier in the body).
+    $data_by_table = [ $cast, $team ];
+    foreach ( $tables as $ti => $tbl ) {
+        $rows = $tbl['tableRows'] ?? [];
+        $data = $data_by_table[ $ti ];
+        foreach ( $rows as $ri => $row ) {
+            $cells = $row['tableCells'] ?? [];
+            foreach ( $cells as $ci => $cell ) {
+                $first_para = $cell['content'][0]['paragraph'] ?? null;
+                if ( ! $first_para ) continue;
+                $cell_para_start = $cell['content'][0]['startIndex'] ?? null;
+                if ( $cell_para_start === null ) continue;
+
+                if ( $ri === 0 ) {
+                    $val = $header_row[ $ci ] ?? '';
+                } else {
+                    $data_row = $data[ $ri - 1 ] ?? [];
+                    $val = tlt_cb_s( [
+                        $data_row['name']     ?? '',
+                        $data_row['pronouns'] ?? '',
+                        $data_row['role']     ?? '',
+                        $data_row['phone']    ?? '',
+                        $data_row['email']    ?? '',
+                    ][ $ci ] ?? '' );
+                }
+
+                if ( $val === '' ) continue; // no need to insert empty text
+
+                $inserts[] = [
+                    'index' => $cell_para_start,
+                    'text'  => $val,
+                    // Track table+cell coords for post-insert styling.
+                    'table' => $ti,
+                    'row'   => $ri,
+                    'col'   => $ci,
+                    'len'   => strlen( $val ),
+                ];
+            }
+        }
+    }
+
+    // Sort DESCENDING by index so later inserts don't shift earlier ones'
+    // target indices.
+    usort( $inserts, function ( $a, $b ) { return $b['index'] - $a['index']; } );
+
+    $phase3_requests = [];
+    foreach ( $inserts as $ins ) {
+        $phase3_requests[] = [
+            'insertText' => [
+                'location' => [ 'index' => $ins['index'] ],
+                'text'     => $ins['text'],
+            ],
+        ];
+    }
+
+    // Also set column widths and cell padding via updateTableColumnProperties
+    // and updateTableCellStyle. These need to know the table's startIndex.
+    // Padding for header rows: 4pt top/bottom, 6pt left/right; font 10 bold.
+    // Padding for data rows:   3pt top/bottom, 6pt left/right; font 10.
+    foreach ( $tables as $ti => $tbl ) {
+        // Column widths — need the table's startIndex, which we get from the
+        // enclosing content element. Re-walk to find it.
+    }
+    // The above needs the table start index — reload the body top-level list
+    // with startIndex on the table element too.
+    $doc2 = tlt_cb_docs_get( $doc_id, 'body(content(startIndex,table(tableStyle(tableColumnProperties))))' );
+    if ( is_wp_error( $doc2 ) ) return $doc2;
+    $table_start_indices = [];
+    foreach ( ( $doc2['body']['content'] ?? [] ) as $el ) {
+        if ( isset( $el['table'] ) ) $table_start_indices[] = $el['startIndex'] ?? null;
+    }
+
+    foreach ( $table_start_indices as $ti => $start ) {
+        if ( $start === null ) continue;
+        // Column widths.
+        foreach ( $col_widths as $ci => $w ) {
+            $phase3_requests[] = [
+                'updateTableColumnProperties' => [
+                    'tableStartLocation'      => [ 'index' => $start ],
+                    'columnIndices'           => [ $ci ],
+                    'tableColumnProperties'   => [
+                        'widthType' => 'FIXED_WIDTH',
+                        'width'     => [ 'magnitude' => $w, 'unit' => 'PT' ],
+                    ],
+                    'fields' => 'widthType,width',
+                ],
+            ];
+        }
+        // Header row (row 0): 4pt top/bottom, 6pt left/right padding.
+        $phase3_requests[] = [
+            'updateTableCellStyle' => [
+                'tableStartLocation' => [ 'index' => $start ],
+                'tableRange' => [
+                    'tableCellLocation' => [
+                        'tableStartLocation' => [ 'index' => $start ],
+                        'rowIndex'           => 0,
+                        'columnIndex'        => 0,
+                    ],
+                    'rowSpan'    => 1,
+                    'columnSpan' => $cols,
+                ],
+                'tableCellStyle' => [
+                    'paddingTop'    => [ 'magnitude' => 4, 'unit' => 'PT' ],
+                    'paddingBottom' => [ 'magnitude' => 4, 'unit' => 'PT' ],
+                    'paddingLeft'   => [ 'magnitude' => 6, 'unit' => 'PT' ],
+                    'paddingRight'  => [ 'magnitude' => 6, 'unit' => 'PT' ],
+                ],
+                'fields' => 'paddingTop,paddingBottom,paddingLeft,paddingRight',
+            ],
+        ];
+        // Data rows: 3pt top/bottom, 6pt left/right. Only add if there ARE
+        // data rows (empty cast/team lists would break the tableRange).
+        $data_count = ( $ti === 0 ) ? count( $cast ) : count( $team );
+        if ( $data_count > 0 ) {
+            $phase3_requests[] = [
+                'updateTableCellStyle' => [
+                    'tableStartLocation' => [ 'index' => $start ],
+                    'tableRange' => [
+                        'tableCellLocation' => [
+                            'tableStartLocation' => [ 'index' => $start ],
+                            'rowIndex'           => 1,
+                            'columnIndex'        => 0,
+                        ],
+                        'rowSpan'    => $data_count,
+                        'columnSpan' => $cols,
+                    ],
+                    'tableCellStyle' => [
+                        'paddingTop'    => [ 'magnitude' => 3, 'unit' => 'PT' ],
+                        'paddingBottom' => [ 'magnitude' => 3, 'unit' => 'PT' ],
+                        'paddingLeft'   => [ 'magnitude' => 6, 'unit' => 'PT' ],
+                        'paddingRight'  => [ 'magnitude' => 6, 'unit' => 'PT' ],
+                    ],
+                    'fields' => 'paddingTop,paddingBottom,paddingLeft,paddingRight',
+                ],
+            ];
+        }
+    }
+
+    $r = tlt_cb_docs_batch_update( $doc_id, $phase3_requests );
+    if ( is_wp_error( $r ) ) return $r;
+
+    // -------------- Phase 4: text styling on filled cells --------------
+    // GAS sets all cell text to font 10 (bold for header row, not bold for
+    // data rows). We do this after phase 3 so we can compute exact cell
+    // text ranges from the current doc structure.
+
+    $doc3 = tlt_cb_docs_get( $doc_id, 'body(content(table(tableRows(tableCells(content(startIndex,endIndex,paragraph(elements(startIndex,endIndex,textRun(content)))))))))' );
+    if ( is_wp_error( $doc3 ) ) return $doc3;
+
+    $tables3 = [];
+    foreach ( ( $doc3['body']['content'] ?? [] ) as $el ) {
+        if ( isset( $el['table'] ) ) $tables3[] = $el['table'];
+    }
+
+    $style_reqs4 = [];
+    foreach ( $tables3 as $ti => $tbl ) {
+        $rows = $tbl['tableRows'] ?? [];
+        foreach ( $rows as $ri => $row ) {
+            $cells = $row['tableCells'] ?? [];
+            $is_header_row = ( $ri === 0 );
+            foreach ( $cells as $cell ) {
+                foreach ( ( $cell['content'] ?? [] ) as $item ) {
+                    if ( empty( $item['paragraph']['elements'] ) ) continue;
+                    foreach ( $item['paragraph']['elements'] as $pe ) {
+                        if ( empty( $pe['textRun']['content'] ) ) continue;
+                        $s = $pe['startIndex'] ?? null;
+                        $e = $pe['endIndex']   ?? null;
+                        if ( $s === null || $e === null || $e <= $s ) continue;
+                        // Skip the trailing newline character at the end of
+                        // the cell's paragraph — style only real text.
+                        $content = $pe['textRun']['content'];
+                        if ( substr( $content, -1 ) === "\n" ) $e = $e - 1;
+                        if ( $e <= $s ) continue;
+                        $style_reqs4[] = [
+                            'updateTextStyle' => [
+                                'range'     => tlt_cb_docs_range( $s, $e ),
+                                'textStyle' => [
+                                    'fontSize' => [ 'magnitude' => 10, 'unit' => 'PT' ],
+                                    'bold'     => $is_header_row,
+                                ],
+                                'fields' => 'fontSize,bold',
+                            ],
+                        ];
+                    }
+                }
+            }
+        }
+    }
+
+    if ( ! empty( $style_reqs4 ) ) {
+        $r = tlt_cb_docs_batch_update( $doc_id, $style_reqs4 );
+        if ( is_wp_error( $r ) ) return $r;
+    }
+
+    return true;
+}
+
+/**
+ * Public entry point: assemble data, copy template, build doc, write URL
+ * back to Season col M, return the URL.
+ *
+ * @param string $show
+ * @param bool   $regenerate If true, trash existing docs matching the name first.
+ * @return array|WP_Error { url }
+ */
+function tlt_cb_contact_sheet_generate( $show, $regenerate = false ) {
+    $data = tlt_cb_contact_sheet_assemble_data( $show );
+    if ( is_wp_error( $data ) ) return $data;
+    if ( $data['season_long'] === '' ) {
+        return new WP_Error( 'no_season_long', 'Season "Current Season Long" is empty — set it on the Season tab.' );
+    }
+
+    if ( $regenerate ) {
+        $trashed = tlt_cb_contact_sheet_trash_existing( $show, $data['season_long'] );
+        if ( is_wp_error( $trashed ) ) return $trashed;
+    }
+
+    $doc_name = tlt_cb_contact_sheet_doc_name( $show, $data['season_long'] );
+    $file     = tlt_cb_drive_copy( TLT_CALLBOARD_CS_TEMPLATE_ID, TLT_CALLBOARD_CS_FOLDER_ID, $doc_name );
+    if ( is_wp_error( $file ) ) return $file;
+    $doc_id   = $file['id'];
+
+    $r = tlt_cb_contact_sheet_build_doc( $doc_id, $show, $data['season'], $data['season_long'], $data['cast'], $data['team'] );
+    if ( is_wp_error( $r ) ) return $r;
+
+    $url = tlt_cb_doc_url( $doc_id );
+
+    // Cache the URL in Season col M so subsequent /contact-sheet-link calls
+    // don't need to scan Drive.
+    if ( $data['season_row_num'] > 0 ) {
+        $write = tlt_callboard_sheets_write( TLT_CALLBOARD_SHEET_ID, "Season!M{$data['season_row_num']}", [[ $url ]] );
+        if ( is_wp_error( $write ) ) return $write; // still surface the URL? For now bail.
+    }
+
+    return [ 'url' => $url ];
+}
+
+/* ---------------------------------------------------------------------------
+ * Endpoint handlers.
+ * ------------------------------------------------------------------------- */
+
+/**
+ * POST /contact-sheet-generate  { show }
+ * Generates the doc without trashing an existing one. Used for the first
+ * generation of a show's contact sheet.
+ */
+function tlt_callboard_ep_contact_sheet_generate( WP_REST_Request $req ) {
+    $body = $req->get_json_params();
+    $show = tlt_cb_s( is_array( $body ) ? ( $body['show'] ?? '' ) : '' );
+    if ( $show === '' ) return new WP_Error( 'missing_show', 'show is required', [ 'status' => 400 ] );
+    $r = tlt_cb_contact_sheet_generate( $show, false );
+    if ( is_wp_error( $r ) ) return $r;
+    return tlt_cb_ok( $r );
+}
+
+/**
+ * POST /contact-sheet-regenerate  { show }
+ * Trashes the existing doc(s) in the folder matching this show's name, then
+ * generates a fresh one. Used by the "Regenerate" button in the modal.
+ */
+function tlt_callboard_ep_contact_sheet_regenerate( WP_REST_Request $req ) {
+    $body = $req->get_json_params();
+    $show = tlt_cb_s( is_array( $body ) ? ( $body['show'] ?? '' ) : '' );
+    if ( $show === '' ) return new WP_Error( 'missing_show', 'show is required', [ 'status' => 400 ] );
+    $r = tlt_cb_contact_sheet_generate( $show, true );
+    if ( is_wp_error( $r ) ) return $r;
+    return tlt_cb_ok( $r );
+}
+
+/* ===========================================================================
+ * ============  SHARED HELPERS FOR ALL GENERATORS  ==========================
+ * ======================================================================== */
+
+/**
+ * Parse a value from the Sheets API as a PHP DateTime. Values come in as:
+ *   - ISO strings ("2026-10-03")
+ *   - Serial dates as numeric strings (rare with USER_ENTERED)
+ *   - Human strings ("October 3, 2026")
+ * Returns null on failure.
+ */
+function tlt_cb_parse_date( $val ) {
+    $val = trim( (string) $val );
+    if ( $val === '' ) return null;
+    try {
+        $tz = new DateTimeZone( 'America/Los_Angeles' );
+        // Try ISO first (fast common case).
+        $dt = DateTime::createFromFormat( 'Y-m-d', $val, $tz );
+        if ( $dt !== false ) { $dt->setTime( 0, 0 ); return $dt; }
+        $dt = DateTime::createFromFormat( 'Y-m-d H:i:s', $val, $tz );
+        if ( $dt !== false ) return $dt;
+        // Fall back to strtotime.
+        $ts = strtotime( $val );
+        if ( $ts !== false ) return ( new DateTime( '@' . $ts ) )->setTimezone( $tz );
+    } catch ( Exception $e ) { /* fall through */ }
+    return null;
+}
+
+/**
+ * Parse time-of-day into a DateTime (date portion undefined). Handles
+ * "7:30 PM", "7pm", "19:30", or a full ISO date with time. Returns null.
+ */
+function tlt_cb_parse_time( $val ) {
+    $val = trim( (string) $val );
+    if ( $val === '' ) return null;
+    // If it looks like a full timestamp, use parse_date.
+    if ( preg_match( '/\d{4}-\d{2}-\d{2}/', $val ) ) return tlt_cb_parse_date( $val );
+    $ts = strtotime( '2000-01-01 ' . $val );
+    if ( $ts === false ) return null;
+    return ( new DateTime( '@' . $ts ) )->setTimezone( new DateTimeZone( 'America/Los_Angeles' ) );
+}
+
+/**
+ * Match GAS formatDate() output.  "Fri, Oct. 3, 2026" (with year) or
+ * "Fri, Oct. 3" (without). Empty/null input → "TBD".
+ */
+function tlt_cb_fmt_date( $val, $include_year = true ) {
+    $dt = tlt_cb_parse_date( $val );
+    if ( ! $dt ) return 'TBD';
+    return $dt->format( 'D, M' ) . '. ' . (int) $dt->format( 'j' ) . ( $include_year ? ', ' . $dt->format( 'Y' ) : '' );
+}
+
+/**
+ * Match GAS formatTime() output: "7:30pm" or "7pm" (no leading zero on hour).
+ * Empty → "".
+ */
+function tlt_cb_fmt_time( $val ) {
+    $dt = tlt_cb_parse_time( $val );
+    if ( ! $dt ) return '';
+    $h = (int) $dt->format( 'g' );
+    $m = (int) $dt->format( 'i' );
+    $ampm = strtolower( $dt->format( 'a' ) );
+    return $m === 0 ? $h . $ampm : $h . ':' . str_pad( (string) $m, 2, '0', STR_PAD_LEFT ) . $ampm;
+}
+
+/**
+ * Cache a URL in the Season tab. col1Based indexing to match GAS calls:
+ *   L(12) = Bio Doc, M(13) = Contact Sheet, N(14) = Tech Schedule.
+ */
+function tlt_cb_save_show_doc_url( $show_name, $col1_based, $value ) {
+    $rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, 'Season!A1:N' );
+    if ( is_wp_error( $rows ) ) return $rows;
+    foreach ( $rows as $i => $r ) {
+        if ( tlt_cb_s( $r[1] ?? '' ) === tlt_cb_s( $show_name ) ) {
+            $row_num = $i + 1; // A1:N starts at row 1
+            $col_letter = chr( ord( 'A' ) + $col1_based - 1 );
+            return tlt_callboard_sheets_write( TLT_CALLBOARD_SHEET_ID, "Season!{$col_letter}{$row_num}", [[ $value ]] );
+        }
+    }
+    return new WP_Error( 'no_season_row', "No Season row found for show '$show_name'" );
+}
+
+/**
+ * Look up a value on the Season tab config rows (col A = label, col B = value).
+ */
+function tlt_cb_season_setting( $season_rows, $label ) {
+    foreach ( $season_rows as $r ) {
+        if ( tlt_cb_s( $r[0] ?? '' ) === $label ) return tlt_cb_s( $r[1] ?? '' );
+    }
+    return '';
+}
+
+/**
+ * Find or create a subfolder by name inside a Drive parent folder.
+ * Returns the subfolder's ID.
+ */
+function tlt_cb_drive_folder_or_create( $parent_id, $name ) {
+    $token = tlt_callboard_google_access_token();
+    if ( is_wp_error( $token ) ) return $token;
+    $escaped = str_replace( "'", "\\'", $name );
+    $q = "name = '{$escaped}' and '{$parent_id}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false";
+    $url = 'https://www.googleapis.com/drive/v3/files?'
+         . 'q=' . rawurlencode( $q )
+         . '&fields=' . rawurlencode( 'files(id,name)' )
+         . '&supportsAllDrives=true&includeItemsFromAllDrives=true';
+    $resp = wp_remote_get( $url, [
+        'timeout' => 15,
+        'headers' => [ 'Authorization' => 'Bearer ' . $token ],
+    ] );
+    if ( is_wp_error( $resp ) ) return $resp;
+    $body = wp_remote_retrieve_body( $resp );
+    $data = json_decode( $body, true );
+    if ( ! empty( $data['files'][0]['id'] ) ) return $data['files'][0]['id'];
+    // Create it.
+    $resp = wp_remote_post( 'https://www.googleapis.com/drive/v3/files?supportsAllDrives=true&fields=id', [
+        'timeout' => 15,
+        'headers' => [
+            'Authorization' => 'Bearer ' . $token,
+            'Content-Type'  => 'application/json',
+        ],
+        'body' => wp_json_encode( [
+            'name'     => $name,
+            'mimeType' => 'application/vnd.google-apps.folder',
+            'parents'  => [ $parent_id ],
+        ] ),
+    ] );
+    if ( is_wp_error( $resp ) ) return $resp;
+    $body = wp_remote_retrieve_body( $resp );
+    $data = json_decode( $body, true );
+    if ( empty( $data['id'] ) ) return new WP_Error( 'drive_folder_create', "Could not create folder '$name': $body" );
+    return $data['id'];
+}
+
+/**
+ * Create a fresh Google Doc directly (no template copy). Returns the doc ID.
+ * Immediately moves it into $parent_folder_id (Docs are created in root by default).
+ */
+function tlt_cb_docs_create( $title, $parent_folder_id ) {
+    $token = tlt_callboard_google_access_token();
+    if ( is_wp_error( $token ) ) return $token;
+    $resp = wp_remote_post( 'https://docs.googleapis.com/v1/documents', [
+        'timeout' => 30,
+        'headers' => [
+            'Authorization' => 'Bearer ' . $token,
+            'Content-Type'  => 'application/json',
+        ],
+        'body' => wp_json_encode( [ 'title' => $title ] ),
+    ] );
+    if ( is_wp_error( $resp ) ) return $resp;
+    $body = wp_remote_retrieve_body( $resp );
+    $data = json_decode( $body, true );
+    if ( empty( $data['documentId'] ) ) return new WP_Error( 'docs_create', "Docs create failed: $body" );
+    $doc_id = $data['documentId'];
+    // Move into folder.
+    $mv = wp_remote_request( 'https://www.googleapis.com/drive/v3/files/' . $doc_id
+        . '?addParents=' . rawurlencode( $parent_folder_id )
+        . '&removeParents=root&supportsAllDrives=true&fields=id,parents', [
+        'method'  => 'PATCH',
+        'timeout' => 15,
+        'headers' => [ 'Authorization' => 'Bearer ' . $token ],
+    ] );
+    if ( is_wp_error( $mv ) ) return $mv;
+    return $doc_id;
+}
+
+/* ===========================================================================
+ * ============  TECH SCHEDULE GENERATOR  ====================================
+ *
+ * Port of TechScheduleGenerator.js.  Copies the tech schedule template,
+ * replaces <<Tag>> placeholders via replaceAllText, optionally deletes the
+ * Tech Run row when Cue to Cue + Tech Run fall on the same day.  Caches URL
+ * in Season col N (index 13).
+ * ======================================================================== */
+
+/**
+ * Read Dates tab data for a show and build the replacements map matching
+ * TechScheduleGenerator.js line 98-127.
+ *
+ * @return array [ 'replacements' => [ tag => value ], 'c2c_same_day' => bool, 'season_long' => string, 'season_row_num' => int ]
+ */
+function tlt_cb_tech_schedule_assemble( $show ) {
+    $ranges = tlt_callboard_sheets_get( TLT_CALLBOARD_SHEET_ID, [
+        'Season!A1:N',
+        'Dates!A2:H',
+    ] );
+    if ( is_wp_error( $ranges ) ) return $ranges;
+    $season_rows = $ranges['Season!A1:N'] ?? [];
+    $dates_rows  = array_values( array_filter( $ranges['Dates!A2:H'] ?? [], function ( $r ) {
+        return tlt_cb_s( $r[0] ?? '' ) !== '';
+    } ) );
+
+    $season_long   = tlt_cb_season_setting( $season_rows, 'Current Season Long' );
+    $season_row_num = 0;
+    foreach ( $season_rows as $i => $r ) {
+        if ( tlt_cb_s( $r[1] ?? '' ) === $show ) { $season_row_num = $i + 1; break; }
+    }
+
+    // Helpers to fetch data from Dates rows for the target show.
+    $find = function ( $event_type ) use ( $dates_rows, $show ) {
+        foreach ( $dates_rows as $r ) {
+            if ( tlt_cb_s( $r[0] ?? '' ) === $show && tlt_cb_s( $r[1] ?? '' ) === $event_type ) return $r;
+        }
+        return null;
+    };
+    $get_date = function ( $event_type ) use ( $find ) {
+        $r = $find( $event_type ); return $r ? ( $r[4] ?? '' ) : '';
+    };
+    $get_start = function ( $event_type ) use ( $find ) {
+        $r = $find( $event_type ); return $r ? ( $r[5] ?? '' ) : '';
+    };
+    $get_end = function ( $event_type ) use ( $find ) {
+        $r = $find( $event_type ); return $r ? ( $r[7] ?? '' ) : '';
+    };
+    $rows_of = function ( $event_type ) use ( $dates_rows, $show ) {
+        $out = [];
+        foreach ( $dates_rows as $r ) {
+            if ( tlt_cb_s( $r[0] ?? '' ) === $show && tlt_cb_s( $r[1] ?? '' ) === $event_type ) $out[] = $r;
+        }
+        return $out;
+    };
+    $time_range = function ( $event_type ) use ( $get_start, $get_end ) {
+        $s = tlt_cb_fmt_time( $get_start( $event_type ) );
+        $e = tlt_cb_fmt_time( $get_end( $event_type ) );
+        if ( $s === '' ) return '';
+        if ( $e === '' ) return $s;
+        return $s . ' - ' . $e;
+    };
+
+    // Cue to Cue vs Tech Run same-day check.
+    $c2c_date_raw  = $get_date( 'Cue to Cue' );
+    $tr_date_raw   = $get_date( 'Tech Run' );
+    $c2c_dt        = tlt_cb_parse_date( $c2c_date_raw );
+    $tr_dt         = tlt_cb_parse_date( $tr_date_raw );
+    $c2c_same_day  = $c2c_dt && $tr_dt && $c2c_dt->format( 'Y-m-d' ) === $tr_dt->format( 'Y-m-d' );
+    $c2c_label     = $c2c_same_day ? 'Cue to Cue & Tech Run' : 'Cue to Cue';
+
+    // Opening / closing → run dates.
+    $opening = $get_date( 'Opening Performance' );
+    $closing = $get_date( 'Closing Performance' );
+    $run_dates = ( $opening && $closing )
+        ? tlt_cb_fmt_date( $opening, false ) . ' - ' . tlt_cb_fmt_date( $closing, true )
+        : 'TBD';
+
+    // Dress rehearsals range (first row → last row).
+    $dress_rows = $rows_of( 'Dress Rehearsal' );
+    $dress_range = 'TBD';
+    if ( ! empty( $dress_rows ) ) {
+        $dress_start = $dress_rows[0][4] ?? '';
+        $dress_end   = $dress_rows[ count( $dress_rows ) - 1 ][4] ?? '';
+        if ( $dress_start && $dress_end ) {
+            $dress_range = tlt_cb_fmt_date( $dress_start, false ) . ' - ' . tlt_cb_fmt_date( $dress_end, true );
+        }
+    }
+
+    $replacements = [
+        '<<ShowName>>'             => $show,
+        '<<RunDates>>'             => $run_dates,
+        '<<SeasonLong>>'           => $season_long,
+        '<<DesignerRunDate>>'      => tlt_cb_fmt_date( $get_date( 'Designer Run' ) ),
+        '<<DesignerRunTime>>'      => $time_range( 'Designer Run' ),
+        '<<DryTechDate>>'          => tlt_cb_fmt_date( $get_date( 'Dry Tech' ) ),
+        '<<DryTechTime>>'          => $time_range( 'Dry Tech' ),
+        '<<CueToCueLabel>>'        => $c2c_label,
+        '<<CueToCueDate>>'         => tlt_cb_fmt_date( $c2c_date_raw ),
+        '<<CueToCueTime>>'         => $time_range( 'Cue to Cue' ),
+        '<<TechRunLabel>>'         => $c2c_same_day ? '' : 'Tech Run',
+        '<<TechRunDate>>'          => $c2c_same_day ? '' : tlt_cb_fmt_date( $tr_date_raw ),
+        '<<TechRunTime>>'          => $c2c_same_day ? '' : $time_range( 'Tech Run' ),
+        '<<DressRehearsalDates>>'  => $dress_range,
+        '<<ProductionMeeting1>>'   => tlt_cb_fmt_date( $get_date( 'Production Meeting 1' ) ),
+        '<<ProductionMeeting2>>'   => tlt_cb_fmt_date( $get_date( 'Production Meeting 2' ) ),
+        '<<ProductionMeeting3>>'   => tlt_cb_fmt_date( $get_date( 'Production Meeting 3' ) ),
+        '<<ProductionMeetingTime1>>' => $time_range( 'Production Meeting 1' ),
+        '<<ProductionMeetingTime2>>' => $time_range( 'Production Meeting 2' ),
+        '<<ProductionMeetingTime3>>' => $time_range( 'Production Meeting 3' ),
+        '<<DesignPacket1Date>>'    => tlt_cb_fmt_date( $get_date( 'Design Packet 1' ) ),
+        '<<DesignPacket2Date>>'    => tlt_cb_fmt_date( $get_date( 'Design Packet 2' ) ),
+        '<<CuesInCuelistDate>>'    => tlt_cb_fmt_date( $get_date( 'Cues in Cuelist' ) ),
+        '<<CuesProgrammedDate>>'   => tlt_cb_fmt_date( $get_date( 'Cues Programmed' ) ),
+        '<<CostumeParadeDate>>'    => tlt_cb_fmt_date( $get_date( 'Costume/Prop Parade/Headshots' ) ),
+        '<<QuickChangeDate>>'      => tlt_cb_fmt_date( $get_date( 'Quick change costumes / final props' ) ),
+        '<<FinalCostumesDate>>'    => tlt_cb_fmt_date( $get_date( 'Final Costumes Due' ) ),
+        '<<SetDressingDate>>'      => tlt_cb_fmt_date( $get_date( 'Set Dressing Load in' ) ),
+    ];
+
+    return [
+        'replacements'  => $replacements,
+        'c2c_same_day'  => $c2c_same_day,
+        'season_long'   => $season_long,
+        'season_row_num' => $season_row_num,
+    ];
+}
+
+/**
+ * Delete the Tech Run row from the template's schedule table when Cue to Cue
+ * and Tech Run fall on the same day. Finds the row containing the
+ * "<<TechRunLabel>>" placeholder and deletes it via Docs API deleteTableRow.
+ */
+function tlt_cb_tech_schedule_delete_tech_run_row( $doc_id ) {
+    $doc = tlt_cb_docs_get( $doc_id, 'body(content(startIndex,table(rows,columns,tableRows(tableCells(content(paragraph(elements(textRun(content))))))))))' );
+    if ( is_wp_error( $doc ) ) return $doc;
+    foreach ( ( $doc['body']['content'] ?? [] ) as $el ) {
+        if ( empty( $el['table'] ) ) continue;
+        $table_start = $el['startIndex'] ?? null;
+        if ( $table_start === null ) continue;
+        $rows = $el['table']['tableRows'] ?? [];
+        foreach ( $rows as $ri => $row ) {
+            $row_text = '';
+            foreach ( ( $row['tableCells'] ?? [] ) as $cell ) {
+                foreach ( ( $cell['content'] ?? [] ) as $item ) {
+                    foreach ( ( $item['paragraph']['elements'] ?? [] ) as $pe ) {
+                        $row_text .= $pe['textRun']['content'] ?? '';
+                    }
+                }
+            }
+            if ( strpos( $row_text, '<<TechRunLabel>>' ) !== false ) {
+                return tlt_cb_docs_batch_update( $doc_id, [
+                    [ 'deleteTableRow' => [
+                        'tableCellLocation' => [
+                            'tableStartLocation' => [ 'index' => $table_start ],
+                            'rowIndex'           => $ri,
+                            'columnIndex'        => 0,
+                        ],
+                    ] ],
+                ] );
+            }
+        }
+    }
+    return true;
+}
+
+/**
+ * Public entry point for /tech-schedule-generate.  Deletes existing docs with
+ * the same name (mimics GAS "delete then regenerate" behavior — GAS didn't
+ * have a separate view/regen split for tech schedules), copies template,
+ * conditionally deletes Tech Run row, replaces tags, caches URL in Season N.
+ */
+function tlt_cb_tech_schedule_generate( $show ) {
+    $data = tlt_cb_tech_schedule_assemble( $show );
+    if ( is_wp_error( $data ) ) return $data;
+    if ( $data['season_long'] === '' ) return new WP_Error( 'no_season_long', 'Season "Current Season Long" is empty.' );
+
+    $doc_name = $show . ' - ' . $data['season_long'] . ' Tech Schedule';
+
+    // Delete any existing (matches GAS behavior of always regenerating fresh).
+    $existing = tlt_cb_drive_find_in_folder( TLT_CALLBOARD_TS_FOLDER_ID, $doc_name );
+    if ( is_wp_error( $existing ) ) return $existing;
+    foreach ( $existing as $f ) tlt_cb_drive_trash( $f['id'] );
+
+    $file = tlt_cb_drive_copy( TLT_CALLBOARD_TS_TEMPLATE_ID, TLT_CALLBOARD_TS_FOLDER_ID, $doc_name );
+    if ( is_wp_error( $file ) ) return $file;
+    $doc_id = $file['id'];
+
+    // If C2C and Tech Run same-day, drop the Tech Run row BEFORE substituting
+    // — otherwise the deleted row would just show up as blank.
+    if ( $data['c2c_same_day'] ) {
+        $r = tlt_cb_tech_schedule_delete_tech_run_row( $doc_id );
+        if ( is_wp_error( $r ) ) return $r;
+    }
+
+    // Build one big batchUpdate with all replaceAllText requests.
+    $requests = [];
+    foreach ( $data['replacements'] as $tag => $value ) {
+        $requests[] = [
+            'replaceAllText' => [
+                'containsText' => [ 'text' => $tag, 'matchCase' => true ],
+                'replaceText'  => (string) $value,
+            ],
+        ];
+    }
+    $r = tlt_cb_docs_batch_update( $doc_id, $requests );
+    if ( is_wp_error( $r ) ) return $r;
+
+    $url = tlt_cb_doc_url( $doc_id );
+    // Season col N = 14 (1-based) is Tech Schedule cache.
+    if ( $data['season_row_num'] > 0 ) {
+        tlt_callboard_sheets_write( TLT_CALLBOARD_SHEET_ID, "Season!N{$data['season_row_num']}", [[ $url ]] );
+    }
+    return [ 'url' => $url ];
+}
+
+/* -----  Endpoint  --------------------------------------------------------- */
+
+/**
+ * POST /tech-schedule-generate  { show }
+ * Always regenerates (mirrors GAS default). Trashes prior and returns { url }.
+ */
+function tlt_callboard_ep_tech_schedule_generate( WP_REST_Request $req ) {
+    $body = $req->get_json_params();
+    $show = tlt_cb_s( is_array( $body ) ? ( $body['show'] ?? '' ) : '' );
+    if ( $show === '' ) return new WP_Error( 'missing_show', 'show is required', [ 'status' => 400 ] );
+    $r = tlt_cb_tech_schedule_generate( $show );
+    if ( is_wp_error( $r ) ) return $r;
+    return tlt_cb_ok( $r );
+}
+
+/* ===========================================================================
+ * ============  BIOS DOC COMPILATION  =======================================
+ *
+ * Port of BiosManager.js compileBiosDoc(). Creates a fresh Doc (no template),
+ * moves it into a per-season subfolder under BIOS_FOLDER_ID, and lays out
+ * Production Team + Cast sections with per-person bio paragraphs.
+ * ======================================================================== */
+
+/**
+ * Static role → bio-type mapping. Anything not listed defaults to 'designer'.
+ * Matches BiosManager.js line 122-132.
+ */
+function tlt_cb_bios_role_to_bio_type( $role ) {
+    static $map = [
+        'Director'            => 'director',
+        'Choreographer'       => 'director',
+        'Fight Choreographer' => 'director',
+        'Music Director'      => 'director',
+        'Intimacy Director'   => 'director',
+        'Lighting Designer'   => 'designer',
+        'Sound Designer'      => 'designer',
+        'Scenic Designer'     => 'designer',
+        'Costume Designer'    => 'designer',
+        'Properties Manager'  => 'designer',
+        'Scenic Artist'       => 'designer',
+        'Stage Manager'       => 'designer',
+        'Assistant Stage Manager' => 'designer',
+        'Dialect Coach'       => 'designer',
+        'Dramaturg'           => 'designer',
+    ];
+    return $map[ $role ] ?? 'designer';
+}
+
+/**
+ * Compile bios data for a show. Returns:
+ *  { team_entries: [...], actor_entries: [...], season_long: string, season_row_num: int }
+ * Each entry: { firstName, middleName, lastName, suffix, role, bioText }
+ * Only entries with a non-empty bioText are included.
+ */
+function tlt_cb_bios_assemble( $show ) {
+    $ranges = tlt_callboard_sheets_get( TLT_CALLBOARD_SHEET_ID, [
+        'Season!A1:N',
+        'Production Teams!A2:F',
+        'Actors!A2:F',
+    ] );
+    if ( is_wp_error( $ranges ) ) return $ranges;
+    $season_rows = $ranges['Season!A1:N']            ?? [];
+    $team_rows   = $ranges['Production Teams!A2:F'] ?? [];
+    $actor_rows  = $ranges['Actors!A2:F']            ?? [];
+
+    $season_long   = tlt_cb_season_setting( $season_rows, 'Current Season Long' );
+    $season_row_num = 0;
+    foreach ( $season_rows as $i => $r ) {
+        if ( tlt_cb_s( $r[1] ?? '' ) === $show ) { $season_row_num = $i + 1; break; }
+    }
+
+    // Contactbook data — separate spreadsheet.
+    $cb_ranges = tlt_callboard_sheets_get( TLT_CALLBOARD_CONTACTBOOK_ID, [
+        'Contactbook!A2:H',
+        'Bios!A2:F',
+    ] );
+    if ( is_wp_error( $cb_ranges ) ) return $cb_ranges;
+    $cb_rows   = $cb_ranges['Contactbook!A2:H'] ?? [];
+    $bios_rows = $cb_ranges['Bios!A2:F']        ?? [];
+
+    // Name → contactId lookup (first+last, case-insensitive).
+    $contact_id_lookup = [];
+    foreach ( $cb_rows as $r ) {
+        $first = strtolower( tlt_cb_s( $r[1] ?? '' ) );
+        $last  = strtolower( tlt_cb_s( $r[3] ?? '' ) );
+        if ( $first === '' ) continue;
+        $key = $first . '|' . $last;
+        if ( ! isset( $contact_id_lookup[ $key ] ) ) $contact_id_lookup[ $key ] = tlt_cb_s( $r[0] ?? '' );
+    }
+
+    // ContactId → bio row lookup.
+    $bio_row_by_id = [];
+    foreach ( $bios_rows as $r ) {
+        $id = tlt_cb_s( $r[0] ?? '' );
+        if ( $id !== '' && ! isset( $bio_row_by_id[ $id ] ) ) $bio_row_by_id[ $id ] = $r;
+    }
+    $bio_col_by_type = [ 'actor' => 1, 'director' => 3, 'designer' => 5 ];
+
+    $get_bio_text = function ( $first, $last, $bio_type ) use ( $contact_id_lookup, $bio_row_by_id, $bio_col_by_type ) {
+        $key = strtolower( $first ) . '|' . strtolower( $last );
+        $id  = $contact_id_lookup[ $key ] ?? '';
+        if ( $id === '' || ! isset( $bio_row_by_id[ $id ] ) ) return '';
+        $col = $bio_col_by_type[ $bio_type ] ?? null;
+        if ( $col === null ) return '';
+        return tlt_cb_s( $bio_row_by_id[ $id ][ $col ] ?? '' );
+    };
+
+    // Production team — merge duplicate rows by lastname|firstname.
+    $team_map = [];
+    foreach ( $team_rows as $r ) {
+        if ( tlt_cb_s( $r[0] ?? '' ) !== $show ) continue;
+        $first = tlt_cb_s( $r[2] ?? '' );
+        if ( $first === '' ) continue;
+        $last  = tlt_cb_s( $r[4] ?? '' );
+        $mid   = tlt_cb_s( $r[3] ?? '' );
+        $suf   = tlt_cb_s( $r[5] ?? '' );
+        $role  = tlt_cb_s( $r[1] ?? '' );
+        $bio_type = tlt_cb_bios_role_to_bio_type( $role );
+        $key   = strtolower( $last ) . '|' . strtolower( $first );
+        if ( isset( $team_map[ $key ] ) ) {
+            $team_map[ $key ]['role'] .= ' / ' . $role;
+            if ( $bio_type === 'director' ) $team_map[ $key ]['bio_type'] = 'director';
+        } else {
+            $team_map[ $key ] = [
+                'firstName' => $first,
+                'middleName' => $mid,
+                'lastName'  => $last,
+                'suffix'    => $suf,
+                'role'      => $role,
+                'bio_type'  => $bio_type,
+            ];
+        }
+    }
+
+    $team_entries = [];
+    foreach ( $team_map as $e ) {
+        $bio = $get_bio_text( $e['firstName'], $e['lastName'], $e['bio_type'] );
+        if ( $bio === '' ) continue;
+        $team_entries[] = [
+            'firstName'  => $e['firstName'],
+            'middleName' => $e['middleName'],
+            'lastName'   => $e['lastName'],
+            'suffix'     => $e['suffix'],
+            'role'       => $e['role'],
+            'bioText'    => $bio,
+        ];
+    }
+    usort( $team_entries, function ( $a, $b ) { return strcmp( $a['lastName'], $b['lastName'] ); } );
+
+    // Actors — Actors sheet col A=show, B=character, C=first, D=middle, E=last, F=suffix.
+    $actor_entries = [];
+    foreach ( $actor_rows as $r ) {
+        if ( tlt_cb_s( $r[0] ?? '' ) !== $show ) continue;
+        $first = tlt_cb_s( $r[2] ?? '' );
+        if ( $first === '' ) continue;
+        $last  = tlt_cb_s( $r[4] ?? '' );
+        $mid   = tlt_cb_s( $r[3] ?? '' );
+        $char  = tlt_cb_s( $r[1] ?? '' );
+        $bio   = $get_bio_text( $first, $last, 'actor' );
+        if ( $bio === '' ) continue;
+        $actor_entries[] = [
+            'firstName'  => $first,
+            'middleName' => $mid,
+            'lastName'   => $last,
+            'suffix'     => '',
+            'role'       => $char,
+            'bioText'    => $bio,
+        ];
+    }
+    usort( $actor_entries, function ( $a, $b ) { return strcmp( $a['lastName'], $b['lastName'] ); } );
+
+    return [
+        'team_entries'   => $team_entries,
+        'actor_entries'  => $actor_entries,
+        'season_long'    => $season_long,
+        'season_row_num' => $season_row_num,
+    ];
+}
+
+/**
+ * Build the bio doc content into a freshly-created Docs document.
+ * Inserts everything at the top and tracks running end index.
+ */
+function tlt_cb_bios_build_doc( $doc_id, $show, $season_long, array $team_entries, array $actor_entries ) {
+    // ------ Phase 1: margins + title + subtitle + section headers -------
+    // Layout (top-to-bottom):
+    //   title    : "SHOW — Bios" (font 14 bold centered)
+    //   subtitle : season long (font 11 centered, 16pt after)
+    //   "Production Team" (font 11 bold, 18pt before if team empty=false, 6pt after)
+    //     For each entry:
+    //       "First Middle Last Suffix (Role)" (font 10, 10pt before between entries)
+    //       bioText (font 10, 2pt before)
+    //   "Cast" (font 11 bold, 18pt before if team empty=false, 6pt after)
+    //     Same per-entry pattern.
+
+    $lines = [];
+
+    // Compose flat line list with per-line style hints.
+    $push = function ( $text, $style = [] ) use ( &$lines ) {
+        $lines[] = [ 'text' => $text, 'style' => $style ];
+    };
+
+    $push( $show . ' — Bios', [
+        'font' => 14, 'bold' => true, 'align' => 'CENTER', 'after' => 4,
+    ] );
+    $push( $season_long, [
+        'font' => 11, 'bold' => false, 'align' => 'CENTER', 'after' => 16,
+    ] );
+
+    if ( ! empty( $team_entries ) ) {
+        $push( 'Production Team', [
+            'font' => 11, 'bold' => true, 'align' => 'START', 'before' => 0, 'after' => 6,
+        ] );
+        foreach ( $team_entries as $i => $e ) {
+            $name_parts = array_filter( [ $e['firstName'], $e['middleName'], $e['lastName'], $e['suffix'] ], function ( $x ) { return $x !== ''; } );
+            $full_name  = implode( ' ', $name_parts ) . ( $e['role'] !== '' ? ' (' . $e['role'] . ')' : '' );
+            $push( $full_name, [ 'font' => 10, 'bold' => false, 'before' => $i === 0 ? 0 : 10 ] );
+            $push( $e['bioText'], [ 'font' => 10, 'bold' => false, 'italic' => false, 'before' => 2 ] );
+        }
+    }
+
+    if ( ! empty( $actor_entries ) ) {
+        $before = ! empty( $team_entries ) ? 18 : 0;
+        $push( 'Cast', [ 'font' => 11, 'bold' => true, 'align' => 'START', 'before' => $before, 'after' => 6 ] );
+        foreach ( $actor_entries as $i => $e ) {
+            $name_parts = array_filter( [ $e['firstName'], $e['middleName'], $e['lastName'], $e['suffix'] ], function ( $x ) { return $x !== ''; } );
+            $full_name  = implode( ' ', $name_parts ) . ( $e['role'] !== '' ? ' (' . $e['role'] . ')' : '' );
+            $push( $full_name, [ 'font' => 10, 'bold' => false, 'before' => $i === 0 ? 0 : 10 ] );
+            $push( $e['bioText'], [ 'font' => 10, 'bold' => false, 'italic' => false, 'before' => 2 ] );
+        }
+    }
+
+    // Build reverse-order insert requests (each inserts at index 1).
+    $insert_reqs = [];
+    for ( $i = count( $lines ) - 1; $i >= 0; $i-- ) {
+        $insert_reqs[] = [ 'insertText' => [ 'location' => [ 'index' => 1 ], 'text' => $lines[ $i ]['text'] . "\n" ] ];
+    }
+
+    // Compute line ranges after all inserts settled.
+    $ranges = [];
+    $cursor = 1;
+    foreach ( $lines as $line ) {
+        $len = strlen( $line['text'] );
+        $ranges[] = [ 'text_start' => $cursor, 'text_end' => $cursor + $len, 'para_end' => $cursor + $len + 1 ];
+        $cursor += $len + 1;
+    }
+
+    // Margins: top/bottom 36pt, left/right 54pt (matches GAS).
+    $requests = [
+        [ 'updateDocumentStyle' => [
+            'documentStyle' => [
+                'marginTop'    => [ 'magnitude' => 36, 'unit' => 'PT' ],
+                'marginBottom' => [ 'magnitude' => 36, 'unit' => 'PT' ],
+                'marginLeft'   => [ 'magnitude' => 54, 'unit' => 'PT' ],
+                'marginRight'  => [ 'magnitude' => 54, 'unit' => 'PT' ],
+            ],
+            'fields' => 'marginTop,marginBottom,marginLeft,marginRight',
+        ] ],
+    ];
+    $requests = array_merge( $requests, $insert_reqs );
+
+    // Style each line.
+    foreach ( $lines as $i => $line ) {
+        $s     = $ranges[ $i ]['text_start'];
+        $e     = $ranges[ $i ]['text_end'];
+        $pe    = $ranges[ $i ]['para_end'];
+        $style = $line['style'];
+
+        if ( $e > $s ) {
+            $text_style = [];
+            $text_fields = [];
+            if ( isset( $style['font'] ) )   { $text_style['fontSize'] = [ 'magnitude' => $style['font'], 'unit' => 'PT' ]; $text_fields[] = 'fontSize'; }
+            if ( isset( $style['bold'] ) )   { $text_style['bold']     = (bool) $style['bold']; $text_fields[] = 'bold'; }
+            if ( isset( $style['italic'] ) ) { $text_style['italic']   = (bool) $style['italic']; $text_fields[] = 'italic'; }
+            if ( ! empty( $text_style ) ) {
+                $requests[] = [ 'updateTextStyle' => [
+                    'range' => tlt_cb_docs_range( $s, $e ),
+                    'textStyle' => $text_style,
+                    'fields' => implode( ',', $text_fields ),
+                ] ];
+            }
+        }
+
+        $para_style  = [];
+        $para_fields = [];
+        if ( isset( $style['align'] ) )  { $para_style['alignment']  = $style['align'];                            $para_fields[] = 'alignment'; }
+        if ( isset( $style['before'] ) ) { $para_style['spaceAbove'] = [ 'magnitude' => (int) $style['before'], 'unit' => 'PT' ]; $para_fields[] = 'spaceAbove'; }
+        if ( isset( $style['after'] ) )  { $para_style['spaceBelow'] = [ 'magnitude' => (int) $style['after'],  'unit' => 'PT' ]; $para_fields[] = 'spaceBelow'; }
+        if ( ! empty( $para_style ) ) {
+            $requests[] = [ 'updateParagraphStyle' => [
+                'range' => tlt_cb_docs_range( $s, $pe ),
+                'paragraphStyle' => $para_style,
+                'fields' => implode( ',', $para_fields ),
+            ] ];
+        }
+    }
+
+    return tlt_cb_docs_batch_update( $doc_id, $requests );
+}
+
+/**
+ * Entry point: assemble → find/create per-season subfolder → trash existing
+ * doc with same name → create new doc → move to folder → build content →
+ * cache URL in Season col L (12).
+ */
+function tlt_cb_bios_doc_compile( $show ) {
+    $data = tlt_cb_bios_assemble( $show );
+    if ( is_wp_error( $data ) ) return $data;
+    if ( $data['season_long'] === '' ) return new WP_Error( 'no_season_long', 'Season "Current Season Long" is empty.' );
+    if ( empty( $data['team_entries'] ) && empty( $data['actor_entries'] ) ) {
+        return new WP_Error( 'no_bios', 'No submitted bios found for ' . $show . '.' );
+    }
+
+    $season_folder_id = tlt_cb_drive_folder_or_create( TLT_CALLBOARD_BIOS_FOLDER_ID, $data['season_long'] );
+    if ( is_wp_error( $season_folder_id ) ) return $season_folder_id;
+
+    // Note: GAS docName uses em-dash "—" between show and season.
+    $doc_name = $show . ' — ' . $data['season_long'] . ' Bios';
+    $existing = tlt_cb_drive_find_in_folder( $season_folder_id, $doc_name );
+    if ( is_wp_error( $existing ) ) return $existing;
+    foreach ( $existing as $f ) tlt_cb_drive_trash( $f['id'] );
+
+    $doc_id = tlt_cb_docs_create( $doc_name, $season_folder_id );
+    if ( is_wp_error( $doc_id ) ) return $doc_id;
+
+    $r = tlt_cb_bios_build_doc( $doc_id, $show, $data['season_long'], $data['team_entries'], $data['actor_entries'] );
+    if ( is_wp_error( $r ) ) return $r;
+
+    $url = tlt_cb_doc_url( $doc_id );
+    if ( $data['season_row_num'] > 0 ) {
+        tlt_callboard_sheets_write( TLT_CALLBOARD_SHEET_ID, "Season!L{$data['season_row_num']}", [[ $url ]] );
+    }
+    $count = count( $data['team_entries'] ) + count( $data['actor_entries'] );
+    return [ 'url' => $url, 'count' => $count ];
+}
+
+/* ===========================================================================
+ * ============  PROGRAM EXPORT  =============================================
+ *
+ * Port of ProgramExport.js.  Assembles the full "program bundle" JSON that
+ * the InDesign build script consumes, and (optionally) writes it to Drive
+ * so it can be downloaded via drive.google.com/uc?export=download&id=…
+ * ======================================================================== */
+
+if ( ! defined( 'TLT_CALLBOARD_PROGRAM_EXPORTS_PARENT_ID' ) ) {
+    // Default parent for the "TLT Program Exports" subfolder. Override in
+    // wp-config.php if Blake wants it in a different Drive location — must
+    // be shared with the SA email.
+    define( 'TLT_CALLBOARD_PROGRAM_EXPORTS_PARENT_ID', TLT_CALLBOARD_CS_FOLDER_ID );
+}
+
+/**
+ * Build the same shape as GAS getProgramData(show) — see ProgramExport.js
+ * lines 250-275. Consumed by /program (rich version) and /program-export.
+ */
+function tlt_cb_program_get_data( $show ) {
+    $ranges = tlt_callboard_sheets_get( TLT_CALLBOARD_SHEET_ID, [
+        'Season!A1:N',
+        "'Production Teams'!A2:F",
+        'Actors!A2:F',
+        'Theatre!A2:D200',
+        'Dates!A2:H',
+        'Programs!A1:Z',
+        // Show Titles is optional — a sheet that may or may not exist. Guarded below.
+    ] );
+    if ( is_wp_error( $ranges ) ) return $ranges;
+    $season_rows = $ranges['Season!A1:N']              ?? [];
+    $team_rows   = $ranges["'Production Teams'!A2:F"] ?? [];
+    $actor_rows  = $ranges['Actors!A2:F']              ?? [];
+    $theatre_rows = $ranges['Theatre!A2:D200']         ?? [];
+    $dates_rows  = $ranges['Dates!A2:H']               ?? [];
+    $prog_rows   = $ranges['Programs!A1:Z']            ?? [];
+
+    // Contactbook data for bios.
+    $cb_ranges = tlt_callboard_sheets_get( TLT_CALLBOARD_CONTACTBOOK_ID, [
+        'Contactbook!A2:H',
+        'Bios!A2:F',
+    ] );
+    if ( is_wp_error( $cb_ranges ) ) return $cb_ranges;
+    $cb_rows   = $cb_ranges['Contactbook!A2:H'] ?? [];
+    $bios_rows = $cb_ranges['Bios!A2:F']        ?? [];
+
+    // --- Programs tab (per-show editable fields) ---
+    // Column layout: A=Show B=Author C=Legal D=Act1 E=Act2 F=Intermission G=Place H=Special Thanks
+    $prog_row = [];
+    foreach ( array_slice( $prog_rows, 1 ) as $r ) {
+        if ( tlt_cb_s( $r[0] ?? '' ) === $show ) { $prog_row = $r; break; }
+    }
+    $fields = [
+        'author'        => tlt_cb_s( $prog_row[1] ?? '' ),
+        'legal'         => tlt_cb_s( $prog_row[2] ?? '' ),
+        'a1'            => tlt_cb_s( $prog_row[3] ?? '' ),
+        'a2'            => tlt_cb_s( $prog_row[4] ?? '' ),
+        'intermission'  => tlt_cb_s( $prog_row[5] ?? '' ),
+        'place'         => tlt_cb_s( $prog_row[6] ?? '' ),
+        'specialThanks' => tlt_cb_s( $prog_row[7] ?? '' ),
+    ];
+
+    // --- Director ---
+    $director = '';
+    foreach ( $team_rows as $r ) {
+        if ( tlt_cb_s( $r[0] ?? '' ) !== $show ) continue;
+        if ( tlt_cb_s( $r[1] ?? '' ) === 'Director' ) {
+            $parts = array_filter( [
+                tlt_cb_s( $r[2] ?? '' ), // first
+                tlt_cb_s( $r[3] ?? '' ), // middle
+                tlt_cb_s( $r[4] ?? '' ), // last
+                tlt_cb_s( $r[5] ?? '' ), // suffix
+            ], function ( $x ) { return $x !== ''; } );
+            $director = trim( preg_replace( '/\s+/', ' ', implode( ' ', $parts ) ) );
+            break;
+        }
+    }
+
+    // --- Run (first → last Performance in Dates) ---
+    $perf_dts = [];
+    foreach ( $dates_rows as $r ) {
+        if ( tlt_cb_s( $r[0] ?? '' ) !== $show ) continue;
+        if ( strpos( tlt_cb_s( $r[1] ?? '' ), 'Performance' ) === false ) continue;
+        $dt = tlt_cb_parse_date( $r[4] ?? '' );
+        if ( $dt ) $perf_dts[] = $dt;
+    }
+    usort( $perf_dts, function ( $a, $b ) { return $a->getTimestamp() <=> $b->getTimestamp(); } );
+    $fmt = function ( $dt ) { return $dt->format( 'F j, Y' ); };
+    $run = '';
+    if ( count( $perf_dts ) > 0 ) {
+        $first = $perf_dts[0]; $last = end( $perf_dts );
+        $run = $first->getTimestamp() === $last->getTimestamp() ? $fmt( $first ) : $fmt( $first ) . ' – ' . $fmt( $last );
+    }
+
+    // --- Staff (Theatre tab, only rows with numeric order) ---
+    $staff = [];
+    foreach ( $theatre_rows as $r ) {
+        $order_raw = $r[3] ?? '';
+        if ( $order_raw === '' || ! is_numeric( $order_raw ) ) continue;
+        $role = tlt_cb_s( $r[0] ?? '' );
+        if ( $role === '' ) continue;
+        $staff[] = [
+            'order' => (int) $order_raw,
+            'role'  => $role,
+            'name'  => tlt_cb_s( $r[1] ?? '' ),
+        ];
+    }
+    usort( $staff, function ( $a, $b ) { return $a['order'] <=> $b['order']; } );
+
+    // --- Production team (this show's roster, sheet order preserved) ---
+    $team = [];
+    foreach ( $team_rows as $r ) {
+        if ( tlt_cb_s( $r[0] ?? '' ) !== $show ) continue;
+        $role = tlt_cb_s( $r[1] ?? '' );
+        if ( $role === '' || $role === 'Role' ) continue;
+        $first = tlt_cb_s( $r[2] ?? '' );
+        $last  = tlt_cb_s( $r[4] ?? '' );
+        if ( $first === '' && $last === '' ) continue;
+        $parts = array_filter( [ $first, tlt_cb_s( $r[3] ?? '' ), $last, tlt_cb_s( $r[5] ?? '' ) ], function ( $x ) { return $x !== ''; } );
+        $team[] = [ 'role' => $role, 'name' => implode( ' ', $parts ) ];
+    }
+    // Append fixed Theatre roles.
+    foreach ( [ 'Lead Carpenter', 'Shop Technician', 'Photography' ] as $role ) {
+        foreach ( $theatre_rows as $r ) {
+            if ( tlt_cb_s( $r[0] ?? '' ) === $role ) {
+                $name = tlt_cb_s( $r[1] ?? '' );
+                if ( $name !== '' ) $team[] = [ 'role' => $role, 'name' => $name ];
+                break;
+            }
+        }
+    }
+
+    // --- Bios (data version of compileBiosDoc, keeps sheet order) ---
+    $contact_id_lookup = [];
+    foreach ( $cb_rows as $r ) {
+        $first = strtolower( tlt_cb_s( $r[1] ?? '' ) );
+        $last  = strtolower( tlt_cb_s( $r[3] ?? '' ) );
+        if ( $first === '' ) continue;
+        $key = $first . '|' . $last;
+        if ( ! isset( $contact_id_lookup[ $key ] ) ) $contact_id_lookup[ $key ] = tlt_cb_s( $r[0] ?? '' );
+    }
+    $bio_row_by_id = [];
+    foreach ( $bios_rows as $r ) {
+        $id = tlt_cb_s( $r[0] ?? '' );
+        if ( $id !== '' && ! isset( $bio_row_by_id[ $id ] ) ) $bio_row_by_id[ $id ] = $r;
+    }
+    $bio_col_by_type = [ 'actor' => 1, 'director' => 3, 'designer' => 5 ];
+
+    $get_contact_id = function ( $first, $last ) use ( $contact_id_lookup ) {
+        return $contact_id_lookup[ strtolower( $first ) . '|' . strtolower( $last ) ] ?? '';
+    };
+    $get_bio_text = function ( $contact_id, $bio_type ) use ( $bio_row_by_id, $bio_col_by_type ) {
+        if ( $contact_id === '' ) return '';
+        $col = $bio_col_by_type[ $bio_type ] ?? null;
+        if ( $col === null ) return '';
+        return tlt_cb_s( $bio_row_by_id[ $contact_id ][ $col ] ?? '' );
+    };
+    $headshot_name = function ( $first, $last ) {
+        $c = function ( $s ) { return preg_replace( '/[^A-Za-z0-9]/', '', $s ); };
+        return $c( $last ) . '_' . $c( $first ) . '.jpg';
+    };
+
+    // Team bios (merge multiple roles by lastname|firstname). Preserves order
+    // of first appearance in Production Teams.
+    $team_bio_map = [];
+    foreach ( $team_rows as $r ) {
+        if ( tlt_cb_s( $r[0] ?? '' ) !== $show ) continue;
+        $first = tlt_cb_s( $r[2] ?? '' );
+        if ( $first === '' ) continue;
+        $last  = tlt_cb_s( $r[4] ?? '' );
+        $mid   = tlt_cb_s( $r[3] ?? '' );
+        $suf   = tlt_cb_s( $r[5] ?? '' );
+        $role  = tlt_cb_s( $r[1] ?? '' );
+        $bio_type = tlt_cb_bios_role_to_bio_type( $role );
+        $key = strtolower( $last ) . '|' . strtolower( $first );
+        if ( isset( $team_bio_map[ $key ] ) ) {
+            $team_bio_map[ $key ]['role'] .= ' / ' . $role;
+            if ( $bio_type === 'director' ) $team_bio_map[ $key ]['bio_type'] = 'director';
+        } else {
+            $team_bio_map[ $key ] = [
+                'first'    => $first, 'middle' => $mid, 'last' => $last, 'suffix' => $suf,
+                'role'     => $role, 'bio_type' => $bio_type,
+            ];
+        }
+    }
+    $team_bios = [];
+    foreach ( $team_bio_map as $e ) {
+        $cid = $get_contact_id( $e['first'], $e['last'] );
+        $team_bios[] = [
+            'name'      => implode( ' ', array_filter( [ $e['first'], $e['middle'], $e['last'], $e['suffix'] ], function ( $x ) { return $x !== ''; } ) ),
+            'role'      => $e['role'],
+            'bio'       => $get_bio_text( $cid, $e['bio_type'] ),
+            'headshot'  => $headshot_name( $e['first'], $e['last'] ),
+            'contactId' => $cid,
+        ];
+    }
+
+    $cast_bios = [];
+    foreach ( $actor_rows as $r ) {
+        if ( tlt_cb_s( $r[0] ?? '' ) !== $show ) continue;
+        $first = tlt_cb_s( $r[2] ?? '' );
+        if ( $first === '' ) continue;
+        $last  = tlt_cb_s( $r[4] ?? '' );
+        $mid   = tlt_cb_s( $r[3] ?? '' );
+        $cid   = $get_contact_id( $first, $last );
+        $cast_bios[] = [
+            'name'      => implode( ' ', array_filter( [ $first, $mid, $last ], function ( $x ) { return $x !== ''; } ) ),
+            'role'      => tlt_cb_s( $r[1] ?? '' ),  // character
+            'bio'       => $get_bio_text( $cid, 'actor' ),
+            'headshot'  => $headshot_name( $first, $last ),
+            'contactId' => $cid,
+        ];
+    }
+
+    // --- Italicize titles (union of Show Titles tab + ShowList named-range shows) ---
+    $italicize = [];
+    // Try Show Titles tab (optional).
+    $show_titles_range = tlt_callboard_sheets_get( TLT_CALLBOARD_SHEET_ID, [ "'Show Titles'!A1:A" ] );
+    if ( ! is_wp_error( $show_titles_range ) ) {
+        $skip = [ 'title', 'show', 'shows', 'show title', 'show titles' ];
+        foreach ( ( $show_titles_range["'Show Titles'!A1:A"] ?? [] ) as $r ) {
+            $t = tlt_cb_s( $r[0] ?? '' );
+            if ( $t === '' || in_array( strtolower( $t ), $skip, true ) ) continue;
+            $italicize[] = $t;
+        }
+    }
+    // Merge in shows from the Season tab.
+    foreach ( $season_rows as $r ) {
+        $lbl = tlt_cb_s( $r[0] ?? '' );
+        if ( strpos( $lbl, 'Show' ) === 0 && preg_match( '/^Show\d+$/', $lbl ) ) {
+            $t = tlt_cb_s( $r[1] ?? '' );
+            if ( $t !== '' ) $italicize[] = $t;
+        }
+    }
+    $seen = []; $italicize_dedup = [];
+    foreach ( $italicize as $t ) {
+        $k = strtolower( $t );
+        if ( ! isset( $seen[ $k ] ) ) { $seen[ $k ] = true; $italicize_dedup[] = $t; }
+    }
+
+    $season_long = tlt_cb_season_setting( $season_rows, 'Current Season Long' );
+
+    return [
+        'show'   => $show,
+        'season' => $season_long,
+        'info'   => [
+            'title'         => $show,
+            'author'        => $fields['author'],
+            'director'      => $director,
+            'legal'         => $fields['legal'],
+            'run'           => $run,
+            'a1'            => $fields['a1'],
+            'a2'            => $fields['a2'],
+            'intermission'  => $fields['intermission'],
+            'place'         => $fields['place'],
+            'specialThanks' => $fields['specialThanks'],
+        ],
+        'staff'          => $staff,
+        'productionTeam' => $team,
+        'bios' => [
+            'team' => $team_bios,
+            'cast' => $cast_bios,
+        ],
+        'italicizeTitles' => $italicize_dedup,
+    ];
+}
+
+/**
+ * POST /program-export  { show }  →  { id, name, url }
+ * Writes JSON to Drive so the frontend can download via ?export=download&id=…
+ */
+function tlt_callboard_ep_program_export( WP_REST_Request $req ) {
+    $body = $req->get_json_params();
+    $show = tlt_cb_s( is_array( $body ) ? ( $body['show'] ?? '' ) : '' );
+    if ( $show === '' ) return new WP_Error( 'missing_show', 'show is required', [ 'status' => 400 ] );
+
+    $data = tlt_cb_program_get_data( $show );
+    if ( is_wp_error( $data ) ) return $data;
+    $json = wp_json_encode( $data, JSON_PRETTY_PRINT );
+
+    // Find or create the "TLT Program Exports" subfolder inside the parent.
+    $folder_id = tlt_cb_drive_folder_or_create( TLT_CALLBOARD_PROGRAM_EXPORTS_PARENT_ID, 'TLT Program Exports' );
+    if ( is_wp_error( $folder_id ) ) return $folder_id;
+
+    $file_name = $show . ' - Program.json';
+
+    // Trash any prior exports with this name.
+    $existing = tlt_cb_drive_find_in_folder( $folder_id, $file_name );
+    if ( is_wp_error( $existing ) ) return $existing;
+    foreach ( $existing as $f ) tlt_cb_drive_trash( $f['id'] );
+
+    // Multipart upload to Drive files.create.
+    $token = tlt_callboard_google_access_token();
+    if ( is_wp_error( $token ) ) return $token;
+    $boundary = 'tltcbboundary' . bin2hex( random_bytes( 6 ) );
+    $metadata = wp_json_encode( [
+        'name'     => $file_name,
+        'mimeType' => 'application/json',
+        'parents'  => [ $folder_id ],
+    ] );
+    $mp_body =
+        "--{$boundary}\r\n" .
+        "Content-Type: application/json; charset=UTF-8\r\n\r\n" .
+        $metadata . "\r\n" .
+        "--{$boundary}\r\n" .
+        "Content-Type: application/json\r\n\r\n" .
+        $json . "\r\n" .
+        "--{$boundary}--";
+
+    $resp = wp_remote_post( 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&supportsAllDrives=true&fields=id,name', [
+        'timeout' => 60,
+        'headers' => [
+            'Authorization' => 'Bearer ' . $token,
+            'Content-Type'  => 'multipart/related; boundary=' . $boundary,
+        ],
+        'body' => $mp_body,
+    ] );
+    if ( is_wp_error( $resp ) ) return $resp;
+    $body_resp = wp_remote_retrieve_body( $resp );
+    $file = json_decode( $body_resp, true );
+    if ( empty( $file['id'] ) ) return new WP_Error( 'drive_upload', "Program export upload failed: $body_resp" );
+
+    return tlt_cb_ok( [
+        'id'   => $file['id'],
+        'name' => $file['name'] ?? $file_name,
+        'url'  => 'https://drive.google.com/uc?export=download&id=' . $file['id'],
+    ] );
+}
+
+/* ===========================================================================
+ * ============  MAIL HELPER (Resend)  =======================================
+ *
+ * All outbound email — bio requests, contract send notifications, resends —
+ * goes through Resend's REST API. Blake must set TLT_CALLBOARD_RESEND_KEY in
+ * wp-config.php. If unset, the send functions return a clear WP_Error.
+ * ======================================================================== */
+
+/**
+ * @param string|array $to    recipient(s) — string or list
+ * @param string       $subject
+ * @param string       $html
+ * @param array        $opts { text?, replyTo?, bcc?, from? }
+ * @return array|WP_Error  Resend response body decoded
+ */
+function tlt_cb_send_mail( $to, $subject, $html, array $opts = [] ) {
+    if ( ! defined( 'TLT_CALLBOARD_RESEND_KEY' ) || TLT_CALLBOARD_RESEND_KEY === '' ) {
+        return new WP_Error( 'mail_not_configured',
+            'Outbound email is not configured. Add `define( "TLT_CALLBOARD_RESEND_KEY", "re_..." );` to wp-config.php.' );
+    }
+    $from     = $opts['from']    ?? TLT_CALLBOARD_MAIL_FROM;
+    $reply_to = $opts['replyTo'] ?? TLT_CALLBOARD_MAIL_REPLY_TO;
+    $bcc      = $opts['bcc']     ?? TLT_CALLBOARD_MAIL_BCC;
+    $text     = $opts['text']    ?? tlt_cb_html_to_text( $html );
+
+    $payload = [
+        'from'    => $from,
+        'to'      => is_array( $to ) ? $to : [ (string) $to ],
+        'subject' => $subject,
+        'html'    => $html,
+        'text'    => $text,
+    ];
+    if ( $reply_to !== '' ) $payload['reply_to'] = $reply_to;
+    if ( $bcc !== '' )       $payload['bcc']      = is_array( $bcc ) ? $bcc : [ $bcc ];
+
+    $resp = wp_remote_post( TLT_CALLBOARD_RESEND_URL, [
+        'timeout' => 30,
+        'headers' => [
+            'Authorization' => 'Bearer ' . TLT_CALLBOARD_RESEND_KEY,
+            'Content-Type'  => 'application/json',
+        ],
+        'body' => wp_json_encode( $payload ),
+    ] );
+    if ( is_wp_error( $resp ) ) return $resp;
+    $code = wp_remote_retrieve_response_code( $resp );
+    $body = wp_remote_retrieve_body( $resp );
+    if ( $code < 200 || $code >= 300 ) {
+        return new WP_Error( 'mail_send_http', "Resend returned $code: $body" );
+    }
+    return json_decode( $body, true );
+}
+
+/**
+ * Cheap HTML → text fallback for the text part of outbound emails.
+ */
+function tlt_cb_html_to_text( $html ) {
+    $html = preg_replace( '#<br\s*/?>#i', "\n", $html );
+    $html = preg_replace( '#</p>#i', "\n\n", $html );
+    $html = preg_replace( '#</h[1-6]>#i', "\n\n", $html );
+    $text = wp_strip_all_tags( $html, true );
+    return trim( html_entity_decode( $text, ENT_QUOTES | ENT_HTML5, 'UTF-8' ) );
+}
+
+/**
+ * Emergency Info URL derivation matches GAS (BIO_APP_URL rooted variant).
+ * If the "Emergency Info Url" Season setting isn't set, derives one from
+ * BIO_APP_URL by trimming ?query, trailing /index/index.html, then appending
+ * /emergency-info.
+ */
+function tlt_cb_emergency_info_base( $season_rows ) {
+    $emergency_url = tlt_cb_season_setting( $season_rows, 'Emergency Info Url' );
+    if ( $emergency_url !== '' ) return $emergency_url;
+    $bio_app_url = tlt_cb_season_setting( $season_rows, 'Bio App Url' );
+    if ( $bio_app_url === '' ) return '';
+    $base = preg_replace( '/\?.*$/', '', $bio_app_url );
+    $base = preg_replace( '#/?index(\.html)?/?$#', '', $base );
+    return rtrim( $base, '/' ) . '/emergency-info';
+}
+
+/**
+ * Generate or fetch a Contactbook Bio Token. If the contact row has an empty
+ * col K (index 10), a new token is written along with col L (Token Sent Date).
+ *
+ * Returns [ 'token' => '...', 'contactbook_row_num' => int, 'primary_email' => '...' ]
+ * or WP_Error.
+ *
+ * $seed is used only for the SHA input — usually the email or contact ID so
+ * the same person gets a stable token per generation attempt.
+ */
+function tlt_cb_ensure_bio_token( $first_name, $last_name, $seed ) {
+    $cb_rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_CONTACTBOOK_ID, 'Contactbook!A2:O' );
+    if ( is_wp_error( $cb_rows ) ) return $cb_rows;
+    $target_row_num = 0;
+    $existing_token = '';
+    $primary_email  = '';
+    $first_lc = strtolower( $first_name );
+    $last_lc  = strtolower( $last_name );
+    foreach ( $cb_rows as $i => $r ) {
+        if ( strtolower( tlt_cb_s( $r[1] ?? '' ) ) === $first_lc &&
+             strtolower( tlt_cb_s( $r[3] ?? '' ) ) === $last_lc ) {
+            $target_row_num = $i + 2; // sheet is 1-based; header is row 1 (A1); A2 starts at index 0
+            $existing_token = tlt_cb_s( $r[10] ?? '' );
+            $primary_email  = tlt_cb_s( $r[7]  ?? '' );
+            break;
+        }
+    }
+    if ( $target_row_num === 0 ) {
+        return new WP_Error( 'no_contactbook_row', "No Contactbook row for {$first_name} {$last_name}." );
+    }
+    if ( $existing_token !== '' ) {
+        return [ 'token' => $existing_token, 'contactbook_row_num' => $target_row_num, 'primary_email' => $primary_email ];
+    }
+    // Generate SHA-256-based token, alphanumeric, 32 chars.
+    $hash  = hash( 'sha256', $seed . microtime( true ) . random_bytes( 8 ), true );
+    $b64   = rtrim( strtr( base64_encode( $hash ), '+/', '__' ), '=' );
+    $alnum = preg_replace( '/[^A-Za-z0-9]/', '', $b64 );
+    $token = substr( $alnum, 0, 32 );
+    $today = ( new DateTime( 'now', new DateTimeZone( 'America/Los_Angeles' ) ) )->format( 'Y-m-d' );
+    // Write cols K + L on the target row.
+    $w1 = tlt_callboard_sheets_write( TLT_CALLBOARD_CONTACTBOOK_ID, "Contactbook!K{$target_row_num}", [[ $token ]] );
+    if ( is_wp_error( $w1 ) ) return $w1;
+    $w2 = tlt_callboard_sheets_write( TLT_CALLBOARD_CONTACTBOOK_ID, "Contactbook!L{$target_row_num}", [[ $today ]] );
+    if ( is_wp_error( $w2 ) ) return $w2;
+    return [ 'token' => $token, 'contactbook_row_num' => $target_row_num, 'primary_email' => $primary_email ];
+}
+
+/**
+ * Build the single-show bio request email HTML. Matches the visual layout of
+ * ContractGenerator.js sendBioRequestEmail (contents are the port surface —
+ * this is the "welcome to the show" email with bio + emergency info + comp
+ * code + SM info + show folder link).
+ *
+ * $ctx : associative context
+ *   - fullName, firstName
+ *   - show
+ *   - role                (skips show-folder block when === 'Actor')
+ *   - season              (short: "26-27")
+ *   - bioLink, emergencyLink
+ *   - handbookUrl
+ *   - showFolderUrl       (may be '')
+ *   - smName, smEmail
+ *   - compCode, compCode2
+ *   - contactEmail        (footer mailto)
+ */
+function tlt_cb_bio_email_html( array $ctx ) {
+    $red = '#a2242a';
+    $show = htmlspecialchars( $ctx['show'] ?? '', ENT_QUOTES );
+    $first = htmlspecialchars( $ctx['firstName'] ?? '', ENT_QUOTES );
+    $bio_link = htmlspecialchars( $ctx['bioLink'] ?? '', ENT_QUOTES );
+    $emg_link = htmlspecialchars( $ctx['emergencyLink'] ?? '', ENT_QUOTES );
+    $handbook = htmlspecialchars( $ctx['handbookUrl'] ?? '', ENT_QUOTES );
+    $folder   = trim( (string) ( $ctx['showFolderUrl'] ?? '' ) );
+    $sm_name  = htmlspecialchars( $ctx['smName']  ?? '', ENT_QUOTES );
+    $sm_email = htmlspecialchars( $ctx['smEmail'] ?? '', ENT_QUOTES );
+    $comp     = htmlspecialchars( $ctx['compCode']  ?? '', ENT_QUOTES );
+    $comp2    = htmlspecialchars( $ctx['compCode2'] ?? '', ENT_QUOTES );
+    $role     = tlt_cb_s( $ctx['role'] ?? '' );
+    $footer_email = htmlspecialchars( $ctx['contactEmail'] ?? 'tlt@tacomalittletheatre.com', ENT_QUOTES );
+
+    $btn = function ( $url, $label ) use ( $red ) {
+        if ( $url === '' ) return '';
+        return '<a href="' . $url . '" style="display:inline-block; padding:11px 20px; margin:6px 6px 6px 0; background:' . $red . '; color:#fff; text-decoration:none; border-radius:4px; font-weight:600; font-size:14px;">' . $label . '</a>';
+    };
+
+    $show_folder_block = '';
+    if ( $folder !== '' && strcasecmp( $role, 'Actor' ) !== 0 ) {
+        $folder_esc = htmlspecialchars( $folder, ENT_QUOTES );
+        $show_folder_block =
+            '<p style="margin:16px 0 4px; font-size:14px;"><strong>Show Drive folder</strong> (design docs, rehearsal notes, etc.):</p>' .
+            '<p style="margin:0 0 12px; font-size:14px;">' . $btn( $folder_esc, 'Open Show Folder' ) . '</p>';
+    }
+
+    $sm_block = '';
+    if ( $sm_name !== '' || $sm_email !== '' ) {
+        $sm_block = '<p style="margin:14px 0 6px; font-size:14px;"><strong>Your stage manager:</strong> ' . $sm_name;
+        if ( $sm_email !== '' ) $sm_block .= ' &lt;<a href="mailto:' . $sm_email . '" style="color:' . $red . ';">' . $sm_email . '</a>&gt;';
+        $sm_block .= '</p>';
+    }
+
+    $comp_block = '';
+    if ( $comp !== '' ) {
+        $comp_block = '<p style="margin:14px 0 4px; font-size:14px;"><strong>Comp code:</strong> <code style="background:#f5f5f5; padding:2px 6px; border-radius:3px;">' . $comp . '</code></p>';
+    }
+    if ( $comp2 !== '' ) {
+        $comp_block .= '<p style="margin:4px 0; font-size:14px;"><strong>Future-shows comp code:</strong> <code style="background:#f5f5f5; padding:2px 6px; border-radius:3px;">' . $comp2 . '</code></p>';
+    }
+
+    return
+        '<div style="font-family:Arial,Helvetica,sans-serif; max-width:640px; margin:auto; color:#222; line-height:1.5;">' .
+        '<div style="background:' . $red . '; color:#fff; padding:18px 20px; font-size:19px; font-weight:600;">Welcome to <em>' . $show . '</em></div>' .
+        '<div style="padding:22px 20px; font-size:14px;">' .
+        '<p style="margin:0 0 12px;">Hi ' . $first . ',</p>' .
+        '<p style="margin:0 0 12px;">Your Tacoma Little Theatre contract for <em>' . $show . '</em> has been sent to your inbox for signature. Once you\'ve signed, please take a minute to fill out the two forms below.</p>' .
+        '<p style="margin:0 0 12px; color:#666; font-size:12px;">If either link doesn\'t open in your normal browser, try Firefox / Safari or a private/incognito window.</p>' .
+        '<p style="margin:16px 0 4px; font-size:14px;"><strong>Your bio</strong> — for the program:</p>' .
+        '<p style="margin:0 0 12px;">' . $btn( $bio_link, 'Submit Bio' ) . '</p>' .
+        '<p style="margin:16px 0 4px; font-size:14px;"><strong>Emergency &amp; medical info</strong> — for the SM and safety captain:</p>' .
+        '<p style="margin:0 0 12px;">' . $btn( $emg_link, 'Submit Emergency Info' ) . '</p>' .
+        '<p style="margin:16px 0 4px; font-size:14px;"><strong>Cast &amp; Crew Handbook</strong>:</p>' .
+        '<p style="margin:0 0 12px;">' . $btn( $handbook, 'Read Handbook' ) . '</p>' .
+        $show_folder_block .
+        $sm_block .
+        $comp_block .
+        '<p style="margin:24px 0 0; font-size:13px; color:#666;">Questions? Reply to this email or reach us at <a href="mailto:' . $footer_email . '" style="color:' . $red . ';">' . $footer_email . '</a>.</p>' .
+        '</div></div>';
+}
+
+/**
+ * Combined-contract version of the bio email. Replaces the per-show blocks
+ * with a season reference table (one row per show).
+ *
+ * $ctx.perShow = [ [ 'show' => '...', 'folder' => '...', 'smName' => '...', 'smEmail' => '...', 'compCode' => '...', 'compCode2' => '...' ], ... ]
+ */
+function tlt_cb_combined_bio_email_html( array $ctx ) {
+    $red   = '#a2242a';
+    $first = htmlspecialchars( $ctx['firstName']       ?? '', ENT_QUOTES );
+    $shows_display = htmlspecialchars( $ctx['showsDisplay'] ?? '', ENT_QUOTES );
+    $bio_link = htmlspecialchars( $ctx['bioLink']       ?? '', ENT_QUOTES );
+    $emg_link = htmlspecialchars( $ctx['emergencyLink'] ?? '', ENT_QUOTES );
+    $handbook = htmlspecialchars( $ctx['handbookUrl']   ?? '', ENT_QUOTES );
+    $footer_email = htmlspecialchars( $ctx['contactEmail'] ?? 'tlt@tacomalittletheatre.com', ENT_QUOTES );
+    $per_show = $ctx['perShow'] ?? [];
+    $role     = tlt_cb_s( $ctx['role'] ?? '' );
+    $skip_folder = strcasecmp( $role, 'Actor' ) === 0;
+
+    $btn = function ( $url, $label ) use ( $red ) {
+        if ( $url === '' ) return '';
+        return '<a href="' . $url . '" style="display:inline-block; padding:11px 20px; margin:6px 6px 6px 0; background:' . $red . '; color:#fff; text-decoration:none; border-radius:4px; font-weight:600; font-size:14px;">' . $label . '</a>';
+    };
+
+    $rows_html = '';
+    foreach ( $per_show as $ps ) {
+        $show_esc  = htmlspecialchars( $ps['show'] ?? '', ENT_QUOTES );
+        $folder    = trim( (string) ( $ps['folder'] ?? '' ) );
+        $folder_html = ( $folder !== '' && ! $skip_folder )
+            ? '<a href="' . htmlspecialchars( $folder, ENT_QUOTES ) . '" style="color:' . $red . ';">Show folder</a>' : '';
+        $sm_name  = htmlspecialchars( $ps['smName']  ?? '', ENT_QUOTES );
+        $sm_email = htmlspecialchars( $ps['smEmail'] ?? '', ENT_QUOTES );
+        $sm_html  = $sm_name;
+        if ( $sm_email !== '' ) $sm_html .= '<br><a href="mailto:' . $sm_email . '" style="color:' . $red . '; font-size:12px;">' . $sm_email . '</a>';
+        $comp   = htmlspecialchars( $ps['compCode']  ?? '', ENT_QUOTES );
+        $comp2  = htmlspecialchars( $ps['compCode2'] ?? '', ENT_QUOTES );
+        $rows_html .=
+            '<tr style="border-top:1px solid #eee;">' .
+            '<td style="padding:10px 8px; vertical-align:top;"><strong>' . $show_esc . '</strong><br>' . $folder_html . '</td>' .
+            '<td style="padding:10px 8px; vertical-align:top;">' . $sm_html . '</td>' .
+            '<td style="padding:10px 8px; vertical-align:top; font-family:monospace;">' . $comp . '</td>' .
+            '<td style="padding:10px 8px; vertical-align:top; font-family:monospace;">' . $comp2 . '</td>' .
+            '</tr>';
+    }
+
+    return
+        '<div style="font-family:Arial,Helvetica,sans-serif; max-width:680px; margin:auto; color:#222; line-height:1.5;">' .
+        '<div style="background:' . $red . '; color:#fff; padding:18px 20px; font-size:19px; font-weight:600;">Welcome to ' . $shows_display . '</div>' .
+        '<div style="padding:22px 20px; font-size:14px;">' .
+        '<p style="margin:0 0 12px;">Hi ' . $first . ',</p>' .
+        '<p style="margin:0 0 12px;">Your combined Tacoma Little Theatre contract covering <em>' . $shows_display . '</em> has been sent for signature. When you\'ve signed, please fill out the two forms below (once — they cover all shows).</p>' .
+        '<p style="margin:0 0 12px; color:#666; font-size:12px;">If either link doesn\'t open in your normal browser, try Firefox / Safari or a private/incognito window.</p>' .
+        '<p style="margin:16px 0 4px; font-size:14px;"><strong>Your bio</strong> — for the program:</p>' .
+        '<p style="margin:0 0 12px;">' . $btn( $bio_link, 'Submit Bio' ) . '</p>' .
+        '<p style="margin:16px 0 4px; font-size:14px;"><strong>Emergency &amp; medical info</strong>:</p>' .
+        '<p style="margin:0 0 12px;">' . $btn( $emg_link, 'Submit Emergency Info' ) . '</p>' .
+        '<p style="margin:16px 0 4px; font-size:14px;"><strong>Cast &amp; Crew Handbook</strong>:</p>' .
+        '<p style="margin:0 0 12px;">' . $btn( $handbook, 'Read Handbook' ) . '</p>' .
+        '<h3 style="margin:20px 0 8px; font-size:15px; color:' . $red . ';">Season reference</h3>' .
+        '<table style="border-collapse:collapse; width:100%; font-size:13px;">' .
+        '<thead><tr style="border-bottom:2px solid ' . $red . '; text-align:left;">' .
+        '<th style="padding:8px;">Show</th><th style="padding:8px;">Stage Manager</th><th style="padding:8px;">Comp Code</th><th style="padding:8px;">Future-Shows Comp Code</th>' .
+        '</tr></thead><tbody>' . $rows_html . '</tbody></table>' .
+        '<p style="margin:24px 0 0; font-size:13px; color:#666;">Questions? Reply to this email or reach us at <a href="mailto:' . $footer_email . '" style="color:' . $red . ';">' . $footer_email . '</a>.</p>' .
+        '</div></div>';
+}
+
+/**
+ * Bio email for a single show — assembles context from the sheet, then sends.
+ * Called after successful contract send (or from resend/bulk-request paths).
+ */
+function tlt_cb_send_bio_request_email( $email, $full_name, $first_name, $last_name, $show, $role ) {
+    if ( trim( (string) $email ) === '' ) {
+        return new WP_Error( 'no_email', "No email on file for $full_name." );
+    }
+    $ranges = tlt_callboard_sheets_get( TLT_CALLBOARD_SHEET_ID, [
+        'Season!A1:N',
+        "'Production Teams'!A2:E",
+    ] );
+    if ( is_wp_error( $ranges ) ) return $ranges;
+    $season_rows = $ranges['Season!A1:N']            ?? [];
+    $team_rows   = $ranges["'Production Teams'!A2:E"] ?? [];
+
+    $season = tlt_cb_season_setting( $season_rows, 'Current Season' );
+    // Find this show's Season row (SM email, comp codes, folder URL).
+    $sm_email = ''; $comp = ''; $comp2 = ''; $folder = '';
+    foreach ( $season_rows as $r ) {
+        if ( tlt_cb_s( $r[1] ?? '' ) === $show ) {
+            $comp     = tlt_cb_s( $r[2]  ?? '' );
+            $comp2    = tlt_cb_s( $r[3]  ?? '' );
+            $sm_email = tlt_cb_s( $r[4]  ?? '' );
+            $folder   = tlt_cb_s( $r[10] ?? '' );  // col K
+            break;
+        }
+    }
+    // Look up Stage Manager name for this show from Production Teams.
+    $sm_name = '';
+    foreach ( $team_rows as $r ) {
+        if ( tlt_cb_s( $r[0] ?? '' ) === $show && tlt_cb_s( $r[1] ?? '' ) === 'Stage Manager' ) {
+            $sm_name = trim( tlt_cb_s( $r[2] ?? '' ) . ' ' . tlt_cb_s( $r[4] ?? '' ) );
+            break;
+        }
+    }
+
+    $tok = tlt_cb_ensure_bio_token( $first_name, $last_name, $email );
+    if ( is_wp_error( $tok ) ) return $tok;
+    $bio_app_url = tlt_cb_season_setting( $season_rows, 'Bio App Url' );
+    if ( $bio_app_url === '' ) return new WP_Error( 'no_bio_app', 'Bio App Url not set in Season config.' );
+    $bio_link = $bio_app_url . '?token=' . rawurlencode( $tok['token'] ) . '&show=' . rawurlencode( $show );
+    $emergency_base = tlt_cb_emergency_info_base( $season_rows );
+    $emergency_link = $emergency_base !== '' ? $emergency_base . '?token=' . rawurlencode( $tok['token'] ) : '';
+
+    $html = tlt_cb_bio_email_html( [
+        'fullName' => $full_name, 'firstName' => $first_name,
+        'show' => $show, 'role' => $role, 'season' => $season,
+        'bioLink' => $bio_link, 'emergencyLink' => $emergency_link,
+        'handbookUrl'   => TLT_CALLBOARD_HANDBOOK_URL,
+        'showFolderUrl' => $folder,
+        'smName' => $sm_name, 'smEmail' => $sm_email,
+        'compCode' => $comp, 'compCode2' => $comp2,
+    ] );
+    $subject = 'TLT Season ' . $season . ' — Welcome to ' . $show;
+    return tlt_cb_send_mail( $email, $subject, $html );
+}
+
+/**
+ * Combined-shows variant. $shows is array of show names.
+ */
+function tlt_cb_send_combined_bio_request_email( $email, $full_name, $first_name, $last_name, array $shows, $role ) {
+    if ( trim( (string) $email ) === '' ) {
+        return new WP_Error( 'no_email', "No email on file for $full_name." );
+    }
+    $ranges = tlt_callboard_sheets_get( TLT_CALLBOARD_SHEET_ID, [
+        'Season!A1:N',
+        "'Production Teams'!A2:E",
+    ] );
+    if ( is_wp_error( $ranges ) ) return $ranges;
+    $season_rows = $ranges['Season!A1:N']            ?? [];
+    $team_rows   = $ranges["'Production Teams'!A2:E"] ?? [];
+    $season = tlt_cb_season_setting( $season_rows, 'Current Season' );
+
+    $per_show = [];
+    foreach ( $shows as $sh ) {
+        $sm_email = ''; $comp = ''; $comp2 = ''; $folder = '';
+        foreach ( $season_rows as $r ) {
+            if ( tlt_cb_s( $r[1] ?? '' ) === $sh ) {
+                $comp     = tlt_cb_s( $r[2]  ?? '' );
+                $comp2    = tlt_cb_s( $r[3]  ?? '' );
+                $sm_email = tlt_cb_s( $r[4]  ?? '' );
+                $folder   = tlt_cb_s( $r[10] ?? '' );
+                break;
+            }
+        }
+        $sm_name = '';
+        foreach ( $team_rows as $r ) {
+            if ( tlt_cb_s( $r[0] ?? '' ) === $sh && tlt_cb_s( $r[1] ?? '' ) === 'Stage Manager' ) {
+                $sm_name = trim( tlt_cb_s( $r[2] ?? '' ) . ' ' . tlt_cb_s( $r[4] ?? '' ) );
+                break;
+            }
+        }
+        $per_show[] = [
+            'show'      => $sh,
+            'folder'    => $folder,
+            'smName'    => $sm_name,
+            'smEmail'   => $sm_email,
+            'compCode'  => $comp,
+            'compCode2' => $comp2,
+        ];
+    }
+
+    $tok = tlt_cb_ensure_bio_token( $first_name, $last_name, $email );
+    if ( is_wp_error( $tok ) ) return $tok;
+    $bio_app_url = tlt_cb_season_setting( $season_rows, 'Bio App Url' );
+    if ( $bio_app_url === '' ) return new WP_Error( 'no_bio_app', 'Bio App Url not set in Season config.' );
+    $bio_link = $bio_app_url . '?token=' . rawurlencode( $tok['token'] ) . '&shows=' . rawurlencode( implode( ',', $shows ) );
+    $emergency_base = tlt_cb_emergency_info_base( $season_rows );
+    $emergency_link = $emergency_base !== '' ? $emergency_base . '?token=' . rawurlencode( $tok['token'] ) : '';
+
+    // Shows display: "A and B", "A, B, and C".
+    $shows_display = $shows[0];
+    if ( count( $shows ) === 2 ) $shows_display = $shows[0] . ' and ' . $shows[1];
+    elseif ( count( $shows ) > 2 ) $shows_display = implode( ', ', array_slice( $shows, 0, -1 ) ) . ', and ' . $shows[ count( $shows ) - 1 ];
+
+    $html = tlt_cb_combined_bio_email_html( [
+        'firstName' => $first_name, 'showsDisplay' => $shows_display, 'role' => $role,
+        'bioLink' => $bio_link, 'emergencyLink' => $emergency_link,
+        'handbookUrl' => TLT_CALLBOARD_HANDBOOK_URL, 'perShow' => $per_show,
+    ] );
+    $subject = 'TLT Season ' . $season . ' — Welcome to ' . $shows_display;
+    return tlt_cb_send_mail( $email, $subject, $html );
+}
+
+/**
+ * POST /bios-doc-compile  { show }
+ */
+function tlt_callboard_ep_bios_doc_compile( WP_REST_Request $req ) {
+    $body = $req->get_json_params();
+    $show = tlt_cb_s( is_array( $body ) ? ( $body['show'] ?? '' ) : '' );
+    if ( $show === '' ) return new WP_Error( 'missing_show', 'show is required', [ 'status' => 400 ] );
+    $r = tlt_cb_bios_doc_compile( $show );
+    if ( is_wp_error( $r ) ) return $r;
+    return tlt_cb_ok( $r );
+}
+
+/**
+ * Rewrite GET /schedule-link to match the contact-sheet-link shape so the
+ * frontend can drive a View/Regenerate modal. Was: plain URL string.
+ * Now: { url, exists, source }.
+ */
+function tlt_callboard_ep_get_schedule_link_v2( WP_REST_Request $req ) {
+    $show = tlt_cb_s( $req->get_param( 'show' ) );
+    if ( $show === '' ) return new WP_Error( 'missing_show', 'show query param required', [ 'status' => 400 ] );
+
+    $season_rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, 'Season!A1:N' );
+    if ( is_wp_error( $season_rows ) ) return $season_rows;
+
+    $season_long    = '';
+    $cached_url     = '';
+    $season_row_num = 0;
+    foreach ( $season_rows as $i => $r ) {
+        if ( tlt_cb_s( $r[0] ?? '' ) === 'Current Season Long' ) $season_long = tlt_cb_s( $r[1] ?? '' );
+        if ( tlt_cb_s( $r[1] ?? '' ) === $show ) {
+            $cached_url = tlt_cb_s( $r[13] ?? '' );
+            $season_row_num = $i + 1;
+        }
+    }
+    if ( $cached_url !== '' ) return tlt_cb_ok( [ 'url' => $cached_url, 'exists' => true, 'source' => 'cache' ] );
+
+    if ( $season_long !== '' ) {
+        $doc_name = $show . ' - ' . $season_long . ' Tech Schedule';
+        $files = tlt_cb_drive_find_in_folder( TLT_CALLBOARD_TS_FOLDER_ID, $doc_name );
+        if ( is_wp_error( $files ) ) return $files;
+        if ( ! empty( $files ) ) {
+            $url = tlt_cb_doc_url( $files[0]['id'] );
+            if ( $season_row_num > 0 ) tlt_callboard_sheets_write( TLT_CALLBOARD_SHEET_ID, "Season!N{$season_row_num}", [[ $url ]] );
+            return tlt_cb_ok( [ 'url' => $url, 'exists' => true, 'source' => 'drive' ] );
+        }
+    }
+    return tlt_cb_ok( [ 'url' => '', 'exists' => false, 'source' => 'none' ] );
+}
+
+/* ===========================================================================
+ * ============  BIO REQUEST EMAIL ENDPOINTS  ================================
+ * ======================================================================== */
+
+/**
+ * POST /bios-send-requests  { show }
+ * Sends the welcome/bio-request email to every unique person on the show's
+ * Production Teams + Actors roster. Skips those with no email on file.
+ * Returns { sent, skipped }.
+ */
+function tlt_callboard_ep_bios_send_requests( WP_REST_Request $req ) {
+    $body = $req->get_json_params();
+    $show = tlt_cb_s( is_array( $body ) ? ( $body['show'] ?? '' ) : '' );
+    if ( $show === '' ) return new WP_Error( 'missing_show', 'show is required', [ 'status' => 400 ] );
+
+    $ranges = tlt_callboard_sheets_get( TLT_CALLBOARD_SHEET_ID, [
+        "'Production Teams'!A2:E",
+        'Actors!A2:E',
+    ] );
+    if ( is_wp_error( $ranges ) ) return $ranges;
+    $team_rows  = $ranges["'Production Teams'!A2:E"] ?? [];
+    $actor_rows = $ranges['Actors!A2:E']              ?? [];
+
+    // Combined dedup by first+last.
+    $seen = []; $people = [];
+    foreach ( $team_rows as $r ) {
+        if ( tlt_cb_s( $r[0] ?? '' ) !== $show ) continue;
+        $first = tlt_cb_s( $r[2] ?? '' );
+        if ( $first === '' ) continue;
+        $last  = tlt_cb_s( $r[4] ?? '' );
+        $key   = strtolower( $first ) . '|' . strtolower( $last );
+        if ( isset( $seen[ $key ] ) ) continue;
+        $seen[ $key ] = true;
+        $people[] = [ 'first' => $first, 'last' => $last, 'role' => tlt_cb_s( $r[1] ?? '' ) ];
+    }
+    foreach ( $actor_rows as $r ) {
+        if ( tlt_cb_s( $r[0] ?? '' ) !== $show ) continue;
+        $first = tlt_cb_s( $r[2] ?? '' );
+        if ( $first === '' ) continue;
+        $last  = tlt_cb_s( $r[4] ?? '' );
+        $key   = strtolower( $first ) . '|' . strtolower( $last );
+        if ( isset( $seen[ $key ] ) ) continue;
+        $seen[ $key ] = true;
+        $people[] = [ 'first' => $first, 'last' => $last, 'role' => 'Actor' ];
+    }
+
+    // Look up emails in Contactbook.
+    $cb_rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_CONTACTBOOK_ID, 'Contactbook!A2:H' );
+    if ( is_wp_error( $cb_rows ) ) return $cb_rows;
+    $email_by_name = [];
+    foreach ( $cb_rows as $r ) {
+        $first = strtolower( tlt_cb_s( $r[1] ?? '' ) );
+        if ( $first === '' ) continue;
+        $last  = strtolower( tlt_cb_s( $r[3] ?? '' ) );
+        $email_by_name[ $first . '|' . $last ] = tlt_cb_s( $r[7] ?? '' );
+    }
+
+    $sent = 0; $skipped = 0; $errors = [];
+    foreach ( $people as $p ) {
+        $email = $email_by_name[ strtolower( $p['first'] ) . '|' . strtolower( $p['last'] ) ] ?? '';
+        if ( $email === '' ) { $skipped++; continue; }
+        $full = trim( $p['first'] . ' ' . $p['last'] );
+        $r = tlt_cb_send_bio_request_email( $email, $full, $p['first'], $p['last'], $show, $p['role'] );
+        if ( is_wp_error( $r ) ) { $skipped++; $errors[] = $full . ': ' . $r->get_error_message(); }
+        else $sent++;
+    }
+
+    return tlt_cb_ok( [
+        'sent'    => $sent,
+        'skipped' => $skipped,
+        'errors'  => $errors,
+    ] );
+}
+
+/**
+ * POST /bios-resend  { show, firstName, lastName, role }
+ * Send a single bio-request email; auto-detects combined-contract group via
+ * col S on Production Teams/Actors and sends the combined variant if present.
+ */
+function tlt_callboard_ep_bios_resend( WP_REST_Request $req ) {
+    $body = $req->get_json_params() ?: [];
+    $show  = tlt_cb_s( $body['show']      ?? '' );
+    $first = tlt_cb_s( $body['firstName'] ?? '' );
+    $last  = tlt_cb_s( $body['lastName']  ?? '' );
+    $role  = tlt_cb_s( $body['role']      ?? '' );
+    if ( $show === '' || $first === '' || $last === '' ) {
+        return new WP_Error( 'missing_args', 'show, firstName, lastName required', [ 'status' => 400 ] );
+    }
+
+    // Look up email.
+    $cb_rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_CONTACTBOOK_ID, 'Contactbook!A2:H' );
+    if ( is_wp_error( $cb_rows ) ) return $cb_rows;
+    $email = '';
+    foreach ( $cb_rows as $r ) {
+        if ( strtolower( tlt_cb_s( $r[1] ?? '' ) ) === strtolower( $first )
+          && strtolower( tlt_cb_s( $r[3] ?? '' ) ) === strtolower( $last ) ) {
+            $email = tlt_cb_s( $r[7] ?? '' ); break;
+        }
+    }
+    if ( $email === '' ) return new WP_Error( 'no_email', "No email on file for {$first} {$last}." );
+
+    // Determine combined group (col S on Production Teams/Actors).
+    $shows = tlt_cb_find_combined_shows_for_row( $show, $first, $last );
+    $full  = $first . ' ' . $last;
+    if ( count( $shows ) > 1 ) {
+        $r = tlt_cb_send_combined_bio_request_email( $email, $full, $first, $last, $shows, $role );
+    } else {
+        $r = tlt_cb_send_bio_request_email( $email, $full, $first, $last, $show, $role );
+    }
+    if ( is_wp_error( $r ) ) return $r;
+    return tlt_cb_ok( [ 'sent' => true, 'combined' => count( $shows ) > 1, 'shows' => $shows ] );
+}
+
+/**
+ * Reproduces GAS _findCombinedShowsForRow. Returns [ show ] when there's no
+ * combined group.
+ */
+function tlt_cb_find_combined_shows_for_row( $show, $first_name, $last_name ) {
+    $ranges = tlt_callboard_sheets_get( TLT_CALLBOARD_SHEET_ID, [
+        "'Production Teams'!A2:S",
+        'Actors!A2:S',
+    ] );
+    if ( is_wp_error( $ranges ) ) return [ $show ];
+    $rows_by_tab = [
+        $ranges["'Production Teams'!A2:S"] ?? [],
+        $ranges['Actors!A2:S']              ?? [],
+    ];
+    $first_lc = strtolower( $first_name );
+    $last_lc  = strtolower( $last_name );
+
+    $group_id = '';
+    foreach ( $rows_by_tab as $rows ) {
+        foreach ( $rows as $r ) {
+            if ( tlt_cb_s( $r[0] ?? '' ) !== $show ) continue;
+            if ( strtolower( tlt_cb_s( $r[2] ?? '' ) ) !== $first_lc ) continue;
+            if ( strtolower( tlt_cb_s( $r[4] ?? '' ) ) !== $last_lc  ) continue;
+            $group_id = tlt_cb_s( $r[18] ?? '' ); // col S
+            break 2;
+        }
+    }
+    if ( $group_id === '' ) return [ $show ];
+
+    $shows = [];
+    foreach ( $rows_by_tab as $rows ) {
+        foreach ( $rows as $r ) {
+            if ( tlt_cb_s( $r[18] ?? '' ) === $group_id ) {
+                $s = tlt_cb_s( $r[0] ?? '' );
+                if ( $s !== '' ) $shows[ $s ] = true;
+            }
+        }
+    }
+    if ( empty( $shows ) ) return [ $show ];
+    return array_keys( $shows );
+}
+
+/* ===========================================================================
+ * ============  CONTRACT GENERATOR  =========================================
+ *
+ * Port of ContractGenerator.js.  This is the beast — it copies a template
+ * Doc (one of 4 based on role type), fills placeholders + conditional
+ * sections + a Duties block + key dates via Docs API, saves to Drive under
+ * a season/show subfolder, updates sheet status. Send flow exports PDF,
+ * uploads to OpenSign, sends the bio welcome email.
+ *
+ * Requires: OpenSign key + Resend key in wp-config.php.
+ *
+ * Template selection is driven by the Duties sheet, col B ("template" —
+ * one of "General", "Director", "Actor", "Operator"). Defaults to General.
+ * ======================================================================== */
+
+/**
+ * Look up the Google Docs template ID for a template type string.
+ */
+function tlt_cb_contract_template_id( $type ) {
+    switch ( $type ) {
+        case 'Director': return TLT_CALLBOARD_TPL_DIRECTOR;
+        case 'Actor':    return TLT_CALLBOARD_TPL_ACTOR;
+        case 'Operator': return TLT_CALLBOARD_TPL_OPERATOR;
+        case 'General':
+        default:         return TLT_CALLBOARD_TPL_GENERAL;
+    }
+}
+
+/**
+ * Fetch a spreadsheet's named ranges via Sheets API v4 spreadsheets.get,
+ * then batchGet the actual range values. Returns [ name => flat string ].
+ */
+function tlt_cb_get_named_ranges( array $names ) {
+    static $cache = null;
+    if ( $cache !== null ) return array_intersect_key( $cache, array_flip( $names ) );
+    $token = tlt_callboard_google_access_token();
+    if ( is_wp_error( $token ) ) return $token;
+    $url = 'https://sheets.googleapis.com/v4/spreadsheets/' . TLT_CALLBOARD_SHEET_ID . '?fields=namedRanges,sheets(properties(sheetId,title))';
+    $resp = wp_remote_get( $url, [
+        'timeout' => 15,
+        'headers' => [ 'Authorization' => 'Bearer ' . $token ],
+    ] );
+    if ( is_wp_error( $resp ) ) return $resp;
+    $data = json_decode( wp_remote_retrieve_body( $resp ), true );
+    if ( empty( $data['namedRanges'] ) ) { $cache = []; return []; }
+    $sheet_titles = [];
+    foreach ( ( $data['sheets'] ?? [] ) as $s ) {
+        $sheet_titles[ $s['properties']['sheetId'] ] = $s['properties']['title'];
+    }
+    $a1_by_name = [];
+    foreach ( $data['namedRanges'] as $nr ) {
+        $r = $nr['range'];
+        $sheet_id = $r['sheetId'] ?? 0;
+        $title    = $sheet_titles[ $sheet_id ] ?? '';
+        // Convert col index to letter.
+        $col_letter = function ( $i ) {
+            $letters = '';
+            $i = $i + 1;
+            while ( $i > 0 ) { $rem = ( $i - 1 ) % 26; $letters = chr( 65 + $rem ) . $letters; $i = intval( ( $i - 1 ) / 26 ); }
+            return $letters;
+        };
+        $sc = $col_letter( $r['startColumnIndex'] ?? 0 );
+        $ec = $col_letter( ( $r['endColumnIndex'] ?? 1 ) - 1 );
+        $sr = ( $r['startRowIndex'] ?? 0 ) + 1;
+        $er = $r['endRowIndex']   ?? $sr;
+        $a1 = "'{$title}'!{$sc}{$sr}:{$ec}{$er}";
+        $a1_by_name[ $nr['name'] ] = $a1;
+    }
+    $cache = [];
+    if ( ! empty( $a1_by_name ) ) {
+        $vals = tlt_callboard_sheets_get( TLT_CALLBOARD_SHEET_ID, array_values( $a1_by_name ) );
+        if ( ! is_wp_error( $vals ) ) {
+            foreach ( $a1_by_name as $name => $a1 ) {
+                $rows = $vals[ $a1 ] ?? [];
+                $flat = [];
+                foreach ( $rows as $rr ) foreach ( $rr as $cc ) {
+                    $s = tlt_cb_s( $cc ); if ( $s !== '' ) $flat[] = $s;
+                }
+                $cache[ $name ] = implode( "\n", $flat );
+            }
+        }
+    }
+    return array_intersect_key( $cache, array_flip( $names ) );
+}
+
+/**
+ * Read the Duties Google Doc and parse the [Role:...] block for a role.
+ * Returns [ 'overview' => string, 'duties' => [lines], 'specialConditions' => string ].
+ */
+function tlt_cb_contract_parse_duties_doc( $role ) {
+    $doc = tlt_cb_docs_get( TLT_CALLBOARD_DUTIES_DOC_ID, 'body(content(paragraph(elements(textRun(content)))))' );
+    if ( is_wp_error( $doc ) ) return $doc;
+    $text = '';
+    foreach ( ( $doc['body']['content'] ?? [] ) as $el ) {
+        foreach ( ( $el['paragraph']['elements'] ?? [] ) as $pe ) {
+            $text .= $pe['textRun']['content'] ?? '';
+        }
+    }
+    $role_key   = preg_replace( '/\s+/', '', $role );
+    $open_tag   = '[Role:' . $role_key . ']';
+    $close_tag  = '[/Role:' . $role_key . ']';
+    $empty = [ 'overview' => '', 'duties' => [], 'specialConditions' => '' ];
+
+    $start = strpos( $text, $open_tag );
+    if ( $start === false ) return $empty;
+    $end = strpos( $text, $close_tag, $start );
+    if ( $end === false ) return $empty;
+    $block = substr( $text, $start + strlen( $open_tag ), $end - $start - strlen( $open_tag ) );
+
+    $extract = function ( $blob, $tag ) {
+        $o = strpos( $blob, "[$tag]" );
+        if ( $o === false ) return '';
+        $c = strpos( $blob, "[/$tag]", $o );
+        if ( $c === false ) return '';
+        return trim( substr( $blob, $o + strlen( $tag ) + 2, $c - $o - strlen( $tag ) - 2 ) );
+    };
+
+    $overview   = $extract( $block, 'Overview' );
+    $duties_raw = $extract( $block, 'Duties' );
+    $special    = $extract( $block, 'SpecialConditions' );
+
+    $duties = [];
+    foreach ( explode( "\n", $duties_raw ) as $line ) {
+        $t = trim( $line );
+        if ( $t !== '' ) $duties[] = $t;
+    }
+
+    return [
+        'overview'          => $overview,
+        'duties'            => $duties,
+        'specialConditions' => $special,
+    ];
+}
+
+/**
+ * Look up (role) in the Duties sheet — returns:
+ *   [ 'template' => 'Director'|..., 'budgetVerbage' => string, 'budgetVerbage2', 'budgetVerbage3',
+ *     'key_date_flags' => [ event-type-string => bool ] ]
+ * (key_date_flags is filled by inspecting cols G onward, whose headers are event types).
+ */
+function tlt_cb_contract_get_duties_row( $role ) {
+    $duties = tlt_callboard_sheets_get( TLT_CALLBOARD_SHEET_ID, [ 'Duties!A1:AZ' ] );
+    if ( is_wp_error( $duties ) ) return $duties;
+    $rows = $duties['Duties!A1:AZ'] ?? [];
+    if ( count( $rows ) < 2 ) return [ 'template' => 'General', 'budgetVerbage' => '', 'budgetVerbage2' => '', 'budgetVerbage3' => '', 'key_date_flags' => [] ];
+    $header = $rows[0];
+
+    $target = null;
+    foreach ( array_slice( $rows, 1 ) as $r ) {
+        if ( strcasecmp( tlt_cb_s( $r[0] ?? '' ), $role ) === 0 ) { $target = $r; break; }
+    }
+    if ( $target === null ) return [ 'template' => 'General', 'budgetVerbage' => '', 'budgetVerbage2' => '', 'budgetVerbage3' => '', 'key_date_flags' => [] ];
+
+    $key_date_flags = [];
+    for ( $i = 6; $i < count( $header ); $i++ ) { // col G = index 6
+        $event = tlt_cb_s( $header[ $i ] ?? '' );
+        if ( $event === '' ) continue;
+        $flag = tlt_cb_s( $target[ $i ] ?? '' );
+        $key_date_flags[ $event ] = ( $flag === 'TRUE' || $flag === '1' || $flag === 'true' || $flag === true );
+    }
+
+    return [
+        'template'        => tlt_cb_s( $target[1] ?? '' ) ?: 'General',
+        'budgetVerbage'   => tlt_cb_s( $target[2] ?? '' ),
+        'budgetVerbage2'  => tlt_cb_s( $target[3] ?? '' ),
+        'budgetVerbage3'  => tlt_cb_s( $target[4] ?? '' ),
+        'key_date_flags'  => $key_date_flags,
+    ];
+}
+
+/**
+ * Build the [ label, date_str ] items for the <<KeyDates>> block for a show,
+ * filtered by which events the Duties row flags TRUE.
+ *
+ * Uses the Settings tab as the label mapping (event key → display text).
+ */
+function tlt_cb_contract_key_date_items( $show, $key_date_flags ) {
+    $ranges = tlt_callboard_sheets_get( TLT_CALLBOARD_SHEET_ID, [
+        'Dates!A2:H',
+        'Settings!A1:B',
+    ] );
+    if ( is_wp_error( $ranges ) ) return $ranges;
+    $dates_rows    = $ranges['Dates!A2:H']    ?? [];
+    $settings_rows = $ranges['Settings!A1:B'] ?? [];
+    $label_by_key = [];
+    foreach ( $settings_rows as $r ) {
+        $k = tlt_cb_s( $r[0] ?? '' );
+        if ( $k !== '' ) $label_by_key[ $k ] = tlt_cb_s( $r[1] ?? '' );
+    }
+    $items = [];
+    foreach ( $dates_rows as $r ) {
+        if ( tlt_cb_s( $r[0] ?? '' ) !== $show ) continue;
+        $event = tlt_cb_s( $r[1] ?? '' );
+        if ( empty( $key_date_flags[ $event ] ) ) continue;
+        $date_raw = $r[4] ?? '';
+        $label    = $label_by_key[ $event ] ?? ( $event . ':' );
+        $items[]  = [ 'label' => $label, 'date' => tlt_cb_fmt_date( $date_raw ) ];
+    }
+    return $items;
+}
+
+/**
+ * Format performances list as multi-line text: "Fri, October 3, 2025 at 7:30pm".
+ */
+function tlt_cb_contract_format_performances( $show ) {
+    $rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, 'Dates!A2:H' );
+    if ( is_wp_error( $rows ) ) return '';
+    $out = [];
+    foreach ( $rows as $r ) {
+        if ( tlt_cb_s( $r[0] ?? '' ) !== $show ) continue;
+        $type = tlt_cb_s( $r[1] ?? '' );
+        if ( strpos( $type, 'Performance' ) === false ) continue;
+        $dt = tlt_cb_parse_date( $r[4] ?? '' );
+        if ( ! $dt ) continue;
+        $tm_raw = $r[5] ?? '';
+        $tm     = tlt_cb_fmt_time( $tm_raw );
+        $out[] = $dt->format( 'D, F j, Y' ) . ( $tm !== '' ? ' at ' . $tm : '' );
+    }
+    return implode( "\n", $out );
+}
+
+/**
+ * Read stipend + up-to-3 budget values from the Budget tab (row per show+role).
+ */
+function tlt_cb_contract_budget_row( $show, $role ) {
+    $rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, 'Budget!A2:F' );
+    if ( is_wp_error( $rows ) ) return [ 'stipend' => '', 'budget1' => '', 'budget2' => '', 'budget3' => '' ];
+    foreach ( $rows as $r ) {
+        if ( tlt_cb_s( $r[0] ?? '' ) !== $show ) continue;
+        if ( strcasecmp( tlt_cb_s( $r[1] ?? '' ), $role ) !== 0 ) continue;
+        return [
+            'stipend' => tlt_cb_s( $r[2] ?? '' ),
+            'budget1' => tlt_cb_s( $r[3] ?? '' ),
+            'budget2' => tlt_cb_s( $r[4] ?? '' ),
+            'budget3' => tlt_cb_s( $r[5] ?? '' ),
+        ];
+    }
+    return [ 'stipend' => '', 'budget1' => '', 'budget2' => '', 'budget3' => '' ];
+}
+
+/**
+ * Look up a value on the Theatre tab (org staff roster).
+ */
+function tlt_cb_contract_theatre_value( $label, $theatre_rows = null ) {
+    if ( $theatre_rows === null ) {
+        $theatre_rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, 'Theatre!A2:D200' );
+        if ( is_wp_error( $theatre_rows ) ) return '';
+    }
+    foreach ( $theatre_rows as $r ) {
+        if ( tlt_cb_s( $r[0] ?? '' ) === $label ) return tlt_cb_s( $r[1] ?? '' );
+    }
+    return '';
+}
+
+/**
+ * Format currency: numeric → "$N" (no decimals for whole), else raw string.
+ */
+function tlt_cb_contract_fmt_currency( $val ) {
+    $v = tlt_cb_s( $val );
+    if ( $v === '' ) return '';
+    if ( is_numeric( $v ) ) {
+        $n = (float) $v;
+        return '$' . number_format( $n, ( $n == floor( $n ) ) ? 0 : 2 );
+    }
+    return $v;
+}
+
+/**
+ * Assemble the full replacements map for a single-show contract.
+ * Returns [ 'template' => ..., 'replacements' => [...], 'duties_content' => [...],
+ *           'key_date_items' => [...], 'has_budget1/2/3' => bool, 'has_special' => bool ]
+ */
+function tlt_cb_contract_assemble( $show, $role, $character = '' ) {
+    $named = tlt_cb_get_named_ranges( [ 'Mission', 'Vision', 'Board', 'CurrentSeason', 'CurrentSeasonLong' ] );
+    if ( is_wp_error( $named ) ) return $named;
+
+    $theatre_rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, 'Theatre!A2:D200' );
+    if ( is_wp_error( $theatre_rows ) ) return $theatre_rows;
+
+    $duties_row = tlt_cb_contract_get_duties_row( $role );
+    if ( is_wp_error( $duties_row ) ) return $duties_row;
+    $duties_content = tlt_cb_contract_parse_duties_doc( $role );
+    if ( is_wp_error( $duties_content ) ) return $duties_content;
+    $key_date_items = tlt_cb_contract_key_date_items( $show, $duties_row['key_date_flags'] );
+    if ( is_wp_error( $key_date_items ) ) return $key_date_items;
+    $budget = tlt_cb_contract_budget_row( $show, $role );
+
+    $get_dates_val = function ( $event_type ) use ( $show ) {
+        $rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, 'Dates!A2:H' );
+        if ( is_wp_error( $rows ) ) return '';
+        foreach ( $rows as $r ) {
+            if ( tlt_cb_s( $r[0] ?? '' ) === $show && tlt_cb_s( $r[1] ?? '' ) === $event_type ) return $r[4] ?? '';
+        }
+        return '';
+    };
+
+    $replacements = [
+        '<<Show>>'         => $show,
+        '<<Role>>'         => $role,
+        '<<Character>>'    => $character,
+        '<<CombinedShow>>' => $show,
+        '<<Performances>>' => tlt_cb_contract_format_performances( $show ),
+        '<<MAD>>'          => tlt_cb_contract_theatre_value( 'Managing Artistic Director',   $theatre_rows ),
+        '<<AD>>'           => tlt_cb_contract_theatre_value( 'Associate Producing Director', $theatre_rows ),
+        '<<TD>>'           => tlt_cb_contract_theatre_value( 'Technical Director',           $theatre_rows ),
+        '<<DD>>'           => tlt_cb_contract_theatre_value( 'Development Director',         $theatre_rows ),
+        '<<ED>>'           => tlt_cb_contract_theatre_value( 'Education Director',           $theatre_rows ),
+        '<<OM>>'           => tlt_cb_contract_theatre_value( 'Office Manager',               $theatre_rows ),
+        '<<PM>>'           => tlt_cb_contract_theatre_value( 'Production Manager',           $theatre_rows ),
+        '<<Mission>>'      => $named['Mission'] ?? '',
+        '<<Vision>>'       => $named['Vision']  ?? '',
+        '<<Stipend>>'      => tlt_cb_contract_fmt_currency( $budget['stipend'] ),
+        '<<Budget>>'       => tlt_cb_contract_fmt_currency( $budget['budget1'] ),
+        '<<Budget2>>'      => tlt_cb_contract_fmt_currency( $budget['budget2'] ),
+        '<<Budget3>>'      => tlt_cb_contract_fmt_currency( $budget['budget3'] ),
+        '<<BudgetVerbage>>'  => $duties_row['budgetVerbage'],
+        '<<BudgetVerbage2>>' => $duties_row['budgetVerbage2'],
+        '<<BudgetVerbage3>>' => $duties_row['budgetVerbage3'],
+        '<<RehearsalStart>>' => tlt_cb_fmt_date( $get_dates_val( 'Rehearsal Start' ) ),
+        '<<Opening>>'        => tlt_cb_fmt_date( $get_dates_val( 'Opening Performance' ) ),
+        '<<Closing>>'        => tlt_cb_fmt_date( $get_dates_val( 'Closing Performance' ) ),
+        '<<Overview>>'       => $duties_content['overview'],
+        '<<Name>>'           => '',
+        '<<Date>>'           => ( new DateTime( 'now', new DateTimeZone( 'America/Los_Angeles' ) ) )->format( 'F j, Y' ),
+    ];
+
+    return [
+        'template'         => $duties_row['template'],
+        'season'           => $named['CurrentSeason']     ?? '',
+        'season_long'      => $named['CurrentSeasonLong'] ?? '',
+        'board_value'      => $named['Board']             ?? '',
+        'replacements'     => $replacements,
+        'duties_content'   => $duties_content,
+        'key_date_items'   => $key_date_items,
+        'has_budget1'      => $budget['budget1'] !== '',
+        'has_budget2'      => $budget['budget2'] !== '',
+        'has_budget3'      => $budget['budget3'] !== '',
+        'has_special'      => $duties_content['specialConditions'] !== '',
+        'has_key_dates'    => count( $key_date_items ) > 0,
+    ];
+}
+
+/* -----  Contract doc-building helpers  ------------------------------------ */
+
+/**
+ * Iterate the doc body top-level content elements, resolving each paragraph's
+ * plain text. Returns [ [start, end, text], ... ] one entry per element.
+ */
+function tlt_cb_contract_walk_paragraphs( $doc_id ) {
+    $doc = tlt_cb_docs_get( $doc_id, 'body(content(startIndex,endIndex,paragraph(elements(startIndex,endIndex,textRun(content))),table(tableRows(tableCells(content(startIndex,endIndex,paragraph(elements(startIndex,endIndex,textRun(content)))))))))' );
+    if ( is_wp_error( $doc ) ) return $doc;
+    $out = [];
+    $walk = function ( $items, &$out ) use ( &$walk ) {
+        foreach ( $items as $el ) {
+            if ( isset( $el['paragraph'] ) ) {
+                $text = '';
+                foreach ( ( $el['paragraph']['elements'] ?? [] ) as $pe ) {
+                    $text .= $pe['textRun']['content'] ?? '';
+                }
+                $out[] = [
+                    'start' => $el['startIndex'] ?? null,
+                    'end'   => $el['endIndex']   ?? null,
+                    'text'  => $text,
+                ];
+            } elseif ( isset( $el['table']['tableRows'] ) ) {
+                foreach ( $el['table']['tableRows'] as $row ) {
+                    foreach ( ( $row['tableCells'] ?? [] ) as $cell ) {
+                        $walk( $cell['content'] ?? [], $out );
+                    }
+                }
+            }
+        }
+    };
+    $walk( $doc['body']['content'] ?? [], $out );
+    return $out;
+}
+
+/**
+ * Delete the entire paragraph containing $marker (marker occurs anywhere in
+ * the paragraph text). No-op if not found.
+ */
+function tlt_cb_contract_delete_marker_paragraph( $doc_id, $marker ) {
+    $paras = tlt_cb_contract_walk_paragraphs( $doc_id );
+    if ( is_wp_error( $paras ) ) return $paras;
+    foreach ( $paras as $p ) {
+        if ( strpos( $p['text'], $marker ) === false ) continue;
+        if ( $p['start'] === null || $p['end'] === null ) continue;
+        return tlt_cb_docs_batch_update( $doc_id, [
+            [ 'deleteContentRange' => [
+                'range' => tlt_cb_docs_range( $p['start'], $p['end'] ),
+            ] ],
+        ] );
+    }
+    return true;
+}
+
+/**
+ * Replace paragraph containing $marker with an ordered list of lines. Each
+ * line becomes its own paragraph. Insertions preserve the paragraph before/
+ * after.
+ */
+function tlt_cb_contract_replace_marker_with_lines( $doc_id, $marker, array $lines ) {
+    $paras = tlt_cb_contract_walk_paragraphs( $doc_id );
+    if ( is_wp_error( $paras ) ) return $paras;
+    foreach ( $paras as $p ) {
+        if ( strpos( $p['text'], $marker ) === false ) continue;
+        if ( $p['start'] === null || $p['end'] === null ) continue;
+        // Two-step: delete the marker's line, then insert the new lines at $p['start'].
+        $requests = [
+            [ 'deleteContentRange' => [ 'range' => tlt_cb_docs_range( $p['start'], $p['end'] ) ] ],
+        ];
+        // Insert in reverse order so each new line goes at $p['start'].
+        $joined = implode( "\n", $lines ) . "\n";
+        $requests[] = [ 'insertText' => [ 'location' => [ 'index' => $p['start'] ], 'text' => $joined ] ];
+        return tlt_cb_docs_batch_update( $doc_id, $requests );
+    }
+    // Marker not found — silent no-op (mirrors GAS: expansion is best-effort).
+    return true;
+}
+
+/**
+ * Handle a conditional bracket section — [$start_tag]...[$end_tag]. If
+ * $keep is true, only the two tag markers are removed. Otherwise the entire
+ * block including both tags is removed.
+ *
+ * Uses replaceAllText for the tags-only case (simple) and content-range
+ * deletion for the keep=false case.
+ */
+function tlt_cb_contract_handle_conditional( $doc_id, $start_tag, $end_tag, $keep ) {
+    if ( $keep ) {
+        return tlt_cb_docs_batch_update( $doc_id, [
+            [ 'replaceAllText' => [ 'containsText' => [ 'text' => "[{$start_tag}]", 'matchCase' => true ], 'replaceText' => '' ] ],
+            [ 'replaceAllText' => [ 'containsText' => [ 'text' => "[/{$end_tag}]", 'matchCase' => true ], 'replaceText' => '' ] ],
+        ] );
+    }
+    // Delete-block variant: find the text range from first [start] to end of paragraph containing [/end].
+    $paras = tlt_cb_contract_walk_paragraphs( $doc_id );
+    if ( is_wp_error( $paras ) ) return $paras;
+    $sp = null; $ep = null;
+    foreach ( $paras as $p ) {
+        if ( $sp === null && strpos( $p['text'], "[{$start_tag}]" ) !== false ) $sp = $p;
+        if ( $sp !== null && strpos( $p['text'], "[/{$end_tag}]" ) !== false ) { $ep = $p; break; }
+    }
+    if ( $sp === null || $ep === null ) return true;
+    // Delete from sp start to ep end.
+    return tlt_cb_docs_batch_update( $doc_id, [
+        [ 'deleteContentRange' => [ 'range' => tlt_cb_docs_range( $sp['start'], $ep['end'] ) ] ],
+    ] );
+}
+
+/**
+ * Format the <<Duties>> marker: replace with a list of lines where ALL-CAPS
+ * lines become section headers (bold) and other lines are bulleted items.
+ * Simplified vs GAS but functionally equivalent — a bit less precision on
+ * spacing.
+ */
+function tlt_cb_contract_expand_duties( $doc_id, array $duties ) {
+    if ( empty( $duties ) ) {
+        return tlt_cb_contract_delete_marker_paragraph( $doc_id, '<<Duties>>' );
+    }
+    // Replace the marker paragraph with the duties lines (plain text join).
+    $paras = tlt_cb_contract_walk_paragraphs( $doc_id );
+    if ( is_wp_error( $paras ) ) return $paras;
+    $marker_para = null;
+    foreach ( $paras as $p ) if ( strpos( $p['text'], '<<Duties>>' ) !== false ) { $marker_para = $p; break; }
+    if ( $marker_para === null ) return true;
+
+    $start = $marker_para['start'];
+    // Build text and remember which line indices need bold + which need bullet
+    // via later styling passes.
+    $joined = '';
+    $ranges_by_kind = [ 'header' => [], 'bullet' => [] ];
+    $cursor = $start;
+    foreach ( $duties as $line ) {
+        $len = strlen( $line );
+        $is_header = ( strtoupper( $line ) === $line && preg_match( '/[A-Z]/', $line ) );
+        $ranges_by_kind[ $is_header ? 'header' : 'bullet' ][] = [ $cursor, $cursor + $len, $cursor + $len + 1 ];
+        $joined .= $line . "\n";
+        $cursor += $len + 1;
+    }
+    // Delete original marker paragraph then insert new content.
+    $requests = [
+        [ 'deleteContentRange' => [ 'range' => tlt_cb_docs_range( $start, $marker_para['end'] ) ] ],
+        [ 'insertText' => [ 'location' => [ 'index' => $start ], 'text' => $joined ] ],
+    ];
+    // Bold header ranges.
+    foreach ( $ranges_by_kind['header'] as $rr ) {
+        $requests[] = [ 'updateTextStyle' => [
+            'range' => tlt_cb_docs_range( $rr[0], $rr[1] ),
+            'textStyle' => [ 'bold' => true ],
+            'fields' => 'bold',
+        ] ];
+    }
+    // Bulleted paragraphs.
+    foreach ( $ranges_by_kind['bullet'] as $rr ) {
+        $requests[] = [ 'createParagraphBullets' => [
+            'range' => tlt_cb_docs_range( $rr[0], $rr[2] ),
+            'bulletPreset' => 'BULLET_DISC_CIRCLE_SQUARE',
+        ] ];
+    }
+    return tlt_cb_docs_batch_update( $doc_id, $requests );
+}
+
+/**
+ * Expand <<KeyDates>> into "Label DATE" lines (date portion bolded).
+ */
+function tlt_cb_contract_expand_key_dates( $doc_id, array $items, $marker = '<<KeyDates>>' ) {
+    if ( empty( $items ) ) {
+        return tlt_cb_contract_delete_marker_paragraph( $doc_id, $marker );
+    }
+    $paras = tlt_cb_contract_walk_paragraphs( $doc_id );
+    if ( is_wp_error( $paras ) ) return $paras;
+    $marker_para = null;
+    foreach ( $paras as $p ) if ( strpos( $p['text'], $marker ) !== false ) { $marker_para = $p; break; }
+    if ( $marker_para === null ) return true;
+
+    $start   = $marker_para['start'];
+    $joined  = '';
+    $bolds   = [];
+    $cursor  = $start;
+    foreach ( $items as $it ) {
+        $label = trim( $it['label'] );
+        $date  = $it['date'];
+        $line  = $label . ' ' . $date;
+        $joined .= $line . "\n";
+        // Bold just the date portion.
+        $date_start = $cursor + strlen( $label ) + 1;
+        $bolds[] = [ $date_start, $date_start + strlen( $date ) ];
+        $cursor += strlen( $line ) + 1;
+    }
+    $requests = [
+        [ 'deleteContentRange' => [ 'range' => tlt_cb_docs_range( $start, $marker_para['end'] ) ] ],
+        [ 'insertText' => [ 'location' => [ 'index' => $start ], 'text' => $joined ] ],
+    ];
+    foreach ( $bolds as $b ) {
+        $requests[] = [ 'updateTextStyle' => [
+            'range' => tlt_cb_docs_range( $b[0], $b[1] ),
+            'textStyle' => [ 'bold' => true ],
+            'fields' => 'bold',
+        ] ];
+    }
+    return tlt_cb_docs_batch_update( $doc_id, $requests );
+}
+
+/**
+ * Expand <<SpecialConditions>> — split multi-line special conditions block
+ * into paragraphs. The marker paragraph itself gets replaced with the first
+ * line; subsequent lines are inserted as siblings.
+ */
+function tlt_cb_contract_expand_special_conditions( $doc_id, $special ) {
+    $lines = array_values( array_filter( array_map( 'trim', explode( "\n", $special ) ), function ( $x ) { return $x !== ''; } ) );
+    if ( empty( $lines ) ) return tlt_cb_contract_delete_marker_paragraph( $doc_id, '<<SpecialConditions>>' );
+    // Replace marker with joined lines.
+    return tlt_cb_contract_replace_marker_with_lines( $doc_id, '<<SpecialConditions>>', $lines );
+}
+
+/**
+ * Expand <<Board>> — one line per name.
+ */
+function tlt_cb_contract_expand_board( $doc_id, $board_value ) {
+    $lines = array_values( array_filter( array_map( 'trim', explode( "\n", $board_value ) ), function ( $x ) { return $x !== ''; } ) );
+    if ( empty( $lines ) ) return tlt_cb_contract_delete_marker_paragraph( $doc_id, '<<Board>>' );
+    return tlt_cb_contract_replace_marker_with_lines( $doc_id, '<<Board>>', $lines );
+}
+
+/**
+ * Collapse duplicate immediate-repeat tags like "<<Show>><<Show>>" → "<<Show>>".
+ * Runs several tags up to 5 times each.
+ */
+function tlt_cb_contract_collapse_duplicate_tags( $doc_id ) {
+    $tags = [ '<<Show>>', '<<Role>>', '<<Name>>', '<<Character>>', '<<Date>>' ];
+    $requests = [];
+    foreach ( $tags as $t ) {
+        for ( $i = 0; $i < 5; $i++ ) {
+            $requests[] = [ 'replaceAllText' => [
+                'containsText' => [ 'text' => $t . $t, 'matchCase' => true ],
+                'replaceText'  => $t,
+            ] ];
+        }
+    }
+    return tlt_cb_docs_batch_update( $doc_id, $requests );
+}
+
+/**
+ * Hide empty staff blocks. Walks paragraphs; for any paragraph whose exact
+ * text is one of the known role labels (MAD, TD, AD, DD, ED, OM, PM), if
+ * the paragraph directly ABOVE is empty (because <<MAD>> was replaced with
+ * ''), delete both. Ported from _hideEmptyStaffBlocks.
+ */
+function tlt_cb_contract_hide_empty_staff_blocks( $doc_id ) {
+    $labels = [
+        'Managing Artistic Director',
+        'Associate Producing Director',
+        'Associate Director',
+        'Technical Director',
+        'Development Director',
+        'Education Director',
+        'Office Manager',
+        'Production Manager',
+    ];
+    $paras = tlt_cb_contract_walk_paragraphs( $doc_id );
+    if ( is_wp_error( $paras ) ) return $paras;
+
+    // Build list of ranges to delete (from empty-tag paragraph start to label paragraph end).
+    // Walk in REVERSE index order so deletions don't shift earlier ones.
+    $to_delete = [];
+    for ( $i = 1; $i < count( $paras ); $i++ ) {
+        $curr = $paras[ $i ];
+        $prev = $paras[ $i - 1 ];
+        $curr_trim = trim( rtrim( $curr['text'], "\n" ) );
+        $prev_trim = trim( rtrim( $prev['text'], "\n" ) );
+        if ( in_array( $curr_trim, $labels, true ) && $prev_trim === '' && $prev['start'] !== null && $curr['end'] !== null ) {
+            $to_delete[] = [ 'start' => $prev['start'], 'end' => $curr['end'] ];
+        }
+    }
+    usort( $to_delete, function ( $a, $b ) { return $b['start'] - $a['start']; } );
+    $requests = [];
+    foreach ( $to_delete as $d ) {
+        $requests[] = [ 'deleteContentRange' => [ 'range' => tlt_cb_docs_range( $d['start'], $d['end'] ) ] ];
+    }
+    if ( empty( $requests ) ) return true;
+    return tlt_cb_docs_batch_update( $doc_id, $requests );
+}
+
+/**
+ * Update Production Teams or Actors row for a contract status change.
+ * @param string $status   'Generated' | 'Sent for Signature' | 'Not Started'
+ * @param string $link_or_id  For 'Generated' = doc URL. For 'Sent for Signature' = OpenSign ID.
+ * @param array  $opts     [ 'combinedContractId' => 'CC-...' | null ]
+ */
+function tlt_cb_contract_update_status( $show, $role, $first_name, $status, $link_or_id, array $opts = [] ) {
+    $is_actor = strcasecmp( $role, 'Actor' ) === 0;
+    $tab = $is_actor ? 'Actors' : "'Production Teams'";
+    $rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, "{$tab}!A2:S" );
+    if ( is_wp_error( $rows ) ) return $rows;
+
+    $target_row = 0;
+    foreach ( $rows as $i => $r ) {
+        if ( tlt_cb_s( $r[0] ?? '' ) !== $show ) continue;
+        if ( strcasecmp( tlt_cb_s( $r[2] ?? '' ), $first_name ) !== 0 ) continue;
+        if ( ! $is_actor && tlt_cb_s( $r[1] ?? '' ) !== $role ) continue;
+        $target_row = $i + 2; // A2 offset
+        break;
+    }
+    if ( $target_row === 0 ) return new WP_Error( 'no_status_row', "No {$tab} row for ({$show}, {$role}, {$first_name})" );
+
+    // Compute updates.
+    $sheet_tab = $is_actor ? 'Actors' : 'Production Teams';
+    $today = ( new DateTime( 'now', new DateTimeZone( 'America/Los_Angeles' ) ) )->format( 'Y-m-d' );
+
+    // Grab existing combined ID from col S.
+    $target_row_data = $rows[ $target_row - 2 ];
+    $existing_ccid = tlt_cb_s( $target_row_data[18] ?? '' );
+
+    $updates = [
+        [ "'{$sheet_tab}'!I{$target_row}", [[ $status ]] ],
+        [ "'{$sheet_tab}'!L{$target_row}", [[ $link_or_id ]] ],
+    ];
+    if ( $status === 'Sent for Signature' ) {
+        $updates[] = [ "'{$sheet_tab}'!J{$target_row}", [[ $today ]] ];
+    }
+    if ( ! empty( $opts['combinedContractId'] ) ) {
+        $ccid = $opts['combinedContractId'];
+        $updates[] = [ "'{$sheet_tab}'!S{$target_row}", [[ $ccid ]] ];
+        $existing_ccid = $ccid; // propagate below
+    }
+
+    // Apply target row updates first.
+    foreach ( $updates as $u ) {
+        $r = tlt_callboard_sheets_write( TLT_CALLBOARD_SHEET_ID, $u[0], $u[1] );
+        if ( is_wp_error( $r ) ) return $r;
+    }
+
+    // Propagate to other rows with the same combined ID (across both tabs).
+    if ( $existing_ccid !== '' ) {
+        foreach ( [ [ 'Production Teams', "'Production Teams'!A2:S" ], [ 'Actors', 'Actors!A2:S' ] ] as $tab_pair ) {
+            $tabname = $tab_pair[0];
+            $tab_rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, $tab_pair[1] );
+            if ( is_wp_error( $tab_rows ) ) continue;
+            foreach ( $tab_rows as $j => $rr ) {
+                if ( tlt_cb_s( $rr[18] ?? '' ) !== $existing_ccid ) continue;
+                $rn = $j + 2;
+                if ( $tabname === $sheet_tab && $rn === $target_row ) continue; // already done
+                tlt_callboard_sheets_write( TLT_CALLBOARD_SHEET_ID, "'{$tabname}'!I{$rn}", [[ $status ]] );
+                tlt_callboard_sheets_write( TLT_CALLBOARD_SHEET_ID, "'{$tabname}'!L{$rn}", [[ $link_or_id ]] );
+                if ( $status === 'Sent for Signature' ) {
+                    tlt_callboard_sheets_write( TLT_CALLBOARD_SHEET_ID, "'{$tabname}'!J{$rn}", [[ $today ]] );
+                }
+            }
+        }
+    }
+    return true;
+}
+
+/**
+ * Find (or create) the "<season> Contracts" folder under the contract root
+ * and the show subfolder inside it. Returns show subfolder ID.
+ */
+function tlt_cb_contract_folder_for_show( $season_long, $show ) {
+    $season_folder = tlt_cb_drive_folder_or_create( TLT_CALLBOARD_CONTRACT_ROOT_FOLDER_ID, "{$season_long} Contracts" );
+    if ( is_wp_error( $season_folder ) ) return $season_folder;
+    $show_folder = tlt_cb_drive_folder_or_create( $season_folder, $show );
+    if ( is_wp_error( $show_folder ) ) return $show_folder;
+    return $show_folder;
+}
+
+/**
+ * Full flow: copy template → replace tags → expand markers → conditionals →
+ * dedup → hide staff blocks → return doc URL. Sheet update to "Generated"
+ * happens in the calling endpoint.
+ */
+function tlt_cb_contract_generate( $show, $role, $first_name, $last_name, $character = '' ) {
+    $data = tlt_cb_contract_assemble( $show, $role, $character );
+    if ( is_wp_error( $data ) ) return $data;
+    if ( $data['season_long'] === '' ) return new WP_Error( 'no_season_long', 'Season "Current Season Long" is not set.' );
+
+    $show_folder = tlt_cb_contract_folder_for_show( $data['season_long'], $show );
+    if ( is_wp_error( $show_folder ) ) return $show_folder;
+
+    // Actors get a sub-subfolder.
+    $is_actor = strcasecmp( $role, 'Actor' ) === 0;
+    if ( $is_actor ) {
+        $show_folder = tlt_cb_drive_folder_or_create( $show_folder, 'Actor Contracts' );
+        if ( is_wp_error( $show_folder ) ) return $show_folder;
+    }
+
+    $full_name = trim( $first_name . ' ' . $last_name );
+    $doc_name  = $full_name . ' - ' . $role . ' - ' . $show;
+
+    // Trash any prior doc with the same name.
+    $existing = tlt_cb_drive_find_in_folder( $show_folder, $doc_name );
+    if ( is_wp_error( $existing ) ) return $existing;
+    foreach ( $existing as $f ) tlt_cb_drive_trash( $f['id'] );
+
+    // Copy template.
+    $template_id = tlt_cb_contract_template_id( $data['template'] );
+    $file = tlt_cb_drive_copy( $template_id, $show_folder, $doc_name );
+    if ( is_wp_error( $file ) ) return $file;
+    $doc_id = $file['id'];
+
+    // Update the <<Name>> replacement now that we know the doc's target.
+    $reps = $data['replacements'];
+    $reps['<<Name>>'] = $full_name;
+
+    // Phase 1: simple replaceAllText for all tags.
+    $requests = [];
+    foreach ( $reps as $tag => $value ) {
+        $requests[] = [ 'replaceAllText' => [
+            'containsText' => [ 'text' => $tag, 'matchCase' => true ],
+            'replaceText'  => (string) $value,
+        ] ];
+    }
+    $r = tlt_cb_docs_batch_update( $doc_id, $requests );
+    if ( is_wp_error( $r ) ) return $r;
+
+    // Phase 2: multi-paragraph expansions.
+    tlt_cb_contract_expand_duties( $doc_id, $data['duties_content']['duties'] );
+    tlt_cb_contract_expand_key_dates( $doc_id, $data['key_date_items'] );
+    tlt_cb_contract_expand_special_conditions( $doc_id, $data['duties_content']['specialConditions'] );
+    tlt_cb_contract_expand_board( $doc_id, $data['board_value'] );
+
+    // Single-show contracts don't use <<Compensation>>.
+    tlt_cb_contract_delete_marker_paragraph( $doc_id, '<<Compensation>>' );
+
+    // Phase 3: conditional bracket sections.
+    tlt_cb_contract_handle_conditional( $doc_id, 'BudgetSection', 'BudgetSection', $data['has_budget1'] );
+    tlt_cb_contract_handle_conditional( $doc_id, 'Budget2', 'Budget2', $data['has_budget2'] );
+    tlt_cb_contract_handle_conditional( $doc_id, 'Budget3', 'Budget3', $data['has_budget3'] );
+    tlt_cb_contract_handle_conditional( $doc_id, 'SpecialConditionsSection', 'SpecialConditionsSection', $data['has_special'] );
+    tlt_cb_contract_handle_conditional( $doc_id, 'KeyDatesSection', 'KeyDatesSection', $data['has_key_dates'] );
+
+    // Phase 4: cleanup.
+    tlt_cb_contract_collapse_duplicate_tags( $doc_id );
+    tlt_cb_contract_hide_empty_staff_blocks( $doc_id );
+
+    $url = tlt_cb_doc_url( $doc_id );
+
+    // Update status.
+    $r = tlt_cb_contract_update_status( $show, $role, $first_name, 'Generated', $url );
+    if ( is_wp_error( $r ) ) return $r;
+
+    return [
+        'success'      => true,
+        'docId'        => $doc_id,
+        'docUrl'       => $url,
+        'docName'      => $doc_name,
+        'fullName'     => $full_name,
+        'show'         => $show,
+        'role'         => $role,
+        'firstName'    => $first_name,
+        'templateType' => $data['template'],
+    ];
+}
+
+/**
+ * Combined generation. Same core doc; different naming, folder, replacements
+ * for compensation, and combined contract ID for status propagation.
+ */
+function tlt_cb_contract_generate_combined( array $shows, $role, $first_name, $last_name, $character = '' ) {
+    if ( count( $shows ) === 1 ) return tlt_cb_contract_generate( $shows[0], $role, $first_name, $last_name, $character );
+
+    // Assemble against the first show for the base replacements.
+    $first_show = $shows[0];
+    $data = tlt_cb_contract_assemble( $first_show, $role, $character );
+    if ( is_wp_error( $data ) ) return $data;
+    if ( $data['season_long'] === '' ) return new WP_Error( 'no_season_long', 'Season "Current Season Long" is not set.' );
+
+    // Season "Contracts" root → "Combined Contracts" subfolder.
+    $season_folder = tlt_cb_drive_folder_or_create( TLT_CALLBOARD_CONTRACT_ROOT_FOLDER_ID, "{$data['season_long']} Contracts" );
+    if ( is_wp_error( $season_folder ) ) return $season_folder;
+    $combined_folder = tlt_cb_drive_folder_or_create( $season_folder, 'Combined Contracts' );
+    if ( is_wp_error( $combined_folder ) ) return $combined_folder;
+
+    $full_name = trim( $first_name . ' ' . $last_name );
+    $doc_name  = $full_name . ' - ' . $role . ' - Combined (' . count( $shows ) . ' shows)';
+    $existing = tlt_cb_drive_find_in_folder( $combined_folder, $doc_name );
+    if ( is_wp_error( $existing ) ) return $existing;
+    foreach ( $existing as $f ) tlt_cb_drive_trash( $f['id'] );
+
+    // Copy template.
+    $template_id = tlt_cb_contract_template_id( $data['template'] );
+    $file = tlt_cb_drive_copy( $template_id, $combined_folder, $doc_name );
+    if ( is_wp_error( $file ) ) return $file;
+    $doc_id = $file['id'];
+
+    // Modified replacements for combined.
+    $shows_list = count( $shows ) === 2
+        ? $shows[0] . ' and ' . $shows[1]
+        : implode( ', ', array_slice( $shows, 0, -1 ) ) . ', and ' . $shows[ count( $shows ) - 1 ];
+    $reps = $data['replacements'];
+    $reps['<<Show>>']         = $shows_list;
+    $reps['<<CombinedShow>>'] = 'the ' . $data['season_long'] . ' season';
+    $reps['<<Performances>>'] = '';
+    // Stipend: sum across shows.
+    $total_stipend_num = 0.0; $any_numeric = false;
+    foreach ( $shows as $sh ) {
+        $b = tlt_cb_contract_budget_row( $sh, $role );
+        if ( is_numeric( $b['stipend'] ) ) { $total_stipend_num += (float) $b['stipend']; $any_numeric = true; }
+    }
+    if ( $any_numeric ) $reps['<<Stipend>>'] = tlt_cb_contract_fmt_currency( $total_stipend_num );
+    $reps['<<Name>>']           = $full_name;
+    $reps['<<RehearsalStart>>'] = 'See per-show dates below';
+    $reps['<<Closing>>']        = 'See per-show dates below';
+
+    // Build combined key dates: per-show header line + items.
+    $combined_key_items = [];
+    foreach ( $shows as $sh ) {
+        $sh_data = tlt_cb_contract_assemble( $sh, $role, $character );
+        if ( is_wp_error( $sh_data ) ) continue;
+        // Header row: "For <show> — Opens <MMM D, YYYY>"
+        $opens = '';
+        foreach ( tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, 'Dates!A2:H' ) as $r ) {
+            if ( tlt_cb_s( $r[0] ?? '' ) === $sh && tlt_cb_s( $r[1] ?? '' ) === 'Opening Performance' ) {
+                $dt = tlt_cb_parse_date( $r[4] ?? '' );
+                if ( $dt ) $opens = $dt->format( 'M j, Y' );
+                break;
+            }
+        }
+        $combined_key_items[] = [
+            'label' => "For {$sh} — Opens",
+            'date'  => $opens,
+        ];
+        foreach ( $sh_data['key_date_items'] as $it ) $combined_key_items[] = $it;
+    }
+
+    // Compensation items: per-show stipend + total.
+    $comp_items = [];
+    foreach ( $shows as $sh ) {
+        $b = tlt_cb_contract_budget_row( $sh, $role );
+        $s = $b['stipend'] !== '' ? tlt_cb_contract_fmt_currency( $b['stipend'] ) : 'TBD';
+        $comp_items[] = [ 'label' => "{$sh} stipend:", 'date' => $s ];
+    }
+    if ( $any_numeric ) {
+        $comp_items[] = [ 'label' => 'Season total:', 'date' => tlt_cb_contract_fmt_currency( $total_stipend_num ) ];
+    }
+
+    // Phase 1: simple replaceAllText.
+    $requests = [];
+    foreach ( $reps as $tag => $value ) {
+        $requests[] = [ 'replaceAllText' => [
+            'containsText' => [ 'text' => $tag, 'matchCase' => true ],
+            'replaceText'  => (string) $value,
+        ] ];
+    }
+    $r = tlt_cb_docs_batch_update( $doc_id, $requests );
+    if ( is_wp_error( $r ) ) return $r;
+
+    // Phase 2: expansions.
+    tlt_cb_contract_expand_duties( $doc_id, $data['duties_content']['duties'] );
+    tlt_cb_contract_expand_key_dates( $doc_id, $combined_key_items );
+    tlt_cb_contract_expand_special_conditions( $doc_id, $data['duties_content']['specialConditions'] );
+    tlt_cb_contract_expand_board( $doc_id, $data['board_value'] );
+
+    // Combined uses <<Compensation>>.
+    tlt_cb_contract_expand_key_dates( $doc_id, $comp_items, '<<Compensation>>' );
+
+    // Phase 3: conditionals.
+    tlt_cb_contract_handle_conditional( $doc_id, 'BudgetSection', 'BudgetSection', $data['has_budget1'] );
+    tlt_cb_contract_handle_conditional( $doc_id, 'Budget2', 'Budget2', $data['has_budget2'] );
+    tlt_cb_contract_handle_conditional( $doc_id, 'Budget3', 'Budget3', $data['has_budget3'] );
+    tlt_cb_contract_handle_conditional( $doc_id, 'SpecialConditionsSection', 'SpecialConditionsSection', $data['has_special'] );
+    tlt_cb_contract_handle_conditional( $doc_id, 'KeyDatesSection', 'KeyDatesSection', ! empty( $combined_key_items ) );
+
+    // Phase 4: cleanup.
+    tlt_cb_contract_collapse_duplicate_tags( $doc_id );
+    tlt_cb_contract_hide_empty_staff_blocks( $doc_id );
+
+    $url = tlt_cb_doc_url( $doc_id );
+    $combined_id = 'CC-' . strtoupper( substr( bin2hex( random_bytes( 6 ) ), 0, 12 ) );
+
+    foreach ( $shows as $sh ) {
+        $r = tlt_cb_contract_update_status( $sh, $role, $first_name, 'Generated', $url, [ 'combinedContractId' => $combined_id ] );
+        if ( is_wp_error( $r ) ) return $r;
+    }
+
+    return [
+        'success'            => true,
+        'docId'              => $doc_id,
+        'docUrl'             => $url,
+        'docName'            => $doc_name,
+        'fullName'           => $full_name,
+        'shows'              => $shows,
+        'role'               => $role,
+        'firstName'          => $first_name,
+        'templateType'       => $data['template'],
+        'combinedContractId' => $combined_id,
+    ];
+}
+
+/* -----  Contract SEND flow (Docs → PDF → OpenSign → email)  --------------- */
+
+/**
+ * Export a Google Doc as PDF via drive.google.com/document/d/{id}/export.
+ * Returns raw PDF bytes.
+ */
+function tlt_cb_contract_export_pdf( $doc_id ) {
+    $token = tlt_callboard_google_access_token();
+    if ( is_wp_error( $token ) ) return $token;
+    $url = 'https://docs.google.com/document/d/' . $doc_id . '/export?format=pdf';
+    $resp = wp_remote_get( $url, [
+        'timeout' => 90,
+        'headers' => [ 'Authorization' => 'Bearer ' . $token ],
+    ] );
+    if ( is_wp_error( $resp ) ) return $resp;
+    $code = wp_remote_retrieve_response_code( $resp );
+    $body = wp_remote_retrieve_body( $resp );
+    if ( $code < 200 || $code >= 300 ) return new WP_Error( 'pdf_export_http', "PDF export returned $code" );
+    return $body;
+}
+
+/**
+ * Cheap PDF page count — same trick as GAS: count /Page tokens (as byte
+ * sequences). Fallback to 3 if we can't detect.
+ */
+function tlt_cb_contract_pdf_page_count( $pdf_bytes ) {
+    if ( ! is_string( $pdf_bytes ) || $pdf_bytes === '' ) return 3;
+    preg_match_all( '#/Type\s*/Page[^s]#', $pdf_bytes, $m );
+    $n = count( $m[0] );
+    return $n > 0 ? $n : 3;
+}
+
+/**
+ * OpenSign widget layout per template type — port of SIGNATURE_WIDGETS.
+ * `page` is added at call time based on PDF page count.
+ */
+function tlt_cb_contract_opensign_widgets( $template_type ) {
+    $checkbox = function ( $x, $y, $w, $h, $value ) {
+        return [
+            'type' => 'checkbox', 'x' => $x, 'y' => $y, 'w' => $w, 'h' => $h,
+            'name' => 'payment_preference', 'value' => $value,
+            'options' => [ 'hidelabel' => true, 'validation' => [ 'minselections' => 0, 'maxselections' => 1 ] ],
+        ];
+    };
+    $sig = function ( $x, $y, $w, $h, $required = true ) {
+        return [ 'type' => 'signature', 'x' => $x, 'y' => $y, 'w' => $w, 'h' => $h, 'options' => [ 'required' => $required ] ];
+    };
+    $date = function ( $x, $y, $w, $h ) {
+        return [
+            'type' => 'date', 'x' => $x, 'y' => $y, 'w' => $w, 'h' => $h,
+            'options' => [ 'required' => true, 'signing_date' => true, 'format' => 'MMMM dd, yyyy' ],
+        ];
+    };
+    $donation = [
+        'type' => 'textbox', 'x' => 431, 'y' => 228, 'w' => 37, 'h' => 13,
+        'name' => 'donation_amount', 'options' => [ 'fontsize' => 10 ],
+    ];
+
+    switch ( $template_type ) {
+        case 'Actor':
+            return [ $sig( 120, 115, 180, 20, true ), $date( 351, 115, 100, 20 ), $sig( 120, 170, 180, 20, false ) ];
+        case 'Operator':
+            return [ $sig( 120, 114, 180, 20, true ), $date( 350, 114, 100, 20 ) ];
+        case 'Director':
+        case 'General':
+        default:
+            return [
+                $checkbox( 83, 150, 11, 9, 'option1' ),
+                $checkbox( 83, 183, 11, 7, 'option2' ),
+                $checkbox( 83, 202, 11, 9, 'option3' ),
+                $checkbox( 83, 234, 12, 9, 'option4' ),
+                $donation,
+                $sig( 122, 326, 180, 15, true ),
+                $date( 348, 326, 100, 15 ),
+            ];
+    }
+}
+
+/**
+ * POST /createcontact + POST /createdocument to OpenSign. Returns
+ * [ 'openSignId' => ..., 'signingUrl' => ... ] or WP_Error.
+ */
+function tlt_cb_contract_opensign_send( $doc_name, $pdf_bytes, $email, $full_name, $template_type, $combined = false ) {
+    if ( ! defined( 'TLT_CALLBOARD_OPENSIGN_KEY' ) || TLT_CALLBOARD_OPENSIGN_KEY === '' ) {
+        return new WP_Error( 'opensign_not_configured',
+            'OpenSign not configured. Add `define( "TLT_CALLBOARD_OPENSIGN_KEY", "opensign.…" );` to wp-config.php.' );
+    }
+    $headers = [
+        'Content-Type' => 'application/json',
+        'x-api-token'  => TLT_CALLBOARD_OPENSIGN_KEY,
+    ];
+    // 1. Create contact.
+    $r1 = wp_remote_post( TLT_CALLBOARD_OPENSIGN_URL . '/createcontact', [
+        'timeout' => 30,
+        'headers' => $headers,
+        'body'    => wp_json_encode( [ 'name' => $full_name, 'email' => $email ] ),
+    ] );
+    if ( is_wp_error( $r1 ) ) return $r1;
+    $b1 = wp_remote_retrieve_body( $r1 );
+    $c1 = json_decode( $b1, true );
+    if ( empty( $c1['objectId'] ) ) return new WP_Error( 'opensign_contact', "OpenSign createcontact failed: $b1" );
+    $contact_id = $c1['objectId'];
+
+    // 2. Create document with widgets stamped on last page.
+    $pages = tlt_cb_contract_pdf_page_count( $pdf_bytes );
+    $widgets = array_map( function ( $w ) use ( $pages ) { $w['page'] = $pages; return $w; },
+        tlt_cb_contract_opensign_widgets( $template_type ) );
+    $r2 = wp_remote_post( TLT_CALLBOARD_OPENSIGN_URL . '/createdocument', [
+        'timeout' => 60,
+        'headers' => $headers,
+        'body'    => wp_json_encode( [
+            'file'    => base64_encode( $pdf_bytes ),
+            'title'   => $doc_name,
+            'note'    => 'Please review and sign your Tacoma Little Theatre ' . ( $combined ? 'combined contract' : 'contract' ) . '.',
+            'signers' => [ [
+                'objectId' => $contact_id,
+                'name'     => $full_name,
+                'email'    => $email,
+                'widgets'  => $widgets,
+            ] ],
+        ] ),
+    ] );
+    if ( is_wp_error( $r2 ) ) return $r2;
+    $b2 = wp_remote_retrieve_body( $r2 );
+    $code2 = wp_remote_retrieve_response_code( $r2 );
+    if ( $code2 !== 200 && $code2 !== 201 ) return new WP_Error( 'opensign_doc', "OpenSign createdocument returned $code2: $b2" );
+    $c2 = json_decode( $b2, true );
+    if ( empty( $c2['objectId'] ) ) return new WP_Error( 'opensign_doc', "OpenSign createdocument had no objectId: $b2" );
+    return [
+        'openSignId' => $c2['objectId'],
+        'signingUrl' => $c2['signurl'] ?? '',
+    ];
+}
+
+/**
+ * Send flow entry point. Called after generate: exports PDF, sends to
+ * OpenSign, updates sheet to "Sent for Signature", fires bio email.
+ */
+function tlt_cb_contract_send( $doc_id, $doc_name, $email, $full_name, $show, $role, $first_name, $last_name, $template_type ) {
+    $pdf = tlt_cb_contract_export_pdf( $doc_id );
+    if ( is_wp_error( $pdf ) ) return $pdf;
+    $os = tlt_cb_contract_opensign_send( $doc_name, $pdf, $email, $full_name, $template_type, false );
+    if ( is_wp_error( $os ) ) return $os;
+    $r = tlt_cb_contract_update_status( $show, $role, $first_name, 'Sent for Signature', $os['openSignId'] );
+    if ( is_wp_error( $r ) ) return $r;
+    // Non-fatal bio email.
+    $bio_r = tlt_cb_send_bio_request_email( $email, $full_name, $first_name, $last_name, $show, $role );
+    $bio_error = is_wp_error( $bio_r ) ? $bio_r->get_error_message() : null;
+    return [
+        'success'      => true,
+        'openSignId'   => $os['openSignId'],
+        'signingUrl'   => $os['signingUrl'],
+        'bioEmailError' => $bio_error,
+    ];
+}
+
+function tlt_cb_contract_send_combined( $doc_id, $doc_name, $email, $full_name, array $shows, $role, $first_name, $last_name, $template_type ) {
+    if ( count( $shows ) === 1 ) {
+        return tlt_cb_contract_send( $doc_id, $doc_name, $email, $full_name, $shows[0], $role, $first_name, $last_name, $template_type );
+    }
+    $pdf = tlt_cb_contract_export_pdf( $doc_id );
+    if ( is_wp_error( $pdf ) ) return $pdf;
+    $os = tlt_cb_contract_opensign_send( $doc_name, $pdf, $email, $full_name, $template_type, true );
+    if ( is_wp_error( $os ) ) return $os;
+    // Update on shows[0] — the col S propagation covers the rest.
+    $r = tlt_cb_contract_update_status( $shows[0], $role, $first_name, 'Sent for Signature', $os['openSignId'] );
+    if ( is_wp_error( $r ) ) return $r;
+    $bio_r = tlt_cb_send_combined_bio_request_email( $email, $full_name, $first_name, $last_name, $shows, $role );
+    $bio_error = is_wp_error( $bio_r ) ? $bio_r->get_error_message() : null;
+    return [
+        'success'       => true,
+        'openSignId'    => $os['openSignId'],
+        'signingUrl'    => $os['signingUrl'],
+        'bioEmailError' => $bio_error,
+    ];
+}
+
+function tlt_cb_contract_delete( $doc_id, $show, $role, $first_name ) {
+    if ( $doc_id !== '' ) {
+        $t = tlt_cb_drive_trash( $doc_id );
+        // Non-fatal — the file may already be gone.
+    }
+    return tlt_cb_contract_update_status( $show, $role, $first_name, 'Not Started', '' );
+}
+
+/* -----  Contract endpoints  ----------------------------------------------- */
+
+function tlt_callboard_ep_contract_generate( WP_REST_Request $req ) {
+    $body = $req->get_json_params() ?: [];
+    $show  = tlt_cb_s( $body['show']      ?? '' );
+    $role  = tlt_cb_s( $body['role']      ?? '' );
+    $first = tlt_cb_s( $body['firstName'] ?? '' );
+    $last  = tlt_cb_s( $body['lastName']  ?? '' );
+    $char  = tlt_cb_s( $body['character'] ?? '' );
+    if ( $show === '' || $role === '' || $first === '' ) {
+        return new WP_Error( 'missing_args', 'show, role, firstName required', [ 'status' => 400 ] );
+    }
+    $r = tlt_cb_contract_generate( $show, $role, $first, $last, $char );
+    if ( is_wp_error( $r ) ) return $r;
+    return tlt_cb_ok( $r );
+}
+
+function tlt_callboard_ep_contract_generate_combined( WP_REST_Request $req ) {
+    $body = $req->get_json_params() ?: [];
+    $shows = $body['shows'] ?? [];
+    if ( ! is_array( $shows ) || count( $shows ) === 0 ) {
+        return new WP_Error( 'missing_shows', 'shows[] required', [ 'status' => 400 ] );
+    }
+    $shows = array_map( 'tlt_cb_s', $shows );
+    $role  = tlt_cb_s( $body['role']      ?? '' );
+    $first = tlt_cb_s( $body['firstName'] ?? '' );
+    $last  = tlt_cb_s( $body['lastName']  ?? '' );
+    $char  = tlt_cb_s( $body['character'] ?? '' );
+    if ( $role === '' || $first === '' ) return new WP_Error( 'missing_args', 'role, firstName required', [ 'status' => 400 ] );
+    $r = tlt_cb_contract_generate_combined( $shows, $role, $first, $last, $char );
+    if ( is_wp_error( $r ) ) return $r;
+    return tlt_cb_ok( $r );
+}
+
+function tlt_callboard_ep_contract_send( WP_REST_Request $req ) {
+    $body = $req->get_json_params() ?: [];
+    $doc_id = tlt_cb_s( $body['docId']    ?? '' );
+    $doc_name = tlt_cb_s( $body['docName'] ?? '' );
+    $email  = tlt_cb_s( $body['email']    ?? '' );
+    $full   = tlt_cb_s( $body['fullName'] ?? '' );
+    $show   = tlt_cb_s( $body['show']     ?? '' );
+    $role   = tlt_cb_s( $body['role']     ?? '' );
+    $first  = tlt_cb_s( $body['firstName']?? '' );
+    $last   = tlt_cb_s( $body['lastName'] ?? '' );
+    $tpl    = tlt_cb_s( $body['templateType'] ?? 'General' );
+    if ( $doc_id === '' || $email === '' || $show === '' || $role === '' || $first === '' ) {
+        return new WP_Error( 'missing_args', 'docId, email, show, role, firstName required', [ 'status' => 400 ] );
+    }
+    $r = tlt_cb_contract_send( $doc_id, $doc_name, $email, $full, $show, $role, $first, $last, $tpl );
+    if ( is_wp_error( $r ) ) return $r;
+    return tlt_cb_ok( $r );
+}
+
+function tlt_callboard_ep_contract_send_combined( WP_REST_Request $req ) {
+    $body = $req->get_json_params() ?: [];
+    $doc_id = tlt_cb_s( $body['docId']    ?? '' );
+    $doc_name = tlt_cb_s( $body['docName'] ?? '' );
+    $email  = tlt_cb_s( $body['email']    ?? '' );
+    $full   = tlt_cb_s( $body['fullName'] ?? '' );
+    $shows  = $body['shows'] ?? [];
+    if ( ! is_array( $shows ) || count( $shows ) === 0 ) return new WP_Error( 'missing_shows', 'shows[] required', [ 'status' => 400 ] );
+    $shows  = array_map( 'tlt_cb_s', $shows );
+    $role   = tlt_cb_s( $body['role']         ?? '' );
+    $first  = tlt_cb_s( $body['firstName']    ?? '' );
+    $last   = tlt_cb_s( $body['lastName']     ?? '' );
+    $tpl    = tlt_cb_s( $body['templateType'] ?? 'General' );
+    if ( $doc_id === '' || $email === '' || $role === '' || $first === '' ) {
+        return new WP_Error( 'missing_args', 'docId, email, role, firstName required', [ 'status' => 400 ] );
+    }
+    $r = tlt_cb_contract_send_combined( $doc_id, $doc_name, $email, $full, $shows, $role, $first, $last, $tpl );
+    if ( is_wp_error( $r ) ) return $r;
+    return tlt_cb_ok( $r );
+}
+
+function tlt_callboard_ep_contract_delete( WP_REST_Request $req ) {
+    $body = $req->get_json_params() ?: [];
+    $doc_id = tlt_cb_s( $body['docId'] ?? '' );
+    $show   = tlt_cb_s( $body['show']  ?? '' );
+    $role   = tlt_cb_s( $body['role']  ?? '' );
+    $first  = tlt_cb_s( $body['firstName'] ?? '' );
+    if ( $show === '' || $role === '' || $first === '' ) {
+        return new WP_Error( 'missing_args', 'show, role, firstName required', [ 'status' => 400 ] );
+    }
+    $r = tlt_cb_contract_delete( $doc_id, $show, $role, $first );
+    if ( is_wp_error( $r ) ) return $r;
+    return tlt_cb_ok( [ 'success' => true ] );
 }
