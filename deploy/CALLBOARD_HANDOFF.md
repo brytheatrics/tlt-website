@@ -81,6 +81,18 @@ Frontend UX additions:
 - **Contact Sheet button** — View/Regenerate modal if one exists; auto-generate if not
 - **Tech Schedule button** — Same View/Regenerate modal pattern
 
+## Fast pre-flight: smoke test
+
+Before running through the UI, verify all read endpoints work with your
+password:
+
+```bash
+./deploy/callboard_smoketest.sh 'YOUR_CALLBOARD_PASSWORD'
+```
+
+Reports pass/fail per endpoint. Doesn't touch any writes — safe on production.
+Any 401/500 in the output is a real bug that'll bite you in the UI too.
+
 ## What to test (recommended order)
 
 1. **Log in** at the temp URL (or callboard.tacomalittletheatre.com if you've DNS-pointed). Purge the Cloudways Full Page Cache from the dashboard first — the frontend and plugin changes won't appear otherwise.
