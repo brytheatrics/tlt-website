@@ -3329,39 +3329,13 @@ function tlt_cb_contact_sheet_generate( $show, $regenerate = false ) {
         return new WP_Error( 'no_season_long', 'Season "Current Season Long" is empty — set it on the Season tab.' );
     }
 
-    // Default target = Contact Sheets. If the existing doc was moved into a
-    // show's General folder (via /contact-sheet-add-to-show), we regenerate
-    // there so the doc stays where the user put it. Personal Drive files can
-    // only live in one folder, so we look up the existing doc's parent and
-    // reuse it as the target.
-    $target_folder = TLT_CALLBOARD_CS_FOLDER_ID;
     if ( $regenerate ) {
-        $existing_ids = [];
-        // Preferred lookup: URL cached in Season col M — reliable even after
-        // the doc has been moved out of the Contact Sheets folder.
-        if ( $data['season_row_num'] > 0 ) {
-            $cell = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, "Season!M{$data['season_row_num']}", 0, true );
-            $cached_url = tlt_cb_s( $cell[0][0] ?? '' );
-            if ( $cached_url !== '' && preg_match( '~/document/d/([^/?]+)~', $cached_url, $m ) ) {
-                $existing_ids[] = $m[1];
-                $parents = tlt_cb_drive_get_parents( $m[1] );
-                if ( ! empty( $parents ) ) $target_folder = $parents[0];
-            }
-        }
-        // Fallback: sweep the Contact Sheets folder for any other stragglers
-        // that share the doc name (older docs, manual copies, etc).
-        $existing_name = tlt_cb_contact_sheet_doc_name( $show, $data['season_long'] );
-        $extra_files = tlt_cb_drive_find_in_folder( TLT_CALLBOARD_CS_FOLDER_ID, $existing_name );
-        if ( is_array( $extra_files ) ) {
-            foreach ( $extra_files as $f ) {
-                if ( ! in_array( $f['id'], $existing_ids, true ) ) $existing_ids[] = $f['id'];
-            }
-        }
-        foreach ( $existing_ids as $id ) tlt_cb_drive_trash( $id );
+        $trashed = tlt_cb_contact_sheet_trash_existing( $show, $data['season_long'] );
+        if ( is_wp_error( $trashed ) ) return $trashed;
     }
 
     $doc_name = tlt_cb_contact_sheet_doc_name( $show, $data['season_long'] );
-    $file     = tlt_cb_drive_copy( TLT_CALLBOARD_CS_TEMPLATE_ID, $target_folder, $doc_name );
+    $file     = tlt_cb_drive_copy( TLT_CALLBOARD_CS_TEMPLATE_ID, TLT_CALLBOARD_CS_FOLDER_ID, $doc_name );
     if ( is_wp_error( $file ) ) return $file;
     $doc_id   = $file['id'];
 
@@ -3376,6 +3350,9 @@ function tlt_cb_contact_sheet_generate( $show, $regenerate = false ) {
         $write = tlt_callboard_sheets_write( TLT_CALLBOARD_SHEET_ID, "Season!M{$data['season_row_num']}", [[ $url ]] );
         if ( is_wp_error( $write ) ) return $write; // still surface the URL? For now bail.
     }
+
+    // Auto-refresh the show-folder PDF if one was previously distributed.
+    tlt_cb_generator_refresh_show_pdf( $show, $doc_id, $doc_name . '.pdf' );
 
     return [ 'url' => $url ];
 }
@@ -3414,18 +3391,16 @@ function tlt_callboard_ep_contact_sheet_regenerate( WP_REST_Request $req ) {
 
 /**
  * POST /contact-sheet-add-to-show  { show }
- * MOVE the existing contact sheet doc into {season}/{show}/General/. Personal
- * Drive files can only live in one folder, so the doc leaves the Contact
- * Sheets folder as part of this operation. The Google Doc URL is unchanged
- * (Drive IDs survive folder moves), so cached URLs and the callboard's View
- * button keep working. Regenerate looks up the current parent via URL cache
- * and stays in place.
+ * Export the current contact sheet doc as a PDF and drop it in
+ * {season}/{show}/General/. The Google Doc stays canonical in the Contact
+ * Sheets folder. Later regenerates automatically refresh this PDF too, so
+ * users only have to click once per show.
  */
 function tlt_callboard_ep_contact_sheet_add_to_show( WP_REST_Request $req ) {
     $body = $req->get_json_params();
     $show = tlt_cb_s( is_array( $body ) ? ( $body['show'] ?? '' ) : '' );
     if ( $show === '' ) return new WP_Error( 'missing_show', 'show is required', [ 'status' => 400 ] );
-    return tlt_cb_move_generator_doc_to_show(
+    return tlt_cb_send_generator_pdf_to_show(
         $show,
         TLT_CALLBOARD_CS_FOLDER_ID,
         'M',
@@ -3436,13 +3411,13 @@ function tlt_callboard_ep_contact_sheet_add_to_show( WP_REST_Request $req ) {
 
 /**
  * POST /tech-schedule-add-to-show  { show }
- * Same as above, for the tech schedule (cache column N, primary Tech Packets).
+ * Same as above, for the tech schedule.
  */
 function tlt_callboard_ep_tech_schedule_add_to_show( WP_REST_Request $req ) {
     $body = $req->get_json_params();
     $show = tlt_cb_s( is_array( $body ) ? ( $body['show'] ?? '' ) : '' );
     if ( $show === '' ) return new WP_Error( 'missing_show', 'show is required', [ 'status' => 400 ] );
-    return tlt_cb_move_generator_doc_to_show(
+    return tlt_cb_send_generator_pdf_to_show(
         $show,
         TLT_CALLBOARD_TS_FOLDER_ID,
         'N',
@@ -3452,29 +3427,29 @@ function tlt_callboard_ep_tech_schedule_add_to_show( WP_REST_Request $req ) {
 }
 
 /**
- * Move a generated doc (contact sheet / tech schedule) into the show's General
- * folder. Idempotent — calling on an already-moved doc is a safe no-op.
+ * Export a generator doc as PDF and drop it in {show}/General/. Called by both
+ * the "Add PDF to show Drive" button and (indirectly) by regenerate via
+ * tlt_cb_generator_refresh_show_pdf.
  *
  * @param string   $show
- * @param string   $primary_folder_id  Folder the doc originally lives in.
- * @param string   $url_col_letter     Season col letter caching the doc URL ('M' or 'N').
- * @param callable $name_builder       ( $show, $season_long ) → filename (fallback lookup).
+ * @param string   $primary_folder_id  Where the canonical Doc lives.
+ * @param string   $url_col_letter     Season col letter caching the doc URL.
+ * @param callable $name_builder       ( $show, $season_long ) → doc filename (no .pdf).
  * @param string   $doc_label          Human label for error messages.
  */
-function tlt_cb_move_generator_doc_to_show( $show, $primary_folder_id, $url_col_letter, $name_builder, $doc_label ) {
+function tlt_cb_send_generator_pdf_to_show( $show, $primary_folder_id, $url_col_letter, $name_builder, $doc_label ) {
     // Resolve season config for the show's row + season name.
     $season_rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, 'Season!A1:N', 60, true );
     if ( is_wp_error( $season_rows ) ) return $season_rows;
     $season_long = tlt_cb_season_setting( $season_rows, 'Current Season Long' );
     if ( $season_long === '' ) return new WP_Error( 'no_season_long', 'Season "Current Season Long" is empty.' );
 
-    // Find the show's row (col A = show name, cross-referencing with Contactbook layout).
     $row_num = 0;
     foreach ( $season_rows as $i => $r ) {
         if ( trim( tlt_cb_s( $r[0] ?? '' ) ) === trim( $show ) ) { $row_num = $i + 1; break; }
     }
 
-    // Prefer URL cache — reliable after prior moves.
+    // Look up the doc: URL cache preferred, folder scan fallback.
     $doc_id = null;
     if ( $row_num > 0 ) {
         $cell = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, "Season!{$url_col_letter}{$row_num}", 0, true );
@@ -3483,46 +3458,59 @@ function tlt_cb_move_generator_doc_to_show( $show, $primary_folder_id, $url_col_
             $doc_id = $m[1];
         }
     }
-    // Fallback: scan primary folder by exact filename.
+    $doc_name = $name_builder( $show, $season_long );
     if ( ! $doc_id ) {
-        $doc_name = $name_builder( $show, $season_long );
         $files = tlt_cb_drive_find_in_folder( $primary_folder_id, $doc_name );
         if ( is_wp_error( $files ) ) return $files;
         if ( empty( $files ) ) return new WP_Error( 'no_doc', 'No ' . $doc_label . ' found for ' . $show . '. Generate it first.' );
         $doc_id = $files[0]['id'];
     }
 
-    // Locate the show's General folder (create if missing).
+    $general_id = tlt_cb_resolve_show_general_folder( $show );
+    if ( is_wp_error( $general_id ) ) return $general_id;
+
+    $pdf_filename = $doc_name . '.pdf';
+    $r = tlt_cb_generator_publish_pdf( $doc_id, $general_id, $pdf_filename );
+    if ( is_wp_error( $r ) ) return $r;
+
+    return tlt_cb_ok( [ 'folder' => $show . ' / General', 'pdf' => $pdf_filename ] );
+}
+
+/**
+ * Called after a regenerate to keep an already-distributed PDF in sync with
+ * the canonical Doc. If no PDF matching $pdf_filename lives in $show's General
+ * folder, this is a no-op (the show hasn't opted in to PDF distribution yet).
+ * All failures are silent — regenerate always succeeds from the caller's view.
+ */
+function tlt_cb_generator_refresh_show_pdf( $show, $doc_id, $pdf_filename ) {
+    $general_id = tlt_cb_resolve_show_general_folder( $show );
+    if ( is_wp_error( $general_id ) ) return;
+    $existing = tlt_cb_drive_find_in_folder( $general_id, $pdf_filename );
+    if ( is_wp_error( $existing ) || empty( $existing ) ) return; // never distributed → nothing to refresh
+    tlt_cb_generator_publish_pdf( $doc_id, $general_id, $pdf_filename );
+}
+
+/**
+ * Resolve the {season}/{show}/General/ folder ID, creating General if missing.
+ */
+function tlt_cb_resolve_show_general_folder( $show ) {
     $season_folder_id = tlt_cb_emergency_season_folder_id();
     if ( $season_folder_id === '' ) return new WP_Error( 'no_season_folder', 'Season folder not set in Season tab.' );
     $show_folder_id = tlt_cb_emergency_find_child_folder( $season_folder_id, $show );
     if ( ! $show_folder_id ) return new WP_Error( 'no_show_folder', 'No Drive folder found for "' . $show . '" in the season folder.' );
-    $general_id = tlt_cb_emergency_find_or_create_child_folder( $show_folder_id, 'General' );
-    if ( is_wp_error( $general_id ) ) return $general_id;
+    return tlt_cb_emergency_find_or_create_child_folder( $show_folder_id, 'General' );
+}
 
-    // Move: addParents=General, removeParents=<current parents>. Idempotent —
-    // if the doc is already in General, current parents = [General], we remove
-    // and re-add, ending in the same place.
-    $current_parents = tlt_cb_drive_get_parents( $doc_id );
-    $token = tlt_callboard_google_access_token();
-    if ( is_wp_error( $token ) ) return $token;
-    $url = 'https://www.googleapis.com/drive/v3/files/' . rawurlencode( $doc_id )
-         . '?addParents=' . rawurlencode( $general_id )
-         . ( $current_parents ? '&removeParents=' . rawurlencode( implode( ',', $current_parents ) ) : '' )
-         . '&supportsAllDrives=true&fields=parents';
-    $resp = wp_remote_request( $url, [
-        'method'  => 'PATCH',
-        'timeout' => 15,
-        'headers' => [ 'Authorization' => 'Bearer ' . $token, 'Content-Type' => 'application/json' ],
-        'body'    => '{}',
-    ] );
-    if ( is_wp_error( $resp ) ) return $resp;
-    $code = wp_remote_retrieve_response_code( $resp );
-    if ( $code < 200 || $code >= 300 ) {
-        return new WP_Error( 'move_failed', 'Drive move returned ' . $code . ': ' . wp_remote_retrieve_body( $resp ) );
-    }
-
-    return tlt_cb_ok( [ 'folder' => $show . ' / General', 'doc_id' => $doc_id ] );
+/**
+ * Export $doc_id as PDF and write it into $folder_id as $pdf_filename,
+ * replacing any prior PDF with the same name. Returns true or WP_Error.
+ */
+function tlt_cb_generator_publish_pdf( $doc_id, $folder_id, $pdf_filename ) {
+    $pdf_bytes = tlt_cb_contract_export_pdf( $doc_id );
+    if ( is_wp_error( $pdf_bytes ) ) return $pdf_bytes;
+    $up = tlt_cb_emergency_replace_pdf_in_folder( $folder_id, $pdf_filename, $pdf_bytes );
+    if ( is_wp_error( $up ) ) return $up;
+    return true;
 }
 
 /* ===========================================================================
@@ -3892,29 +3880,12 @@ function tlt_cb_tech_schedule_generate( $show ) {
 
     $doc_name = $show . ' - ' . $data['season_long'] . ' Tech Schedule';
 
-    // Default target = Tech Packets. If the existing doc was moved into a
-    // show's General folder (via /tech-schedule-add-to-show), regenerate there
-    // so it stays where the user put it.
-    $target_folder = TLT_CALLBOARD_TS_FOLDER_ID;
-    $existing_ids = [];
-    if ( $data['season_row_num'] > 0 ) {
-        $cell = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, "Season!N{$data['season_row_num']}", 0, true );
-        $cached_url = tlt_cb_s( $cell[0][0] ?? '' );
-        if ( $cached_url !== '' && preg_match( '~/document/d/([^/?]+)~', $cached_url, $m ) ) {
-            $existing_ids[] = $m[1];
-            $parents = tlt_cb_drive_get_parents( $m[1] );
-            if ( ! empty( $parents ) ) $target_folder = $parents[0];
-        }
-    }
-    // Fallback sweep of the Tech Packets folder for any stragglers.
+    // Delete any existing (matches GAS behavior of always regenerating fresh).
     $existing = tlt_cb_drive_find_in_folder( TLT_CALLBOARD_TS_FOLDER_ID, $doc_name );
     if ( is_wp_error( $existing ) ) return $existing;
-    foreach ( $existing as $f ) {
-        if ( ! in_array( $f['id'], $existing_ids, true ) ) $existing_ids[] = $f['id'];
-    }
-    foreach ( $existing_ids as $id ) tlt_cb_drive_trash( $id );
+    foreach ( $existing as $f ) tlt_cb_drive_trash( $f['id'] );
 
-    $file = tlt_cb_drive_copy( TLT_CALLBOARD_TS_TEMPLATE_ID, $target_folder, $doc_name );
+    $file = tlt_cb_drive_copy( TLT_CALLBOARD_TS_TEMPLATE_ID, TLT_CALLBOARD_TS_FOLDER_ID, $doc_name );
     if ( is_wp_error( $file ) ) return $file;
     $doc_id = $file['id'];
 
@@ -3943,6 +3914,10 @@ function tlt_cb_tech_schedule_generate( $show ) {
     if ( $data['season_row_num'] > 0 ) {
         tlt_callboard_sheets_write( TLT_CALLBOARD_SHEET_ID, "Season!N{$data['season_row_num']}", [[ $url ]] );
     }
+
+    // Auto-refresh the show-folder PDF if one was previously distributed.
+    tlt_cb_generator_refresh_show_pdf( $show, $doc_id, $doc_name . '.pdf' );
+
     return [ 'url' => $url ];
 }
 

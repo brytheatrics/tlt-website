@@ -1543,10 +1543,10 @@
       path: '/contact-sheet-regenerate',
       body: function (show) { return { show: show }; },
     },
-    moveContactSheetToShow: {
-      // MOVE the doc into {season}/{show}/General/. Personal Drive can't
-      // multi-parent, so the doc leaves the Contact Sheets folder. Regenerate
-      // sees the new parent (via URL cache) and stays there.
+    addContactSheetPdfToShow: {
+      // Export the current contact sheet as a PDF into {season}/{show}/General/.
+      // The canonical Doc stays in the Contact Sheets folder. Future regenerates
+      // auto-refresh the PDF if one has already been distributed.
       path: '/contact-sheet-add-to-show',
       body: function (show) { return { show: show }; },
     },
@@ -1557,8 +1557,8 @@
       path: '/tech-schedule-generate',
       body: function (show) { return { show: show }; },
     },
-    moveTechScheduleToShow: {
-      // Same as contact sheet's move, for the tech schedule.
+    addTechSchedulePdfToShow: {
+      // Same PDF-export pattern as contact sheet's add-to-show.
       path: '/tech-schedule-add-to-show',
       body: function (show) { return { show: show }; },
     },
@@ -5733,11 +5733,11 @@
         '<h3 style="margin:0 0 6px; font-size:18px; font-weight:600;">Contact Sheet</h3>' +
         '<p style="margin:0 0 6px; color:#333; font-size:14px;"><strong>' + calEscape(showName) + '</strong> already has a contact sheet.</p>' +
         '<p style="margin:0 0 14px; color:#666; font-size:13px;">Regenerate to pick up any recent cast or crew changes. The old one moves to trash.</p>' +
-        '<p style="margin:0 0 20px; color:#666; font-size:13px;">Move to show Drive once the cast + team are locked in — the doc leaves the Contact Sheets folder and lives in the show\'s <em>General</em> folder from then on. Future regenerates stay there.</p>' +
+        '<p style="margin:0 0 20px; color:#666; font-size:13px;">Once cast + team are locked in, drop a PDF snapshot into the show\'s <em>General</em> folder. The working Google Doc stays here; only the PDF gets distributed. Regenerating later auto-refreshes the PDF too.</p>' +
         '<div style="display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap;">' +
           '<button id="cb-cs-cancel" class="btn btn-secondary" style="font-size:13px; padding:6px 14px;">Cancel</button>' +
           '<button id="cb-cs-regen"  class="btn btn-secondary" style="font-size:13px; padding:6px 14px;">Regenerate</button>' +
-          '<button id="cb-cs-move"   class="btn btn-secondary" style="font-size:13px; padding:6px 14px;">Move to show Drive</button>' +
+          '<button id="cb-cs-pdf"    class="btn btn-secondary" style="font-size:13px; padding:6px 14px;">Add PDF to show Drive</button>' +
           '<button id="cb-cs-view"   class="btn btn-primary"   style="font-size:13px; padding:6px 14px;">View</button>' +
         '</div>' +
       '</div>';
@@ -5748,19 +5748,19 @@
     document.getElementById('cb-cs-cancel').onclick = close;
     document.getElementById('cb-cs-view').onclick   = function () { close(); window.open(url, '_blank'); };
     document.getElementById('cb-cs-regen').onclick  = function () { close(); cbGenerateContactSheet(showName, true); };
-    document.getElementById('cb-cs-move').onclick = function () {
-      var btn = document.getElementById('cb-cs-move');
-      btn.disabled = true; btn.textContent = 'Moving…';
+    document.getElementById('cb-cs-pdf').onclick = function () {
+      var btn = document.getElementById('cb-cs-pdf');
+      btn.disabled = true; btn.textContent = 'Adding PDF…';
       google.script.run
         .withSuccessHandler(function (r) {
           close();
-          cbShowDocReady('Moved to ' + (r && r.folder ? r.folder : (showName + ' / General')), showName, url);
+          cbShowDocReady('PDF added to ' + (r && r.folder ? r.folder : (showName + ' / General')), showName, url);
         })
         .withFailureHandler(function (err) {
-          btn.disabled = false; btn.textContent = 'Move to show Drive';
-          showAlert('Could not move to show Drive: ' + (err && err.message ? err.message : 'unknown error'));
+          btn.disabled = false; btn.textContent = 'Add PDF to show Drive';
+          showAlert('Could not add PDF to show Drive: ' + (err && err.message ? err.message : 'unknown error'));
         })
-        .moveContactSheetToShow(showName);
+        .addContactSheetPdfToShow(showName);
     };
   }
 
@@ -5844,11 +5844,11 @@
         '<h3 style="margin:0 0 6px; font-size:18px; font-weight:600;">Tech Schedule</h3>' +
         '<p style="margin:0 0 6px; color:#333; font-size:14px;"><strong>' + calEscape(showName) + '</strong> already has a tech schedule.</p>' +
         '<p style="margin:0 0 14px; color:#666; font-size:13px;">Regenerate to pull the latest dates from the sheet. The old schedule moves to trash.</p>' +
-        '<p style="margin:0 0 20px; color:#666; font-size:13px;">Move to show Drive once the tech dates are finalized — the doc leaves Tech Packets and lives in the show\'s <em>General</em> folder from then on. Future regenerates stay there.</p>' +
+        '<p style="margin:0 0 20px; color:#666; font-size:13px;">Once tech dates are finalized, drop a PDF snapshot into the show\'s <em>General</em> folder. The working Google Doc stays in Tech Packets; only the PDF gets distributed. Regenerating later auto-refreshes the PDF too.</p>' +
         '<div style="display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap;">' +
           '<button id="cb-sched-cancel" class="btn btn-secondary" style="font-size:13px; padding:6px 14px;">Cancel</button>' +
           '<button id="cb-sched-regen"  class="btn btn-secondary" style="font-size:13px; padding:6px 14px;">Regenerate</button>' +
-          '<button id="cb-sched-move"   class="btn btn-secondary" style="font-size:13px; padding:6px 14px;">Move to show Drive</button>' +
+          '<button id="cb-sched-pdf"    class="btn btn-secondary" style="font-size:13px; padding:6px 14px;">Add PDF to show Drive</button>' +
           '<button id="cb-sched-view"   class="btn btn-primary"   style="font-size:13px; padding:6px 14px;">View</button>' +
         '</div>' +
       '</div>';
@@ -5858,19 +5858,19 @@
     document.getElementById('cb-sched-cancel').onclick = close;
     document.getElementById('cb-sched-view').onclick   = function () { close(); window.open(url, '_blank'); };
     document.getElementById('cb-sched-regen').onclick  = function () { close(); cbGenerateSchedule(showName); };
-    document.getElementById('cb-sched-move').onclick = function () {
-      var btn = document.getElementById('cb-sched-move');
-      btn.disabled = true; btn.textContent = 'Moving…';
+    document.getElementById('cb-sched-pdf').onclick = function () {
+      var btn = document.getElementById('cb-sched-pdf');
+      btn.disabled = true; btn.textContent = 'Adding PDF…';
       google.script.run
         .withSuccessHandler(function (r) {
           close();
-          cbShowDocReady('Moved to ' + (r && r.folder ? r.folder : (showName + ' / General')), showName, url);
+          cbShowDocReady('PDF added to ' + (r && r.folder ? r.folder : (showName + ' / General')), showName, url);
         })
         .withFailureHandler(function (err) {
-          btn.disabled = false; btn.textContent = 'Move to show Drive';
-          showAlert('Could not move to show Drive: ' + (err && err.message ? err.message : 'unknown error'));
+          btn.disabled = false; btn.textContent = 'Add PDF to show Drive';
+          showAlert('Could not add PDF to show Drive: ' + (err && err.message ? err.message : 'unknown error'));
         })
-        .moveTechScheduleToShow(showName);
+        .addTechSchedulePdfToShow(showName);
     };
   }
 
