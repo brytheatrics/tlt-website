@@ -271,8 +271,12 @@ function tlt_callboard_sheets_write( $spreadsheet_id, $range, $values ) {
 function tlt_cb_drive_copy( $template_id, $folder_id, $new_name ) {
     $token = tlt_callboard_google_access_token();
     if ( is_wp_error( $token ) ) return $token;
+    // Google Drive silently ignores `parents:` in the copy body when the target
+    // folder is in a different user's My Drive from the impersonating account
+    // (files land in the impersonating account's root instead). We ask for the
+    // file's `parents` back so we can explicitly move it if needed.
     $url  = 'https://www.googleapis.com/drive/v3/files/' . rawurlencode( $template_id )
-          . '/copy?supportsAllDrives=true&fields=id,name,webViewLink';
+          . '/copy?supportsAllDrives=true&fields=id,name,webViewLink,parents';
     $resp = wp_remote_post( $url, [
         'timeout' => 30,
         'headers' => [
@@ -290,7 +294,31 @@ function tlt_cb_drive_copy( $template_id, $folder_id, $new_name ) {
     if ( $code < 200 || $code >= 300 ) {
         return new WP_Error( 'drive_copy_http', "Drive copy returned $code: $body" );
     }
-    return json_decode( $body, true );
+    $data = json_decode( $body, true );
+
+    // If Drive dropped the file somewhere other than $folder_id (e.g. into the
+    // impersonating account's root), move it explicitly via addParents/removeParents.
+    $current_parents = ! empty( $data['parents'] ) && is_array( $data['parents'] ) ? $data['parents'] : [];
+    if ( ! empty( $data['id'] ) && ! in_array( $folder_id, $current_parents, true ) ) {
+        $move_url = 'https://www.googleapis.com/drive/v3/files/' . rawurlencode( $data['id'] )
+                  . '?addParents=' . rawurlencode( $folder_id )
+                  . '&removeParents=' . rawurlencode( implode( ',', $current_parents ) )
+                  . '&supportsAllDrives=true&fields=id,name,webViewLink,parents';
+        $mv = wp_remote_request( $move_url, [
+            'method'  => 'PATCH',
+            'timeout' => 15,
+            'headers' => [ 'Authorization' => 'Bearer ' . $token, 'Content-Type' => 'application/json' ],
+            'body'    => wp_json_encode( new stdClass() ),
+        ] );
+        if ( ! is_wp_error( $mv ) ) {
+            $mv_code = wp_remote_retrieve_response_code( $mv );
+            if ( $mv_code >= 200 && $mv_code < 300 ) {
+                $moved = json_decode( wp_remote_retrieve_body( $mv ), true );
+                if ( is_array( $moved ) ) $data = $moved + $data;
+            }
+        }
+    }
+    return $data;
 }
 
 /**
