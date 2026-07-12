@@ -28,8 +28,10 @@
 		}
 
 		function bestUrl( att ) {
-			if ( att.sizes && att.sizes.large ) return att.sizes.large.url;
-			return att.url;
+			// Prefer the full-resolution URL (att.url is the original, or the auto-scaled
+			// "big-image-threshold" version WP stops at 2560px). "large" is only 1024
+			// wide and looks pixelated on the splash background at retina/4K.
+			return att.url || ( att.sizes && att.sizes.large && att.sizes.large.url ) || '';
 		}
 
 		/* ---------- focal-point picker (for the cover crop) ---------- */
