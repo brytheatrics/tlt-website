@@ -330,6 +330,28 @@ function tlt_cb_drive_find_in_folder( $folder_id, $name ) {
  * @param string $file_id
  * @return true|WP_Error
  */
+/**
+ * Rename a Drive file (PATCH files.update with just a name). Doesn't require
+ * ownership, only edit access — useful as a fallback when trash fails 403.
+ */
+function tlt_cb_drive_rename( $file_id, $new_name ) {
+    $token = tlt_callboard_google_access_token();
+    if ( is_wp_error( $token ) ) return $token;
+    $url = 'https://www.googleapis.com/drive/v3/files/' . rawurlencode( $file_id ) . '?supportsAllDrives=true';
+    $resp = wp_remote_request( $url, [
+        'method'  => 'PATCH',
+        'timeout' => 15,
+        'headers' => [ 'Authorization' => 'Bearer ' . $token, 'Content-Type' => 'application/json' ],
+        'body'    => wp_json_encode( [ 'name' => $new_name ] ),
+    ] );
+    if ( is_wp_error( $resp ) ) return $resp;
+    $code = wp_remote_retrieve_response_code( $resp );
+    if ( $code < 200 || $code >= 300 ) {
+        return new WP_Error( 'drive_rename_http', 'Drive rename returned ' . $code . ': ' . wp_remote_retrieve_body( $resp ) );
+    }
+    return true;
+}
+
 function tlt_cb_drive_trash( $file_id ) {
     $token = tlt_callboard_google_access_token();
     if ( is_wp_error( $token ) ) return $token;
@@ -7855,11 +7877,22 @@ function tlt_cb_emergency_generate_pdf( $template_id, $tag_map, $temp_name ) {
  * Returns file ID or WP_Error.
  */
 function tlt_cb_emergency_replace_pdf_in_folder( $folder_id, $filename, $pdf_bytes ) {
-    // Trash any existing files with the same name.
+    // Any file with the same name has to be evicted before the new one lands or
+    // we accumulate duplicates. Preferred path: trash it. Fallback for legacy
+    // GAS-era files owned by other users (SA lacks canTrash on those): rename
+    // the old file with a timestamp suffix so ours wins the canonical name.
     $existing = tlt_cb_drive_find_in_folder( $folder_id, $filename );
     if ( ! is_wp_error( $existing ) && is_array( $existing ) ) {
         foreach ( $existing as $f ) {
-            if ( ! empty( $f['id'] ) ) tlt_cb_drive_trash( $f['id'] );
+            if ( empty( $f['id'] ) ) continue;
+            $tres = tlt_cb_drive_trash( $f['id'] );
+            if ( is_wp_error( $tres ) ) {
+                $dot = strrpos( $filename, '.' );
+                $ext = $dot !== false ? substr( $filename, $dot ) : '';
+                $stem = $dot !== false ? substr( $filename, 0, $dot ) : $filename;
+                $stamp = date( 'Y-m-d-His' );
+                tlt_cb_drive_rename( $f['id'], $stem . ' (superseded ' . $stamp . ')' . $ext );
+            }
         }
     }
 
@@ -8043,9 +8076,21 @@ function tlt_callboard_ep_bio_emergency( WP_REST_Request $req ) {
 
 /**
  * POST /bio-emergency-submit  { token, data:{...} }
- * Response: { success:true, medical:{status,detail}, watch:{status,detail}, shows:[names] }
- * On success the row is written and PDFs are generated. Any per-block failures
- * are reported in the response but the sheet row still lands.
+ *
+ * Fast path (blocks the response, ~3-5s):
+ *   1) Validate token.
+ *   2) Upsert the Emergency Info row (this is the "sent" the submitter waits for).
+ *   3) Append a Bio Log entry.
+ *
+ * Slow path (deferred via register_shutdown_function so the user doesn't wait):
+ *   4) Bootstrap templates on first use (~4s one-time cost).
+ *   5) Docs API replaceAllText + PDF export for medical + WATCH.
+ *   6) Multipart upload PDFs to every relevant Drive folder (~2-4s each).
+ *   7) Send WATCH review flag email if conviction=yes.
+ *
+ * Response is {success:true} the moment the sheet row lands. If a PDF or upload
+ * fails in the background it's silent — matches the original GAS queue-and-forget
+ * semantics. Blake can spot-check Drive folders after submission if needed.
  */
 function tlt_callboard_ep_bio_emergency_submit( WP_REST_Request $req ) {
     $body = $req->get_json_params();
@@ -8065,60 +8110,89 @@ function tlt_callboard_ep_bio_emergency_submit( WP_REST_Request $req ) {
 
     tlt_cb_emergency_log( $contactId, $cb_row, $is_update );
 
-    // Assemble identity fields.
+    // Send the JSON response and close the HTTP connection RIGHT NOW so the
+    // submitter isn't stuck watching a spinner for 30-45s while we generate
+    // 8 PDFs and upload them to Drive. Cloudways nginx buffers WP's normal
+    // REST output past the shutdown hook, so we serialize + echo manually.
+    $response_json = wp_json_encode( [ 'success' => true ] );
+    if ( ! headers_sent() ) {
+        @header( 'Content-Type: application/json; charset=UTF-8' );
+        @header( 'Content-Length: ' . strlen( $response_json ) );
+        @header( 'Connection: close' );
+        @header( 'X-Accel-Buffering: no' ); // Tell nginx not to buffer FPM output.
+    }
+    // Drop any WP-added output buffers so what we echo goes straight to the wire.
+    while ( ob_get_level() > 0 ) { @ob_end_clean(); }
+    echo $response_json;
+    if ( function_exists( 'fastcgi_finish_request' ) ) {
+        @fastcgi_finish_request();
+    } elseif ( function_exists( 'litespeed_finish_request' ) ) {
+        @litespeed_finish_request();
+    } else {
+        @flush();
+    }
+
+    // We're now detached from the client. Do the slow work with headroom.
+    @ignore_user_abort( true );
+    @set_time_limit( 180 );
+
+    tlt_cb_emergency_process_pdfs_bg( [ 'contactId' => $contactId, 'cb_row' => $cb_row, 'data' => $data ] );
+
+    // Prevent WP's REST server from also echoing a response.
+    exit;
+}
+
+/**
+ * The slow half of bio-emergency-submit — Docs+Drive PDF generation and upload.
+ * Runs after the client has already received {success:true}. Failures land in
+ * the PHP error log; the submitter never sees them.
+ */
+function tlt_cb_emergency_process_pdfs_bg( $ctx ) {
+    $contactId = $ctx['contactId'];
+    $cb_row    = $ctx['cb_row'];
+    $data      = $ctx['data'];
+
     $first = tlt_cb_s( $cb_row[1] ?? '' );
     $mid   = tlt_cb_s( $cb_row[2] ?? '' );
     $last  = tlt_cb_s( $cb_row[3] ?? '' );
     $suf   = tlt_cb_s( $cb_row[4] ?? '' );
     $parts = array_filter( [ $first, $mid, $last, $suf ], function( $s ) { return trim( (string) $s ) !== ''; } );
     $full_name = implode( ' ', $parts );
-    $filename = $last . ', ' . $first . '.pdf';
-
-    $result = [ 'success' => true, 'medical' => [ 'status' => 'skipped', 'detail' => '' ], 'watch' => [ 'status' => 'skipped', 'detail' => '' ], 'shows' => [] ];
+    $filename  = $last . ', ' . $first . '.pdf';
 
     $season_folder_id = tlt_cb_emergency_season_folder_id();
     if ( $season_folder_id === '' ) {
-        $result['medical'] = [ 'status' => 'error', 'detail' => 'Season folder not configured in Season tab.' ];
-        $result['watch']   = [ 'status' => 'error', 'detail' => 'Season folder not configured in Season tab.' ];
-        return rest_ensure_response( $result );
+        error_log( 'TLT emergency PDF gen aborted: no season folder id configured.' );
+        return;
     }
 
     // -------- Medical PDF --------
     try {
         $medical_template_id = tlt_cb_emergency_bootstrap_template( 'medical' );
         if ( is_wp_error( $medical_template_id ) ) throw new Exception( $medical_template_id->get_error_message() );
-
         $medical_pdf = tlt_cb_emergency_generate_pdf( $medical_template_id, tlt_cb_emergency_medical_tag_map( $full_name, $data ), $filename );
         if ( is_wp_error( $medical_pdf ) ) throw new Exception( $medical_pdf->get_error_message() );
 
         $shows = tlt_cb_emergency_shows_for_contact( $first, $last, $contactId );
-        $result['shows'] = $shows;
-        $delivered = [];
         foreach ( $shows as $show_name ) {
             $show_folder_id = tlt_cb_emergency_find_child_folder( $season_folder_id, $show_name );
-            if ( ! $show_folder_id ) continue; // Skip if show folder not present in Drive.
+            if ( ! $show_folder_id ) continue;
             $sm_id = tlt_cb_emergency_find_or_create_child_folder( $show_folder_id, 'Stage Management' );
             if ( is_wp_error( $sm_id ) ) continue;
             $mf_id = tlt_cb_emergency_find_or_create_child_folder( $sm_id, 'Medical Forms' );
             if ( is_wp_error( $mf_id ) ) continue;
             $up = tlt_cb_emergency_replace_pdf_in_folder( $mf_id, $filename, $medical_pdf );
             if ( is_wp_error( $up ) ) continue;
-            $delivered[] = $show_name;
             tlt_cb_emergency_mark_submitted_for_show( $show_name, $first, $last );
         }
-        $result['medical'] = [
-            'status' => $delivered ? 'ok' : 'no_shows_matched',
-            'detail' => $delivered ? implode( ', ', $delivered ) : 'No show folders found for this contact in the season.',
-        ];
     } catch ( Exception $e ) {
-        $result['medical'] = [ 'status' => 'error', 'detail' => $e->getMessage() ];
+        error_log( 'TLT medical PDF gen failed for ' . $contactId . ': ' . $e->getMessage() );
     }
 
     // -------- WATCH PDF --------
     try {
         $watch_template_id = tlt_cb_emergency_bootstrap_template( 'watch' );
         if ( is_wp_error( $watch_template_id ) ) throw new Exception( $watch_template_id->get_error_message() );
-
         $watch_pdf = tlt_cb_emergency_generate_pdf( $watch_template_id, tlt_cb_emergency_watch_tag_map( $full_name, $data ), $filename );
         if ( is_wp_error( $watch_pdf ) ) throw new Exception( $watch_pdf->get_error_message() );
 
@@ -8129,16 +8203,10 @@ function tlt_callboard_ep_bio_emergency_submit( WP_REST_Request $req ) {
         $watch_file_id = tlt_cb_emergency_replace_pdf_in_folder( $watch_folder_id, $filename, $watch_pdf );
         if ( is_wp_error( $watch_file_id ) ) throw new Exception( $watch_file_id->get_error_message() );
 
-        $result['watch'] = [ 'status' => 'ok', 'detail' => 'WATCH folder' ];
-
-        // Flag email if convicted.
         if ( strtolower( trim( tlt_cb_s( $data['conviction'] ?? '' ) ) ) === 'yes' ) {
             tlt_cb_emergency_send_watch_flag( TLT_CALLBOARD_EMERGENCY_WATCH_SHARE_EMAIL, $full_name, $data, $watch_file_id );
-            $result['watch']['flag_sent'] = true;
         }
     } catch ( Exception $e ) {
-        $result['watch'] = [ 'status' => 'error', 'detail' => $e->getMessage() ];
+        error_log( 'TLT WATCH PDF gen failed for ' . $contactId . ': ' . $e->getMessage() );
     }
-
-    return rest_ensure_response( $result );
 }
