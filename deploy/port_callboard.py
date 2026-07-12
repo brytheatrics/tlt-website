@@ -1037,7 +1037,7 @@ SHOW_VISIBILITY_MODULE = r'''
       table.innerHTML =
         '<thead><tr>' +
           '<th>Character</th><th>Name</th><th>Phone</th><th>Email</th>' +
-          '<th>Contract Status</th><th>Actions</th>' +
+          '<th>Contract</th><th>Bio</th><th>Emergency</th><th>Actions</th>' +
         '</tr></thead><tbody></tbody>';
       const tbody = table.querySelector('tbody');
 
@@ -1045,6 +1045,10 @@ SHOW_VISIBILITY_MODULE = r'''
         const fullName = [actor.firstName, actor.middleName, actor.lastName, actor.suffix].filter(Boolean).join(' ');
         const statusClass = actor.contractStatus === 'Signed' ? 'signed'
           : actor.contractStatus === 'Sent for Signature' ? 'sent' : 'not-started';
+        const bioClass = actor.bioStatus === 'Submitted' ? 'submitted' : 'pending';
+        const bioLabel = actor.bioStatus === 'Submitted' ? 'Submitted' : 'Awaiting';
+        const emClass  = actor.emergencyInfoStatus === 'Submitted' ? 'submitted' : 'pending';
+        const emLabel  = actor.emergencyInfoStatus === 'Submitted' ? 'Submitted' : 'Awaiting';
         const tr = document.createElement('tr');
         tr.innerHTML =
           '<td>' + calEscape(actor.character || '') + '</td>' +
@@ -1052,6 +1056,8 @@ SHOW_VISIBILITY_MODULE = r'''
           '<td>' + (actor.phone ? calEscape(formatPhone(actor.phone)) : '') + '</td>' +
           '<td>' + calEscape(actor.email || '') + '</td>' +
           '<td><span class="status-badge ' + statusClass + '">' + calEscape(actor.contractStatus || '') + '</span></td>' +
+          '<td><span class="bio-badge ' + bioClass + '">' + bioLabel + '</span></td>' +
+          '<td><span class="emergency-badge ' + emClass + '">' + emLabel + '</span></td>' +
           '<td><div class="actor-actions"></div></td>';
         const rm = document.createElement('button');
         rm.className = 'btn btn-danger';
