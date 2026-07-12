@@ -1814,6 +1814,35 @@ html = _apply_if_present(
     'renderRosterActors',
 )
 
+# .season-show-block clipped the "Search contacts" dropdown when it extended
+# past the card's bottom edge. Table + header don't have backgrounds that
+# need clipping to the rounded corners, so visible is fine.
+html = _apply_if_present(
+    html,
+    '''    .season-show-block {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      border: 1px solid #eee;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }''',
+    '''    .season-show-block {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      border: 1px solid #eee;
+      margin-bottom: 20px;
+      /* overflow was hidden — clipped the contact-search dropdown when it
+         extended past the card's bottom edge. Table + header don't have
+         backgrounds that need clipping to the rounded corners, so visible
+         is fine visually. */
+      overflow: visible;
+      position: relative;
+    }''',
+    'season-show-block overflow',
+)
+
 # renderActors (standalone Actors tab) header + row.
 html = _apply_if_present(
     html,

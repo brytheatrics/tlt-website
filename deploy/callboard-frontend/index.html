@@ -659,7 +659,12 @@
       box-shadow: 0 1px 4px rgba(0,0,0,0.08);
       border: 1px solid #eee;
       margin-bottom: 20px;
-      overflow: hidden;
+      /* overflow was hidden — clipped the contact-search dropdown when it
+         extended past the card's bottom edge. Table + header don't have
+         backgrounds that need clipping to the rounded corners, so visible
+         is fine visually. */
+      overflow: visible;
+      position: relative;
     }
 
     .season-show-header {
