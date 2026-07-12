@@ -3444,16 +3444,20 @@ function tlt_cb_send_generator_pdf_to_show( $show, $primary_folder_id, $url_col_
     $season_long = tlt_cb_season_setting( $season_rows, 'Current Season Long' );
     if ( $season_long === '' ) return new WP_Error( 'no_season_long', 'Season "Current Season Long" is empty.' );
 
+    // Show name lives in col B on the Season tab (col A is the slot label
+    // "Show1", "Show2", …). Match same convention as the other generators.
     $row_num = 0;
     foreach ( $season_rows as $i => $r ) {
-        if ( trim( tlt_cb_s( $r[0] ?? '' ) ) === trim( $show ) ) { $row_num = $i + 1; break; }
+        if ( tlt_cb_s( $r[1] ?? '' ) === $show ) { $row_num = $i + 1; break; }
     }
 
     // Look up the doc: URL cache preferred, folder scan fallback.
     $doc_id = null;
     if ( $row_num > 0 ) {
-        $cell = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, "Season!{$url_col_letter}{$row_num}", 0, true );
-        $cached_url = tlt_cb_s( $cell[0][0] ?? '' );
+        // Column letter is 0-based-index-of-M + row_num offset — we already
+        // read the whole row above; just grab the cached URL directly.
+        $col_index = ord( strtoupper( $url_col_letter ) ) - ord( 'A' );
+        $cached_url = tlt_cb_s( $season_rows[ $row_num - 1 ][ $col_index ] ?? '' );
         if ( $cached_url !== '' && preg_match( '~/document/d/([^/?]+)~', $cached_url, $m ) ) {
             $doc_id = $m[1];
         }
@@ -3473,7 +3477,11 @@ function tlt_cb_send_generator_pdf_to_show( $show, $primary_folder_id, $url_col_
     $r = tlt_cb_generator_publish_pdf( $doc_id, $general_id, $pdf_filename );
     if ( is_wp_error( $r ) ) return $r;
 
-    return tlt_cb_ok( [ 'folder' => $show . ' / General', 'pdf' => $pdf_filename ] );
+    return tlt_cb_ok( [
+        'folder'     => $show . ' / General',
+        'folder_url' => 'https://drive.google.com/drive/folders/' . rawurlencode( $general_id ),
+        'pdf'        => $pdf_filename,
+    ] );
 }
 
 /**

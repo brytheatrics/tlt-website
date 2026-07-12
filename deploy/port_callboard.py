@@ -1212,7 +1212,8 @@ CONTACT_SHEET_MODULE = '''
       google.script.run
         .withSuccessHandler(function (r) {
           close();
-          cbShowDocReady('PDF added to ' + (r && r.folder ? r.folder : (showName + ' / General')), showName, url);
+          // Open the show's General folder (the destination), not the source doc.
+          cbShowDocReady('PDF added to ' + (r && r.folder ? r.folder : (showName + ' / General')), showName, (r && r.folder_url) || url);
         })
         .withFailureHandler(function (err) {
           btn.disabled = false; btn.textContent = 'Add PDF to show Drive';
@@ -1322,7 +1323,8 @@ CONTACT_SHEET_MODULE = '''
       google.script.run
         .withSuccessHandler(function (r) {
           close();
-          cbShowDocReady('PDF added to ' + (r && r.folder ? r.folder : (showName + ' / General')), showName, url);
+          // Open the show's General folder (the destination), not the source doc.
+          cbShowDocReady('PDF added to ' + (r && r.folder ? r.folder : (showName + ' / General')), showName, (r && r.folder_url) || url);
         })
         .withFailureHandler(function (err) {
           btn.disabled = false; btn.textContent = 'Add PDF to show Drive';
