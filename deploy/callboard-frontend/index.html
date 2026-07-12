@@ -408,7 +408,10 @@
     .btn-remove { background: #fff; color: #f57c00; border: 1px solid #f57c00; font-size: 12px; padding: 4px 10px; }
     .btn-remove:hover { background: #fff3e0; }
 
-    .inline-assign { position: relative; }
+    /* z-index promotes .inline-assign into its own stacking context so the
+       autocomplete dropdown (z-index:1000 below) lifts above the "+ Add Role"
+       row that sits after the table in the season-show-block. */
+    .inline-assign { position: relative; z-index: 100; }
     .inline-search-input {
       width: 100%;
       padding: 4px 8px;

@@ -1814,6 +1814,21 @@ html = _apply_if_present(
     'renderRosterActors',
 )
 
+# .inline-assign needs its own stacking context so the autocomplete dropdown
+# (z-index:1000) reliably paints above the "+ Add Role" row that sits after
+# the table inside the season-show-block. Without an explicit z-index here,
+# position:relative alone doesn't create a stacking context, and the
+# dropdown paints in DOM order and gets covered.
+html = _apply_if_present(
+    html,
+    '''    .inline-assign { position: relative; }''',
+    '''    /* z-index promotes .inline-assign into its own stacking context so the
+       autocomplete dropdown (z-index:1000 below) lifts above the "+ Add Role"
+       row that sits after the table in the season-show-block. */
+    .inline-assign { position: relative; z-index: 100; }''',
+    'inline-assign stacking context',
+)
+
 # .season-show-block clipped the "Search contacts" dropdown when it extended
 # past the card's bottom edge. Table + header don't have backgrounds that
 # need clipping to the rounded corners, so visible is fine.
