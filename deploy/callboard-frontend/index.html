@@ -1543,11 +1543,23 @@
       path: '/contact-sheet-regenerate',
       body: function (show) { return { show: show }; },
     },
+    moveContactSheetToShow: {
+      // MOVE the doc into {season}/{show}/General/. Personal Drive can't
+      // multi-parent, so the doc leaves the Contact Sheets folder. Regenerate
+      // sees the new parent (via URL cache) and stays there.
+      path: '/contact-sheet-add-to-show',
+      body: function (show) { return { show: show }; },
+    },
     // Tech schedule — GAS calls this getScheduleLink but the OLD behavior was
     // to silently generate on missing cache. We wire the new modal on top and
     // have generateTechSchedule map to the fresh-generate endpoint.
     generateTechSchedule: {
       path: '/tech-schedule-generate',
+      body: function (show) { return { show: show }; },
+    },
+    moveTechScheduleToShow: {
+      // Same as contact sheet's move, for the tech schedule.
+      path: '/tech-schedule-add-to-show',
       body: function (show) { return { show: show }; },
     },
     // Bios
@@ -5717,13 +5729,15 @@
     overlay.id = 'cb-cs-modal';
     overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:99998; display:flex; align-items:center; justify-content:center;';
     overlay.innerHTML =
-      '<div style="background:#fff; border-radius:10px; padding:24px; max-width:420px; width:calc(100% - 40px); box-shadow:0 4px 24px rgba(0,0,0,0.15);">' +
+      '<div style="background:#fff; border-radius:10px; padding:24px; max-width:460px; width:calc(100% - 40px); box-shadow:0 4px 24px rgba(0,0,0,0.15);">' +
         '<h3 style="margin:0 0 6px; font-size:18px; font-weight:600;">Contact Sheet</h3>' +
         '<p style="margin:0 0 6px; color:#333; font-size:14px;"><strong>' + calEscape(showName) + '</strong> already has a contact sheet.</p>' +
-        '<p style="margin:0 0 20px; color:#666; font-size:13px;">Regenerate to pick up any recent cast or crew changes. The old one moves to trash.</p>' +
+        '<p style="margin:0 0 14px; color:#666; font-size:13px;">Regenerate to pick up any recent cast or crew changes. The old one moves to trash.</p>' +
+        '<p style="margin:0 0 20px; color:#666; font-size:13px;">Move to show Drive once the cast + team are locked in — the doc leaves the Contact Sheets folder and lives in the show\'s <em>General</em> folder from then on. Future regenerates stay there.</p>' +
         '<div style="display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap;">' +
           '<button id="cb-cs-cancel" class="btn btn-secondary" style="font-size:13px; padding:6px 14px;">Cancel</button>' +
           '<button id="cb-cs-regen"  class="btn btn-secondary" style="font-size:13px; padding:6px 14px;">Regenerate</button>' +
+          '<button id="cb-cs-move"   class="btn btn-secondary" style="font-size:13px; padding:6px 14px;">Move to show Drive</button>' +
           '<button id="cb-cs-view"   class="btn btn-primary"   style="font-size:13px; padding:6px 14px;">View</button>' +
         '</div>' +
       '</div>';
@@ -5734,6 +5748,20 @@
     document.getElementById('cb-cs-cancel').onclick = close;
     document.getElementById('cb-cs-view').onclick   = function () { close(); window.open(url, '_blank'); };
     document.getElementById('cb-cs-regen').onclick  = function () { close(); cbGenerateContactSheet(showName, true); };
+    document.getElementById('cb-cs-move').onclick = function () {
+      var btn = document.getElementById('cb-cs-move');
+      btn.disabled = true; btn.textContent = 'Moving…';
+      google.script.run
+        .withSuccessHandler(function (r) {
+          close();
+          cbShowDocReady('Moved to ' + (r && r.folder ? r.folder : (showName + ' / General')), showName, url);
+        })
+        .withFailureHandler(function (err) {
+          btn.disabled = false; btn.textContent = 'Move to show Drive';
+          showAlert('Could not move to show Drive: ' + (err && err.message ? err.message : 'unknown error'));
+        })
+        .moveContactSheetToShow(showName);
+    };
   }
 
   function cbGenerateContactSheet(showName, regenerate) {
@@ -5812,13 +5840,15 @@
     overlay.id = 'cb-sched-modal';
     overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:99998; display:flex; align-items:center; justify-content:center;';
     overlay.innerHTML =
-      '<div style="background:#fff; border-radius:10px; padding:24px; max-width:420px; width:calc(100% - 40px); box-shadow:0 4px 24px rgba(0,0,0,0.15);">' +
+      '<div style="background:#fff; border-radius:10px; padding:24px; max-width:460px; width:calc(100% - 40px); box-shadow:0 4px 24px rgba(0,0,0,0.15);">' +
         '<h3 style="margin:0 0 6px; font-size:18px; font-weight:600;">Tech Schedule</h3>' +
         '<p style="margin:0 0 6px; color:#333; font-size:14px;"><strong>' + calEscape(showName) + '</strong> already has a tech schedule.</p>' +
-        '<p style="margin:0 0 20px; color:#666; font-size:13px;">Regenerate to pull the latest dates from the sheet. The old schedule moves to trash.</p>' +
+        '<p style="margin:0 0 14px; color:#666; font-size:13px;">Regenerate to pull the latest dates from the sheet. The old schedule moves to trash.</p>' +
+        '<p style="margin:0 0 20px; color:#666; font-size:13px;">Move to show Drive once the tech dates are finalized — the doc leaves Tech Packets and lives in the show\'s <em>General</em> folder from then on. Future regenerates stay there.</p>' +
         '<div style="display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap;">' +
           '<button id="cb-sched-cancel" class="btn btn-secondary" style="font-size:13px; padding:6px 14px;">Cancel</button>' +
           '<button id="cb-sched-regen"  class="btn btn-secondary" style="font-size:13px; padding:6px 14px;">Regenerate</button>' +
+          '<button id="cb-sched-move"   class="btn btn-secondary" style="font-size:13px; padding:6px 14px;">Move to show Drive</button>' +
           '<button id="cb-sched-view"   class="btn btn-primary"   style="font-size:13px; padding:6px 14px;">View</button>' +
         '</div>' +
       '</div>';
@@ -5828,6 +5858,20 @@
     document.getElementById('cb-sched-cancel').onclick = close;
     document.getElementById('cb-sched-view').onclick   = function () { close(); window.open(url, '_blank'); };
     document.getElementById('cb-sched-regen').onclick  = function () { close(); cbGenerateSchedule(showName); };
+    document.getElementById('cb-sched-move').onclick = function () {
+      var btn = document.getElementById('cb-sched-move');
+      btn.disabled = true; btn.textContent = 'Moving…';
+      google.script.run
+        .withSuccessHandler(function (r) {
+          close();
+          cbShowDocReady('Moved to ' + (r && r.folder ? r.folder : (showName + ' / General')), showName, url);
+        })
+        .withFailureHandler(function (err) {
+          btn.disabled = false; btn.textContent = 'Move to show Drive';
+          showAlert('Could not move to show Drive: ' + (err && err.message ? err.message : 'unknown error'));
+        })
+        .moveTechScheduleToShow(showName);
+    };
   }
 
   /* =====  Add a real "Resend" button to Sent-for-Signature rows.
