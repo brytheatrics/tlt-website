@@ -7088,21 +7088,78 @@ function tlt_callboard_ep_bio_submit( WP_REST_Request $req ) {
 }
 
 /**
- * POST /bio-update-contact  { token, pronouns, phone }
+ * POST /bio-update-contact  { token, firstName?, middleName?, lastName?, suffix?, pronouns?, phone?, email? }
+ *
+ * Writes any provided fields to the caller's Contactbook row. If first/middle/last/suffix
+ * change, ALSO cascades the new name to the caller's Actors + Production Teams rows so the
+ * callboard's show lookup (which matches by name, not contactId) keeps finding them. Without
+ * the cascade, a name correction here would silently orphan them from every show.
+ *
+ * Emergency Info's name fields are NOT touched — that's legal name and can differ.
+ *
+ * Columns: A=Contact ID, B=First, C=Middle, D=Last, E=Suffix, F=Pronouns, G=Phone, H=Email
  */
 function tlt_callboard_ep_bio_update_contact( WP_REST_Request $req ) {
     $body = $req->get_json_params() ?: [];
     $token = tlt_cb_s( $body['token'] ?? '' );
     $lookup = tlt_cb_bio_find_by_token( $token );
     if ( is_wp_error( $lookup ) ) return rest_ensure_response( [ 'success' => false, 'error' => $lookup->get_error_message() ] );
-    $row_num = $lookup['row_num_1b'];
-    if ( array_key_exists( 'pronouns', $body ) && $body['pronouns'] !== null ) {
-        tlt_callboard_sheets_write( TLT_CALLBOARD_CONTACTBOOK_ID, "Contactbook!F{$row_num}", [[ tlt_cb_s( $body['pronouns'] ) ]] );
+    $row_num  = $lookup['row_num_1b'];
+    $cb_row   = $lookup['row'];
+    $old_first = tlt_cb_s( $cb_row[1] ?? '' );
+    $old_last  = tlt_cb_s( $cb_row[3] ?? '' );
+
+    $col_map = [
+        'firstName'  => 'B',
+        'middleName' => 'C',
+        'lastName'   => 'D',
+        'suffix'     => 'E',
+        'pronouns'   => 'F',
+        'phone'      => 'G',
+        'email'      => 'H',
+    ];
+    foreach ( $col_map as $field => $col ) {
+        if ( array_key_exists( $field, $body ) && $body[ $field ] !== null ) {
+            tlt_callboard_sheets_write( TLT_CALLBOARD_CONTACTBOOK_ID, "Contactbook!{$col}{$row_num}", [[ tlt_cb_s( $body[ $field ] ) ]] );
+        }
     }
-    if ( array_key_exists( 'phone', $body ) && $body['phone'] !== null ) {
-        tlt_callboard_sheets_write( TLT_CALLBOARD_CONTACTBOOK_ID, "Contactbook!G{$row_num}", [[ tlt_cb_s( $body['phone'] ) ]] );
+
+    // Cascade name change to Actors + Production Teams (they match by name, not contactId).
+    $new_first = array_key_exists( 'firstName', $body ) && $body['firstName'] !== null ? tlt_cb_s( $body['firstName'] ) : $old_first;
+    $new_last  = array_key_exists( 'lastName',  $body ) && $body['lastName']  !== null ? tlt_cb_s( $body['lastName']  ) : $old_last;
+    $cascaded  = [ 'actors' => 0, 'teams' => 0 ];
+    $name_changed = ( strcasecmp( trim( $new_first ), trim( $old_first ) ) !== 0
+                     || strcasecmp( trim( $new_last ), trim( $old_last ) ) !== 0 );
+    if ( $name_changed && $old_first !== '' && $old_last !== '' ) {
+        $cascaded['actors'] = tlt_cb_bio_cascade_name_to_tab( 'Actors', $old_first, $old_last, $new_first, $new_last );
+        $cascaded['teams']  = tlt_cb_bio_cascade_name_to_tab( "'Production Teams'", $old_first, $old_last, $new_first, $new_last );
     }
-    return rest_ensure_response( [ 'success' => true ] );
+    tlt_cb_bump_cache();
+
+    return rest_ensure_response( [ 'success' => true, 'cascaded' => $cascaded ] );
+}
+
+/**
+ * Rewrite col C (first) + col E (last) on every row of $tab where the person matches
+ * the old name. Used by /bio-update-contact when someone corrects their name. Returns
+ * the number of rows updated.
+ */
+function tlt_cb_bio_cascade_name_to_tab( $tab, $old_first, $old_last, $new_first, $new_last ) {
+    $rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, "{$tab}!A2:E", 1, true );
+    if ( is_wp_error( $rows ) ) return 0;
+    $of = strtolower( trim( $old_first ) );
+    $ol = strtolower( trim( $old_last  ) );
+    $count = 0;
+    foreach ( $rows as $i => $r ) {
+        $rf = strtolower( trim( tlt_cb_s( $r[2] ?? '' ) ) );
+        $rl = strtolower( trim( tlt_cb_s( $r[4] ?? '' ) ) );
+        if ( $rf !== $of || $rl !== $ol ) continue;
+        $rn = $i + 2;
+        tlt_callboard_sheets_write( TLT_CALLBOARD_SHEET_ID, "{$tab}!C{$rn}", [[ $new_first ]] );
+        tlt_callboard_sheets_write( TLT_CALLBOARD_SHEET_ID, "{$tab}!E{$rn}", [[ $new_last  ]] );
+        $count++;
+    }
+    return $count;
 }
 
 /**

@@ -115,10 +115,15 @@
       </div>
       <div id="info-edit" style="display:none;">
         <div class="info-grid">
-          <div class="info-field">
-            <label>Name</label>
-            <div class="readonly" id="edit-name-readonly"></div>
-            <div class="hint">Contact TLT staff to change your name.</div>
+          <div class="info-field" style="grid-column: 1 / -1;">
+            <label>Preferred Name (this is how you'll appear on the callboard, program, and bios)</label>
+            <div style="display:grid; grid-template-columns: 2fr 1.5fr 2fr 1fr; gap:8px;">
+              <input type="text" id="edit-firstName"  placeholder="First">
+              <input type="text" id="edit-middleName" placeholder="Middle (optional)">
+              <input type="text" id="edit-lastName"   placeholder="Last">
+              <input type="text" id="edit-suffix"     placeholder="Suffix (Jr., III, etc.)">
+            </div>
+            <div class="hint">This does not change your legal name on the medical / WATCH release forms — that stays whatever you enter there.</div>
           </div>
           <div class="info-field">
             <label>Pronouns</label>
@@ -126,8 +131,7 @@
           </div>
           <div class="info-field">
             <label>Email</label>
-            <div class="readonly" id="edit-email-readonly"></div>
-            <div class="hint">Contact TLT staff to change your email.</div>
+            <input type="email" id="edit-email" placeholder="you@example.com">
           </div>
           <div class="info-field">
             <label>Phone</label>
@@ -285,10 +289,13 @@
     document.getElementById('view-pronouns').innerText = contactData.pronouns || '—';
     document.getElementById('view-email').innerText    = contactData.email    || '—';
     document.getElementById('view-phone').innerText    = formatPhone(contactData.phone) || '—';
-    document.getElementById('edit-name-readonly').innerText  = fullName;
-    document.getElementById('edit-email-readonly').innerText = contactData.email || '—';
-    document.getElementById('edit-pronouns').value = contactData.pronouns || '';
-    document.getElementById('edit-phone').value    = contactData.phone    || '';
+    document.getElementById('edit-firstName').value  = contactData.firstName  || '';
+    document.getElementById('edit-middleName').value = contactData.middleName || '';
+    document.getElementById('edit-lastName').value   = contactData.lastName   || '';
+    document.getElementById('edit-suffix').value     = contactData.suffix     || '';
+    document.getElementById('edit-pronouns').value   = contactData.pronouns   || '';
+    document.getElementById('edit-email').value      = contactData.email      || '';
+    document.getElementById('edit-phone').value      = contactData.phone      || '';
 
     renderBioCards();
   }
@@ -709,21 +716,45 @@
   }
 
   async function saveContactInfo() {
+    const newFields = {
+      firstName:  document.getElementById('edit-firstName').value.trim(),
+      middleName: document.getElementById('edit-middleName').value.trim(),
+      lastName:   document.getElementById('edit-lastName').value.trim(),
+      suffix:     document.getElementById('edit-suffix').value.trim(),
+      pronouns:   document.getElementById('edit-pronouns').value.trim(),
+      email:      document.getElementById('edit-email').value.trim(),
+      phone:      document.getElementById('edit-phone').value.trim(),
+    };
+    if (newFields.firstName === '' || newFields.lastName === '') {
+      alert('First and last name are required.');
+      return;
+    }
+    // If they changed their name, warn once. A name change cascades to their
+    // Actors / Production Teams rows so the show lookup keeps working.
+    const nameChanged = (newFields.firstName !== (contactData.firstName || '') ||
+                         newFields.middleName !== (contactData.middleName || '') ||
+                         newFields.lastName !== (contactData.lastName || '') ||
+                         newFields.suffix !== (contactData.suffix || ''));
+    if (nameChanged) {
+      if (!confirm('Update your name to "' + [newFields.firstName, newFields.middleName, newFields.lastName, newFields.suffix].filter(Boolean).join(' ') + '"?\n\nThis will also update how you appear on the callboard for every show you\'re on.')) {
+        return;
+      }
+    }
     try {
-      const result = await apiPost({
-        action:   'updateContact',
-        token:    TOKEN,
-        pronouns: document.getElementById('edit-pronouns').value.trim(),
-        phone:    document.getElementById('edit-phone').value.trim()
-      });
+      const result = await apiPost(Object.assign({
+        action: 'updateContact',
+        token:  TOKEN,
+      }, newFields));
       if (result.success) {
-        contactData.pronouns = document.getElementById('edit-pronouns').value.trim();
-        contactData.phone    = document.getElementById('edit-phone').value.trim();
+        Object.assign(contactData, newFields);
+        const fullName = [contactData.firstName, contactData.middleName, contactData.lastName, contactData.suffix].filter(Boolean).join(' ');
+        document.getElementById('view-name').innerText     = fullName;
         document.getElementById('view-pronouns').innerText = contactData.pronouns || '—';
+        document.getElementById('view-email').innerText    = contactData.email    || '—';
         document.getElementById('view-phone').innerText    = formatPhone(contactData.phone) || '—';
         toggleEditInfo();
       } else {
-        alert('Save failed: ' + result.error);
+        alert('Save failed: ' + (result.error || 'Unknown error.'));
       }
     } catch(err) {
       alert('Network error. Please try again.');
