@@ -1,0 +1,6 @@
+# All requests to the old Netlify bio site 301 to the new self-hosted /bio/ path.
+# Query strings (?token=X, ?show=X, ?shows=A,B,C) are preserved automatically.
+# The 301! (force) redirects even if a matching file exists in the Netlify
+# publish directory, so leftover HTML files don't shadow the redirect.
+
+/*  https://tacomalittletheatre.com/bio/:splat  301!

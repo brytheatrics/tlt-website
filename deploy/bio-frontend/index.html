@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TLT Bio Submission</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; color: #333; min-height: 100vh; }
+    header { background: #fff; border-bottom: 2px solid #e0e0e0; padding: 16px 32px; display: flex; align-items: center; gap: 12px; }
+    header h1 { font-size: 20px; font-weight: 600; color: #222; font-family: 'Century Gothic', CenturyGothic, AppleGothic, sans-serif; }
+    .container { max-width: 720px; margin: 40px auto; padding: 0 24px; }
+    .card { background: #fff; border-radius: 10px; padding: 28px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); border: 1px solid #eee; margin-bottom: 20px; }
+    .card h2 { font-size: 16px; font-weight: 600; color: #222; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .info-field label { display: block; font-size: 11px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .info-field input { width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; color: #333; font-family: inherit; outline: none; transition: border 0.2s; }
+    .info-field input:focus { border-color: #1a73e8; }
+    .info-field .readonly { padding: 8px 10px; font-size: 14px; color: #555; background: #f9f9f9; border: 1px solid #eee; border-radius: 6px; }
+    .info-field .hint { font-size: 11px; color: #aaa; margin-top: 3px; }
+    .section-title { font-size: 11px; font-weight: 600; color: #aaa; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .role-badge { font-size: 11px; padding: 3px 10px; border-radius: 99px; background: #e8f0fe; color: #1557b0; font-weight: 500; }
+    .bio-status { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 99px; margin-bottom: 12px; }
+    .bio-status.none { background: #f5f5f5; color: #999; }
+    .bio-status.existing { background: #e8f5e9; color: #2e7d32; }
+    .existing-bio { background: #f9f9f9; border: 1px solid #eee; border-radius: 6px; padding: 12px; font-size: 14px; color: #444; line-height: 1.6; margin-bottom: 12px; white-space: pre-wrap; }
+    .existing-bio-meta { font-size: 11px; color: #aaa; margin-bottom: 12px; }
+    .bio-scope-note { background: #f6f9fe; border: 1px solid #dbe6f5; border-radius: 6px; padding: 10px 12px; font-size: 13px; color: #444; margin-bottom: 14px; }
+    .bio-scope-note ul { margin: 6px 0 0 20px; padding: 0; }
+    .bio-scope-note li { padding: 1px 0; }
+    textarea { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; color: #333; font-family: inherit; outline: none; resize: vertical; min-height: 120px; transition: border 0.2s; line-height: 1.6; }
+    textarea:focus { border-color: #1a73e8; }
+    .word-count { font-size: 11px; text-align: right; margin-top: 4px; }
+    .bio-actions { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+    .btn { padding: 9px 18px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; transition: background 0.2s, opacity 0.2s; font-family: inherit; }
+    .btn:disabled { opacity: 0.5; cursor: default; }
+    .btn-primary { background: #1a73e8; color: #fff; }
+    .btn-primary:hover:not(:disabled) { background: #1557b0; }
+    .btn-secondary { background: #fff; color: #1a73e8; border: 1px solid #1a73e8; }
+    .btn-secondary:hover:not(:disabled) { background: #e8f0fe; }
+    .btn-ghost { background: #f5f5f5; color: #555; }
+    .btn-ghost:hover:not(:disabled) { background: #ebebeb; }
+    .success-banner { display: none; background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; border-radius: 8px; padding: 12px 16px; font-size: 14px; font-weight: 500; margin-bottom: 12px; align-items: center; gap: 8px; }
+    .success-banner.visible { display: flex; }
+    .error-banner { display: none; background: #fce8e6; color: #c62828; border: 1px solid #f5c6c6; border-radius: 8px; padding: 12px 16px; font-size: 14px; margin-bottom: 12px; }
+    .error-banner.visible { display: block; }
+    .loading-screen { text-align: center; padding: 80px 24px; color: #aaa; }
+    .loading-screen .spinner { width: 36px; height: 36px; border: 3px solid #e0e0e0; border-top-color: #1a73e8; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .error-screen { text-align: center; padding: 80px 24px; }
+    .error-screen h2 { font-size: 20px; color: #c62828; margin-bottom: 8px; }
+    .error-screen p { font-size: 14px; color: #666; }
+    .toggle-edit { font-size: 12px; color: #1a73e8; cursor: pointer; text-decoration: underline; background: none; border: none; font-family: inherit; padding: 0; }
+    .save-info-btn { margin-top: 12px; }
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 100; align-items: center; justify-content: center; }
+    .modal-overlay.active { display: flex; }
+    .modal { background: #fff; border-radius: 12px; padding: 28px; width: 480px; max-width: 95vw; box-shadow: 0 8px 32px rgba(0,0,0,0.18); }
+    .modal h3 { font-size: 18px; font-weight: 600; margin-bottom: 10px; color: #222; }
+    .modal p { font-size: 13px; color: #666; margin-bottom: 16px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+    .btn-cancel { background: #f5f5f5; color: #555; }
+    .btn-cancel:hover { background: #e8e8e8; }
+
+    /* Conflicts card */
+    .conflicts-card { margin-top: -8px; border: 1px solid #eee; }
+    .conflicts-card h3 { font-size: 15px; font-weight: 600; color: #a2242a; margin-bottom: 6px; }
+    .conflicts-intro { font-size: 13px; color: #666; margin-bottom: 12px; line-height: 1.5; }
+    .conflict-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-bottom: 1px solid #f5f5f5; }
+    .conflict-row:last-child { border-bottom: none; }
+    .conflict-row label { display: flex; align-items: center; gap: 10px; cursor: pointer; flex: 1; font-size: 14px; color: #333; }
+    .conflict-row input[type="checkbox"] { width: 16px; height: 16px; accent-color: #a2242a; margin: 0; }
+    .conflict-date { font-weight: 600; color: #555; min-width: 100px; font-variant-numeric: tabular-nums; }
+    .conflict-event { color: #333; }
+    .conflict-notes { font-size: 12px; padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; margin: 8px 0 4px; width: 100%; font-family: inherit; color: #333; outline: none; }
+    .conflict-notes:focus { border-color: #a2242a; }
+    .conflict-save { margin-top: 12px; }
+    .cm-conflict-note { font-size: 12px; color: #888; margin-bottom: 12px; font-style: italic; }
+    .cm-conflict-row { padding: 6px 0; font-size: 14px; color: #555; border-bottom: 1px solid #f5f5f5; }
+    .cm-conflict-row:last-child { border-bottom: none; }
+  </style>
+</head>
+<body>
+
+<header>
+  <img src="logo.png" style="height:40px; width:auto;" alt="TLT Logo">
+  <h1>TLT Bio Submission</h1>
+</header>
+
+<div class="container">
+
+  <div class="loading-screen" id="loading-screen">
+    <div class="spinner"></div>
+    <p>Loading your bio form...</p>
+  </div>
+
+  <div class="error-screen" id="error-screen" style="display:none;">
+    <h2>Link Not Found</h2>
+    <p id="error-message">This link may be invalid or expired. Please contact TLT staff.</p>
+  </div>
+
+  <div id="main-content" style="display:none;">
+
+    <div class="card">
+      <h2>
+        Your Information
+        <button class="toggle-edit" id="toggle-edit-btn" onclick="toggleEditInfo()" style="margin-left:10px;">Edit</button>
+      </h2>
+      <div id="info-view">
+        <div class="info-grid">
+          <div class="info-field"><label>Name</label><div class="readonly" id="view-name"></div></div>
+          <div class="info-field"><label>Pronouns</label><div class="readonly" id="view-pronouns"></div></div>
+          <div class="info-field"><label>Email</label><div class="readonly" id="view-email"></div></div>
+          <div class="info-field"><label>Phone</label><div class="readonly" id="view-phone"></div></div>
+        </div>
+      </div>
+      <div id="info-edit" style="display:none;">
+        <div class="info-grid">
+          <div class="info-field">
+            <label>Name</label>
+            <div class="readonly" id="edit-name-readonly"></div>
+            <div class="hint">Contact TLT staff to change your name.</div>
+          </div>
+          <div class="info-field">
+            <label>Pronouns</label>
+            <input type="text" id="edit-pronouns" placeholder="e.g. she/her">
+          </div>
+          <div class="info-field">
+            <label>Email</label>
+            <div class="readonly" id="edit-email-readonly"></div>
+            <div class="hint">Contact TLT staff to change your email.</div>
+          </div>
+          <div class="info-field">
+            <label>Phone</label>
+            <input type="tel" id="edit-phone" placeholder="10 digits">
+          </div>
+        </div>
+        <button class="btn btn-primary save-info-btn" onclick="saveContactInfo()">Save Changes</button>
+        <button class="btn btn-ghost save-info-btn" onclick="toggleEditInfo()" style="margin-left:8px;">Cancel</button>
+      </div>
+    </div>
+
+    <div id="bio-cards-container"></div>
+
+    <p style="font-size:12px; color:#aaa; text-align:center; margin-top:8px;">
+      Tacoma Little Theatre · Questions? <a href="mailto:info@tacomalittletheatre.com" style="color:#1a73e8;">info@tacomalittletheatre.com</a>
+    </p>
+
+  </div>
+</div>
+
+<!-- Other Shows Modal -->
+<div class="modal-overlay" id="other-shows-modal">
+  <div class="modal">
+    <h3>Use This Bio for Other Shows?</h3>
+    <p>Select any other shows you'd like to use this bio for. You can always update it later.</p>
+    <div id="other-shows-list"></div>
+    <div class="modal-actions">
+      <button class="btn btn-cancel" onclick="closeOtherShowsModal()">Skip</button>
+      <button class="btn btn-primary" id="apply-other-shows-btn" onclick="applyToOtherShows()">Apply to Selected</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── Config ──────────────────────────────────────────────────
+  // New self-hosted API (Cloudways WordPress plugin). Fast — no GAS cold starts.
+  const API_BASE = 'https://tacomalittletheatre.com/wp-json/callboard/v1';
+  // Legacy GAS fallback for actions not yet ported (Phase A ships bio flow;
+  // emergency-info stays on GAS until Phase B).
+  const LEGACY_GAS_URL = 'https://script.google.com/macros/s/AKfycbxnew4g7aCHAmENowO08CWya1FAPBB2yeyMpVdQmOqG92HAC1hzxeKCmxriIoOGJudu/exec';
+
+  // ── State ───────────────────────────────────────────────────
+  const params   = new URLSearchParams(window.location.search);
+  const TOKEN    = params.get('token') || '';
+  const SHOW_CTX = params.get('show')  || '';
+  // ?shows=A,B,C — used by combined-contract bio emails so all covered shows
+  // render at once instead of just the first one.
+  const SHOWS_CTX = (params.get('shows') || '')
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean);
+
+  let contactData = null;
+  let biosData    = null;
+  let showsData   = null;
+  let editingInfo = false;
+  let lastSubmittedBio     = null;
+  let lastSubmittedBioType = null;
+
+  const bioTypeLabels = {
+    actor:    'Actor Bio',
+    director: 'Director Bio',
+    designer: 'Production Team Bio'
+  };
+
+  const WORD_LIMITS = {
+    actor:    100,
+    director: 200,
+    designer: 150
+  };
+
+  // ── API Helpers ──────────────────────────────────────────────
+  // Action → REST endpoint routing. Actions on the new backend get their
+  // own dedicated URL. Anything unmapped falls through to the legacy GAS
+  // handler (currently: submitEmergencyInfo — ported in Phase B).
+  const NEW_API_ROUTES = {
+    // GET actions (query params on the URL)
+    getContact:            { method: 'GET',  path: '/bio-contact' },
+    // POST actions (JSON body)
+    submitBio:             { method: 'POST', path: '/bio-submit' },
+    updateContact:         { method: 'POST', path: '/bio-update-contact' },
+    saveConflicts:         { method: 'POST', path: '/bio-save-conflicts' }
+  };
+
+  function routeFor(action) {
+    return NEW_API_ROUTES[action] || null;
+  }
+
+  async function apiGet(params) {
+    const action = params && params.action;
+    const route  = routeFor(action);
+    if (route && route.method === 'GET') {
+      const qs = Object.keys(params).filter(k => k !== 'action').map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&');
+      const res = await fetch(API_BASE + route.path + (qs ? '?' + qs : ''));
+      return res.json();
+    }
+    // Legacy GAS fallback (query-string action).
+    const res = await fetch(LEGACY_GAS_URL + '?' + new URLSearchParams(params).toString());
+    return res.json();
+  }
+
+  async function apiPost(data) {
+    const action = data && data.action;
+    const route  = routeFor(action);
+    if (route && route.method === 'POST') {
+      // Strip the action field — the endpoint URL already encodes it.
+      const payload = Object.assign({}, data);
+      delete payload.action;
+      const res = await fetch(API_BASE + route.path, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(payload)
+      });
+      return res.json();
+    }
+    // Legacy GAS fallback (POST JSON with action field).
+    const res = await fetch(LEGACY_GAS_URL, {
+      method:  'POST',
+      body:    JSON.stringify(data)
+    });
+    return res.json();
+  }
+
+  // ── Init ────────────────────────────────────────────────────
+
+  window.onload = async function() {
+    if (!TOKEN) {
+      showError('No token found in this link. Please use the link sent to you by TLT.');
+      return;
+    }
+    try {
+      const result = await apiGet({ action: 'getContact', token: TOKEN });
+      if (result.error) { showError(result.error); return; }
+      contactData = result.contact;
+      biosData    = result.bios;
+      showsData   = result.shows;
+      renderPage();
+    } catch(err) {
+      showError('Could not load your form. Please try again or contact TLT staff.');
+    }
+  };
+
+  // ── Render ──────────────────────────────────────────────────
+
+  function renderPage() {
+    document.getElementById('loading-screen').style.display = 'none';
+    document.getElementById('main-content').style.display   = 'block';
+
+    const fullName = [contactData.firstName, contactData.middleName, contactData.lastName, contactData.suffix]
+      .filter(Boolean).join(' ');
+
+    document.getElementById('view-name').innerText     = fullName;
+    document.getElementById('view-pronouns').innerText = contactData.pronouns || '—';
+    document.getElementById('view-email').innerText    = contactData.email    || '—';
+    document.getElementById('view-phone').innerText    = formatPhone(contactData.phone) || '—';
+    document.getElementById('edit-name-readonly').innerText  = fullName;
+    document.getElementById('edit-email-readonly').innerText = contactData.email || '—';
+    document.getElementById('edit-pronouns').value = contactData.pronouns || '';
+    document.getElementById('edit-phone').value    = contactData.phone    || '';
+
+    renderBioCards();
+  }
+
+  function renderBioCards() {
+    const container = document.getElementById('bio-cards-container');
+    container.innerHTML = '';
+
+    if (!showsData || showsData.length === 0) {
+      container.innerHTML = '<div class="card"><p style="color:#888; font-size:14px;">You are not currently listed on any shows this season. Contact TLT staff if you think this is an error.</p></div>';
+      return;
+    }
+
+    // Filter precedence: ?shows=A,B,C → those shows. Else ?show=X → that one.
+    // Else no param → render all of the person's shows (safest default; also
+    // what combined-contract bio emails rely on when they omit the param).
+    let toRender;
+    if (SHOWS_CTX.length > 0) {
+      toRender = showsData.filter(s => SHOWS_CTX.indexOf(s.show) !== -1);
+    } else if (SHOW_CTX) {
+      toRender = showsData.filter(s => s.show === SHOW_CTX);
+    } else {
+      toRender = showsData.slice();
+    }
+    if (toRender.length === 0) toRender = [showsData[0]];
+
+    // One bio per person per type — group applicable shows so one bio text
+    // covers all of them. Conflicts stay per-show.
+    const groups = {};
+    toRender.forEach(s => {
+      if (!groups[s.bioType]) groups[s.bioType] = [];
+      groups[s.bioType].push(s);
+    });
+
+    ['actor','director','designer'].forEach(bioType => {
+      const grp = groups[bioType];
+      if (!grp || grp.length === 0) return;
+
+      const bioTypeLabel = bioTypeLabels[bioType] || bioType;
+      const existingBio  = biosData[bioType];
+      const hasExisting  = existingBio && existingBio.text && existingBio.text.trim() !== '';
+      const cardId       = 'card-' + bioType;
+      // Word limit = smallest across the group's shows so the bio fits everywhere.
+      const limits = grp.map(s => (typeof s.bioWordLimit === 'number' && s.bioWordLimit > 0)
+                                    ? s.bioWordLimit
+                                    : (WORD_LIMITS[bioType] || 150));
+      const limit  = Math.min.apply(null, limits);
+      const targetsJson = JSON.stringify(grp.map(s => ({ show: s.show, role: s.role })));
+
+      // Scope banner listing which shows this bio applies to.
+      const scopeHtml = grp.length === 1
+        ? `<div class="bio-scope-note"><strong>Show:</strong> ${escHtml(grp[0].show)}${grp[0].isActor && grp[0].character ? ` <span style="color:#888;">— ${escHtml(grp[0].character)}</span>` : ''}</div>`
+        : `<div class="bio-scope-note"><strong>This bio will apply to all ${grp.length} of your shows this season:</strong>
+             <ul>${grp.map(s => `<li>${escHtml(s.show)}${s.isActor && s.character ? ` <span style="color:#888;">— ${escHtml(s.character)}</span>` : ''}</li>`).join('')}</ul>
+             <div style="color:#888;font-size:12px;margin-top:6px;">You can return to this link any time to update it.</div>
+           </div>`;
+
+      const useBtnLabel    = grp.length > 1 ? `✓ Use This Bio for All ${grp.length} Shows` : '✓ Use This Bio';
+      const submitBtnLabel = grp.length > 1 ? `Submit Bio for All ${grp.length} Shows` : 'Submit Bio';
+
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.id = cardId;
+      card.style.border = '2px solid #1a73e8';
+
+      card.innerHTML = `
+        <h2>${escHtml(bioTypeLabel)}</h2>
+        <div id="success-${cardId}" class="success-banner">✓ Bio submitted successfully!</div>
+        <div id="error-${cardId}" class="error-banner"></div>
+        ${scopeHtml}
+        ${hasExisting ? `
+          <div class="bio-status existing">✓ Bio on file</div>
+          <div class="existing-bio">${escHtml(existingBio.text)}</div>
+          ${existingBio.updated ? `<div class="existing-bio-meta">Last updated: ${new Date(existingBio.updated).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</div>` : ''}
+          <div class="bio-actions" id="actions-existing-${cardId}">
+            <button class="btn btn-primary" data-targets='${escAttr(targetsJson)}' onclick="useBioGrouped('${bioType}','${cardId}',${limit},this)">${useBtnLabel}</button>
+            <button class="btn btn-secondary" onclick="showUpdateForm('${cardId}','${bioType}')">Edit & Update</button>
+          </div>
+          <div id="update-form-${cardId}" style="display:none;">
+            <textarea id="textarea-${cardId}" oninput="updateWordCount('${cardId}',${limit})">${escHtml(existingBio.text)}</textarea>
+            <div class="word-count" id="wordcount-${cardId}">${countWords(existingBio.text)} / ${limit} words</div>
+            <div class="bio-actions">
+              <button class="btn btn-primary" data-targets='${escAttr(targetsJson)}' onclick="updateAndSubmitGrouped('${bioType}','${cardId}',${limit},this)">Save & Submit</button>
+              <button class="btn btn-ghost" onclick="hideUpdateForm('${cardId}')">Cancel</button>
+            </div>
+          </div>
+        ` : `
+          <div class="bio-status none">No bio on file yet</div>
+          <textarea id="textarea-${cardId}" placeholder="Write your ${escHtml(bioTypeLabel.toLowerCase())} here..." oninput="updateWordCount('${cardId}',${limit})"></textarea>
+          <div class="word-count" id="wordcount-${cardId}">0 / ${limit} words</div>
+          <div class="bio-actions">
+            <button class="btn btn-primary" data-targets='${escAttr(targetsJson)}' onclick="updateAndSubmitGrouped('${bioType}','${cardId}',${limit},this)">${submitBtnLabel}</button>
+          </div>
+        `}
+      `;
+      container.appendChild(card);
+
+      // One conflicts card per show in the group.
+      grp.forEach(show => {
+        const conflictsCard = buildConflictsCard(show, cardId);
+        if (conflictsCard) container.appendChild(conflictsCard);
+      });
+    });
+  }
+
+  // ── Conflicts Card ───────────────────────────────────────────
+
+  function buildConflictsCard(show, bioCardId) {
+    const conflictsId = 'conflicts-' + show.show.replace(/[^a-zA-Z0-9]/g, '-');
+    const card = document.createElement('div');
+    card.className = 'card conflicts-card';
+    card.id = conflictsId;
+
+    if (show.isActor) {
+      // Read-only CM conflicts summary
+      const cmConflicts = show.cmConflicts || [];
+      if (cmConflicts.length === 0) return null; // nothing to show
+      const rowsHtml = cmConflicts.map(c => {
+        const dateLabel = formatConflictDate(c.date);
+        const eventLabel = c.eventType && c.eventType !== 'Conflict' ? ' — ' + escHtml(c.eventType) : '';
+        return `<div class="cm-conflict-row"><strong>${dateLabel}</strong>${eventLabel}${c.notes ? ' <span style="color:#888;">(' + escHtml(c.notes) + ')</span>' : ''}</div>`;
+      }).join('');
+      card.innerHTML = `
+        <h3>Conflicts on File (${escHtml(show.show)})</h3>
+        <div class="cm-conflict-note">Conflicts pulled from CastingManager. If any of these are wrong or you have a new conflict, please contact your Stage Manager or Director directly.</div>
+        ${rowsHtml}
+      `;
+      return card;
+    }
+
+    // Production team: checkbox list of role's events
+    const events = show.events || [];
+    if (events.length === 0) return null;
+
+    const existingSet = new Set((show.existingConflicts || []).map(c => c.date + '|' + c.eventType));
+    const notesByKey  = {};
+    (show.existingConflicts || []).forEach(c => { notesByKey[c.date + '|' + c.eventType] = c.notes || ''; });
+
+    const rowsHtml = events.map((e, i) => {
+      const key = e.date + '|' + e.eventType;
+      const checkboxId = conflictsId + '-cb-' + i;
+      const notesId    = conflictsId + '-nt-' + i;
+      const isChecked  = existingSet.has(key);
+      const notes      = notesByKey[key] || '';
+      return `
+        <div class="conflict-row">
+          <label>
+            <input type="checkbox" id="${checkboxId}"
+                   data-date="${escAttr(e.date)}"
+                   data-event="${escAttr(e.eventType)}"
+                   data-notes-id="${notesId}"
+                   ${isChecked ? 'checked' : ''}
+                   onchange="toggleConflictNotes('${notesId}', this.checked)">
+            <span class="conflict-date">${escHtml(e.dateLabel)}</span>
+            <span class="conflict-event">${escHtml(e.eventType)}</span>
+          </label>
+          <input type="text" id="${notesId}" class="conflict-notes"
+                 placeholder="Optional note (e.g., work, out of town)"
+                 value="${escAttr(notes)}"
+                 style="display:${isChecked ? 'block' : 'none'}; max-width:260px;">
+        </div>
+      `;
+    }).join('');
+
+    const successId = 'conflicts-success-' + conflictsId;
+    const errorId   = 'conflicts-error-'   + conflictsId;
+
+    card.innerHTML = `
+      <h3>Schedule Conflicts (${escHtml(show.show)})</h3>
+      <div class="conflicts-intro">
+        Check any events you know you can't attend. Leave everything unchecked if you have no conflicts.
+      </div>
+      <div id="${successId}" class="success-banner">✓ Conflicts saved.</div>
+      <div id="${errorId}" class="error-banner"></div>
+      ${rowsHtml}
+      <div class="conflict-save">
+        <button class="btn btn-primary" onclick="saveShowConflicts('${escAttr(show.show)}','${escAttr(String(show.role))}','${conflictsId}','${successId}','${errorId}')">Save Conflicts</button>
+      </div>
+    `;
+    return card;
+  }
+
+  function toggleConflictNotes(notesId, show) {
+    const el = document.getElementById(notesId);
+    if (el) el.style.display = show ? 'block' : 'none';
+  }
+
+  function formatConflictDate(iso) {
+    if (!iso) return '';
+    const parts = String(iso).split('-');
+    if (parts.length !== 3) return iso;
+    const d = new Date(parseInt(parts[0],10), parseInt(parts[1],10)-1, parseInt(parts[2],10));
+    return d.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
+  }
+
+  async function saveShowConflicts(showName, role, conflictsId, successId, errorId) {
+    const card = document.getElementById(conflictsId);
+    if (!card) return;
+    const btn = card.querySelector('.btn-primary');
+    const originalLabel = btn.innerText;
+    btn.disabled = true;
+    btn.innerText = 'Saving...';
+    document.getElementById(successId).classList.remove('visible');
+    document.getElementById(errorId).classList.remove('visible');
+
+    const checkboxes = card.querySelectorAll('input[type="checkbox"]');
+    const conflicts = [];
+    checkboxes.forEach(cb => {
+      if (!cb.checked) return;
+      const notesId = cb.dataset.notesId;
+      const notesEl = notesId ? document.getElementById(notesId) : null;
+      conflicts.push({
+        date:      cb.dataset.date,
+        eventType: cb.dataset.event,
+        notes:     notesEl ? notesEl.value.trim() : ''
+      });
+    });
+
+    try {
+      const result = await apiPost({
+        action:    'saveConflicts',
+        token:     TOKEN,
+        show:      showName,
+        role:      role,
+        conflicts: conflicts
+      });
+      if (result.error) {
+        document.getElementById(errorId).innerText = result.error;
+        document.getElementById(errorId).classList.add('visible');
+      } else {
+        const s = document.getElementById(successId);
+        s.innerText = conflicts.length === 0
+          ? '✓ Marked as no conflicts.'
+          : '✓ ' + conflicts.length + ' conflict' + (conflicts.length === 1 ? '' : 's') + ' saved.';
+        s.classList.add('visible');
+        setTimeout(() => s.classList.remove('visible'), 4000);
+      }
+    } catch(err) {
+      document.getElementById(errorId).innerText = 'Save failed. Please try again.';
+      document.getElementById(errorId).classList.add('visible');
+    } finally {
+      btn.disabled = false;
+      btn.innerText = originalLabel;
+    }
+  }
+
+  // ── Word Count ───────────────────────────────────────────────
+
+  function countWords(str) {
+    return str.trim() === '' ? 0 : str.trim().split(/\s+/).length;
+  }
+
+  function updateWordCount(cardId, limit) {
+    const ta    = document.getElementById('textarea-' + cardId);
+    const cnt   = document.getElementById('wordcount-' + cardId);
+    if (!ta || !cnt) return;
+    limit = (typeof limit === 'number' && limit > 0) ? limit : 150;
+    const words     = countWords(ta.value);
+    const remaining = limit - words;
+    if (remaining < 0) {
+      ta.value        = ta.value.trim().split(/\s+/).slice(0, limit).join(' ');
+      cnt.style.color = '#888';
+      cnt.innerText   = '0 words remaining';
+    } else if (remaining <= 10) {
+      cnt.style.color = '#f57f17';
+      cnt.innerText   = remaining + ' words remaining';
+    } else {
+      cnt.style.color = '#888';
+      cnt.innerText   = words + ' / ' + limit + ' words';
+    }
+  }
+
+  // ── Bio Actions ──────────────────────────────────────────────
+
+  // Grouped submit — one bio text applies to every show in `targets`.
+  async function useBioGrouped(bioType, cardId, limit, btnEl) {
+    const savedText = (biosData[bioType] && biosData[bioType].text) || '';
+    limit = (typeof limit === 'number' && limit > 0) ? limit : 150;
+    if (countWords(savedText) > limit) {
+      showCardError(cardId, 'Your saved bio is ' + countWords(savedText) + ' words but the smallest limit across these shows is ' + limit + '. Please edit and trim before submitting.');
+      showUpdateForm(cardId, bioType);
+      updateWordCount(cardId, limit);
+      return;
+    }
+    const targets = JSON.parse(btnEl.dataset.targets || '[]');
+    if (targets.length === 0) return;
+    const original = btnEl.innerText;
+    btnEl.disabled  = true;
+    btnEl.innerText = 'Submitting...';
+    try {
+      const result = await apiPost({
+        action: 'submitBio', action_type: 'use',
+        token: TOKEN, bioType, bioText: savedText,
+        shows: targets,
+        show: targets[0].show, role: targets[0].role  // legacy fields for old backend
+      });
+      if (result.success) {
+        showCardSuccess(cardId);
+        btnEl.innerText = '✓ Submitted';
+        lastSubmittedBio     = savedText;
+        lastSubmittedBioType = bioType;
+      } else {
+        showCardError(cardId, result.error || 'Submission failed.');
+        btnEl.disabled  = false;
+        btnEl.innerText = original;
+      }
+    } catch(err) {
+      showCardError(cardId, 'Network error. Please try again.');
+      btnEl.disabled  = false;
+      btnEl.innerText = original;
+    }
+  }
+
+  async function updateAndSubmitGrouped(bioType, cardId, limit, btnEl) {
+    const textarea = document.getElementById('textarea-' + cardId);
+    const bioText  = textarea.value.trim();
+    if (!bioText) { showCardError(cardId, 'Please enter a bio before submitting.'); return; }
+    limit = (typeof limit === 'number' && limit > 0) ? limit : 150;
+    if (countWords(bioText) > limit) { showCardError(cardId, 'Bio exceeds the ' + limit + ' word limit.'); return; }
+    const targets = JSON.parse(btnEl.dataset.targets || '[]');
+    if (targets.length === 0) return;
+
+    const btns = document.querySelectorAll('#' + cardId + ' .btn-primary');
+    const originals = [];
+    btns.forEach((b, i) => { originals[i] = b.innerText; b.disabled = true; b.innerText = 'Submitting...'; });
+    try {
+      const result = await apiPost({
+        action: 'submitBio', action_type: 'update',
+        token: TOKEN, bioType, bioText,
+        shows: targets,
+        show: targets[0].show, role: targets[0].role
+      });
+      if (result.success) {
+        biosData[bioType] = { text: bioText, updated: new Date().toISOString() };
+        showCardSuccess(cardId);
+        btns.forEach(b => { b.innerText = '✓ Submitted'; });
+        lastSubmittedBio     = bioText;
+        lastSubmittedBioType = bioType;
+      } else {
+        showCardError(cardId, result.error || 'Submission failed.');
+        btns.forEach((b, i) => { b.disabled = false; b.innerText = originals[i]; });
+      }
+    } catch(err) {
+      showCardError(cardId, 'Network error. Please try again.');
+      btns.forEach((b, i) => { b.disabled = false; b.innerText = originals[i]; });
+    }
+  }
+
+  function showUpdateForm(cardId) {
+    document.getElementById('actions-existing-' + cardId).style.display = 'none';
+    document.getElementById('update-form-' + cardId).style.display      = 'block';
+  }
+
+  function hideUpdateForm(cardId) {
+    document.getElementById('update-form-' + cardId).style.display      = 'none';
+    document.getElementById('actions-existing-' + cardId).style.display = 'flex';
+  }
+
+  // ── Other Shows Modal ────────────────────────────────────────
+
+  function showOtherShowsModal(currentShow, currentBioType) {
+    const otherShows = showsData.filter(s => s.show !== currentShow && s.bioType === currentBioType);
+    if (otherShows.length === 0) return;
+
+    const list = document.getElementById('other-shows-list');
+    list.innerHTML = '';
+
+    otherShows.forEach(s => {
+      const roleDisplay = s.isActor ? 'Actor' + (s.character ? ' — ' + s.character : '') : s.role;
+      const bioLabel    = bioTypeLabels[s.bioType] || s.bioType;
+      const item        = document.createElement('label');
+      item.style.cssText = 'display:flex; align-items:flex-start; gap:10px; margin-bottom:12px; cursor:pointer; font-size:14px;';
+      item.innerHTML = `
+        <input type="checkbox" value="${escHtml(s.show)}" data-role="${escAttr(s.role)}" data-biotype="${s.bioType}" style="margin-top:2px; width:16px; height:16px; flex-shrink:0;">
+        <div>
+          <div style="font-weight:600; color:#222;">${escHtml(s.show)}</div>
+          <div style="font-size:12px; color:#888;">${escHtml(roleDisplay)} · ${escHtml(bioLabel)}</div>
+        </div>
+      `;
+      list.appendChild(item);
+    });
+
+    document.getElementById('other-shows-modal').classList.add('active');
+  }
+
+  function closeOtherShowsModal() {
+    document.getElementById('other-shows-modal').classList.remove('active');
+  }
+
+  async function applyToOtherShows() {
+    const checks = document.querySelectorAll('#other-shows-list input[type="checkbox"]:checked');
+    if (checks.length === 0) { closeOtherShowsModal(); return; }
+
+    const applyBtn = document.getElementById('apply-other-shows-btn');
+    applyBtn.disabled  = true;
+    applyBtn.innerText = 'Applying...';
+
+    await Promise.all(Array.from(checks).map(cb =>
+      apiPost({
+        action: 'submitBio', action_type: 'update',
+        token: TOKEN, bioType: cb.dataset.biotype,
+        bioText: lastSubmittedBio, show: cb.value, role: cb.dataset.role
+      })
+    ));
+
+    closeOtherShowsModal();
+    applyBtn.disabled  = false;
+    applyBtn.innerText = 'Apply to Selected';
+  }
+
+  // ── Contact Info ─────────────────────────────────────────────
+
+  function toggleEditInfo() {
+    editingInfo = !editingInfo;
+    document.getElementById('info-view').style.display   = editingInfo ? 'none'  : 'block';
+    document.getElementById('info-edit').style.display   = editingInfo ? 'block' : 'none';
+    document.getElementById('toggle-edit-btn').innerText = editingInfo ? 'Cancel' : 'Edit';
+  }
+
+  async function saveContactInfo() {
+    try {
+      const result = await apiPost({
+        action:   'updateContact',
+        token:    TOKEN,
+        pronouns: document.getElementById('edit-pronouns').value.trim(),
+        phone:    document.getElementById('edit-phone').value.trim()
+      });
+      if (result.success) {
+        contactData.pronouns = document.getElementById('edit-pronouns').value.trim();
+        contactData.phone    = document.getElementById('edit-phone').value.trim();
+        document.getElementById('view-pronouns').innerText = contactData.pronouns || '—';
+        document.getElementById('view-phone').innerText    = formatPhone(contactData.phone) || '—';
+        toggleEditInfo();
+      } else {
+        alert('Save failed: ' + result.error);
+      }
+    } catch(err) {
+      alert('Network error. Please try again.');
+    }
+  }
+
+  // ── UI Helpers ───────────────────────────────────────────────
+
+  function showError(msg) {
+    document.getElementById('loading-screen').style.display = 'none';
+    document.getElementById('error-screen').style.display   = 'block';
+    document.getElementById('error-message').innerText = msg;
+  }
+
+  function showCardSuccess(cardId) {
+    document.getElementById('success-' + cardId).classList.add('visible');
+    document.getElementById('error-'   + cardId).classList.remove('visible');
+    const uf = document.getElementById('update-form-' + cardId);
+    if (uf) uf.style.display = 'none';
+  }
+
+  function showCardError(cardId, msg) {
+    const el = document.getElementById('error-' + cardId);
+    el.innerText = msg;
+    el.classList.add('visible');
+  }
+
+  function formatPhone(phone) {
+    const digits = String(phone || '').replace(/\D/g, '');
+    if (digits.length === 10) return '(' + digits.substring(0,3) + ') ' + digits.substring(3,6) + '-' + digits.substring(6);
+    return phone || '';
+  }
+
+  function escHtml(str) {
+    return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  function escAttr(str) {
+    return String(str || '').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+  }
+</script>
+
+</body>
+</html>

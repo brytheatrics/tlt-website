@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <title>TLT Bio Submission</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; color: #333; min-height: 100vh; }
+    header { background: #fff; border-bottom: 2px solid #e0e0e0; padding: 16px 32px; display: flex; align-items: center; gap: 12px; }
+    header h1 { font-size: 20px; font-weight: 600; color: #222; font-family: 'Century Gothic', CenturyGothic, AppleGothic, sans-serif; }
+    .container { max-width: 720px; margin: 40px auto; padding: 0 24px; }
+    .card { background: #fff; border-radius: 10px; padding: 28px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); border: 1px solid #eee; margin-bottom: 20px; }
+    .card h2 { font-size: 16px; font-weight: 600; color: #222; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .info-field label { display: block; font-size: 11px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .info-field input { width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; color: #333; font-family: inherit; outline: none; transition: border 0.2s; }
+    .info-field input:focus { border-color: #1a73e8; }
+    .info-field .readonly { padding: 8px 10px; font-size: 14px; color: #555; background: #f9f9f9; border: 1px solid #eee; border-radius: 6px; }
+    .info-field .hint { font-size: 11px; color: #aaa; margin-top: 3px; }
+    .show-block { border: 1px solid #e8e8e8; border-radius: 8px; margin-bottom: 16px; overflow: hidden; }
+    .section-title { font-size: 11px; font-weight: 600; color: #aaa; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .role-badge { font-size: 11px; padding: 3px 10px; border-radius: 99px; background: #e8f0fe; color: #1557b0; font-weight: 500; }
+    .bio-status { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 99px; margin-bottom: 12px; }
+    .bio-status.none     { background: #f5f5f5; color: #999; }
+    .bio-status.existing { background: #e8f5e9; color: #2e7d32; }
+    .existing-bio { background: #f9f9f9; border: 1px solid #eee; border-radius: 6px; padding: 12px; font-size: 14px; color: #444; line-height: 1.6; margin-bottom: 12px; white-space: pre-wrap; }
+    .existing-bio-meta { font-size: 11px; color: #aaa; margin-bottom: 12px; }
+    textarea { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; color: #333; font-family: inherit; outline: none; resize: vertical; min-height: 120px; transition: border 0.2s; line-height: 1.6; }
+    textarea:focus { border-color: #1a73e8; }
+    .char-count { font-size: 11px; color: #aaa; text-align: right; margin-top: 4px; }
+    .bio-actions { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+    .btn { padding: 9px 18px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; transition: background 0.2s, opacity 0.2s; font-family: inherit; }
+    .btn:disabled { opacity: 0.5; cursor: default; }
+    .btn-primary   { background: #1a73e8; color: #fff; }
+    .btn-primary:hover:not(:disabled) { background: #1557b0; }
+    .btn-secondary { background: #fff; color: #1a73e8; border: 1px solid #1a73e8; }
+    .btn-secondary:hover:not(:disabled) { background: #e8f0fe; }
+    .btn-ghost { background: #f5f5f5; color: #555; }
+    .btn-ghost:hover:not(:disabled) { background: #ebebeb; }
+    .success-banner { display: none; background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; border-radius: 8px; padding: 12px 16px; font-size: 14px; font-weight: 500; margin-bottom: 12px; align-items: center; gap: 8px; }
+    .success-banner.visible { display: flex; }
+    .error-banner { display: none; background: #fce8e6; color: #c62828; border: 1px solid #f5c6c6; border-radius: 8px; padding: 12px 16px; font-size: 14px; margin-bottom: 12px; }
+    .error-banner.visible { display: block; }
+    .loading-screen { text-align: center; padding: 80px 24px; color: #aaa; }
+    .loading-screen .spinner { width: 36px; height: 36px; border: 3px solid #e0e0e0; border-top-color: #1a73e8; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .error-screen { text-align: center; padding: 80px 24px; }
+    .error-screen h2 { font-size: 20px; color: #c62828; margin-bottom: 8px; }
+    .error-screen p  { font-size: 14px; color: #666; }
+    .toggle-edit { font-size: 12px; color: #1a73e8; cursor: pointer; text-decoration: underline; background: none; border: none; font-family: inherit; padding: 0; }
+    .save-info-btn { margin-top: 12px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <img src="https://drive.google.com/thumbnail?id=1ou4nRJB9o-c90WJbD3UO4kWnuIkjk9kb&sz=w60" style="height:36px; width:auto;">
+  <h1>TLT Bio Submission</h1>
+</header>
+
+<div class="container">
+
+  <div class="loading-screen" id="loading-screen">
+    <div class="spinner"></div>
+    <p>Loading your bio form...</p>
+  </div>
+
+  <div class="error-screen" id="error-screen" style="display:none;">
+    <h2>Link Not Found</h2>
+    <p id="error-message">This link may be invalid or expired. Please contact TLT staff.</p>
+  </div>
+
+  <div id="main-content" style="display:none;">
+
+    <div class="card">
+      <h2>
+        Your Information
+        <button class="toggle-edit" id="toggle-edit-btn" onclick="toggleEditInfo()" style="margin-left:10px;">Edit</button>
+      </h2>
+
+      <div id="info-view">
+        <div class="info-grid">
+          <div class="info-field"><label>Name</label><div class="readonly" id="view-name"></div></div>
+          <div class="info-field"><label>Pronouns</label><div class="readonly" id="view-pronouns"></div></div>
+          <div class="info-field"><label>Email</label><div class="readonly" id="view-email"></div></div>
+          <div class="info-field"><label>Phone</label><div class="readonly" id="view-phone"></div></div>
+        </div>
+      </div>
+
+      <div id="info-edit" style="display:none;">
+        <div class="info-grid">
+          <div class="info-field">
+            <label>Name</label>
+            <div class="readonly" id="edit-name-readonly"></div>
+            <div class="hint">Contact TLT staff to change your name.</div>
+          </div>
+          <div class="info-field">
+            <label>Pronouns</label>
+            <input type="text" id="edit-pronouns" placeholder="e.g. she/her">
+          </div>
+          <div class="info-field">
+            <label>Email</label>
+            <div class="readonly" id="edit-email-readonly"></div>
+            <div class="hint">Contact TLT staff to change your email.</div>
+          </div>
+          <div class="info-field">
+            <label>Phone</label>
+            <input type="tel" id="edit-phone" placeholder="10 digits">
+          </div>
+        </div>
+        <button class="btn btn-primary save-info-btn" onclick="saveContactInfo()">Save Changes</button>
+        <button class="btn btn-ghost save-info-btn" onclick="toggleEditInfo()" style="margin-left:8px;">Cancel</button>
+      </div>
+    </div>
+
+    <div id="bio-cards-container"></div>
+
+    <p style="font-size:12px; color:#aaa; text-align:center; margin-top:8px;">
+      Tacoma Little Theatre · Questions? <a href="mailto:info@tacomalittletheatre.com" style="color:#1a73e8;">info@tacomalittletheatre.com</a>
+    </p>
+
+  </div>
+</div>
+
+<script>
+  const TOKEN = '<?= token ?>';
+  let contactData = null;
+  let biosData    = null;
+  let showsData   = null;
+  let editingInfo = false;
+
+  const bioTypeLabels = {
+    actor:    'Actor Bio',
+    director: 'Director Bio',
+    designer: 'Production Team Bio'
+  };
+
+  const WORD_LIMITS = {
+    actor:    100,
+    director: 200,
+    designer: 150
+  };
+
+  function countWords(str) {
+    return str.trim() === '' ? 0 : str.trim().split(/\s+/).length;
+  }
+
+  function updateCharCount(cardId, bioType) {
+    const ta  = document.getElementById('textarea-' + cardId);
+    const cnt = document.getElementById('charcount-' + cardId);
+    if (!ta || !cnt) return;
+
+    const words     = countWords(ta.value);
+    const limit     = WORD_LIMITS[bioType] || 150;
+    const remaining = limit - words;
+
+    if (remaining < 0) {
+      const trimmed = ta.value.trim().split(/\s+/).slice(0, limit).join(' ');
+      ta.value        = trimmed;
+      cnt.style.color = '#888';
+      cnt.innerText   = '0 words remaining';
+    } else if (remaining <= 10) {
+      cnt.style.color = '#f57f17';
+      cnt.innerText   = remaining + ' words remaining';
+    } else {
+      cnt.style.color = '#888';
+      cnt.innerText   = words + ' / ' + limit + ' words';
+    }
+  }
+
+  window.onload = function() {
+    if (!TOKEN) { showError('No token found in this link. Please use the link sent to you by TLT.'); return; }
+    google.script.run
+      .withSuccessHandler(function(result) {
+        if (result.error) { showError(result.error); return; }
+        contactData = result.contact;
+        biosData    = result.bios;
+        showsData   = result.shows;
+        renderPage();
+      })
+      .withFailureHandler(function(err) { showError('Could not load your form: ' + err.message); })
+      .getContactByToken(TOKEN);
+  };
+
+  function renderPage() {
+    document.getElementById('loading-screen').style.display = 'none';
+    document.getElementById('main-content').style.display   = 'block';
+    const fullName = [contactData.firstName, contactData.middleName, contactData.lastName, contactData.suffix].filter(Boolean).join(' ');
+    document.getElementById('view-name').innerText     = fullName;
+    document.getElementById('view-pronouns').innerText = contactData.pronouns || '—';
+    document.getElementById('view-email').innerText    = contactData.email    || '—';
+    document.getElementById('view-phone').innerText    = formatPhone(contactData.phone) || '—';
+    document.getElementById('edit-name-readonly').innerText  = fullName;
+    document.getElementById('edit-email-readonly').innerText = contactData.email || '—';
+    document.getElementById('edit-pronouns').value = contactData.pronouns || '';
+    document.getElementById('edit-phone').value    = contactData.phone    || '';
+    renderBioCards();
+  }
+
+  function renderBioCards() {
+    const container = document.getElementById('bio-cards-container');
+    container.innerHTML = '';
+
+    if (!showsData || showsData.length === 0) {
+      container.innerHTML = '<div class="card"><p style="color:#888; font-size:14px;">You are not currently listed on any shows this season. Contact TLT staff if you think this is an error.</p></div>';
+      return;
+    }
+
+    showsData.forEach(show => {
+      const bioType      = show.bioType;
+      const bioTypeLabel = bioTypeLabels[bioType] || bioType;
+      const existingBio  = biosData[bioType];
+      const hasExisting  = existingBio && existingBio.text && existingBio.text.trim() !== '';
+      const cardId       = 'card-' + show.show.replace(/[^a-zA-Z0-9]/g,'-') + '-' + bioType;
+      const roleDisplay  = show.isActor ? 'Actor' + (show.character ? ' — ' + show.character : '') : show.role;
+
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.id = cardId;
+
+      card.innerHTML = `
+        <h2>
+          ${escHtml(show.show)}
+          <span class="role-badge" style="margin-left:8px;">${escHtml(roleDisplay)}</span>
+        </h2>
+        <div id="success-${cardId}" class="success-banner">✓ Bio submitted successfully!</div>
+        <div id="error-${cardId}" class="error-banner"></div>
+        <div class="section-title">${escHtml(bioTypeLabel)} Bio</div>
+        ${hasExisting ? `
+          <div class="bio-status existing">✓ Bio on file</div>
+          <div class="existing-bio">${escHtml(existingBio.text)}</div>
+          ${existingBio.updated ? `<div class="existing-bio-meta">Last updated: ${new Date(existingBio.updated).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</div>` : ''}
+          <div class="bio-actions" id="actions-existing-${cardId}">
+            <button class="btn btn-primary" onclick="useBio('${escHtml(show.show)}','${escHtml(show.role)}','${bioType}','${cardId}')">✓ Use This Bio for ${escHtml(show.show)}</button>
+            <button class="btn btn-secondary" onclick="showUpdateForm('${cardId}')">Edit & Update</button>
+          </div>
+          <div id="update-form-${cardId}" style="display:none;">
+            <textarea id="textarea-${cardId}" oninput="updateCharCount('${cardId}','${bioType}')">${escHtml(existingBio.text)}</textarea>
+            <div class="char-count" id="charcount-${cardId}">${countWords(existingBio.text)} / ${WORD_LIMITS[bioType]||150} words</div>
+            <div class="bio-actions">
+              <button class="btn btn-primary" onclick="updateAndSubmit('${escHtml(show.show)}','${escHtml(show.role)}','${bioType}','${cardId}')">Save & Submit</button>
+              <button class="btn btn-ghost" onclick="hideUpdateForm('${cardId}')">Cancel</button>
+            </div>
+          </div>
+        ` : `
+          <div class="bio-status none">No bio on file yet</div>
+          <textarea id="textarea-${cardId}" placeholder="Write your ${escHtml(bioTypeLabel.toLowerCase())} bio here..." oninput="updateCharCount('${cardId}','${bioType}')"></textarea>
+          <div class="char-count" id="charcount-${cardId}">0 / ${WORD_LIMITS[bioType]||150} words</div>
+          <div class="bio-actions">
+            <button class="btn btn-primary" onclick="updateAndSubmit('${escHtml(show.show)}','${escHtml(show.role)}','${bioType}','${cardId}')">Submit Bio</button>
+          </div>
+        `}
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  function useBio(show, role, bioType, cardId) {
+    const btn = document.querySelector('#actions-existing-' + cardId + ' .btn-primary');
+    btn.disabled  = true;
+    btn.innerText = 'Submitting...';
+    google.script.run
+      .withSuccessHandler(function(result) {
+        if (result.success) { showCardSuccess(cardId); btn.innerText = '✓ Submitted'; }
+        else { showCardError(cardId, result.error); btn.disabled = false; btn.innerText = '✓ Use This Bio for ' + show; }
+      })
+      .withFailureHandler(function(err) { showCardError(cardId, err.message); btn.disabled = false; btn.innerText = '✓ Use This Bio for ' + show; })
+      .submitBio({ token: TOKEN, bioType, bioText: biosData[bioType].text, show, role, action: 'use' });
+  }
+
+  function updateAndSubmit(show, role, bioType, cardId) {
+    const textarea = document.getElementById('textarea-' + cardId);
+    const bioText  = textarea.value.trim();
+    if (!bioText) { showCardError(cardId, 'Please enter a bio before submitting.'); return; }
+    const btns = document.querySelectorAll('#' + cardId + ' .btn-primary');
+    btns.forEach(b => { b.disabled = true; b.innerText = 'Submitting...'; });
+    google.script.run
+      .withSuccessHandler(function(result) {
+        if (result.success) {
+          // Update local bio data for this type
+          biosData[bioType] = { text: bioText, updated: new Date().toISOString() };
+          showCardSuccess(cardId);
+          btns.forEach(b => { b.innerText = '✓ Submitted'; });
+          // Re-render all other cards of the same bio type to show "Use This Bio"
+          showsData.forEach(s => {
+            if (s.bioType === bioType) {
+              const otherId = 'card-' + s.show.replace(/[^a-zA-Z0-9]/g,'-') + '-' + bioType;
+              if (otherId !== cardId) {
+                const otherCard = document.getElementById(otherId);
+                if (otherCard) {
+                  const sectionTitle = otherCard.querySelector('.section-title').outerHTML;
+                  const h2 = otherCard.querySelector('h2').outerHTML;
+                  const successEl = otherCard.querySelector('.success-banner').outerHTML;
+                  const errorEl   = otherCard.querySelector('.error-banner').outerHTML;
+                  otherCard.innerHTML = `
+                    ${h2}
+                    ${successEl}
+                    ${errorEl}
+                    ${sectionTitle}
+                    <div class="bio-status existing">✓ Bio on file</div>
+                    <div class="existing-bio">${escHtml(bioText)}</div>
+                    <div class="bio-actions" id="actions-existing-${otherId}">
+                      <button class="btn btn-primary" onclick="useBio('${escHtml(s.show)}','${escHtml(s.role)}','${bioType}','${otherId}')">✓ Use This Bio for ${escHtml(s.show)}</button>
+                      <button class="btn btn-secondary" onclick="showUpdateForm('${otherId}')">Edit & Update</button>
+                    </div>
+                    <div id="update-form-${otherId}" style="display:none;">
+                      <textarea id="textarea-${otherId}" oninput="updateCharCount('${otherId}','${bioType}')">${escHtml(bioText)}</textarea>
+                      <div class="char-count" id="charcount-${otherId}">${countWords(bioText)} / ${WORD_LIMITS[bioType]||150} words</div>
+                      <div class="bio-actions">
+                        <button class="btn btn-primary" onclick="updateAndSubmit('${escHtml(s.show)}','${escHtml(s.role)}','${bioType}','${otherId}')">Save & Submit</button>
+                        <button class="btn btn-ghost" onclick="hideUpdateForm('${otherId}')">Cancel</button>
+                      </div>
+                    </div>
+                  `;
+                }
+              }
+            }
+          });
+        } else {
+          showCardError(cardId, result.error);
+          btns.forEach(b => { b.disabled = false; b.innerText = 'Submit Bio'; });
+        }
+      })
+      .withFailureHandler(function(err) {
+        showCardError(cardId, err.message);
+        btns.forEach(b => { b.disabled = false; b.innerText = 'Submit Bio'; });
+      })
+      .submitBio({ token: TOKEN, bioType, bioText, show, role, action: 'update' });
+  }
+
+  function showUpdateForm(cardId) {
+    document.getElementById('actions-existing-' + cardId).style.display = 'none';
+    document.getElementById('update-form-' + cardId).style.display      = 'block';
+  }
+
+  function hideUpdateForm(cardId) {
+    document.getElementById('update-form-' + cardId).style.display      = 'none';
+    document.getElementById('actions-existing-' + cardId).style.display = 'flex';
+  }
+
+  function toggleEditInfo() {
+    editingInfo = !editingInfo;
+    document.getElementById('info-view').style.display   = editingInfo ? 'none'  : 'block';
+    document.getElementById('info-edit').style.display   = editingInfo ? 'block' : 'none';
+    document.getElementById('toggle-edit-btn').innerText = editingInfo ? 'Cancel' : 'Edit';
+  }
+
+  function saveContactInfo() {
+    const data = { token: TOKEN, pronouns: document.getElementById('edit-pronouns').value.trim(), phone: document.getElementById('edit-phone').value.trim() };
+    google.script.run
+      .withSuccessHandler(function(result) {
+        if (result.success) {
+          contactData.pronouns = data.pronouns;
+          contactData.phone    = data.phone;
+          document.getElementById('view-pronouns').innerText = data.pronouns || '—';
+          document.getElementById('view-phone').innerText    = formatPhone(data.phone) || '—';
+          toggleEditInfo();
+        }
+      })
+      .withFailureHandler(function(err) { alert('Save failed: ' + err.message); })
+      .updateContactInfo(data);
+  }
+
+  function showError(msg) {
+    document.getElementById('loading-screen').style.display = 'none';
+    document.getElementById('error-screen').style.display   = 'block';
+    document.getElementById('error-message').innerText = msg;
+  }
+
+  function showCardSuccess(cardId) {
+    document.getElementById('success-' + cardId).classList.add('visible');
+    document.getElementById('error-'   + cardId).classList.remove('visible');
+    const uf = document.getElementById('update-form-' + cardId);
+    if (uf) uf.style.display = 'none';
+  }
+
+  function showCardError(cardId, msg) {
+    const el = document.getElementById('error-' + cardId);
+    el.innerText = msg;
+    el.classList.add('visible');
+  }
+
+
+  function formatPhone(phone) {
+    const digits = String(phone || '').replace(/\D/g, '');
+    if (digits.length === 10) return '(' + digits.substring(0,3) + ') ' + digits.substring(3,6) + '-' + digits.substring(6);
+    return phone || '';
+  }
+
+  function escHtml(str) {
+    return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+</script>
+
+</body>
+</html>

@@ -271,6 +271,15 @@ SHIM = r'''
         return { docId: docId, show: show, role: role, firstName: firstName };
       },
     },
+    resendContractFromWebapp: {
+      // New endpoint — no GAS equivalent. Server looks up the doc in Drive
+      // by name, runs the send flow (OpenSign + welcome email). Works even
+      // when col L was overwritten with an OpenSign ID by earlier sends.
+      path: '/contract-resend',
+      body: function (show, role, firstName) {
+        return { show: show, role: role, firstName: firstName };
+      },
+    },
     purgeCache: {
       path: '/purge-cache',
       body: function () { return {}; },
@@ -321,7 +330,17 @@ SHIM = r'''
               const spec = CB_WRITE_ROUTES[prop];
               const body = spec.body.apply(null, args);
               cbApi(spec.path, { method: 'POST', body: body })
-                .then(r => capturedSucc && capturedSucc(r.data))
+                .then(r => {
+                  // Contract send returns a soft error field when the follow-up
+                  // welcome/bio email fails (OpenSign step succeeded, so the
+                  // frontend treats the call as fully successful and never
+                  // surfaces it). Alert here so Blake sees WHY the email
+                  // didn't arrive.
+                  if (r && r.data && r.data.bioEmailError) {
+                    try { showAlert('Contract went to OpenSign successfully, but the welcome/bio email failed:\\n\\n' + r.data.bioEmailError); } catch (_) {}
+                  }
+                  if (capturedSucc) capturedSucc(r.data);
+                })
                 .catch(e => {
                   if (e.status === 401) { cbClearToken(); cbShowLogin(); return; }
                   if (capturedFail) capturedFail(e);
@@ -1064,6 +1083,66 @@ html = html.replace('</script>', SHOW_VISIBILITY_MODULE + '\n</script>', 1)
 # the main script block, so this appends right after SHOW_VISIBILITY_MODULE.
 # -----------------------------------------------------------------------------
 CONTACT_SHEET_MODULE = '''
+  /* =====  Beefy error alert override — long messages get a scrollable
+     pre + Copy button so the whole error is copyable. Original showAlert
+     used innerText in a 420px-wide dialog with no scroll; anything longer
+     than a paragraph got clipped and unselectable.
+     Only kicks in for LONG messages (>240 chars) or ones containing "{"
+     — short "Sent 3 emails" alerts still render the old compact way. ==== */
+  (function () {
+    var originalShowAlert = window.showAlert;
+    window.showAlert = function (message, onOk) {
+      var msg = String(message == null ? '' : message);
+      var isLong = msg.length > 240 || msg.indexOf('{') !== -1 || msg.indexOf('\\n') !== -1;
+      if (!isLong) return originalShowAlert(msg, onOk);
+
+      // Build our own richer overlay so we don't fight the compact styles.
+      var prior = document.getElementById('cb-err-modal');
+      if (prior) prior.remove();
+      var overlay = document.createElement('div');
+      overlay.id = 'cb-err-modal';
+      overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:99999; display:flex; align-items:center; justify-content:center; padding:20px;';
+      overlay.innerHTML =
+        '<div style="background:#fff; border-radius:10px; padding:22px 24px; max-width:820px; width:100%; max-height:80vh; display:flex; flex-direction:column; box-shadow:0 8px 32px rgba(0,0,0,0.22);">' +
+          '<div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:12px;">' +
+            '<h3 style="margin:0; font-size:17px; color:#a2242a;">Error</h3>' +
+            '<button id="cb-err-copy" class="btn btn-secondary" style="font-size:12px; padding:4px 12px;">Copy</button>' +
+          '</div>' +
+          '<pre id="cb-err-body" style="flex:1; overflow:auto; margin:0 0 16px; padding:14px; background:#fafafa; border:1px solid #eee; border-radius:6px; font-family:Consolas,Monaco,monospace; font-size:12px; line-height:1.5; white-space:pre-wrap; user-select:text; -webkit-user-select:text; cursor:text; color:#222;"></pre>' +
+          '<div style="display:flex; justify-content:flex-end; gap:10px;">' +
+            '<button id="cb-err-close" class="btn btn-primary" style="font-size:13px; padding:6px 14px;">Close</button>' +
+          '</div>' +
+        '</div>';
+      document.body.appendChild(overlay);
+      // Set the message via textContent so raw JSON / HTML doesn't render.
+      document.getElementById('cb-err-body').textContent = msg;
+      var close = function () { overlay.remove(); if (typeof onOk === 'function') onOk(); };
+      document.getElementById('cb-err-close').onclick = close;
+      document.getElementById('cb-err-copy').onclick = function () {
+        var btn = document.getElementById('cb-err-copy');
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(msg).then(function () {
+            btn.textContent = 'Copied ✓';
+            setTimeout(function () { btn.textContent = 'Copy'; }, 1500);
+          });
+        } else {
+          // Fallback: select the pre so Ctrl+C works.
+          var pre = document.getElementById('cb-err-body');
+          var range = document.createRange();
+          range.selectNodeContents(pre);
+          var sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+          btn.textContent = 'Selected — Ctrl+C';
+        }
+      };
+      overlay.addEventListener('click', function (ev) { if (ev.target === overlay) close(); });
+      // Also close on Escape.
+      var esc = function (ev) { if (ev.key === 'Escape') { close(); document.removeEventListener('keydown', esc); } };
+      document.addEventListener('keydown', esc);
+    };
+  })();
+
   /* =====  Contact Sheet: View / Regenerate modal (overrides viewContactSheet)
      Runs after the original declaration so this wins. ================== */
   window.viewContactSheet = function (e, showName) {
@@ -1124,7 +1203,7 @@ CONTACT_SHEET_MODULE = '''
     google.script.run
       .withSuccessHandler(function (result) {
         hideLoadingModal();
-        if (result && result.url) window.open(result.url, '_blank');
+        if (result && result.url) cbShowDocReady('Contact Sheet ready', showName, result.url);
         else showAlert('Could not generate contact sheet for ' + showName);
       })
       .withFailureHandler(function (err) {
@@ -1132,6 +1211,39 @@ CONTACT_SHEET_MODULE = '''
         showAlert('Error: ' + (err && err.message ? err.message : 'generation failed'));
       })
       [method](showName);
+  }
+
+  /* Post-generation confirmation with click-to-open. Popup blockers reject
+     window.open fired from async callbacks; a user-clicked <a target=_blank>
+     is treated as a user gesture and always opens. Auto-clicks the link
+     immediately AND leaves the modal visible for a second so if the popup
+     WAS blocked, the user can still click "Open" manually. */
+  function cbShowDocReady(title, subject, url) {
+    var prior = document.getElementById('cb-doc-ready');
+    if (prior) prior.remove();
+    var overlay = document.createElement('div');
+    overlay.id = 'cb-doc-ready';
+    overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:99998; display:flex; align-items:center; justify-content:center;';
+    overlay.innerHTML =
+      '<div style="background:#fff; border-radius:10px; padding:24px; max-width:400px; width:calc(100% - 40px); box-shadow:0 4px 24px rgba(0,0,0,0.15); text-align:center;">' +
+        '<h3 style="margin:0 0 6px; font-size:18px; font-weight:600; color:#188038;">✓ ' + calEscape(title) + '</h3>' +
+        '<p style="margin:0 0 18px; color:#333; font-size:14px;">' + calEscape(subject) + '</p>' +
+        '<div style="display:flex; gap:8px; justify-content:center;">' +
+          '<button id="cb-doc-ready-close" class="btn btn-secondary" style="font-size:13px; padding:6px 14px;">Close</button>' +
+          '<a id="cb-doc-ready-open" href="' + url + '" target="_blank" rel="noopener" class="btn btn-primary" style="font-size:13px; padding:6px 14px; text-decoration:none; display:inline-block;">Open ↗</a>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(overlay);
+    var close = function () { overlay.remove(); };
+    document.getElementById('cb-doc-ready-close').onclick = close;
+    document.getElementById('cb-doc-ready-open').addEventListener('click', function () { setTimeout(close, 100); });
+    overlay.addEventListener('click', function (ev) { if (ev.target === overlay) close(); });
+    // Try to auto-open too — works in most browsers, silently no-ops if blocked.
+    // The user still has the button as a fallback.
+    try {
+      var w = window.open(url, '_blank', 'noopener');
+      if (w) setTimeout(close, 400); // popup worked — dismiss confirmation quickly
+    } catch (_) { /* no-op */ }
   }
 
   /* =====  Tech Schedule: View / Regenerate (parallel to contact sheet) ==== */
@@ -1176,12 +1288,110 @@ CONTACT_SHEET_MODULE = '''
     document.getElementById('cb-sched-regen').onclick  = function () { close(); cbGenerateSchedule(showName); };
   }
 
+  /* =====  Add a real "Resend" button to Sent-for-Signature rows.
+     Works via a new server endpoint that looks up the doc in Drive by
+     expected name, so it succeeds even when col L was overwritten with
+     an OpenSign ID by the older send code path. Also relabels the
+     source's "Send" button to "Resend" when it's rendered (contracts
+     where col L is still a doc URL). ==== */
+  (function () {
+    function findRowMeta(tr) {
+      // Read data-* attributes from either checkbox — Blake's frontend has an
+      // override renderContracts that only emits .ok-to-send-checkbox with
+      // data-* attrs; the source's row-selector .contract-checkbox may not
+      // exist at all. Try both.
+      var cb = tr.querySelector('.contract-checkbox, .ok-to-send-checkbox');
+      if (!cb) { console.warn('[callboard] Resend UI: no checkbox in row', tr); return null; }
+      var show = cb.getAttribute('data-show') || '';
+      var role = cb.getAttribute('data-role') || '';
+      var firstName = cb.getAttribute('data-firstname') || '';
+      if (!show || !role || !firstName) {
+        console.warn('[callboard] Resend UI: incomplete data-* on checkbox', {
+          show: show, role: role, firstName: firstName
+        });
+        return null;
+      }
+      return { show: show, role: role, firstName: firstName };
+    }
+
+    function ensureResendUI() {
+      var container = document.getElementById('contracts-container');
+      if (!container) return;
+      // Blake's frontend has multiple tables (per-show blocks). Iterate all.
+      container.querySelectorAll('tbody tr').forEach(function (tr) {
+        var badge = tr.querySelector('.status-badge');
+        if (!badge) return;
+        var status = (badge.textContent || '').trim();
+        // "Generated" (just-generated, not yet sent) gets Send button.
+        // "Sent for Signature" (already gone once) gets Resend.
+        var isGenerated = status === 'Generated';
+        var isSent      = status === 'Sent for Signature';
+        if (!isGenerated && !isSent) return;
+
+        var actionsCell = tr.querySelector('.contract-actions');
+        if (!actionsCell) return;
+
+        // Always inject so it shows up regardless of whether col L was a
+        // doc URL or overwritten with OpenSign ID. Idempotent via class.
+        if (actionsCell.querySelector('.cb-resend-btn')) return;
+        var meta = findRowMeta(tr);
+        if (!meta) return;
+        var btn = document.createElement('button');
+        btn.className = 'btn btn-primary cb-resend-btn';
+        btn.style.cssText = 'font-size:11px; padding:4px 10px;';
+        btn.textContent = isSent ? 'Resend' : 'Send';
+        btn.title = 'Look up the generated doc in Drive and ' + (isSent ? 're' : '') + 'send via OpenSign + welcome email';
+        btn.addEventListener('click', function () {
+          var okCheckbox = tr.querySelector('.ok-to-send-checkbox');
+          if (!okCheckbox || !okCheckbox.checked) {
+            showAlert('Please get approval from AAD before sending.');
+            return;
+          }
+          requireApproval(function () {
+            btn.disabled = true;
+            btn.textContent = 'Sending…';
+            google.script.run
+              .withSuccessHandler(function (result) {
+                if (result && result.success) {
+                  btn.textContent = '✓ Sent';
+                  setTimeout(function () {
+                    google.script.run
+                      .withSuccessHandler(function (data) { allContractsData = data; renderContracts(data); })
+                      .getContractsData();
+                  }, 800);
+                } else {
+                  btn.disabled = false;
+                  btn.textContent = isSent ? 'Resend' : 'Send';
+                  showAlert('Send failed: ' + ((result && result.error) || 'unknown error'));
+                }
+              })
+              .withFailureHandler(function (err) {
+                btn.disabled = false;
+                btn.textContent = isSent ? 'Resend' : 'Send';
+                showAlert('Error: ' + (err && err.message ? err.message : 'send failed'));
+              })
+              .resendContractFromWebapp(meta.show, meta.role, meta.firstName);
+          });
+        });
+        // Insert before the Regenerate button so Resend sits leftmost of the "still-active" actions.
+        var regenBtn = Array.from(actionsCell.querySelectorAll('button')).find(function (b) { return b.textContent.trim() === 'Regenerate'; });
+        if (regenBtn) actionsCell.insertBefore(btn, regenBtn);
+        else actionsCell.appendChild(btn);
+      });
+    }
+    // Belt-and-suspenders: run on tab renders, on data refreshes, and on a
+    // slow poll. All idempotent (each row checked for existing .cb-resend-btn
+    // before adding).
+    setInterval(ensureResendUI, 800);
+    ensureResendUI();
+  })();
+
   function cbGenerateSchedule(showName) {
     showLoadingModal('Generating Tech Schedule', showName + ' · This usually takes 10–20 seconds…');
     google.script.run
       .withSuccessHandler(function (result) {
         hideLoadingModal();
-        if (result && result.url) window.open(result.url, '_blank');
+        if (result && result.url) cbShowDocReady('Tech Schedule ready', showName, result.url);
         else showAlert('Could not generate tech schedule for ' + showName);
       })
       .withFailureHandler(function (err) {

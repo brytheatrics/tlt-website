@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TLT Emergency Information & WATCH Release</title>
+  <style>
+    :root {
+      --tlt-red: #a2242a;
+      --tlt-red-dark: #7d1b21;
+      --tlt-red-light: #f7ecec;
+      --text: #2a2a2a;
+      --muted: #888;
+      --border: #ddd;
+      --bg: #f5f5f5;
+      --card-bg: #fff;
+      --serif: 'Playfair Display', 'Baskerville', 'Georgia', serif;
+      --sans: 'Segoe UI', Helvetica, Arial, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.5; }
+    a { color: var(--tlt-red); }
+
+    /* ── Letterhead header ── */
+    .letterhead {
+      background: #fff;
+      border-bottom: 4px double var(--tlt-red);
+      padding: 32px 24px 24px;
+      text-align: center;
+    }
+    .letterhead-logo {
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+    .letterhead-logo img {
+      height: 88px;
+      width: auto;
+    }
+    .letterhead-name {
+      font-family: var(--serif);
+      font-size: 12px;
+      color: var(--tlt-red);
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+    .letterhead-tagline {
+      font-family: var(--serif);
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+    .letterhead-title {
+      font-family: var(--serif);
+      font-size: 28px;
+      color: var(--text);
+      margin-top: 22px;
+      font-weight: 700;
+    }
+
+    /* ── Container ── */
+    .container { max-width: 780px; margin: 32px auto; padding: 0 20px 48px; }
+
+    /* ── Section cards ── */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid #e6dfd6;
+      border-radius: 4px;
+      padding: 28px 32px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+    .card h2 {
+      font-family: var(--serif);
+      font-size: 20px;
+      color: var(--tlt-red);
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .card .section-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid #eee5d8;
+    }
+
+    /* ── Fields ── */
+    .field { margin-bottom: 14px; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .field-row-3 { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; }
+    label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 5px;
+    }
+    label .req { color: var(--tlt-red); }
+    input[type="text"], input[type="tel"], input[type="date"], input[type="email"], textarea, select {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      font-size: 14px;
+      color: var(--text);
+      font-family: inherit;
+      outline: none;
+      background: #fff;
+      transition: border 0.15s;
+    }
+    input:focus, textarea:focus, select:focus { border-color: var(--tlt-red); box-shadow: 0 0 0 2px var(--tlt-red-light); }
+    textarea { min-height: 80px; resize: vertical; line-height: 1.5; }
+    .hint { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+    /* ── Radio / checkbox groups ── */
+    .radio-group, .check-group { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 4px; }
+    .radio-group label, .check-group label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: normal;
+      color: var(--text);
+      text-transform: none;
+      letter-spacing: normal;
+      cursor: pointer;
+      margin-bottom: 0;
+    }
+    .radio-group input[type="radio"], .check-group input[type="checkbox"] {
+      width: 16px; height: 16px;
+      accent-color: var(--tlt-red);
+      margin: 0;
+    }
+
+    .allergy-row {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px;
+      align-items: start;
+      margin-bottom: 10px;
+    }
+    .allergy-row label {
+      margin: 0;
+      padding-top: 10px;
+    }
+
+    /* ── Consent block ── */
+    .consent-block {
+      background: #faf7f2;
+      border-left: 4px solid var(--tlt-red);
+      padding: 16px 20px;
+      margin: 18px 0 12px;
+      font-size: 13px;
+      color: #444;
+      line-height: 1.6;
+    }
+    .consent-check {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-top: 12px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .consent-check input[type="checkbox"] {
+      width: 18px; height: 18px;
+      accent-color: var(--tlt-red);
+      margin-top: 1px;
+      flex-shrink: 0;
+    }
+
+    .signature-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    /* ── Retention notice ── */
+    .retention-notice {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 13px;
+      color: #555;
+      text-align: center;
+      padding: 18px;
+      margin: 8px 0 20px;
+      border-top: 1px solid #d9c9b3;
+      border-bottom: 1px solid #d9c9b3;
+      background: transparent;
+    }
+
+    /* ── Submit ── */
+    .submit-row { text-align: center; margin: 24px 0 32px; }
+    .btn {
+      padding: 14px 40px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      border-radius: 3px;
+      font-family: inherit;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      transition: background 0.2s, opacity 0.2s;
+    }
+    .btn-primary { background: var(--tlt-red); color: #fff; }
+    .btn-primary:hover:not(:disabled) { background: var(--tlt-red-dark); }
+    .btn:disabled { opacity: 0.5; cursor: default; }
+
+    /* ── Banners / states ── */
+    .banner { padding: 12px 16px; border-radius: 4px; font-size: 14px; margin-bottom: 16px; display: none; }
+    .banner.visible { display: block; }
+    .banner.error { background: #fce8e6; color: #c62828; border: 1px solid #f5c6c6; }
+    .banner.success { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+    .loading-screen, .error-screen { text-align: center; padding: 80px 24px; }
+    .spinner { width: 40px; height: 40px; border: 3px solid #e0e0e0; border-top-color: var(--tlt-red); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .error-screen h2 { font-family: var(--serif); font-size: 24px; color: var(--tlt-red); margin-bottom: 8px; }
+    .error-screen p { color: #666; }
+
+    /* ── Footer ── */
+    .footer {
+      text-align: center;
+      padding: 24px 20px 32px;
+      border-top: 4px double var(--tlt-red);
+      background: #fff;
+      color: #555;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+    .footer .footer-contact { color: #444; }
+    .footer .footer-contact a { color: var(--tlt-red); text-decoration: none; }
+    .footer .footer-membership { margin-top: 6px; color: #666; }
+    .footer .footer-tagline {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 13px;
+      color: var(--tlt-red);
+      margin-top: 8px;
+    }
+
+    /* ── Print ── */
+    @media print {
+      body { background: #fff; }
+      .container { max-width: 100%; padding: 0; }
+      .card { border: none; box-shadow: none; padding: 12px 0; }
+      .submit-row, .banner { display: none !important; }
+    }
+
+    @media (max-width: 640px) {
+      .field-row, .field-row-3, .signature-row { grid-template-columns: 1fr; }
+      .card { padding: 20px 18px; }
+      .letterhead-title { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Letterhead ── -->
+<div class="letterhead">
+  <div class="letterhead-logo">
+    <img src="logo.png" alt="Tacoma Little Theatre">
+  </div>
+  <div class="letterhead-name">Tacoma Little Theatre</div>
+  <div class="letterhead-tagline">Since 1918</div>
+  <div class="letterhead-title">Emergency Information &amp; Background Check Release</div>
+</div>
+
+<div class="container">
+
+  <div class="loading-screen" id="loading-screen">
+    <div class="spinner"></div>
+    <p>Loading your form...</p>
+  </div>
+
+  <div class="error-screen" id="error-screen" style="display:none;">
+    <h2>Link Not Found</h2>
+    <p id="error-message">This link may be invalid or expired. Please contact TLT staff.</p>
+  </div>
+
+  <form id="form-content" style="display:none;" onsubmit="return submitForm(event);">
+
+    <div class="banner error" id="err-banner"></div>
+    <div class="banner success" id="ok-banner"></div>
+
+    <!-- ── Personal Info ── -->
+    <div class="card">
+      <h2>Personal Information</h2>
+      <div class="section-sub">Please confirm or complete the information below.</div>
+
+      <div class="field-row-3">
+        <div class="field"><label>Last name <span class="req">*</span></label><input type="text" id="lastName" required></div>
+        <div class="field"><label>First name <span class="req">*</span></label><input type="text" id="firstName" required></div>
+        <div class="field"><label>Middle name</label><input type="text" id="middleName"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Date of birth <span class="req">*</span></label><input type="date" id="dob" required></div>
+        <div class="field">
+          <label>Are you 18 or older? <span class="req">*</span></label>
+          <div class="radio-group">
+            <label><input type="radio" name="over18" value="yes" onchange="toggleGuardian()"> Yes</label>
+            <label><input type="radio" name="over18" value="no" onchange="toggleGuardian()"> No</label>
+          </div>
+        </div>
+      </div>
+      <div class="field"><label>Street address <span class="req">*</span></label><input type="text" id="address" required></div>
+      <div class="field-row">
+        <div class="field"><label>Home phone</label><input type="tel" id="homePhone"></div>
+        <div class="field"><label>Mobile phone <span class="req">*</span></label><input type="tel" id="mobilePhone" required></div>
+      </div>
+    </div>
+
+    <!-- ── Guardian (shown if under 18) ── -->
+    <div class="card" id="guardian-card" style="display:none;">
+      <h2>Parent / Legal Guardian</h2>
+      <div class="section-sub">Required for participants under 18.</div>
+      <div class="field"><label>Guardian name <span class="req">*</span></label><input type="text" id="guardianName"></div>
+      <div class="field"><label>Address</label><input type="text" id="guardianAddress"></div>
+      <div class="field-row">
+        <div class="field"><label>Home phone</label><input type="tel" id="guardianHomePhone"></div>
+        <div class="field"><label>Mobile phone</label><input type="tel" id="guardianMobilePhone"></div>
+      </div>
+    </div>
+
+    <!-- ── Emergency Contacts ── -->
+    <div class="card">
+      <h2>Emergency Contacts</h2>
+      <div class="section-sub">Local persons to be notified in the event of an emergency or illness.</div>
+      <div class="field-row">
+        <div class="field"><label>Contact 1 name <span class="req">*</span></label><input type="text" id="ec1Name" required></div>
+        <div class="field"><label>Contact 1 phone <span class="req">*</span></label><input type="tel" id="ec1Phone" required></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Contact 2 name <span class="req">*</span></label><input type="text" id="ec2Name" required></div>
+        <div class="field"><label>Contact 2 phone <span class="req">*</span></label><input type="tel" id="ec2Phone" required></div>
+      </div>
+    </div>
+
+    <!-- ── Medical Info ── -->
+    <div class="card">
+      <h2>Emergency Medical Information</h2>
+      <div class="section-sub">Producing a play can be physically and emotionally strenuous. Help us keep our company safe by sharing anything relevant.</div>
+
+      <div class="allergy-row">
+        <input type="checkbox" id="foodAllergyCheck">
+        <div>
+          <label style="padding-top:0;">Food allergies</label>
+          <input type="text" id="foodAllergyDetail" placeholder="What kind?">
+        </div>
+      </div>
+      <div class="allergy-row">
+        <input type="checkbox" id="costumeAllergyCheck">
+        <div>
+          <label style="padding-top:0;">Costume allergies</label>
+          <input type="text" id="costumeAllergyDetail" placeholder="e.g. gold, latex, wool, chemicals">
+        </div>
+      </div>
+      <div class="allergy-row">
+        <input type="checkbox" id="otherAllergyCheck">
+        <div>
+          <label style="padding-top:0;">Other allergies</label>
+          <input type="text" id="otherAllergyDetail" placeholder="Describe">
+        </div>
+      </div>
+
+      <div class="field" style="margin-top:12px;">
+        <label>Medical conditions or interventions</label>
+        <textarea id="medicalConditions" placeholder="e.g. diabetes, epi-pens, heart conditions, epilepsy, anxiety, pregnancy, physical limitations, etc."></textarea>
+      </div>
+      <div class="field"><label>Medical insurance provider &amp; ID#</label><input type="text" id="insurance"></div>
+      <div class="field-row">
+        <div class="field"><label>Primary physician</label><input type="text" id="physicianName"></div>
+        <div class="field"><label>Physician phone</label><input type="tel" id="physicianPhone"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Hospital preference</label><input type="text" id="hospitalPref"></div>
+        <div class="field"><label>Emergency care preference</label><input type="text" id="ercarePref"></div>
+      </div>
+
+      <div class="consent-block">
+        In the event of a physical injury or illness, I hereby release, discharge and/or otherwise indemnify Tacoma Little Theatre, their employees and associated personnel, including the owners and employees of offsite rehearsal spaces, from any and all liability regarding a claim of injury or illness as a result of my participation in this production at Tacoma Little Theatre. In the event of an emergency, I hereby give my consent for emergency medical care prescribed by a duly licensed Doctor of Medicine or Doctor of Dentistry.
+      </div>
+      <label class="consent-check">
+        <input type="checkbox" id="medicalAgree" required>
+        <span>I have read and agree to the emergency medical release above. <span class="req">*</span></span>
+      </label>
+      <div class="signature-row">
+        <div class="field"><label>Type your full name to sign <span class="req">*</span></label><input type="text" id="medicalSignature" required></div>
+        <div class="field"><label>Today's date</label><input type="text" id="medicalDate" readonly></div>
+      </div>
+    </div>
+
+    <!-- ── WATCH ── -->
+    <div class="card">
+      <h2>Washington State Patrol Background Check Release</h2>
+      <div class="section-sub">Tacoma Little Theatre will use this information and any resulting record only in making initial employment or engagement decisions. Further dissemination is strictly prohibited without your written permission.</div>
+
+      <div class="field"><label>Alias / maiden name / other names used</label><input type="text" id="aliases"></div>
+
+      <div class="field">
+        <label>Have you ever been convicted of a crime against children or other persons? <span class="req">*</span></label>
+        <div class="radio-group">
+          <label><input type="radio" name="conviction" value="no" onchange="toggleConvictionDetail()"> No</label>
+          <label><input type="radio" name="conviction" value="yes" onchange="toggleConvictionDetail()"> Yes</label>
+        </div>
+        <div class="hint">"Crime against children or other persons" includes offenses listed in Washington State Patrol WATCH statute (e.g. violent felonies, sex offenses, offenses against minors, etc.).</div>
+      </div>
+      <div class="field" id="conviction-detail-field" style="display:none;">
+        <label>Please specify <span class="req">*</span></label>
+        <textarea id="convictionDetail"></textarea>
+      </div>
+
+      <div class="consent-block">
+        I declare that the above information is true and accurate. I grant Tacoma Little Theatre permission to conduct a Washington State Patrol criminal history background check using the information provided.
+      </div>
+      <label class="consent-check">
+        <input type="checkbox" id="watchAgree" required>
+        <span>I have read and agree to the WSP background check release above. <span class="req">*</span></span>
+      </label>
+      <div class="signature-row">
+        <div class="field"><label>Type your full name to sign <span class="req">*</span></label><input type="text" id="watchSignature" required></div>
+        <div class="field"><label>Today's date</label><input type="text" id="watchDate" readonly></div>
+      </div>
+    </div>
+
+    <div class="retention-notice">
+      This information is retained by Tacoma Little Theatre for the duration of your involvement and used only in the event of emergency during productions.
+    </div>
+
+    <div class="submit-row">
+      <button type="submit" class="btn btn-primary" id="submit-btn">Submit Form</button>
+    </div>
+
+  </form>
+</div>
+
+<!-- ── Footer ── -->
+<div class="footer">
+  <div class="footer-contact">
+    210 North I Street &bull; Tacoma, WA 98403 &bull; 253-272-2281 &bull;
+    <a href="https://www.tacomalittletheatre.com">www.tacomalittletheatre.com</a> &bull;
+    <a href="mailto:tlt@tacomalittletheatre.com">tlt@tacomalittletheatre.com</a>
+  </div>
+  <div class="footer-tagline">Washington's Oldest National Award-Winning Community Theatre</div>
+</div>
+
+<script>
+  // ── Config ──────────────────────────────────────────────────
+  const API_BASE = 'https://tacomalittletheatre.com/wp-json/callboard/v1';
+
+  // ── State ───────────────────────────────────────────────────
+  const params = new URLSearchParams(window.location.search);
+  const TOKEN  = params.get('token') || '';
+
+  let contactData = null;
+  let existing    = null;
+
+  // ── Helpers ─────────────────────────────────────────────────
+  function $(id) { return document.getElementById(id); }
+  function showError(msg) {
+    $('loading-screen').style.display = 'none';
+    $('form-content').style.display = 'none';
+    $('error-screen').style.display = 'block';
+    if (msg) $('error-message').innerText = msg;
+  }
+  function banner(id, msg) {
+    const el = $(id);
+    el.innerText = msg;
+    el.classList.add('visible');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  function clearBanners() {
+    $('err-banner').classList.remove('visible');
+    $('ok-banner').classList.remove('visible');
+  }
+  function todayStr() {
+    const d = new Date();
+    return (d.getMonth()+1) + '/' + d.getDate() + '/' + d.getFullYear();
+  }
+  function checked(name) {
+    const el = document.querySelector('input[name="' + name + '"]:checked');
+    return el ? el.value : '';
+  }
+
+  // ── Init ────────────────────────────────────────────────────
+  window.onload = async function() {
+    if (!TOKEN) { showError('No token found in this link. Please use the link sent to you by TLT.'); return; }
+    try {
+      const res = await fetch(API_BASE + '/bio-emergency?token=' + encodeURIComponent(TOKEN));
+      const result = await res.json();
+      if (result.error) { showError(result.error); return; }
+      contactData = result.contact;
+      existing    = result.emergencyInfo || null;
+      renderPage();
+    } catch(err) {
+      showError('Could not load your form. Please try again or contact TLT staff.');
+    }
+  };
+
+  function renderPage() {
+    $('loading-screen').style.display = 'none';
+    $('form-content').style.display = 'block';
+
+    // Pre-fill from Contactbook + any existing emergency info submission
+    $('firstName').value  = (existing && existing.firstName)  || contactData.firstName  || '';
+    $('middleName').value = (existing && existing.middleName) || contactData.middleName || '';
+    $('lastName').value   = (existing && existing.lastName)   || contactData.lastName   || '';
+    $('mobilePhone').value= (existing && existing.mobilePhone)|| contactData.phone      || '';
+    $('medicalDate').value = todayStr();
+    $('watchDate').value   = todayStr();
+
+    if (existing) {
+      $('dob').value              = existing.dob             || '';
+      $('address').value          = existing.address         || '';
+      $('homePhone').value        = existing.homePhone       || '';
+      $('guardianName').value        = existing.guardianName        || '';
+      $('guardianAddress').value     = existing.guardianAddress     || '';
+      $('guardianHomePhone').value   = existing.guardianHomePhone   || '';
+      $('guardianMobilePhone').value = existing.guardianMobilePhone || '';
+      $('ec1Name').value  = existing.ec1Name  || '';
+      $('ec1Phone').value = existing.ec1Phone || '';
+      $('ec2Name').value  = existing.ec2Name  || '';
+      $('ec2Phone').value = existing.ec2Phone || '';
+      $('foodAllergyCheck').checked    = !!existing.foodAllergy;
+      $('foodAllergyDetail').value     = existing.foodAllergyDetail || '';
+      $('costumeAllergyCheck').checked = !!existing.costumeAllergy;
+      $('costumeAllergyDetail').value  = existing.costumeAllergyDetail || '';
+      $('otherAllergyCheck').checked   = !!existing.otherAllergy;
+      $('otherAllergyDetail').value    = existing.otherAllergyDetail || '';
+      $('medicalConditions').value = existing.medicalConditions || '';
+      $('insurance').value         = existing.insurance         || '';
+      $('physicianName').value     = existing.physicianName     || '';
+      $('physicianPhone').value    = existing.physicianPhone    || '';
+      $('hospitalPref').value      = existing.hospitalPref      || '';
+      $('ercarePref').value        = existing.ercarePref        || '';
+      $('aliases').value           = existing.aliases           || '';
+      if (existing.over18 === 'yes' || existing.over18 === 'no') {
+        document.querySelector('input[name="over18"][value="' + existing.over18 + '"]').checked = true;
+        toggleGuardian();
+      }
+      if (existing.conviction === 'yes' || existing.conviction === 'no') {
+        document.querySelector('input[name="conviction"][value="' + existing.conviction + '"]').checked = true;
+        toggleConvictionDetail();
+      }
+      $('convictionDetail').value = existing.convictionDetail || '';
+    }
+  }
+
+  function toggleGuardian() {
+    const under = checked('over18') === 'no';
+    $('guardian-card').style.display = under ? 'block' : 'none';
+    $('guardianName').required = under;
+  }
+
+  function toggleConvictionDetail() {
+    const yes = checked('conviction') === 'yes';
+    $('conviction-detail-field').style.display = yes ? 'block' : 'none';
+    $('convictionDetail').required = yes;
+  }
+
+  async function submitForm(e) {
+    e.preventDefault();
+    clearBanners();
+
+    const over18 = checked('over18');
+    const conviction = checked('conviction');
+    if (!over18) { banner('err-banner', 'Please indicate whether you are 18 or older.'); return false; }
+    if (!conviction) { banner('err-banner', 'Please answer the WATCH conviction question.'); return false; }
+    if (!$('medicalAgree').checked) { banner('err-banner', 'Please check the emergency medical release agreement.'); return false; }
+    if (!$('watchAgree').checked) { banner('err-banner', 'Please check the WSP background check release agreement.'); return false; }
+
+    const payload = {
+      token:  TOKEN,
+      data: {
+        firstName:  $('firstName').value.trim(),
+        middleName: $('middleName').value.trim(),
+        lastName:   $('lastName').value.trim(),
+        dob:        $('dob').value,
+        over18:     over18,
+        address:    $('address').value.trim(),
+        homePhone:  $('homePhone').value.trim(),
+        mobilePhone:$('mobilePhone').value.trim(),
+        guardianName:        $('guardianName').value.trim(),
+        guardianAddress:     $('guardianAddress').value.trim(),
+        guardianHomePhone:   $('guardianHomePhone').value.trim(),
+        guardianMobilePhone: $('guardianMobilePhone').value.trim(),
+        ec1Name:    $('ec1Name').value.trim(),
+        ec1Phone:   $('ec1Phone').value.trim(),
+        ec2Name:    $('ec2Name').value.trim(),
+        ec2Phone:   $('ec2Phone').value.trim(),
+        foodAllergy:        $('foodAllergyCheck').checked,
+        foodAllergyDetail:  $('foodAllergyDetail').value.trim(),
+        costumeAllergy:     $('costumeAllergyCheck').checked,
+        costumeAllergyDetail: $('costumeAllergyDetail').value.trim(),
+        otherAllergy:       $('otherAllergyCheck').checked,
+        otherAllergyDetail: $('otherAllergyDetail').value.trim(),
+        medicalConditions:  $('medicalConditions').value.trim(),
+        insurance:          $('insurance').value.trim(),
+        physicianName:      $('physicianName').value.trim(),
+        physicianPhone:     $('physicianPhone').value.trim(),
+        hospitalPref:       $('hospitalPref').value.trim(),
+        ercarePref:         $('ercarePref').value.trim(),
+        medicalSignature:   $('medicalSignature').value.trim(),
+        medicalDate:        $('medicalDate').value,
+        aliases:            $('aliases').value.trim(),
+        conviction:         conviction,
+        convictionDetail:   $('convictionDetail').value.trim(),
+        watchSignature:     $('watchSignature').value.trim(),
+        watchDate:          $('watchDate').value
+      }
+    };
+
+    $('submit-btn').disabled = true;
+    $('submit-btn').innerText = 'Submitting...';
+    try {
+      const res = await fetch(API_BASE + '/bio-emergency-submit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      const result = await res.json();
+      if (result.error) {
+        banner('err-banner', result.error);
+        $('submit-btn').disabled = false;
+        $('submit-btn').innerText = 'Submit Form';
+        return false;
+      }
+      banner('ok-banner', 'Thank you — your information has been submitted. You can close this window.');
+      $('submit-btn').style.display = 'none';
+    } catch(err) {
+      banner('err-banner', 'Submission failed. Please try again or contact TLT staff.');
+      $('submit-btn').disabled = false;
+      $('submit-btn').innerText = 'Submit Form';
+    }
+    return false;
+  }
+</script>
+
+</body>
+</html>
