@@ -881,14 +881,17 @@ function tlt_callboard_ep_get_actors_for_show( WP_REST_Request $req ) {
     foreach ( $rows as $r ) {
         if ( tlt_cb_s( $r[0] ?? '' ) !== $show ) continue;
         $out[] = [
-            'character'         => tlt_cb_s( $r[1] ?? '' ),
-            'firstName'         => tlt_cb_s( $r[2] ?? '' ),
-            'middleName'        => tlt_cb_s( $r[3] ?? '' ),
-            'lastName'          => tlt_cb_s( $r[4] ?? '' ),
-            'suffix'            => tlt_cb_s( $r[5] ?? '' ),
-            'phone'             => tlt_cb_s( $r[6] ?? '' ),
-            'email'             => tlt_cb_s( $r[7] ?? '' ),
-            'contractStatus'    => tlt_cb_s( $r[8] ?? '' ),
+            'character'           => tlt_cb_s( $r[1] ?? '' ),
+            'firstName'           => tlt_cb_s( $r[2] ?? '' ),
+            'middleName'          => tlt_cb_s( $r[3] ?? '' ),
+            'lastName'            => tlt_cb_s( $r[4] ?? '' ),
+            'suffix'              => tlt_cb_s( $r[5] ?? '' ),
+            'phone'               => tlt_cb_s( $r[6] ?? '' ),
+            'email'               => tlt_cb_s( $r[7] ?? '' ),
+            'contractStatus'      => tlt_cb_s( $r[8] ?? '' ),
+            'bioStatus'           => tlt_cb_s( $r[13] ?? '' ),
+            'bioType'             => tlt_cb_s( $r[14] ?? '' ),
+            'emergencyInfoStatus' => tlt_cb_s( $r[16] ?? '' ),
         ];
     }
     return tlt_cb_ok( $out );
@@ -1144,6 +1147,9 @@ function tlt_callboard_ep_get_actors( WP_REST_Request $req ) {
             'contractSignedDate'  => tlt_cb_s( $r[10] ?? '' ),
             'contractLink'        => tlt_cb_s( $r[11] ?? '' ),
             'notes'               => tlt_cb_s( $r[12] ?? '' ),
+            'bioStatus'           => tlt_cb_s( $r[13] ?? '' ),
+            'bioType'             => tlt_cb_s( $r[14] ?? '' ),
+            'emergencyInfoStatus' => tlt_cb_s( $r[16] ?? '' ),
         ];
     }
     return tlt_cb_ok( $out );

@@ -123,20 +123,31 @@
     .conflict-item-event { color: #333; }
     .conflict-item-notes { color: #888; font-style: italic; font-size: 12px; margin-left: auto; }
 
-    /* Calendar day conflict badges */
+    /* Calendar day conflict badges — red text + prohibition symbol, no fill,
+       so they don't get mistaken for the solid-red show badges next to them. */
     .cal-day-conflict {
       font-size: 10px;
       font-weight: 600;
       padding: 1px 5px;
-      border-radius: 3px;
-      background: #a2242a;
-      color: #fff;
+      color: #a2242a;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       margin-top: 1px;
     }
     .cal-day.past .cal-day-conflict { opacity: 0.55; }
+
+    /* Bio + Emergency status badges — mirror the .status-badge look. */
+    .bio-badge, .emergency-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 99px;
+      white-space: nowrap;
+    }
+    .bio-badge.submitted, .emergency-badge.submitted { background: #e8f5e9; color: #2e7d32; }
+    .bio-badge.pending,   .emergency-badge.pending   { background: #f5f5f5; color: #999; }
     .cal-day-modal-conflict {
       border-left: 4px solid #a2242a;
       padding: 8px 12px;
@@ -913,7 +924,9 @@
           <th>Name</th>
           <th>Email</th>
           <th>Phone</th>
-          <th>Contract Status</th>
+          <th>Contract</th>
+          <th>Bio</th>
+          <th>Emergency</th>
           <th></th>
         </tr>
       </thead>
@@ -2286,12 +2299,18 @@
           askDelete(person.role, currentShow);
         });
 
+        const bioClass = person.bioStatus === 'Submitted' ? 'submitted' : 'pending';
+        const bioLabel = person.bioStatus === 'Submitted' ? 'Submitted' : 'Awaiting';
+        const emClass  = person.emergencyInfoStatus === 'Submitted' ? 'submitted' : 'pending';
+        const emLabel  = person.emergencyInfoStatus === 'Submitted' ? 'Submitted' : 'Awaiting';
         tr.innerHTML = `
           <td>${person.role}</td>
           <td>${name}</td>
           <td><a href="mailto:${person.email}">${person.email}</a></td>
           <td>${formatPhone(person.phone)}</td>
           <td><span class="status-badge ${statusClass}">${person.contractStatus || 'Not Started'}</span></td>
+          <td><span class="bio-badge ${bioClass}">${bioLabel}</span></td>
+          <td><span class="emergency-badge ${emClass}">${emLabel}</span></td>
           <td><div class="row-actions"></div></td>
         `;
 
@@ -2312,6 +2331,8 @@
           <td></td>
           <td></td>
           <td><span class="status-badge not-started">Unfilled</span></td>
+          <td></td>
+          <td></td>
           <td><div class="row-actions"></div></td>
         `;
 
@@ -2858,7 +2879,9 @@
                 <th>Name</th>
                 <th>Email</th>
                 <th>Phone</th>
-                <th>Contract Status</th>
+                <th>Contract</th>
+                <th>Bio</th>
+                <th>Emergency</th>
                 <th></th>
               </tr>
             </thead>
@@ -2943,12 +2966,18 @@
           ? `<span class="conflict-pill" onclick="toggleConflictDetail(event, '${conflictRowId}')">⚠ ${conflictCount} conflict${conflictCount === 1 ? '' : 's'}</span>`
           : '';
 
+        const bioClass = person.bioStatus === 'Submitted' ? 'submitted' : 'pending';
+        const bioLabel = person.bioStatus === 'Submitted' ? 'Submitted' : 'Awaiting';
+        const emClass  = person.emergencyInfoStatus === 'Submitted' ? 'submitted' : 'pending';
+        const emLabel  = person.emergencyInfoStatus === 'Submitted' ? 'Submitted' : 'Awaiting';
         tr.innerHTML = `
           <td>${person.role}</td>
           <td>${name} ${conflictPill}</td>
           <td><a href="mailto:${person.email}">${person.email}</a></td>
           <td>${formatPhone(person.phone)}</td>
           <td><span class="status-badge ${statusClass}">${person.contractStatus || 'Not Started'}</span></td>
+          <td><span class="bio-badge ${bioClass}">${bioLabel}</span></td>
+          <td><span class="emergency-badge ${emClass}">${emLabel}</span></td>
           <td><div class="row-actions"></div></td>
         `;
 
@@ -2965,7 +2994,7 @@
           const detailHtml = person.conflicts.map(c =>
             `<div class="conflict-item"><span class="conflict-item-date">${c.dateLabel || c.date}</span><span class="conflict-item-event">${c.eventType}</span>${c.notes ? `<span class="conflict-item-notes">${c.notes}</span>` : ''}</div>`
           ).join('');
-          detailTr.innerHTML = `<td colspan="6" style="background:#faf5f5; padding:12px 20px; border-top:1px solid #f0d5d5;"><div class="conflict-detail-list">${detailHtml}</div></td>`;
+          detailTr.innerHTML = `<td colspan="8" style="background:#faf5f5; padding:12px 20px; border-top:1px solid #f0d5d5;"><div class="conflict-detail-list">${detailHtml}</div></td>`;
           setTimeout(() => tr.parentNode && tr.parentNode.insertBefore(detailTr, tr.nextSibling), 0);
         }
 
@@ -2981,6 +3010,8 @@
           <td></td>
           <td></td>
           <td><span class="status-badge not-started">Unfilled</span></td>
+          <td></td>
+          <td></td>
           <td><div class="row-actions"></div></td>
         `;
 
@@ -3200,7 +3231,9 @@
           <th>Name</th>
           <th>Phone</th>
           <th>Email</th>
-          <th>Contract Status</th>
+          <th>Contract</th>
+          <th>Bio</th>
+          <th>Emergency</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -3209,6 +3242,10 @@
     const tbody = table.querySelector('tbody');
     actors.forEach(actor => {
       const fullName = [actor.firstName, actor.middleName, actor.lastName, actor.suffix].filter(Boolean).join(' ');
+      const bioClass = actor.bioStatus === 'Submitted' ? 'submitted' : 'pending';
+      const bioLabel = actor.bioStatus === 'Submitted' ? 'Submitted' : 'Awaiting';
+      const emClass  = actor.emergencyInfoStatus === 'Submitted' ? 'submitted' : 'pending';
+      const emLabel  = actor.emergencyInfoStatus === 'Submitted' ? 'Submitted' : 'Awaiting';
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>${actor.character || ''}</td>
@@ -3216,6 +3253,8 @@
         <td>${actor.phone ? formatPhone(actor.phone) : ''}</td>
         <td>${actor.email || ''}</td>
         <td><span class="status-badge ${actor.contractStatus === 'Signed' ? 'signed' : actor.contractStatus === 'Sent for Signature' ? 'sent' : actor.contractStatus === 'Generated' ? 'generated' : 'not-started'}">${actor.contractStatus}</span></td>
+        <td><span class="bio-badge ${bioClass}">${bioLabel}</span></td>
+        <td><span class="emergency-badge ${emClass}">${emLabel}</span></td>
       `;
       tbody.appendChild(tr);
     });
@@ -3666,7 +3705,9 @@
           <th>Name</th>
           <th>Phone</th>
           <th>Email</th>
-          <th>Contract Status</th>
+          <th>Contract</th>
+          <th>Bio</th>
+          <th>Emergency</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -3676,6 +3717,10 @@
     const tbody = table.querySelector('tbody');
     filtered.forEach(actor => {
       const fullName = [actor.firstName, actor.middleName, actor.lastName, actor.suffix].filter(Boolean).join(' ');
+      const bioClass = actor.bioStatus === 'Submitted' ? 'submitted' : 'pending';
+      const bioLabel = actor.bioStatus === 'Submitted' ? 'Submitted' : 'Awaiting';
+      const emClass  = actor.emergencyInfoStatus === 'Submitted' ? 'submitted' : 'pending';
+      const emLabel  = actor.emergencyInfoStatus === 'Submitted' ? 'Submitted' : 'Awaiting';
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>${actor.show}</td>
@@ -3684,6 +3729,8 @@
         <td>${actor.phone ? formatPhone(actor.phone) : ''}</td>
         <td>${actor.email || ''}</td>
         <td><span class="status-badge ${actor.contractStatus === 'Signed' ? 'signed' : actor.contractStatus === 'Sent for Signature' ? 'sent' : 'not-started'}">${actor.contractStatus}</span></td>
+        <td><span class="bio-badge ${bioClass}">${bioLabel}</span></td>
+        <td><span class="emergency-badge ${emClass}">${emLabel}</span></td>
         <td><div class="actor-actions"></div></td>
       `;
 
@@ -5016,7 +5063,7 @@
           const nameLabel = c.firstName + ' ' + (c.lastName ? c.lastName.charAt(0) + '.' : '');
           const title     = c.firstName + ' ' + c.lastName + ' (' + (c.role || 'Production Team') + ') — unavailable' +
             (c.eventType ? ' for ' + c.eventType : '');
-          return '<div class="cal-day-conflict" title="' + calEscape(title) + '">' + calEscape(nameLabel) + '</div>';
+          return '<div class="cal-day-conflict" title="' + calEscape(title) + '">🚫 ' + calEscape(nameLabel) + '</div>';
         }).join('');
 
         return '<div class="' + classes.join(' ') + '" onclick="openCalDayModal(\'' + iso + '\')">' +
