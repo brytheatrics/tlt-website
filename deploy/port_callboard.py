@@ -1646,12 +1646,12 @@ html = _apply_if_present(
     'renderRoster rows',
 )
 
-# Season view roster table header.
+# Season view roster table header. Both `old` and `new` are anchored just
+# below the <table> line so that the separate overflow-visible substitution
+# on the same <table> line doesn't invalidate this match.
 html = _apply_if_present(
     html,
-    '''        <div class="season-show-body">
-          <table style="border-radius:0; box-shadow:none;">
-            <thead>
+    '''            <thead>
               <tr>
                 <th>Role</th>
                 <th>Name</th>
@@ -1661,9 +1661,7 @@ html = _apply_if_present(
                 <th></th>
               </tr>
             </thead>''',
-    '''        <div class="season-show-body">
-          <table style="border-radius:0; box-shadow:none;">
-            <thead>
+    '''            <thead>
               <tr>
                 <th>Role</th>
                 <th>Name</th>
