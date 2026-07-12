@@ -1461,6 +1461,428 @@ html = html.replace('</script>', CONTACT_SHEET_MODULE + '\n</script>', 1)
 # -----------------------------------------------------------------------------
 
 # -----------------------------------------------------------------------------
+# 4d. Roster/Actor bio+emergency columns and calendar conflict restyle.
+#
+# The source Index.html snapshot has been modified in place with these changes,
+# but that directory is gitignored, so if someone ever refreshes the snapshot
+# from a fresh GAS pull the substitutions below reapply the changes. Each
+# substitution is a no-op when the modified form is already present, so the
+# script stays idempotent whether run against a fresh source or a modified one.
+#
+# Changes:
+#  - Prod Teams / Season / Actors tables get Bio + Emergency status columns
+#    (adds <th>s and <td> badges; server exposes bioStatus / emergencyInfoStatus)
+#  - Calendar day conflict badges: no red fill, red text with 🚫 prefix so
+#    they don't read like show status badges
+#  - Related CSS: .bio-badge, .emergency-badge, revised .cal-day-conflict
+# -----------------------------------------------------------------------------
+def _apply_if_present(html_in, old, new, label):
+    if new in html_in:
+        return html_in  # already modified (running against post-edit snapshot)
+    assert old in html_in, f'{label}: neither old nor new snippet found — source structure changed'
+    return html_in.replace(old, new, 1)
+
+# CSS: replace filled-red conflict badge with text-only red + no fill, add
+# .bio-badge/.emergency-badge classes.
+html = _apply_if_present(
+    html,
+    '''    /* Calendar day conflict badges */
+    .cal-day-conflict {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 1px 5px;
+      border-radius: 3px;
+      background: #a2242a;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 1px;
+    }
+    .cal-day.past .cal-day-conflict { opacity: 0.55; }''',
+    '''    /* Calendar day conflict badges — red text + prohibition symbol, no fill,
+       so they don't get mistaken for the solid-red show badges next to them. */
+    .cal-day-conflict {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 1px 5px;
+      color: #a2242a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 1px;
+    }
+    .cal-day.past .cal-day-conflict { opacity: 0.55; }
+
+    /* Bio + Emergency status badges — mirror the .status-badge look. */
+    .bio-badge, .emergency-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 99px;
+      white-space: nowrap;
+    }
+    .bio-badge.submitted, .emergency-badge.submitted { background: #e8f5e9; color: #2e7d32; }
+    .bio-badge.pending,   .emergency-badge.pending   { background: #f5f5f5; color: #999; }''',
+    'calendar conflict + status badge CSS',
+)
+
+# Calendar conflict badge JS — prepend 🚫 symbol.
+html = _apply_if_present(
+    html,
+    '''return '<div class="cal-day-conflict" title="' + calEscape(title) + '">' + calEscape(nameLabel) + '</div>';''',
+    '''return '<div class="cal-day-conflict" title="' + calEscape(title) + '">🚫 ' + calEscape(nameLabel) + '</div>';''',
+    'calendar conflict JS symbol',
+)
+
+# Production Teams single-show table header.
+html = _apply_if_present(
+    html,
+    '''    <table>
+      <thead>
+        <tr>
+          <th>Role</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Contract Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="roster-body"></tbody>
+    </table>''',
+    '''    <table>
+      <thead>
+        <tr>
+          <th>Role</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Contract</th>
+          <th>Bio</th>
+          <th>Emergency</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="roster-body"></tbody>
+    </table>''',
+    'production teams header',
+)
+
+# renderRoster filled row: add Bio + Emergency badges.
+html = _apply_if_present(
+    html,
+    '''        tr.innerHTML = `
+          <td>${person.role}</td>
+          <td>${name}</td>
+          <td><a href="mailto:${person.email}">${person.email}</a></td>
+          <td>${formatPhone(person.phone)}</td>
+          <td><span class="status-badge ${statusClass}">${person.contractStatus || 'Not Started'}</span></td>
+          <td><div class="row-actions"></div></td>
+        `;
+
+        const actionsCell = tr.querySelector('.row-actions');
+        actionsCell.appendChild(editBtn);
+        actionsCell.appendChild(removeBtn);
+        actionsCell.appendChild(deleteBtn);
+
+      } else {
+        tr.innerHTML = `
+          <td>${person.role}</td>
+          <td class="assign-cell">
+            <div class="inline-assign">
+              <input type="text" placeholder="Search contacts..." autocomplete="off" class="inline-search-input">
+              <div class="inline-dropdown" style="display:none;"></div>
+            </div>
+          </td>
+          <td></td>
+          <td></td>
+          <td><span class="status-badge not-started">Unfilled</span></td>
+          <td><div class="row-actions"></div></td>
+        `;''',
+    '''        const bioClass = person.bioStatus === 'Submitted' ? 'submitted' : 'pending';
+        const bioLabel = person.bioStatus === 'Submitted' ? 'Submitted' : 'Awaiting';
+        const emClass  = person.emergencyInfoStatus === 'Submitted' ? 'submitted' : 'pending';
+        const emLabel  = person.emergencyInfoStatus === 'Submitted' ? 'Submitted' : 'Awaiting';
+        tr.innerHTML = `
+          <td>${person.role}</td>
+          <td>${name}</td>
+          <td><a href="mailto:${person.email}">${person.email}</a></td>
+          <td>${formatPhone(person.phone)}</td>
+          <td><span class="status-badge ${statusClass}">${person.contractStatus || 'Not Started'}</span></td>
+          <td><span class="bio-badge ${bioClass}">${bioLabel}</span></td>
+          <td><span class="emergency-badge ${emClass}">${emLabel}</span></td>
+          <td><div class="row-actions"></div></td>
+        `;
+
+        const actionsCell = tr.querySelector('.row-actions');
+        actionsCell.appendChild(editBtn);
+        actionsCell.appendChild(removeBtn);
+        actionsCell.appendChild(deleteBtn);
+
+      } else {
+        tr.innerHTML = `
+          <td>${person.role}</td>
+          <td class="assign-cell">
+            <div class="inline-assign">
+              <input type="text" placeholder="Search contacts..." autocomplete="off" class="inline-search-input">
+              <div class="inline-dropdown" style="display:none;"></div>
+            </div>
+          </td>
+          <td></td>
+          <td></td>
+          <td><span class="status-badge not-started">Unfilled</span></td>
+          <td></td>
+          <td></td>
+          <td><div class="row-actions"></div></td>
+        `;''',
+    'renderRoster rows',
+)
+
+# Season view roster table header.
+html = _apply_if_present(
+    html,
+    '''        <div class="season-show-body">
+          <table style="border-radius:0; box-shadow:none;">
+            <thead>
+              <tr>
+                <th>Role</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Contract Status</th>
+                <th></th>
+              </tr>
+            </thead>''',
+    '''        <div class="season-show-body">
+          <table style="border-radius:0; box-shadow:none;">
+            <thead>
+              <tr>
+                <th>Role</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Contract</th>
+                <th>Bio</th>
+                <th>Emergency</th>
+                <th></th>
+              </tr>
+            </thead>''',
+    'season roster header',
+)
+
+# renderSeasonRoster filled row: add badges + bump conflict-detail colspan to 8.
+html = _apply_if_present(
+    html,
+    '''        tr.innerHTML = `
+          <td>${person.role}</td>
+          <td>${name} ${conflictPill}</td>
+          <td><a href="mailto:${person.email}">${person.email}</a></td>
+          <td>${formatPhone(person.phone)}</td>
+          <td><span class="status-badge ${statusClass}">${person.contractStatus || 'Not Started'}</span></td>
+          <td><div class="row-actions"></div></td>
+        `;''',
+    '''        const bioClass = person.bioStatus === 'Submitted' ? 'submitted' : 'pending';
+        const bioLabel = person.bioStatus === 'Submitted' ? 'Submitted' : 'Awaiting';
+        const emClass  = person.emergencyInfoStatus === 'Submitted' ? 'submitted' : 'pending';
+        const emLabel  = person.emergencyInfoStatus === 'Submitted' ? 'Submitted' : 'Awaiting';
+        tr.innerHTML = `
+          <td>${person.role}</td>
+          <td>${name} ${conflictPill}</td>
+          <td><a href="mailto:${person.email}">${person.email}</a></td>
+          <td>${formatPhone(person.phone)}</td>
+          <td><span class="status-badge ${statusClass}">${person.contractStatus || 'Not Started'}</span></td>
+          <td><span class="bio-badge ${bioClass}">${bioLabel}</span></td>
+          <td><span class="emergency-badge ${emClass}">${emLabel}</span></td>
+          <td><div class="row-actions"></div></td>
+        `;''',
+    'renderSeasonRoster filled row',
+)
+html = _apply_if_present(
+    html,
+    '''detailTr.innerHTML = `<td colspan="6" style="background:#faf5f5; padding:12px 20px; border-top:1px solid #f0d5d5;"><div class="conflict-detail-list">${detailHtml}</div></td>`;''',
+    '''detailTr.innerHTML = `<td colspan="8" style="background:#faf5f5; padding:12px 20px; border-top:1px solid #f0d5d5;"><div class="conflict-detail-list">${detailHtml}</div></td>`;''',
+    'season conflict detail colspan',
+)
+html = _apply_if_present(
+    html,
+    '''      } else {
+        tr.innerHTML = `
+          <td>${person.role}</td>
+          <td class="assign-cell">
+            <div class="inline-assign">
+              <input type="text" placeholder="Search contacts..." autocomplete="off" class="inline-search-input">
+              <div class="inline-dropdown" style="display:none;"></div>
+            </div>
+          </td>
+          <td></td>
+          <td></td>
+          <td><span class="status-badge not-started">Unfilled</span></td>
+          <td><div class="row-actions"></div></td>''',
+    '''      } else {
+        tr.innerHTML = `
+          <td>${person.role}</td>
+          <td class="assign-cell">
+            <div class="inline-assign">
+              <input type="text" placeholder="Search contacts..." autocomplete="off" class="inline-search-input">
+              <div class="inline-dropdown" style="display:none;"></div>
+            </div>
+          </td>
+          <td></td>
+          <td></td>
+          <td><span class="status-badge not-started">Unfilled</span></td>
+          <td></td>
+          <td></td>
+          <td><div class="row-actions"></div></td>''',
+    'renderSeasonRoster unfilled row',
+)
+
+# renderRosterActors header + body.
+html = _apply_if_present(
+    html,
+    '''    const table = document.createElement('table');
+    table.className = 'contracts-table';
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th>Character</th>
+          <th>Name</th>
+          <th>Phone</th>
+          <th>Email</th>
+          <th>Contract Status</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    `;
+
+    const tbody = table.querySelector('tbody');
+    actors.forEach(actor => {
+      const fullName = [actor.firstName, actor.middleName, actor.lastName, actor.suffix].filter(Boolean).join(' ');
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${actor.character || ''}</td>
+        <td>${fullName}</td>
+        <td>${actor.phone ? formatPhone(actor.phone) : ''}</td>
+        <td>${actor.email || ''}</td>
+        <td><span class="status-badge ${actor.contractStatus === 'Signed' ? 'signed' : actor.contractStatus === 'Sent for Signature' ? 'sent' : actor.contractStatus === 'Generated' ? 'generated' : 'not-started'}">${actor.contractStatus}</span></td>
+      `;
+      tbody.appendChild(tr);
+    });''',
+    '''    const table = document.createElement('table');
+    table.className = 'contracts-table';
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th>Character</th>
+          <th>Name</th>
+          <th>Phone</th>
+          <th>Email</th>
+          <th>Contract</th>
+          <th>Bio</th>
+          <th>Emergency</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    `;
+
+    const tbody = table.querySelector('tbody');
+    actors.forEach(actor => {
+      const fullName = [actor.firstName, actor.middleName, actor.lastName, actor.suffix].filter(Boolean).join(' ');
+      const bioClass = actor.bioStatus === 'Submitted' ? 'submitted' : 'pending';
+      const bioLabel = actor.bioStatus === 'Submitted' ? 'Submitted' : 'Awaiting';
+      const emClass  = actor.emergencyInfoStatus === 'Submitted' ? 'submitted' : 'pending';
+      const emLabel  = actor.emergencyInfoStatus === 'Submitted' ? 'Submitted' : 'Awaiting';
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${actor.character || ''}</td>
+        <td>${fullName}</td>
+        <td>${actor.phone ? formatPhone(actor.phone) : ''}</td>
+        <td>${actor.email || ''}</td>
+        <td><span class="status-badge ${actor.contractStatus === 'Signed' ? 'signed' : actor.contractStatus === 'Sent for Signature' ? 'sent' : actor.contractStatus === 'Generated' ? 'generated' : 'not-started'}">${actor.contractStatus}</span></td>
+        <td><span class="bio-badge ${bioClass}">${bioLabel}</span></td>
+        <td><span class="emergency-badge ${emClass}">${emLabel}</span></td>
+      `;
+      tbody.appendChild(tr);
+    });''',
+    'renderRosterActors',
+)
+
+# renderActors (standalone Actors tab) header + row.
+html = _apply_if_present(
+    html,
+    '''    const table = document.createElement('table');
+    table.className = 'contracts-table';
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th>Show</th>
+          <th>Character</th>
+          <th>Name</th>
+          <th>Phone</th>
+          <th>Email</th>
+          <th>Contract Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    `;
+
+    const tbody = table.querySelector('tbody');
+    filtered.forEach(actor => {
+      const fullName = [actor.firstName, actor.middleName, actor.lastName, actor.suffix].filter(Boolean).join(' ');
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${actor.show}</td>
+        <td>${actor.character}</td>
+        <td>${fullName}</td>
+        <td>${actor.phone ? formatPhone(actor.phone) : ''}</td>
+        <td>${actor.email || ''}</td>
+        <td><span class="status-badge ${actor.contractStatus === 'Signed' ? 'signed' : actor.contractStatus === 'Sent for Signature' ? 'sent' : 'not-started'}">${actor.contractStatus}</span></td>
+        <td><div class="actor-actions"></div></td>
+      `;''',
+    '''    const table = document.createElement('table');
+    table.className = 'contracts-table';
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th>Show</th>
+          <th>Character</th>
+          <th>Name</th>
+          <th>Phone</th>
+          <th>Email</th>
+          <th>Contract</th>
+          <th>Bio</th>
+          <th>Emergency</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    `;
+
+    const tbody = table.querySelector('tbody');
+    filtered.forEach(actor => {
+      const fullName = [actor.firstName, actor.middleName, actor.lastName, actor.suffix].filter(Boolean).join(' ');
+      const bioClass = actor.bioStatus === 'Submitted' ? 'submitted' : 'pending';
+      const bioLabel = actor.bioStatus === 'Submitted' ? 'Submitted' : 'Awaiting';
+      const emClass  = actor.emergencyInfoStatus === 'Submitted' ? 'submitted' : 'pending';
+      const emLabel  = actor.emergencyInfoStatus === 'Submitted' ? 'Submitted' : 'Awaiting';
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${actor.show}</td>
+        <td>${actor.character}</td>
+        <td>${fullName}</td>
+        <td>${actor.phone ? formatPhone(actor.phone) : ''}</td>
+        <td>${actor.email || ''}</td>
+        <td><span class="status-badge ${actor.contractStatus === 'Signed' ? 'signed' : actor.contractStatus === 'Sent for Signature' ? 'sent' : 'not-started'}">${actor.contractStatus}</span></td>
+        <td><span class="bio-badge ${bioClass}">${bioLabel}</span></td>
+        <td><span class="emergency-badge ${emClass}">${emLabel}</span></td>
+        <td><div class="actor-actions"></div></td>
+      `;''',
+    'renderActors',
+)
+
+# -----------------------------------------------------------------------------
 # 5. Disable the "restore last tab on refresh" behavior so load timing is
 #    predictable (dashboard first every time).
 # -----------------------------------------------------------------------------
