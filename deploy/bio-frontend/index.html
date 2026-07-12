@@ -164,7 +164,9 @@
 <script>
   // ── Config ──────────────────────────────────────────────────
   // New self-hosted API (Cloudways WordPress plugin). Fast — no GAS cold starts.
-  const API_BASE = 'https://tacomalittletheatre.com/wp-json/callboard/v1';
+  // Call the API on whatever host served the page — works at the Cloudways
+  // temp URL now and at tacomalittletheatre.com after DNS cutover with no code change.
+  const API_BASE = window.location.origin + '/wp-json/callboard/v1';
   // Legacy GAS fallback for actions not yet ported (Phase A ships bio flow;
   // emergency-info stays on GAS until Phase B).
   const LEGACY_GAS_URL = 'https://script.google.com/macros/s/AKfycbxnew4g7aCHAmENowO08CWya1FAPBB2yeyMpVdQmOqG92HAC1hzxeKCmxriIoOGJudu/exec';
