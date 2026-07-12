@@ -1829,6 +1829,19 @@ html = _apply_if_present(
     'inline-assign stacking context',
 )
 
+# The base `table` selector has overflow:hidden (for rounded corners on
+# free-standing tables). Inside a season-show-block the table's border-radius
+# is already 0'd inline, so overflow:hidden buys nothing but clips the
+# autocomplete dropdown when it extends past the last row. Override to visible.
+html = _apply_if_present(
+    html,
+    '''        <div class="season-show-body">
+          <table style="border-radius:0; box-shadow:none;">''',
+    '''        <div class="season-show-body">
+          <table style="border-radius:0; box-shadow:none; overflow:visible;">''',
+    'season-view table overflow',
+)
+
 # .season-show-block clipped the "Search contacts" dropdown when it extended
 # past the card's bottom edge. Table + header don't have backgrounds that
 # need clipping to the rounded corners, so visible is fine.
