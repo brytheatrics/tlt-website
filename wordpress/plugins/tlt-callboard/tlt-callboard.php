@@ -5621,7 +5621,11 @@ function tlt_cb_contract_assemble( $show, $role, $character = '' ) {
         '<<CombinedShow>>' => $show,
         '<<Performances>>' => tlt_cb_contract_format_performances( $show ),
         '<<MAD>>'          => tlt_cb_contract_theatre_value( 'Managing Artistic Director',   $theatre_rows ),
+        // Historical templates used <<AD>> for Associate Producing Director;
+        // current templates use <<APD>>. Both map to the same Theatre lookup so
+        // either works. Empty rows are trimmed out by hide_empty_staff_blocks.
         '<<AD>>'           => tlt_cb_contract_theatre_value( 'Associate Producing Director', $theatre_rows ),
+        '<<APD>>'          => tlt_cb_contract_theatre_value( 'Associate Producing Director', $theatre_rows ),
         '<<TD>>'           => tlt_cb_contract_theatre_value( 'Technical Director',           $theatre_rows ),
         '<<DD>>'           => tlt_cb_contract_theatre_value( 'Development Director',         $theatre_rows ),
         '<<ED>>'           => tlt_cb_contract_theatre_value( 'Education Director',           $theatre_rows ),
@@ -5949,12 +5953,94 @@ function tlt_cb_contract_expand_special_conditions( $doc_id, $special ) {
 }
 
 /**
- * Expand <<Board>> — one line per name.
+ * Expand <<Board>> — render each board member as a name (8pt regular) followed
+ * by their title (7.5pt italic, if present), with 3pt space-after on the last
+ * paragraph of each member so members are visibly separated.
+ *
+ * The Board named range is one line per line: names sit on their own line, and
+ * an optional officer title line follows (e.g. "President", "Vice President",
+ * "Co-Treasurer"). Titles are auto-detected as lines containing common board
+ * office keywords (president|treasurer|secretary|chair). Any line that doesn't
+ * match starts a new member.
  */
 function tlt_cb_contract_expand_board( $doc_id, $board_value ) {
     $lines = array_values( array_filter( array_map( 'trim', explode( "\n", $board_value ) ), function ( $x ) { return $x !== ''; } ) );
     if ( empty( $lines ) ) return tlt_cb_contract_delete_marker_paragraph( $doc_id, '<<Board>>' );
-    return tlt_cb_contract_replace_marker_with_lines( $doc_id, '<<Board>>', $lines );
+
+    $title_regex = '/\b(president|treasurer|secretary|chair)\b/i';
+    $members = [];
+    foreach ( $lines as $line ) {
+        if ( ! empty( $members ) && preg_match( $title_regex, $line ) ) {
+            $members[ count( $members ) - 1 ]['title'] = $line;
+        } else {
+            $members[] = [ 'name' => $line, 'title' => '' ];
+        }
+    }
+
+    // Locate the marker paragraph so we can splice content in place.
+    $paras = tlt_cb_contract_walk_paragraphs( $doc_id );
+    if ( is_wp_error( $paras ) ) return $paras;
+    $marker_para = null;
+    foreach ( $paras as $p ) {
+        if ( $p['start'] !== null && strpos( $p['text'], '<<Board>>' ) !== false ) {
+            $marker_para = $p;
+            break;
+        }
+    }
+    if ( ! $marker_para ) return true;
+    $insert_start = $marker_para['start'];
+
+    // Compose the composite text and remember each name / title / last-of-member
+    // range as OFFSETS from insert_start (in UTF-16 code units — mb_strlen with
+    // UTF-8 is equivalent for the BMP characters real board names use).
+    $text          = '';
+    $name_ranges   = [];
+    $title_ranges  = [];
+    $last_para_ranges = [];
+    foreach ( $members as $m ) {
+        $offset_name = mb_strlen( $text, 'UTF-8' );
+        $text       .= $m['name'] . "\n";
+        $name_len    = mb_strlen( $m['name'], 'UTF-8' );
+        $name_ranges[] = [ $offset_name, $offset_name + $name_len ];
+        $last_para   = [ $offset_name, $offset_name + $name_len + 1 ]; // include \n so paragraph lookup catches it
+
+        if ( $m['title'] !== '' ) {
+            $offset_title = mb_strlen( $text, 'UTF-8' );
+            $text        .= $m['title'] . "\n";
+            $title_len    = mb_strlen( $m['title'], 'UTF-8' );
+            $title_ranges[] = [ $offset_title, $offset_title + $title_len ];
+            $last_para    = [ $offset_title, $offset_title + $title_len + 1 ];
+        }
+        $last_para_ranges[] = $last_para;
+    }
+
+    $requests = [
+        [ 'deleteContentRange' => [ 'range' => tlt_cb_docs_range( $marker_para['start'], $marker_para['end'] ) ] ],
+        [ 'insertText' => [ 'location' => [ 'index' => $insert_start ], 'text' => $text ] ],
+    ];
+    foreach ( $name_ranges as $r ) {
+        $requests[] = [ 'updateTextStyle' => [
+            'range'     => tlt_cb_docs_range( $insert_start + $r[0], $insert_start + $r[1] ),
+            'textStyle' => [ 'fontSize' => [ 'magnitude' => 8, 'unit' => 'PT' ], 'italic' => false ],
+            'fields'    => 'fontSize,italic',
+        ] ];
+    }
+    foreach ( $title_ranges as $r ) {
+        $requests[] = [ 'updateTextStyle' => [
+            'range'     => tlt_cb_docs_range( $insert_start + $r[0], $insert_start + $r[1] ),
+            'textStyle' => [ 'fontSize' => [ 'magnitude' => 7.5, 'unit' => 'PT' ], 'italic' => true ],
+            'fields'    => 'fontSize,italic',
+        ] ];
+    }
+    foreach ( $last_para_ranges as $r ) {
+        $requests[] = [ 'updateParagraphStyle' => [
+            'range'          => tlt_cb_docs_range( $insert_start + $r[0], $insert_start + $r[1] ),
+            'paragraphStyle' => [ 'spaceBelow' => [ 'magnitude' => 3, 'unit' => 'PT' ] ],
+            'fields'         => 'spaceBelow',
+        ] ];
+    }
+
+    return tlt_cb_docs_batch_update( $doc_id, $requests );
 }
 
 /**
