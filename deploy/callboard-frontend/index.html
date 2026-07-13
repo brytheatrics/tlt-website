@@ -6009,9 +6009,14 @@
         var actionsCell = tr.querySelector('.contract-actions');
         if (!actionsCell) return;
 
-        // Always inject so it shows up regardless of whether col L was a
-        // doc URL or overwritten with OpenSign ID. Idempotent via class.
-        if (actionsCell.querySelector('.cb-resend-btn')) return;
+        // Dedup: skip if the cell already has a working Send / Resend /
+        // Send Combined button (from either _renderPreviewSendButtons or
+        // cbBuildActionButtons). Only inject when the row is missing one.
+        var existingSends = Array.from(actionsCell.querySelectorAll('button')).filter(function (b) {
+          var t = (b.textContent || '').trim();
+          return t === 'Send' || t === 'Resend' || t === 'Send Combined';
+        });
+        if (existingSends.length > 0) return;
         var meta = findRowMeta(tr);
         if (!meta) return;
         var btn = document.createElement('button');
