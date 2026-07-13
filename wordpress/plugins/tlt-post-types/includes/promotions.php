@@ -119,6 +119,7 @@ add_action( 'acf/init', function () {
                 'type'          => 'select',
                 'choices'       => [
                     'standalone'     => 'Standalone (its own row at the top of the homepage promos)',
+                    'guest_artists'  => 'Guest Artists group',
                     'education'      => 'Education group',
                     'special_events' => 'Special Events / Beyond the Stage group',
                     'get_involved'   => 'Get Involved group',

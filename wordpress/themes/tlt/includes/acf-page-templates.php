@@ -32,7 +32,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * classic editor loaded, and the auto-reload should fire for them too.
  */
 function tlt_acf_body_driven_templates() {
-    return [ 'page-job-posting.php', 'page-press-post.php', 'page-clubtlt.php' ];
+    return [ 'page-job-posting.php', 'page-press-post.php', 'page-clubtlt.php', 'page-guest-artist.php' ];
 }
 
 /**
@@ -907,6 +907,76 @@ add_action( 'acf/init', function () {
         ],
         'location' => [
             [ [ 'param' => 'page_template', 'operator' => '==', 'value' => 'page-job-posting.php' ] ],
+        ],
+        'menu_order' => 0,
+        'position'   => 'normal',
+        'style'      => 'default',
+        'label_placement'       => 'top',
+        'instruction_placement' => 'label',
+    ] );
+} );
+
+/* ---------------------------------------------------------------------------
+ * ACF for page-guest-artist.php.
+ *
+ * Same idea as the Job Posting group — gives Chris a proper form + image picker
+ * so he doesn't have to dig into Custom Fields. Blake reuses a single Page
+ * every season; each show he swaps the values below and hits Update.
+ * ------------------------------------------------------------------------- */
+add_action( 'acf/init', function () {
+    if ( ! function_exists( 'acf_add_local_field_group' ) ) return;
+
+    acf_add_local_field_group( [
+        'key'    => 'group_tlt_guest_artist',
+        'title'  => 'Guest Artist',
+        'fields' => [
+            [
+                'key'          => 'field_guest_eyebrow',
+                'label'        => 'Eyebrow pill',
+                'name'         => 'guest_eyebrow',
+                'type'         => 'text',
+                'default_value'=> 'Guest Artist',
+                'instructions' => 'Small pill above the title. E.g. "For The Play That Goes Wrong".',
+                'wrapper'      => [ 'width' => '50' ],
+            ],
+            [
+                'key'          => 'field_guest_meta',
+                'label'        => 'Subtitle / meta line',
+                'name'         => 'guest_meta',
+                'type'         => 'text',
+                'instructions' => 'Optional line under the artist name. E.g. medium & size ("Acrylic on canvas · 24×36") or dates on display.',
+                'wrapper'      => [ 'width' => '50' ],
+            ],
+            [
+                'key'          => 'field_guest_flyer_image',
+                'label'        => 'Flyer image',
+                'name'         => 'guest_flyer_image',
+                'type'         => 'image',
+                'return_format'=> 'url',
+                'preview_size' => 'medium',
+                'instructions' => 'The full-scale flyer for the guest artist. Displays centered at ~620px wide (portrait-friendly).',
+            ],
+            [
+                'key'          => 'field_guest_website_url',
+                'label'        => "Artist's website URL",
+                'name'         => 'guest_website_url',
+                'type'         => 'text',
+                'placeholder'  => 'https://…',
+                'instructions' => 'Link the button opens (portfolio, Etsy, Instagram, etc.). Leave blank to hide the button.',
+                'wrapper'      => [ 'width' => '50' ],
+            ],
+            [
+                'key'          => 'field_guest_button_label',
+                'label'        => 'Button label',
+                'name'         => 'guest_button_label',
+                'type'         => 'text',
+                'placeholder'  => "Visit Artist's Website",
+                'instructions' => 'Optional. Defaults to "Visit Artist\'s Website".',
+                'wrapper'      => [ 'width' => '50' ],
+            ],
+        ],
+        'location' => [
+            [ [ 'param' => 'page_template', 'operator' => '==', 'value' => 'page-guest-artist.php' ] ],
         ],
         'menu_order' => 0,
         'position'   => 'normal',
@@ -2004,6 +2074,12 @@ function tlt_home_section_defaults() {
             'lede'    => '', // blank → auto progress text in the template
             'buttons' => "Order Single Tickets Here | https://tlt.ludus.com/index.php | new\nOrder Season Tickets | /season-tickets/",
         ],
+        'guest_artists' => [
+            'eyebrow' => 'Guest Artists',
+            'title'   => 'Now Showing in the Lobby',
+            'lede'    => 'Each production features artwork from a guest artist on display in the TLT lobby.',
+            'buttons' => '',
+        ],
         'education' => [
             'eyebrow' => 'Education',
             'title'   => 'Programs for Every Age',
@@ -2133,11 +2209,12 @@ add_action( 'acf/init', function () {
 
     $sections = [
         'onstage'        => [ 'tab' => 'Onstage (current season)',       'num' => '01' ],
-        'education'      => [ 'tab' => 'Education',                       'num' => '02' ],
-        'special_events' => [ 'tab' => 'Special Events',                  'num' => '03' ],
-        'get_involved'   => [ 'tab' => 'Get Involved',                    'num' => '04' ],
-        'support'        => [ 'tab' => 'Support',                         'num' => '05' ],
-        'sponsors'       => [ 'tab' => 'Sponsors',                        'num' => '06' ],
+        'guest_artists'  => [ 'tab' => 'Guest Artists',                   'num' => '02' ],
+        'education'      => [ 'tab' => 'Education',                       'num' => '03' ],
+        'special_events' => [ 'tab' => 'Special Events',                  'num' => '04' ],
+        'get_involved'   => [ 'tab' => 'Get Involved',                    'num' => '05' ],
+        'support'        => [ 'tab' => 'Support',                         'num' => '06' ],
+        'sponsors'       => [ 'tab' => 'Sponsors',                        'num' => '07' ],
     ];
 
     $defaults = tlt_home_section_defaults();

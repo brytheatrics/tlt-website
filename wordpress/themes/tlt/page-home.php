@@ -308,28 +308,33 @@ if ( $standalone_promos ) : ?>
 
 <?php if ( function_exists( 'tlt_render_homepage_section' ) ) : ?>
 <?php tlt_render_homepage_section(
-    'education', '02', 'Education', 'Programs for Every Age',
-    'Classes, camps, and youth productions — explore the craft of theatre at TLT.',
+    'guest_artists', '02', 'Guest Artists', 'Now Showing in the Lobby',
+    'Each production features artwork from a guest artist on display in the TLT lobby.',
     'block alt'
 ); ?>
 <?php tlt_render_homepage_section(
-    'special_events', '03', 'Beyond the Stage', 'Special Events',
-    'Mystery dinners, partner restaurants, and other ways to make a night of it.',
+    'education', '03', 'Education', 'Programs for Every Age',
+    'Classes, camps, and youth productions — explore the craft of theatre at TLT.',
     'block'
 ); ?>
 <?php tlt_render_homepage_section(
-    'get_involved', '04', 'Get Involved', 'Join Us',
-    'Hiring, season tickets, and other ways to be part of TLT.',
+    'special_events', '04', 'Beyond the Stage', 'Special Events',
+    'Mystery dinners, partner restaurants, and other ways to make a night of it.',
     'block alt'
 ); ?>
 <?php tlt_render_homepage_section(
-    'support', '05', 'Support', 'Easy (and Free) Ways to Help TLT',
-    '', 'block'
+    'get_involved', '05', 'Get Involved', 'Join Us',
+    'Hiring, season tickets, and other ways to be part of TLT.',
+    'block'
+); ?>
+<?php tlt_render_homepage_section(
+    'support', '06', 'Support', 'Easy (and Free) Ways to Help TLT',
+    '', 'block alt'
 ); ?>
 <?php endif; ?>
 
 <!-- Sponsors -->
-<section class="block dark" data-section-num="06">
+<section class="block dark" data-section-num="07">
   <div class="container">
     <?php
     $sp_eyebrow = function_exists( 'tlt_home_field' ) ? tlt_home_field( 'sponsors', 'eyebrow' ) : 'With Gratitude';
