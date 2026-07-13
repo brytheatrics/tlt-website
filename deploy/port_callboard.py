@@ -1544,14 +1544,42 @@ CONTRACT_BULK_MODULE = '''
     });
   };
 
-  /* ==================================================================
-     Immediate-after-generate button set — original _renderPreviewSendButtons
-     only rendered Preview + Send. The full Preview + Send + Regenerate +
-     Delete set only appeared after a re-render (page refresh, or another
-     action that re-called renderContracts). Override to render all four
-     right when the doc lands so users don't have to refresh to Delete.
-     ================================================================== */
-  window._renderPreviewSendButtons = function (actionsCell, tr, contract, result, isCombined) {
+'''
+html = html.replace('</script>', CONTRACT_BULK_MODULE + '\n</script>', 1)
+
+# _renderPreviewSendButtons used to add only Preview + Send. Now it emits the
+# full Preview + Send + Regenerate + Delete set (matching what cbBuildActionButtons
+# renders on re-render) so users get a Delete button right after Generate without
+# having to refresh. Doing this as a text replacement of the original function
+# body — the window.-override attempt didn't take effect reliably, resulting in
+# duplicated Send buttons.
+_prev_send_old = '''  function _renderPreviewSendButtons(actionsCell, tr, contract, result, isCombined) {
+    const previewBtn = document.createElement('a');
+    previewBtn.href = result.docUrl;
+    previewBtn.target = '_blank';
+    previewBtn.className = 'btn btn-secondary';
+    previewBtn.style.fontSize = '11px';
+    previewBtn.style.padding = '4px 10px';
+    previewBtn.innerText = 'Preview';
+
+    const sendBtn = document.createElement('button');
+    sendBtn.className = 'btn btn-primary';
+    sendBtn.style.fontSize = '11px';
+    sendBtn.style.padding = '4px 10px';
+    sendBtn.innerText = isCombined ? 'Send Combined' : 'Send';
+    sendBtn.addEventListener('click', function() {
+      const okCheckbox = tr.querySelector('.ok-to-send-checkbox');
+      if (!okCheckbox || !okCheckbox.checked) {
+        showAlert('Please get approval from AAD before sending.');
+        return;
+      }
+      requireApproval(function() { sendSingleContract(contract, result, tr); });
+    });
+
+    actionsCell.appendChild(previewBtn);
+    actionsCell.appendChild(sendBtn);
+  }'''
+_prev_send_new = '''  function _renderPreviewSendButtons(actionsCell, tr, contract, result, isCombined) {
     cbBtn(actionsCell, 'Preview', 'btn-secondary', function () { window.open(result.docUrl, '_blank'); });
     cbBtn(actionsCell, isCombined ? 'Send Combined' : 'Send', 'btn-primary', function () {
       var okCheckbox = tr.querySelector('.ok-to-send-checkbox');
@@ -1560,9 +1588,8 @@ CONTRACT_BULK_MODULE = '''
     });
     cbBtn(actionsCell, 'Regenerate', 'btn-secondary', function () { generateSingleContract(contract, tr); });
     cbBuildDeleteButton(actionsCell, tr, contract);
-  };
-'''
-html = html.replace('</script>', CONTRACT_BULK_MODULE + '\n</script>', 1)
+  }'''
+html = _apply_if_present(html, _prev_send_old, _prev_send_new, '_renderPreviewSendButtons body')
 
 # -----------------------------------------------------------------------------
 # 4c. Calendar conflicts — REMOVED: Blake now maintains the calendar
