@@ -923,7 +923,7 @@ SHOW_VISIBILITY_MODULE = r'''
   // clears the row's sent/signed/status/link cells on the sheet.
   function cbBuildDeleteButton(actionsCell, tr, contract) {
     cbBtn(actionsCell, 'Delete', 'btn-danger', function () {
-      showConfirm('Delete this contract? The doc goes to Drive trash and the row\\'s status/sent/signed/link cells get cleared.', function () {
+      showConfirm('Delete this contract? The doc goes to Drive trash, and the status / sent / signed / link cells for this row get cleared.', function () {
         actionsCell.innerHTML = '<span style="font-size:12px; color:#aaa;">Deleting…</span>';
         google.script.run
           .withSuccessHandler(function () {
