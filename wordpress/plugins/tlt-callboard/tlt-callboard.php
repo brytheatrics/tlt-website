@@ -5953,25 +5953,16 @@ function tlt_cb_contract_expand_special_conditions( $doc_id, $special ) {
 }
 
 /**
- * Expand <<Board>> — render each board member as a name (8pt regular) followed
- * by their title (7.5pt italic, if present), with 3pt space-after on the last
- * paragraph of each member so members are visibly separated.
+ * Parse the multi-line Board named-range content into [{name, title}, …].
  *
- * The Board named range is one line per line: names sit on their own line, and
- * an optional officer title line follows (e.g. "President", "Vice President",
- * "Co-Treasurer"). Titles are auto-detected as lines containing common board
- * office keywords (president|treasurer|secretary|chair). Any line that doesn't
- * match starts a new member.
+ * Accepts either format:
+ *   1) "Name, Title" one-liners where the title matches a board office keyword.
+ *   2) Name and Title on adjacent lines (title-only line matches the keyword
+ *      and attaches to the preceding name).
+ * Any line that doesn't match a title pattern starts a new name-only member.
  */
-function tlt_cb_contract_expand_board( $doc_id, $board_value ) {
-    $lines = array_values( array_filter( array_map( 'trim', explode( "\n", $board_value ) ), function ( $x ) { return $x !== ''; } ) );
-    if ( empty( $lines ) ) return tlt_cb_contract_delete_marker_paragraph( $doc_id, '<<Board>>' );
-
-    // Two accepted formats — parse both so nothing breaks during a reformat:
-    //   1) "Name, Title" on one line, title contains a board keyword.
-    //   2) "Name" and "Title" on two adjacent lines (title-only line contains
-    //      the same keyword and attaches to the preceding name).
-    // A line with no comma-split match and no title match is a name-only member.
+function tlt_cb_contract_parse_board_members( $board_value ) {
+    $lines = array_values( array_filter( array_map( 'trim', explode( "\n", (string) $board_value ) ), function ( $x ) { return $x !== ''; } ) );
     $title_regex = '/\b(president|treasurer|secretary|chair)\b/i';
     $members = [];
     foreach ( $lines as $line ) {
@@ -5990,6 +5981,121 @@ function tlt_cb_contract_expand_board( $doc_id, $board_value ) {
         }
         $members[] = [ 'name' => $line, 'title' => '' ];
     }
+    return $members;
+}
+
+/**
+ * Expand <<Board>> — one marker replaces the entire left-column sidebar:
+ *   Board of Directors header  → board members from the Board named range
+ *   Staff header               → Theatre-tab rows where col E is numeric AND
+ *                                col B is non-empty, sorted by col E ascending
+ *   Mission header             → paragraph text from Theatre col B
+ *   Vision header              → paragraph text from Theatre col B
+ *
+ * Section labels come verbatim from Theatre rows 3, 5, 7, 9 col A, so Chris
+ * can rename "TLT's Mission:" without touching code. Content styling is fixed:
+ *   - Section headings   : 8.5pt bold  (4pt spaceAbove on all but the first)
+ *   - Names              : 7pt regular
+ *   - Titles             : 6.5pt italic
+ *   - Mission/Vision text: 7pt regular
+ *   - 1pt spaceBelow on the last paragraph of each member so entries breathe
+ *
+ * Template Doc must contain a single <<Board>> marker in the sidebar. All the
+ * old markers (<<MAD>> / <<APD>> / <<TD>> / <<DD>> / <<ED>> / <<OM>> / <<PM>>
+ * / <<Mission>> / <<Vision>>) plus their label paragraphs should be removed
+ * from the template — they still get replaceAllText'd (as empty), harmlessly,
+ * if left behind.
+ */
+function tlt_cb_contract_expand_board( $doc_id, $board_value ) {
+    $theatre = tlt_callboard_sheet_rows( TLT_CALLBOARD_SHEET_ID, 'Theatre!A1:E30' );
+    if ( is_wp_error( $theatre ) ) $theatre = [];
+
+    // Section labels — verbatim from Theatre if present, else sensible defaults.
+    $lbl_board   = tlt_cb_s( $theatre[2][0] ?? '' ) ?: 'Board of Directors';
+    $lbl_mission = tlt_cb_s( $theatre[4][0] ?? '' ) ?: "TLT's Mission:";
+    $lbl_vision  = tlt_cb_s( $theatre[6][0] ?? '' ) ?: "TLT's Vision:";
+    $lbl_staff   = tlt_cb_s( $theatre[8][0] ?? '' ) ?: 'Staff';
+
+    $mission_text = trim( tlt_cb_s( $theatre[4][1] ?? '' ) );
+    $vision_text  = trim( tlt_cb_s( $theatre[6][1] ?? '' ) );
+
+    // Staff rows: col E numeric = display order + "show on contracts" flag.
+    // Rows without numeric E are omitted (Lead Carpenter, House Managers, etc.
+    // don't get their own contract sidebar block). Empty col B rows are also
+    // omitted so an unfilled role (like APD right now) just drops out.
+    $staff_members = [];
+    foreach ( $theatre as $r ) {
+        $title = tlt_cb_s( $r[0] ?? '' );
+        $name  = trim( tlt_cb_s( $r[1] ?? '' ) );
+        $order = tlt_cb_s( $r[4] ?? '' );
+        if ( ! is_numeric( $order ) || $name === '' || $title === '' ) continue;
+        $staff_members[] = [ 'name' => $name, 'title' => $title, 'order' => (float) $order ];
+    }
+    usort( $staff_members, function ( $a, $b ) { return $a['order'] <=> $b['order']; } );
+
+    $board_members = tlt_cb_contract_parse_board_members( $board_value );
+
+    // Compose text + track offsets for each style-relevant range.
+    $text = '';
+    $heading_ranges = []; // [start, end] — bold 8.5pt, +spaceAbove if not first
+    $name_ranges    = []; // [start, end] — 7pt regular
+    $title_ranges   = []; // [start, end] — 6.5pt italic
+    $body_ranges    = []; // [start, end] — 7pt regular (mission/vision)
+    $member_last_para_ranges = []; // 1pt spaceBelow after each member
+    $section_heading_para_ranges = []; // 4pt spaceAbove on all but first heading
+
+    $append_heading = function ( $label, $is_first ) use ( &$text, &$heading_ranges, &$section_heading_para_ranges ) {
+        $start = mb_strlen( $text, 'UTF-8' );
+        $text .= $label . "\n";
+        $end   = mb_strlen( $text, 'UTF-8' ) - 1; // exclude trailing \n from text-style range
+        $heading_ranges[] = [ $start, $end ];
+        if ( ! $is_first ) $section_heading_para_ranges[] = [ $start, $end + 1 ];
+    };
+    $append_member = function ( $m ) use ( &$text, &$name_ranges, &$title_ranges, &$member_last_para_ranges ) {
+        $ns = mb_strlen( $text, 'UTF-8' );
+        $text .= $m['name'] . "\n";
+        $ne = mb_strlen( $text, 'UTF-8' ) - 1;
+        $name_ranges[] = [ $ns, $ne ];
+        $last_start = $ns; $last_end = $ne + 1;
+        if ( trim( (string) ( $m['title'] ?? '' ) ) !== '' ) {
+            $ts = mb_strlen( $text, 'UTF-8' );
+            $text .= $m['title'] . "\n";
+            $te = mb_strlen( $text, 'UTF-8' ) - 1;
+            $title_ranges[] = [ $ts, $te ];
+            $last_start = $ts; $last_end = $te + 1;
+        }
+        $member_last_para_ranges[] = [ $last_start, $last_end ];
+    };
+    $append_body = function ( $body ) use ( &$text, &$body_ranges ) {
+        if ( trim( (string) $body ) === '' ) return;
+        $s = mb_strlen( $text, 'UTF-8' );
+        $text .= $body . "\n";
+        $e = mb_strlen( $text, 'UTF-8' ) - 1;
+        $body_ranges[] = [ $s, $e ];
+    };
+
+    // Board section
+    if ( ! empty( $board_members ) ) {
+        $append_heading( $lbl_board, true );
+        foreach ( $board_members as $m ) $append_member( $m );
+    }
+    // Staff section
+    if ( ! empty( $staff_members ) ) {
+        $append_heading( $lbl_staff, empty( $board_members ) );
+        foreach ( $staff_members as $m ) $append_member( [ 'name' => $m['name'], 'title' => $m['title'] ] );
+    }
+    // Mission section
+    if ( $mission_text !== '' ) {
+        $append_heading( $lbl_mission, empty( $board_members ) && empty( $staff_members ) );
+        $append_body( $mission_text );
+    }
+    // Vision section
+    if ( $vision_text !== '' ) {
+        $append_heading( $lbl_vision, empty( $board_members ) && empty( $staff_members ) && $mission_text === '' );
+        $append_body( $vision_text );
+    }
+
+    if ( $text === '' ) return tlt_cb_contract_delete_marker_paragraph( $doc_id, '<<Board>>' );
 
     // Locate the marker paragraph so we can splice content in place.
     $paras = tlt_cb_contract_walk_paragraphs( $doc_id );
@@ -6004,53 +6110,56 @@ function tlt_cb_contract_expand_board( $doc_id, $board_value ) {
     if ( ! $marker_para ) return true;
     $insert_start = $marker_para['start'];
 
-    // Compose the composite text and remember each name / title / last-of-member
-    // range as OFFSETS from insert_start (in UTF-16 code units — mb_strlen with
-    // UTF-8 is equivalent for the BMP characters real board names use).
-    $text          = '';
-    $name_ranges   = [];
-    $title_ranges  = [];
-    $last_para_ranges = [];
-    foreach ( $members as $m ) {
-        $offset_name = mb_strlen( $text, 'UTF-8' );
-        $text       .= $m['name'] . "\n";
-        $name_len    = mb_strlen( $m['name'], 'UTF-8' );
-        $name_ranges[] = [ $offset_name, $offset_name + $name_len ];
-        $last_para   = [ $offset_name, $offset_name + $name_len + 1 ]; // include \n so paragraph lookup catches it
-
-        if ( $m['title'] !== '' ) {
-            $offset_title = mb_strlen( $text, 'UTF-8' );
-            $text        .= $m['title'] . "\n";
-            $title_len    = mb_strlen( $m['title'], 'UTF-8' );
-            $title_ranges[] = [ $offset_title, $offset_title + $title_len ];
-            $last_para    = [ $offset_title, $offset_title + $title_len + 1 ];
-        }
-        $last_para_ranges[] = $last_para;
-    }
-
     $requests = [
         [ 'deleteContentRange' => [ 'range' => tlt_cb_docs_range( $marker_para['start'], $marker_para['end'] ) ] ],
         [ 'insertText' => [ 'location' => [ 'index' => $insert_start ], 'text' => $text ] ],
     ];
+    // Headings: 8.5pt bold.
+    foreach ( $heading_ranges as $r ) {
+        $requests[] = [ 'updateTextStyle' => [
+            'range'     => tlt_cb_docs_range( $insert_start + $r[0], $insert_start + $r[1] ),
+            'textStyle' => [ 'fontSize' => [ 'magnitude' => 8.5, 'unit' => 'PT' ], 'bold' => true, 'italic' => false ],
+            'fields'    => 'fontSize,bold,italic',
+        ] ];
+    }
+    // Names: 7pt regular.
     foreach ( $name_ranges as $r ) {
         $requests[] = [ 'updateTextStyle' => [
             'range'     => tlt_cb_docs_range( $insert_start + $r[0], $insert_start + $r[1] ),
-            'textStyle' => [ 'fontSize' => [ 'magnitude' => 8, 'unit' => 'PT' ], 'italic' => false ],
-            'fields'    => 'fontSize,italic',
+            'textStyle' => [ 'fontSize' => [ 'magnitude' => 7, 'unit' => 'PT' ], 'bold' => false, 'italic' => false ],
+            'fields'    => 'fontSize,bold,italic',
         ] ];
     }
+    // Titles: 6.5pt italic.
     foreach ( $title_ranges as $r ) {
         $requests[] = [ 'updateTextStyle' => [
             'range'     => tlt_cb_docs_range( $insert_start + $r[0], $insert_start + $r[1] ),
-            'textStyle' => [ 'fontSize' => [ 'magnitude' => 7.5, 'unit' => 'PT' ], 'italic' => true ],
-            'fields'    => 'fontSize,italic',
+            'textStyle' => [ 'fontSize' => [ 'magnitude' => 6.5, 'unit' => 'PT' ], 'bold' => false, 'italic' => true ],
+            'fields'    => 'fontSize,bold,italic',
         ] ];
     }
-    foreach ( $last_para_ranges as $r ) {
+    // Mission/Vision body text: 7pt regular.
+    foreach ( $body_ranges as $r ) {
+        $requests[] = [ 'updateTextStyle' => [
+            'range'     => tlt_cb_docs_range( $insert_start + $r[0], $insert_start + $r[1] ),
+            'textStyle' => [ 'fontSize' => [ 'magnitude' => 7, 'unit' => 'PT' ], 'bold' => false, 'italic' => false ],
+            'fields'    => 'fontSize,bold,italic',
+        ] ];
+    }
+    // 1pt spaceBelow on the last paragraph of each member.
+    foreach ( $member_last_para_ranges as $r ) {
         $requests[] = [ 'updateParagraphStyle' => [
             'range'          => tlt_cb_docs_range( $insert_start + $r[0], $insert_start + $r[1] ),
-            'paragraphStyle' => [ 'spaceBelow' => [ 'magnitude' => 3, 'unit' => 'PT' ] ],
+            'paragraphStyle' => [ 'spaceBelow' => [ 'magnitude' => 1, 'unit' => 'PT' ] ],
             'fields'         => 'spaceBelow',
+        ] ];
+    }
+    // 4pt spaceAbove on all section headings except the first.
+    foreach ( $section_heading_para_ranges as $r ) {
+        $requests[] = [ 'updateParagraphStyle' => [
+            'range'          => tlt_cb_docs_range( $insert_start + $r[0], $insert_start + $r[1] ),
+            'paragraphStyle' => [ 'spaceAbove' => [ 'magnitude' => 4, 'unit' => 'PT' ] ],
+            'fields'         => 'spaceAbove',
         ] ];
     }
 
