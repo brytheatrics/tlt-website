@@ -1543,6 +1543,24 @@ CONTRACT_BULK_MODULE = '''
       }
     });
   };
+
+  /* ==================================================================
+     Immediate-after-generate button set — original _renderPreviewSendButtons
+     only rendered Preview + Send. The full Preview + Send + Regenerate +
+     Delete set only appeared after a re-render (page refresh, or another
+     action that re-called renderContracts). Override to render all four
+     right when the doc lands so users don't have to refresh to Delete.
+     ================================================================== */
+  window._renderPreviewSendButtons = function (actionsCell, tr, contract, result, isCombined) {
+    cbBtn(actionsCell, 'Preview', 'btn-secondary', function () { window.open(result.docUrl, '_blank'); });
+    cbBtn(actionsCell, isCombined ? 'Send Combined' : 'Send', 'btn-primary', function () {
+      var okCheckbox = tr.querySelector('.ok-to-send-checkbox');
+      if (!okCheckbox || !okCheckbox.checked) { showAlert('Please get approval from AAD before sending.'); return; }
+      requireApproval(function () { sendSingleContract(contract, result, tr); });
+    });
+    cbBtn(actionsCell, 'Regenerate', 'btn-secondary', function () { generateSingleContract(contract, tr); });
+    cbBuildDeleteButton(actionsCell, tr, contract);
+  };
 '''
 html = html.replace('</script>', CONTRACT_BULK_MODULE + '\n</script>', 1)
 
