@@ -6097,7 +6097,10 @@ function tlt_cb_contract_expand_board( $doc_id, $board_value ) {
 
     if ( $text === '' ) return tlt_cb_contract_delete_marker_paragraph( $doc_id, '<<Board>>' );
 
-    // Locate the marker paragraph so we can splice content in place.
+    // Locate the marker paragraph. We only delete the marker TEXT itself, not
+    // the paragraph terminator — the marker sits inside a table cell in the
+    // sidebar template, and the Docs API refuses deleteContentRange when the
+    // range would eat a table cell boundary.
     $paras = tlt_cb_contract_walk_paragraphs( $doc_id );
     if ( is_wp_error( $paras ) ) return $paras;
     $marker_para = null;
@@ -6108,10 +6111,16 @@ function tlt_cb_contract_expand_board( $doc_id, $board_value ) {
         }
     }
     if ( ! $marker_para ) return true;
-    $insert_start = $marker_para['start'];
+    $marker_offset_in_para = mb_strpos( $marker_para['text'], '<<Board>>', 0, 'UTF-8' );
+    if ( $marker_offset_in_para === false ) return true;
+    $marker_len   = mb_strlen( '<<Board>>', 'UTF-8' );
+    $marker_start = $marker_para['start'] + $marker_offset_in_para;
+    $marker_end   = $marker_start + $marker_len;
+    $insert_start = $marker_start;
 
+    // Delete the marker text, then insert the composed sidebar block in its place.
     $requests = [
-        [ 'deleteContentRange' => [ 'range' => tlt_cb_docs_range( $marker_para['start'], $marker_para['end'] ) ] ],
+        [ 'deleteContentRange' => [ 'range' => tlt_cb_docs_range( $marker_start, $marker_end ) ] ],
         [ 'insertText' => [ 'location' => [ 'index' => $insert_start ], 'text' => $text ] ],
     ];
     // Headings: 8.5pt bold.
