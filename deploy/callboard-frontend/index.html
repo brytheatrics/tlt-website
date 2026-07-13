@@ -5416,8 +5416,12 @@
     const table = document.createElement('table');
     table.className = 'contracts-table';
     table.style.marginBottom = '4px';
+    // Leading column is the bulk-select checkbox that the header buttons
+    // ("Generate Selected" / "Send Selected") read. Per-section select-all
+    // in the thead only toggles this section's rows.
     table.innerHTML =
       '<thead><tr>' +
+        '<th style="width:24px;"><input type="checkbox" class="cb-section-select-all" title="Select all in this section"></th>' +
         '<th>' + (title === 'Cast' ? 'Character' : 'Role') + '</th>' +
         '<th>Name</th>' +
         '<th>Email</th>' +
@@ -5431,6 +5435,13 @@
 
     const tbody = table.querySelector('tbody');
     rows.forEach(function (contract) { tbody.appendChild(cbContractRow(contract)); });
+    // Per-section select-all wiring.
+    const selAll = table.querySelector('.cb-section-select-all');
+    if (selAll) {
+      selAll.addEventListener('change', function () {
+        table.querySelectorAll('tbody .contract-checkbox').forEach(function (cb) { cb.checked = selAll.checked; });
+      });
+    }
     wrap.appendChild(table);
     return wrap;
   }
@@ -5442,7 +5453,15 @@
       : contract.contractStatus === 'Generated'          ? 'generated'
       : 'not-started';
     const label = contract.isActor ? (contract.character || '') : (contract.role || '');
+    // Bulk-select checkbox carries the same data-* attrs the original
+    // generateSelected() / sendSelected() functions read.
     tr.innerHTML =
+      '<td style="text-align:center;"><input type="checkbox" class="contract-checkbox"' +
+        ' data-show="' + calEscape(contract.show) + '"' +
+        ' data-role="' + calEscape(contract.role) + '"' +
+        ' data-firstname="' + calEscape(contract.firstName) + '"' +
+        ' data-lastname="' + calEscape(contract.lastName || '') + '"' +
+        ' data-character="' + calEscape(contract.character || '') + '"></td>' +
       '<td>' + calEscape(label) + '</td>' +
       '<td>' + calEscape(contract.fullName || '') + '</td>' +
       '<td>' + (contract.contact && contract.contact.email ? '<a href="mailto:' + calEscape(contract.contact.email) + '">' + calEscape(contract.contact.email) + '</a>' : '') + '</td>' +
