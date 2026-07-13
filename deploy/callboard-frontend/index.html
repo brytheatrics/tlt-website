@@ -5534,9 +5534,35 @@
     } else if (contract.contractLink) {
       cbBtn(actionsCell, 'Preview', 'btn-secondary', function () { window.open(contract.contractLink, '_blank'); });
       cbBtn(actionsCell, 'Regenerate', 'btn-secondary', function () { generateSingleContract(contract, tr); });
+      cbBuildDeleteButton(actionsCell, tr, contract);
     } else {
       cbBtn(actionsCell, 'Regenerate', 'btn-secondary', function () { generateSingleContract(contract, tr); });
+      cbBuildDeleteButton(actionsCell, tr, contract);
     }
+  }
+
+  // Shared Delete button for rows where generatedDocs[key] isn't in memory —
+  // typical after a page refresh. Passes null for docId; the backend endpoint
+  // /contract-delete looks it up in Drive by expected name. The endpoint also
+  // clears the row's sent/signed/status/link cells on the sheet.
+  function cbBuildDeleteButton(actionsCell, tr, contract) {
+    cbBtn(actionsCell, 'Delete', 'btn-danger', function () {
+      showConfirm('Delete this contract? The doc goes to Drive trash and the row\\'s status/sent/signed/link cells get cleared.', function () {
+        actionsCell.innerHTML = '<span style="font-size:12px; color:#aaa;">Deleting…</span>';
+        google.script.run
+          .withSuccessHandler(function () {
+            const key = contract.show + '|' + contract.role + '|' + contract.firstName;
+            delete generatedDocs[key];
+            google.script.run
+              .withSuccessHandler(function (data) { allContractsData = data; renderContracts(data); })
+              .getContractsData();
+          })
+          .withFailureHandler(function (err) {
+            actionsCell.innerHTML = '<span style="font-size:12px; color:#d93025;">Delete failed: ' + (err && err.message || err) + '</span>';
+          })
+          .deleteGeneratedContract(null, contract.show, contract.role, contract.firstName);
+      });
+    });
   }
   function cbBtn(parent, label, cls, onclick) {
     const b = document.createElement('button');

@@ -6271,6 +6271,11 @@ function tlt_cb_contract_update_status( $show, $role, $first_name, $status, $lin
     if ( $status === 'Sent for Signature' ) {
         $updates[] = [ "'{$sheet_tab}'!J{$target_row}", [[ $today ]] ];
     }
+    if ( $status === 'Not Started' ) {
+        // Contract is being deleted — wipe the sent + signed date cells too.
+        $updates[] = [ "'{$sheet_tab}'!J{$target_row}", [[ '' ]] ];
+        $updates[] = [ "'{$sheet_tab}'!K{$target_row}", [[ '' ]] ];
+    }
     if ( ! empty( $opts['combinedContractId'] ) ) {
         $ccid = $opts['combinedContractId'];
         $updates[] = [ "'{$sheet_tab}'!S{$target_row}", [[ $ccid ]] ];
@@ -6297,6 +6302,10 @@ function tlt_cb_contract_update_status( $show, $role, $first_name, $status, $lin
                 tlt_callboard_sheets_write( TLT_CALLBOARD_SHEET_ID, "'{$tabname}'!L{$rn}", [[ $link_or_id ]] );
                 if ( $status === 'Sent for Signature' ) {
                     tlt_callboard_sheets_write( TLT_CALLBOARD_SHEET_ID, "'{$tabname}'!J{$rn}", [[ $today ]] );
+                }
+                if ( $status === 'Not Started' ) {
+                    tlt_callboard_sheets_write( TLT_CALLBOARD_SHEET_ID, "'{$tabname}'!J{$rn}", [[ '' ]] );
+                    tlt_callboard_sheets_write( TLT_CALLBOARD_SHEET_ID, "'{$tabname}'!K{$rn}", [[ '' ]] );
                 }
             }
         }
