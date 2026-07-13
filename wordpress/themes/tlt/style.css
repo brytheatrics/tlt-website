@@ -1168,7 +1168,12 @@ body.splash-page { overflow: hidden; }
 .splash-photo { position: absolute; inset: 0; background-size: cover; background-position: 50% 30%; opacity: 0; transition: opacity 1.5s ease-in-out; }
 .splash-photo.active { opacity: 1; }
 .splash-overlay { position: fixed; inset: 0; z-index: 1; background: linear-gradient(90deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.15) 100%); }
-.splash-wrap { position: relative; z-index: 2; min-height: 100vh; display: grid; grid-template-rows: auto 1fr auto; padding: 2.5rem clamp(1.5rem, 5vw, 4rem); color: #fff; }
+/* iOS Safari: 100vh treats the viewport as if the browser's URL/toolbar
+   were HIDDEN, so with them visible on first load the ticket button and
+   social icons at the bottom of the grid land below the fold. 100svh is
+   the always-inclusive height; the 100vh fallback stays for pre-2022
+   browsers. */
+.splash-wrap { position: relative; z-index: 2; min-height: 100vh; min-height: 100svh; display: grid; grid-template-rows: auto 1fr auto; padding: 2.5rem clamp(1.5rem, 5vw, 4rem); color: #fff; }
 .splash-mid { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; flex-wrap: wrap; }
 .splash-text { max-width: 640px; }
 .splash-text h1 { font-size: clamp(2.5rem, 5.5vw, 4.5rem); font-weight: 300; }
