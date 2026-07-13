@@ -5967,14 +5967,28 @@ function tlt_cb_contract_expand_board( $doc_id, $board_value ) {
     $lines = array_values( array_filter( array_map( 'trim', explode( "\n", $board_value ) ), function ( $x ) { return $x !== ''; } ) );
     if ( empty( $lines ) ) return tlt_cb_contract_delete_marker_paragraph( $doc_id, '<<Board>>' );
 
+    // Two accepted formats — parse both so nothing breaks during a reformat:
+    //   1) "Name, Title" on one line, title contains a board keyword.
+    //   2) "Name" and "Title" on two adjacent lines (title-only line contains
+    //      the same keyword and attaches to the preceding name).
+    // A line with no comma-split match and no title match is a name-only member.
     $title_regex = '/\b(president|treasurer|secretary|chair)\b/i';
     $members = [];
     foreach ( $lines as $line ) {
+        if ( strpos( $line, ',' ) !== false ) {
+            $parts = explode( ',', $line, 2 );
+            $name_part  = trim( $parts[0] );
+            $title_part = trim( $parts[1] );
+            if ( $name_part !== '' && preg_match( $title_regex, $title_part ) ) {
+                $members[] = [ 'name' => $name_part, 'title' => $title_part ];
+                continue;
+            }
+        }
         if ( ! empty( $members ) && preg_match( $title_regex, $line ) ) {
             $members[ count( $members ) - 1 ]['title'] = $line;
-        } else {
-            $members[] = [ 'name' => $line, 'title' => '' ];
+            continue;
         }
+        $members[] = [ 'name' => $line, 'title' => '' ];
     }
 
     // Locate the marker paragraph so we can splice content in place.
