@@ -6123,35 +6123,35 @@ function tlt_cb_contract_expand_board( $doc_id, $board_value ) {
         [ 'deleteContentRange' => [ 'range' => tlt_cb_docs_range( $marker_start, $marker_end ) ] ],
         [ 'insertText' => [ 'location' => [ 'index' => $insert_start ], 'text' => $text ] ],
     ];
-    // Headings: 8.5pt bold.
+    // Headings: 8pt bold.
     foreach ( $heading_ranges as $r ) {
         $requests[] = [ 'updateTextStyle' => [
             'range'     => tlt_cb_docs_range( $insert_start + $r[0], $insert_start + $r[1] ),
-            'textStyle' => [ 'fontSize' => [ 'magnitude' => 8.5, 'unit' => 'PT' ], 'bold' => true, 'italic' => false ],
+            'textStyle' => [ 'fontSize' => [ 'magnitude' => 8, 'unit' => 'PT' ], 'bold' => true, 'italic' => false ],
             'fields'    => 'fontSize,bold,italic',
         ] ];
     }
-    // Names: 7pt regular.
+    // Names: 7.5pt regular.
     foreach ( $name_ranges as $r ) {
         $requests[] = [ 'updateTextStyle' => [
             'range'     => tlt_cb_docs_range( $insert_start + $r[0], $insert_start + $r[1] ),
-            'textStyle' => [ 'fontSize' => [ 'magnitude' => 7, 'unit' => 'PT' ], 'bold' => false, 'italic' => false ],
+            'textStyle' => [ 'fontSize' => [ 'magnitude' => 7.5, 'unit' => 'PT' ], 'bold' => false, 'italic' => false ],
             'fields'    => 'fontSize,bold,italic',
         ] ];
     }
-    // Titles: 6.5pt italic.
+    // Titles: 7pt italic.
     foreach ( $title_ranges as $r ) {
         $requests[] = [ 'updateTextStyle' => [
             'range'     => tlt_cb_docs_range( $insert_start + $r[0], $insert_start + $r[1] ),
-            'textStyle' => [ 'fontSize' => [ 'magnitude' => 6.5, 'unit' => 'PT' ], 'bold' => false, 'italic' => true ],
+            'textStyle' => [ 'fontSize' => [ 'magnitude' => 7, 'unit' => 'PT' ], 'bold' => false, 'italic' => true ],
             'fields'    => 'fontSize,bold,italic',
         ] ];
     }
-    // Mission/Vision body text: 7pt regular.
+    // Mission/Vision body text: 7.5pt regular.
     foreach ( $body_ranges as $r ) {
         $requests[] = [ 'updateTextStyle' => [
             'range'     => tlt_cb_docs_range( $insert_start + $r[0], $insert_start + $r[1] ),
-            'textStyle' => [ 'fontSize' => [ 'magnitude' => 7, 'unit' => 'PT' ], 'bold' => false, 'italic' => false ],
+            'textStyle' => [ 'fontSize' => [ 'magnitude' => 7.5, 'unit' => 'PT' ], 'bold' => false, 'italic' => false ],
             'fields'    => 'fontSize,bold,italic',
         ] ];
     }
