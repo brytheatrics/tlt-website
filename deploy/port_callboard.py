@@ -1589,7 +1589,12 @@ _prev_send_new = '''  function _renderPreviewSendButtons(actionsCell, tr, contra
     cbBtn(actionsCell, 'Regenerate', 'btn-secondary', function () { generateSingleContract(contract, tr); });
     cbBuildDeleteButton(actionsCell, tr, contract);
   }'''
-html = _apply_if_present(html, _prev_send_old, _prev_send_new, '_renderPreviewSendButtons body')
+# _apply_if_present is defined below in section 4d; use plain replace so this
+# runs regardless of section order.
+if _prev_send_new not in html:
+    if _prev_send_old not in html:
+        raise AssertionError('_renderPreviewSendButtons body: source snippet not found')
+    html = html.replace(_prev_send_old, _prev_send_new, 1)
 
 # -----------------------------------------------------------------------------
 # 4c. Calendar conflicts — REMOVED: Blake now maintains the calendar
