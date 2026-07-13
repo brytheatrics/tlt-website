@@ -1479,6 +1479,48 @@ CONTACT_SHEET_MODULE = '''
 html = html.replace('</script>', CONTACT_SHEET_MODULE + '\n</script>', 1)
 
 # -----------------------------------------------------------------------------
+# 4e. Bulk-select Generate/Send override.
+#
+# The GAS-source `generateSelected` calls `generateSingleContract` per row,
+# which fires an async getCombinableShows check. If two of the selected rows
+# have combinable-shows candidates, both fire openCombineModal in parallel —
+# the modal uses shared module-level state (combineModalContract, ...Tr, etc.)
+# so the second call clobbers the first, only one modal is visible, and the
+# other row is stuck showing "Waiting…" forever.
+#
+# Fix: when the user has explicitly checked N rows and clicked "Generate
+# Selected", skip the combine check and generate each row individually. If
+# they want a combined contract they use the per-row "Combine" button.
+# -----------------------------------------------------------------------------
+CONTRACT_BULK_MODULE = '''
+  /* ==================================================================
+     Bulk Generate — skip the auto-combine modal.
+     ================================================================== */
+  window.generateSelected = function () {
+    var checked = Array.from(document.querySelectorAll('.contract-checkbox:checked'));
+    if (checked.length === 0) {
+      showAlert('Please select at least one contract.');
+      return;
+    }
+    checked.forEach(function (cb) {
+      var tr = cb.closest('tr');
+      var contract = {
+        show:      cb.dataset.show,
+        role:      cb.dataset.role,
+        firstName: cb.dataset.firstname,
+        lastName:  cb.dataset.lastname,
+        character: cb.dataset.character || '',
+      };
+      var key = contract.show + '|' + contract.role + '|' + contract.firstName;
+      if (!generatedDocs[key]) {
+        _doGenerateSingle(contract, tr);  // bypass combinable-shows check
+      }
+    });
+  };
+'''
+html = html.replace('</script>', CONTRACT_BULK_MODULE + '\n</script>', 1)
+
+# -----------------------------------------------------------------------------
 # 4c. Calendar conflicts — REMOVED: Blake now maintains the calendar
 #     conflict fetching and rendering directly in the source Index.html
 #     (added in the Callboard Crossover pull). Source has proper .cal-day-conflict

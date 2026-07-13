@@ -6069,6 +6069,32 @@
       .generateTechSchedule(showName);
   }
 
+
+  /* ==================================================================
+     Bulk Generate — skip the auto-combine modal.
+     ================================================================== */
+  window.generateSelected = function () {
+    var checked = Array.from(document.querySelectorAll('.contract-checkbox:checked'));
+    if (checked.length === 0) {
+      showAlert('Please select at least one contract.');
+      return;
+    }
+    checked.forEach(function (cb) {
+      var tr = cb.closest('tr');
+      var contract = {
+        show:      cb.dataset.show,
+        role:      cb.dataset.role,
+        firstName: cb.dataset.firstname,
+        lastName:  cb.dataset.lastname,
+        character: cb.dataset.character || '',
+      };
+      var key = contract.show + '|' + contract.role + '|' + contract.firstName;
+      if (!generatedDocs[key]) {
+        _doGenerateSingle(contract, tr);  // bypass combinable-shows check
+      }
+    });
+  };
+
 </script>
 
 <div class="tlt-dialog-overlay" id="tlt-password-dialog">
