@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TLT Callboard</title>
+  <link rel="icon" href="/favicon.ico">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, system-ui, sans-serif;
+      background: #f5f5f5;
+      color: #222;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 36px 32px 32px;
+      max-width: 420px;
+      width: calc(100% - 32px);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+    h1 {
+      margin: 0 0 6px;
+      font-size: 22px;
+      color: #a2242a;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+    .subtitle {
+      margin: 0 0 24px;
+      color: #666;
+      font-size: 14px;
+    }
+    .season-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .season-btn {
+      display: block;
+      padding: 14px 18px;
+      background: #a2242a;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: 500;
+      text-decoration: none;
+      text-align: center;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.08s;
+      font-family: inherit;
+    }
+    .season-btn:hover { background: #7a1b20; }
+    .season-btn:active { transform: translateY(1px); }
+    .status {
+      color: #666;
+      font-size: 14px;
+      text-align: center;
+      padding: 20px 0;
+    }
+    .status.err { color: #a2242a; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>TLT Callboard</h1>
+    <p class="subtitle">Choose a season.</p>
+    <div class="season-list" id="list">
+      <div class="status" id="status">Loading seasons…</div>
+    </div>
+  </div>
+
+  <script>
+    // Human-friendly label for a season code: "2627" → "26-27 Season".
+    function seasonLabel(code) {
+      const s = String(code);
+      if (/^\d{4}$/.test(s)) return s.slice(0, 2) + '-' + s.slice(2) + ' Season';
+      return s + ' Season';
+    }
+
+    async function loadSeasons() {
+      const list   = document.getElementById('list');
+      const status = document.getElementById('status');
+      try {
+        const resp = await fetch('/wp-json/callboard/v1/seasons', { headers: { 'Accept': 'application/json' } });
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const payload = await resp.json();
+        const seasons = (payload.data && payload.data.seasons) || payload.seasons || [];
+        if (!seasons.length) {
+          status.textContent = 'No active seasons configured.';
+          status.classList.add('err');
+          return;
+        }
+        list.innerHTML = '';
+        seasons.forEach(code => {
+          const a = document.createElement('a');
+          a.className = 'season-btn';
+          a.href = '/callboard/' + encodeURIComponent(code) + '/';
+          a.textContent = seasonLabel(code);
+          list.appendChild(a);
+        });
+      } catch (err) {
+        status.textContent = 'Could not load seasons: ' + err.message;
+        status.classList.add('err');
+      }
+    }
+    loadSeasons();
+  </script>
+</body>
+</html>

@@ -410,8 +410,12 @@
 
     /* z-index promotes .inline-assign into its own stacking context so the
        autocomplete dropdown (z-index:1000 below) lifts above the "+ Add Role"
-       row that sits after the table in the season-show-block. */
+       row that sits after the table in the season-show-block. The
+       :focus-within rule bumps the active row above sibling rows that would
+       otherwise paint on top of the open dropdown (every .inline-assign sits
+       at z-index:100, so DOM order wins without this). */
     .inline-assign { position: relative; z-index: 100; }
+    .inline-assign:focus-within { z-index: 500; }
     .inline-search-input {
       width: 100%;
       padding: 4px 8px;
@@ -455,6 +459,11 @@
     .contact-name { font-size: 15px; font-weight: 600; color: #222; margin-bottom: 4px; }
     .contact-details { font-size: 13px; color: #888; display: flex; gap: 16px; flex-wrap: wrap; }
     .contact-skills { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 4px; }
+    .contact-bio-link { margin-top: 6px; font-size: 12px; color: #666; display: flex; align-items: center; gap: 8px; }
+    .contact-bio-link a { color: #1557b0; text-decoration: none; }
+    .contact-bio-link a:hover { text-decoration: underline; }
+    .cb-bio-copy { font-size: 11px; padding: 2px 8px; border: 1px solid #d0d0d0; border-radius: 3px; background: #fafafa; cursor: pointer; color: #333; }
+    .cb-bio-copy:hover { background: #f0f0f0; }
 
     .skill-tag {
       font-size: 11px;
@@ -907,7 +916,7 @@
 <div class="container">
   <div id="dashboard-view">
     <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
-      <h2>26-27 Season</h2>
+      <h2 id="dashboard-season-label">Season</h2>
       <button class="btn btn-secondary" onclick="refreshDashboard()">↻ Refresh</button>
     </div>
     <div class="cards" id="cards-container">
@@ -1436,6 +1445,15 @@
   const CB_TOKEN_KEY = 'tlt_callboard_token';
   const CB_OLD_URL   = ''; // TODO(Blake): paste the current GAS webapp URL here for
                            //   mutations to bounce to. Empty = just show an alert.
+  // Season context from URL — e.g. /callboard/2728/ → '2728'. Appended to
+  // every REST call as ?season=XXXX. The plugin's rest_pre_dispatch hook
+  // reads it and routes sheet reads to the right season's callboard sheet.
+  // The bare /callboard/ URL has no match → empty string → backend uses the
+  // registry's first entry (currently 26-27). Identical to pre-3b behavior.
+  const CB_SEASON = (function () {
+    const m = window.location.pathname.match(/\/callboard\/(\d+)\//);
+    return m ? m[1] : '';
+  })();
 
   function cbGetToken()   { return localStorage.getItem(CB_TOKEN_KEY); }
   function cbSetToken(t)  { localStorage.setItem(CB_TOKEN_KEY, t); }
@@ -1446,7 +1464,9 @@
     const headers = Object.assign({ 'Accept': 'application/json' }, opts.headers || {});
     if (token) headers['Authorization'] = 'Bearer ' + token;
     if (opts.body && !(opts.body instanceof FormData)) headers['Content-Type'] = 'application/json';
-    const resp = await fetch(CB_API_BASE + path, Object.assign({}, opts, {
+    let url = CB_API_BASE + path;
+    if (CB_SEASON) url += (url.indexOf('?') === -1 ? '?' : '&') + 'season=' + encodeURIComponent(CB_SEASON);
+    const resp = await fetch(url, Object.assign({}, opts, {
       headers,
       body: opts.body ? JSON.stringify(opts.body) : undefined,
     }));
@@ -1819,6 +1839,11 @@
     .withSuccessHandler(function(init) {
       contactList = init.contacts.sort((a, b) => a.lastName.localeCompare(b.lastName));
       document.getElementById('season-label').innerText = 'Season ' + init.season;
+      // Dashboard h2 was hardcoded "26-27 Season" — now pulled from the same
+      // backend-reported season so it tracks whichever callboard sheet the
+      // page is pointed at (26-27 on /callboard/2627/, 27-28 on /callboard/2728/).
+      const _dSeason = document.getElementById('dashboard-season-label');
+      if (_dSeason) _dSeason.innerText = init.season + ' Season';
       dashboardData = init.dashboard;
       // Always land on dashboard so refresh load timing is predictable.
       renderDashboard(init.dashboard);
@@ -3349,6 +3374,14 @@
         ? contact.skills.map(s => `<span class="skill-tag">${s}</span>`).join('')
         : '';
 
+      // Reports link row: shown only when a token exists (Contactbook col K).
+      // Chris sends this URL to SMs/ASMs so they can open the /reports/ PWA
+      // pre-authed. Same underlying token also works with /bio/, but SM
+      // reports is the case Chris most often needs to hand out manually.
+      const reportsHtml = contact.reportsLink
+        ? `<div class="contact-bio-link">🔗 <a href="${contact.reportsLink}" target="_blank" rel="noopener">Reports link</a><button type="button" class="cb-bio-copy" data-link="${contact.reportsLink.replace(/"/g, '&quot;')}" title="Copy reports link">Copy</button></div>`
+        : '';
+
       card.innerHTML = `
         <div class="contact-info">
           <div class="contact-name">${fullName}</div>
@@ -3357,10 +3390,36 @@
             ${contact.phone ? `<span>📞 ${formatPhone(contact.phone)}</span>` : ''}
             ${contact.notes ? `<span>📝 ${contact.notes}</span>` : ''}
           </div>
+          ${reportsHtml}
           ${skillsHtml ? `<div class="contact-skills">${skillsHtml}</div>` : ''}
         </div>
         <div class="row-actions"></div>
       `;
+
+      const copyBtn = card.querySelector('.cb-bio-copy');
+      if (copyBtn) {
+        copyBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          const url = this.getAttribute('data-link') || '';
+          const done = () => {
+            const orig = this.textContent;
+            this.textContent = 'Copied!';
+            setTimeout(() => { this.textContent = orig; }, 1200);
+          };
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url).then(done).catch(() => {
+              // Fallback for older browsers / non-secure contexts
+              const ta = document.createElement('textarea');
+              ta.value = url; document.body.appendChild(ta); ta.select();
+              try { document.execCommand('copy'); done(); } finally { document.body.removeChild(ta); }
+            });
+          } else {
+            const ta = document.createElement('textarea');
+            ta.value = url; document.body.appendChild(ta); ta.select();
+            try { document.execCommand('copy'); done(); } finally { document.body.removeChild(ta); }
+          }
+        });
+      }
 
       const editBtn = document.createElement('button');
       editBtn.className = 'btn btn-secondary';
@@ -5301,21 +5360,14 @@
     const statusF = (statusEl && statusEl.value) || '';
     const pf      = ((personEl && personEl.value) || '').toLowerCase().trim();
 
-    // Populate role dropdown from data. Includes a synthetic "Actor" option
-    // at the top whenever the payload has any actor contracts, since actors
-    // don't have a Production Teams "role" — they're identified by isActor.
+    // Populate role dropdown from data. Actors now emit role='Actor' from
+    // /contracts, so a single deduped Set is enough — no synthetic option
+    // is needed. Filter(Boolean) keeps any legacy blank-role rows out of the
+    // dropdown while still letting them render as unfiltered rows below.
     if (roleEl) {
       const currentRole = roleEl.value;
-      const hasActors = data.some(function (c) { return c.isActor; });
       const roles = [...new Set(data.map(function (c) { return c.role; }).filter(Boolean))].sort();
       roleEl.innerHTML = '<option value="">All Roles</option>';
-      if (hasActors) {
-        const opt = document.createElement('option');
-        opt.value = '__actor__';
-        opt.textContent = 'Actor';
-        if (currentRole === '__actor__') opt.selected = true;
-        roleEl.appendChild(opt);
-      }
       roles.forEach(function (r) {
         const opt = document.createElement('option');
         opt.value = r; opt.textContent = r;
@@ -5326,11 +5378,7 @@
 
     const filtered = data.filter(function (c) {
       if (showF   && c.show           !== showF)   return false;
-      if (roleF === '__actor__') {
-        if (!c.isActor) return false;
-      } else if (roleF && c.role !== roleF) {
-        return false;
-      }
+      if (roleF   && c.role           !== roleF)   return false;
       if (statusF && c.contractStatus !== statusF) return false;
       if (pf      && (c.fullName || '').toLowerCase().indexOf(pf) === -1) return false;
       return true;

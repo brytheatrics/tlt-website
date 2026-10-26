@@ -103,7 +103,7 @@ foreach ( $press_pages as $pp ) {
 
   <div class="press-contact">
     <h2>Media Inquiries</h2>
-    <p>Contact the box office at <a href="mailto:info@tacomalittletheatre.com">info@tacomalittletheatre.com</a> or <a href="tel:+12532722281">(253) 272-2281</a>.</p>
+    <p>Contact the box office at <a href="mailto:tlt@tacomalittletheatre.com">tlt@tacomalittletheatre.com</a> or <a href="tel:+12532722281">(253) 272-2281</a>.</p>
   </div>
 </div>
 

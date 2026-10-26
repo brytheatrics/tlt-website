@@ -72,6 +72,15 @@ SHIM = r'''
   const CB_TOKEN_KEY = 'tlt_callboard_token';
   const CB_OLD_URL   = ''; // TODO(Blake): paste the current GAS webapp URL here for
                            //   mutations to bounce to. Empty = just show an alert.
+  // Season context from URL — e.g. /callboard/2728/ → '2728'. Appended to
+  // every REST call as ?season=XXXX. The plugin's rest_pre_dispatch hook
+  // reads it and routes sheet reads to the right season's callboard sheet.
+  // The bare /callboard/ URL has no match → empty string → backend uses the
+  // registry's first entry (currently 26-27). Identical to pre-3b behavior.
+  const CB_SEASON = (function () {
+    const m = window.location.pathname.match(/\/callboard\/(\d+)\//);
+    return m ? m[1] : '';
+  })();
 
   function cbGetToken()   { return localStorage.getItem(CB_TOKEN_KEY); }
   function cbSetToken(t)  { localStorage.setItem(CB_TOKEN_KEY, t); }
@@ -82,7 +91,9 @@ SHIM = r'''
     const headers = Object.assign({ 'Accept': 'application/json' }, opts.headers || {});
     if (token) headers['Authorization'] = 'Bearer ' + token;
     if (opts.body && !(opts.body instanceof FormData)) headers['Content-Type'] = 'application/json';
-    const resp = await fetch(CB_API_BASE + path, Object.assign({}, opts, {
+    let url = CB_API_BASE + path;
+    if (CB_SEASON) url += (url.indexOf('?') === -1 ? '?' : '&') + 'season=' + encodeURIComponent(CB_SEASON);
+    const resp = await fetch(url, Object.assign({}, opts, {
       headers,
       body: opts.body ? JSON.stringify(opts.body) : undefined,
     }));
@@ -693,21 +704,14 @@ SHOW_VISIBILITY_MODULE = r'''
     const statusF = (statusEl && statusEl.value) || '';
     const pf      = ((personEl && personEl.value) || '').toLowerCase().trim();
 
-    // Populate role dropdown from data. Includes a synthetic "Actor" option
-    // at the top whenever the payload has any actor contracts, since actors
-    // don't have a Production Teams "role" — they're identified by isActor.
+    // Populate role dropdown from data. Actors now emit role='Actor' from
+    // /contracts, so a single deduped Set is enough — no synthetic option
+    // is needed. Filter(Boolean) keeps any legacy blank-role rows out of the
+    // dropdown while still letting them render as unfiltered rows below.
     if (roleEl) {
       const currentRole = roleEl.value;
-      const hasActors = data.some(function (c) { return c.isActor; });
       const roles = [...new Set(data.map(function (c) { return c.role; }).filter(Boolean))].sort();
       roleEl.innerHTML = '<option value="">All Roles</option>';
-      if (hasActors) {
-        const opt = document.createElement('option');
-        opt.value = '__actor__';
-        opt.textContent = 'Actor';
-        if (currentRole === '__actor__') opt.selected = true;
-        roleEl.appendChild(opt);
-      }
       roles.forEach(function (r) {
         const opt = document.createElement('option');
         opt.value = r; opt.textContent = r;
@@ -718,11 +722,7 @@ SHOW_VISIBILITY_MODULE = r'''
 
     const filtered = data.filter(function (c) {
       if (showF   && c.show           !== showF)   return false;
-      if (roleF === '__actor__') {
-        if (!c.isActor) return false;
-      } else if (roleF && c.role !== roleF) {
-        return false;
-      }
+      if (roleF   && c.role           !== roleF)   return false;
       if (statusF && c.contractStatus !== statusF) return false;
       if (pf      && (c.fullName || '').toLowerCase().indexOf(pf) === -1) return false;
       return true;
@@ -1954,20 +1954,9 @@ html = _apply_if_present(
     'renderRosterActors',
 )
 
-# .inline-assign needs its own stacking context so the autocomplete dropdown
-# (z-index:1000) reliably paints above the "+ Add Role" row that sits after
-# the table inside the season-show-block. Without an explicit z-index here,
-# position:relative alone doesn't create a stacking context, and the
-# dropdown paints in DOM order and gets covered.
-html = _apply_if_present(
-    html,
-    '''    .inline-assign { position: relative; }''',
-    '''    /* z-index promotes .inline-assign into its own stacking context so the
-       autocomplete dropdown (z-index:1000 below) lifts above the "+ Add Role"
-       row that sits after the table in the season-show-block. */
-    .inline-assign { position: relative; z-index: 100; }''',
-    'inline-assign stacking context',
-)
+# .inline-assign stacking context + :focus-within row-lift are now applied
+# directly in the source Index.html — this patch is retained as a no-op to
+# document where that fix lives if anyone goes looking for it in port output.
 
 # The base `table` selector has overflow:hidden (for rounded corners on
 # free-standing tables). Inside a season-show-block the table's border-radius

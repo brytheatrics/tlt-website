@@ -3,20 +3,83 @@
  * Template Name: Off the Shelf
  *
  * Off the Shelf readings hub — current season featured at top, prior seasons
- * in a uniform poster archive. To add a new poster, append to the appropriate
- * year's array below.
+ * in a uniform poster archive.
+ *
+ * Content is auto-populated from tlt_show posts whose Program Type is
+ * "Off the Shelf (staged reading)". Shows with a close_date in the future
+ * (or today) land in "What's Next"; closed shows land in the archive, grouped
+ * by TLT season (Aug 1 → Jul 31). Historical hardcoded entries below cover
+ * seasons that predate tlt_show post entries (2015–2026).
  */
 get_header();
 
-// === Current season: featured posters with optional ticket links ===
-// (Leave empty when the season's readings have all closed; the template
-//  shows a "more titles announced soon" message and the recent posters
-//  move into the archive below.)
-$current_season  = '2025–2026';
-$current_posters = [];
+// --- Season bucketing: Aug–Dec dates belong to the SY starting that year;
+//     Jan–Jul dates belong to the SY starting the previous year. ---
+if ( ! function_exists( 'tlt_ots_season_label' ) ) {
+    function tlt_ots_season_label( $ymd ) {
+        if ( ! $ymd || ! preg_match( '/^(\d{4})-(\d{2})-/', $ymd, $m ) ) return 'Unknown';
+        $y = (int) $m[1]; $mo = (int) $m[2];
+        if ( $mo >= 8 ) return $y . '–' . ( $y + 1 );
+        return ( $y - 1 ) . '–' . $y;
+    }
+}
 
-// === Past seasons: poster-only archive ===
-$archive = [
+$today = function_exists( 'tlt_today' ) ? tlt_today() : current_time( 'Y-m-d' );
+
+// --- Query every Off the Shelf tlt_show post ---
+$ots_shows = get_posts( [
+    'post_type'      => 'tlt_show',
+    'post_status'    => 'publish',
+    'posts_per_page' => -1,
+    'meta_query'     => [
+        [ 'key' => 'show_program_type', 'value' => 'off_the_shelf', 'compare' => '=' ],
+    ],
+    'orderby'        => 'date',
+    'order'          => 'DESC',
+] );
+
+$current_posters = [];
+$auto_archive    = []; // season label → list of [img, title]
+
+foreach ( $ots_shows as $show ) {
+    $close  = get_post_meta( $show->ID, 'show_close_date', true );
+    $poster = function_exists( 'tlt_show_image_url' )
+              ? tlt_show_image_url( $show->ID, 'full', 'poster' )
+              : '';
+    if ( ! $poster ) continue; // need a poster to render anything meaningful
+    $title  = get_the_title( $show );
+    $ticket = get_post_meta( $show->ID, 'show_ticket_url', true );
+
+    if ( $close && $close >= $today ) {
+        $current_posters[] = [
+            'img'    => $poster,
+            'title'  => $title,
+            'ticket' => $ticket,
+            'open'   => get_post_meta( $show->ID, 'show_open_date', true ),
+        ];
+    } else {
+        $season = tlt_ots_season_label( $close );
+        $auto_archive[ $season ][] = [
+            'img'   => $poster,
+            'title' => $title,
+            'close' => $close,
+        ];
+    }
+}
+
+// Sort "What's Next" by open date (soonest first)
+usort( $current_posters, function ( $a, $b ) {
+    return strcmp( $a['open'] ?? '9999-99-99', $b['open'] ?? '9999-99-99' );
+} );
+
+// Within each auto-archive season, sort by close_date ascending (first-to-last of season)
+foreach ( $auto_archive as $season => &$posters ) {
+    usort( $posters, function ( $a, $b ) { return strcmp( $a['close'] ?? '', $b['close'] ?? '' ); } );
+}
+unset( $posters );
+
+// === Past seasons: poster-only archive (historical, pre-tlt_show posts) ===
+$hardcoded_archive = [
     '2025–2026' => [
         '/wp-content/uploads/migrated/2526-chirstmas-carol-2.jpg',
         '/wp-content/uploads/migrated/tlt-metamorphoses.jpg',
@@ -101,6 +164,17 @@ $archive = [
         '/wp-content/uploads/migrated/ceremony.png',
     ],
 ];
+
+// Merge auto-populated seasons on top of hardcoded ones. Auto wins for a
+// season that appears in both; hardcoded fills in older seasons that have no
+// tlt_show post entries. Each archive bucket's shape: array of either a URL
+// string (legacy) or ['img' => URL, 'title' => Title] (new). The render loop
+// below handles both.
+$archive = $auto_archive;
+foreach ( $hardcoded_archive as $season => $posters ) {
+    if ( ! isset( $archive[ $season ] ) ) $archive[ $season ] = $posters;
+}
+krsort( $archive ); // newest season first
 ?>
 
 <style>
@@ -258,9 +332,14 @@ $archive = [
       <?php foreach ( $archive as $season => $posters ) : ?>
         <h3 class="ots-season-head"><?php echo esc_html( $season ); ?></h3>
         <div class="ots-grid">
-          <?php foreach ( $posters as $src ) : ?>
-            <button type="button" class="ots-poster" data-lightbox="<?php echo esc_attr( $src ); ?>" aria-label="View poster larger">
-              <img src="<?php echo esc_url( $src ); ?>" alt="" loading="lazy">
+          <?php foreach ( $posters as $entry ) :
+              // Legacy format = plain URL string. New format = ['img', 'title'].
+              $src   = is_array( $entry ) ? ( $entry['img']   ?? '' ) : $entry;
+              $title = is_array( $entry ) ? ( $entry['title'] ?? '' ) : '';
+              if ( ! $src ) continue;
+          ?>
+            <button type="button" class="ots-poster" data-lightbox="<?php echo esc_attr( $src ); ?>" aria-label="<?php echo esc_attr( $title ? 'View poster larger: ' . $title : 'View poster larger' ); ?>">
+              <img src="<?php echo esc_url( $src ); ?>" alt="<?php echo esc_attr( $title ); ?>" loading="lazy">
             </button>
           <?php endforeach; ?>
         </div>

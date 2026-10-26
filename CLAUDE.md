@@ -6,10 +6,11 @@ Read this first when starting a new session. It's the fastest way to get oriente
 
 TLT website migration: Squarespace → self-hosted WordPress.
 
-- **Live site (Squarespace):** https://www.tacomalittletheatre.com — still receiving real traffic
-- **Local dev (Local Sites):** http://tlt.local — full migrated site, where all work happens
-- **Production host:** Cloudways DigitalOcean Micro ($14/mo) — paid subscription active
-- **Domain:** `.com` is registered/DNS at **Squarespace** (repoint here at cutover). `.org` and `.net` are GoDaddy and auto-forward to `.com` — won't need touching unless we want them to hit the new host directly.
+- **Live site:** https://www.tacomalittletheatre.com — **serving from Cloudways** (DNS cutover complete). The domain is *registered* at Squarespace but its DNS points at the Cloudways box; there is no live Squarespace site to compare against.
+- **Local dev (Local Sites):** http://tlt.local — full site, where most work happens
+- **Production host:** Cloudways DigitalOcean Micro ($14/mo) — paid subscription active, serving tacomalittletheatre.com
+- **Cloudways temp URL:** https://wordpress-1633814-6469148.cloudwaysapps.com — still resolves; use only if you need to bypass the domain
+- **Domain:** `.com` registration + DNS at Squarespace but pointed at Cloudways. `.org` and `.net` are GoDaddy and forward to `.com`.
 
 ## Where things live
 
@@ -89,8 +90,8 @@ pymysql.connect(host='127.0.0.1', port=10005, user='root', password='root', data
 
 - **96 review URLs swapped to Wayback in `show_reviews`** — `show_reviews` field on 62 shows now points at Wayback snapshots for dead URLs (Suburban Times domain entirely defunct, plus dead Tacoma Weekly / Weekly Volcano / Heilman & Haver paths). Two rounds: first used the local archive's snapshot URLs (51 URLs), second used the Wayback availability API for URLs not in our archive (45 URLs). **Audit log:** `archive/reviews/wayback_replacements.tsv` (97 rows, columns `show_id | title | reason | old_line | new_line`; reasons are `DEAD-DOMAIN` / `DEAD-PROBE` / `WAYBACK-API`). 26 reviews are truly gone (no Wayback snapshot exists) — left as-is.
 
-- **Cloudways deploy pipeline is live** — paid subscription active, SSH public key added, `deploy/cloudways.json` has real creds (`ssh_host: 64.23.180.12`, `ssh_user: master_vdrkzztcte`, `app_folder: dtvxxevyxd`, `temp_url: https://wordpress-1633814-6469148.cloudwaysapps.com`). Latest push done via the toolkit: theme + plugin + DB (160 shows, 8 events, 8 promos) + 2627 posters + The Outsider hero-layers (desktop + mobile). Search-replace `tlt.local` → temp URL ran cleanly. **Site is live at the temp URL** for testing.
-  - **⚠️ Cloudways has a server-level Full Page Cache** (identified as `CLOUDWAYS-CACHE-DE`) that runs above Varnish and WP-CLI can't purge it. After every code push you must **purge from the Cloudways dashboard** (Applications → your app → Application Management → Full Page Cache → Purge). While iterating, consider disabling that cache entirely; re-enable it just before real launch. Symptom of forgetting: recent code changes don't appear on the live temp URL; cache-busting query strings (`?nocache=…`) will show the fresh version.
+- **Cloudways is serving tacomalittletheatre.com in production.** DNS cutover done. Paid subscription active, SSH public key added, `deploy/cloudways.json` has real creds (`ssh_host: 64.23.180.12`, `ssh_user: master_vdrkzztcte`, `app_folder: dtvxxevyxd`). Deploy toolkit pushes: theme + plugin + DB (shows, events, promos) + posters + hero-layers.
+  - **⚠️ Cloudways has a server-level Full Page Cache** (identified as `CLOUDWAYS-CACHE-DE`) that runs above Varnish and WP-CLI can't purge it. After every code push you must **purge from the Cloudways dashboard** (Applications → your app → Application Management → Full Page Cache → Purge). Symptom of forgetting: recent code changes don't appear on the live site; cache-busting query strings (`?nocache=…`) will show the fresh version.
   - Uploads NOT synced this pass (unchanged since May 29 deploy): `uploads/productions/` (~600MB of gallery photos), `uploads/programs/`, `uploads/migrated/`. If a show page loads with broken photo/PDF links, targeted rsync of those subfolders will fix it.
 
 - **Prior work still live** *(unchanged this session)* — site calendar, ACF on Education + 8 hero-only templates, editor auto-reload, promotion fixes, 2627 hero animation desktop PSD, slideshow on show pages, decade-archive button pattern, 144 shows with photo galleries (2,494 photos / 610 MB), archival pre-2010 show pages, Cityline interviews, splash → home wipe baseline, mobile drawer/header z-index, tickets consolidation, PDF target=_blank, Ludus volunteer link.
@@ -106,8 +107,8 @@ pymysql.connect(host='127.0.0.1', port=10005, user='root', password='root', data
 3. **ACF-ify the rest** — Education got the full treatment. The hero-only ACF on Visit/Off the Shelf/Auditions/Season Tickets/Ticket Info/Donation Request/Press/Job Openings only covers the top eyebrow+title+lede. Body content on these is still hardcoded. Blake's working through these manually to verify Chris can edit each one without code.
 4. **Mobile audit for top-traffic pages** — Splash (40% of pageviews) and Home are done. Remaining top 8: Show detail, Auditions, Education, "About the Program" (= Education).
 5. **Splash page focal point per image** — currently splash backgrounds use centered `background-position`; subjects get cropped on mobile portrait. Schema currently `show_splash_gallery` = JSON array of URLs. Need to support `[{url: "...", focal: "30% 50%"}]`.
-6. **Production hardening** (see LAUNCH_CHECKLIST.md P0/P1) — SMTP, Flamingo, backups, security, search-replace at DNS cutover, redirects.
-7. **Sync remaining uploads to Cloudways** — `uploads/productions/`, `uploads/programs/`, `uploads/migrated/` weren't in the initial push (they haven't changed since the trial deploy, but the trial server was torn down). Do this once before DNS cutover so show pages have their photos + programs. Recommended: WinSCP directory-sync (local ↔ remote) is more reliable than `scp -r` for 1000+ files.
+6. **Production hardening** (see LAUNCH_CHECKLIST.md P0/P1) — SMTP, Flamingo, backups, security, redirects.
+7. **Sync remaining uploads to Cloudways** — `uploads/productions/`, `uploads/programs/`, `uploads/migrated/` — if any show page loads with broken photo/PDF links, targeted rsync of those subfolders. Recommended: WinSCP directory-sync (local ↔ remote) is more reliable than `scp -r` for 1000+ files.
 8. *(lower priority, post-launch is fine)* **Improve archive Photos-button matching** — decade pages auto-render [📷 Photos]/[📄 Program] per show. Some don't match because the Job-B folder title differs from the real show name (e.g. folder "Cole Porter" vs listed "Red, Hot & Cole"). Fix by renaming those show records or adding aliases. ~20/26 match in 2000-2010, ~11/13 in 1990-2000.
 9. *(lower priority)* **Review the 52 archival pages** — auto-derived titles/dates; spot-check. Known rough edges: a few slugs with apostrophes (`broadway-s-fabulous-fifties`), `Once Upon A Mattress` keeps folder casing, ~34 show a season label rather than exact dates. Re-run `wordpress/import/create_archive_shows.py` (idempotent) after tweaks.
 10. *(lowest priority)* **~150 more pre-1996 / unmatched shows** — Job B covered the 61 real-show folders that had a clear title+season. Older/sparser `TLT Photos` folders remain.
@@ -139,11 +140,11 @@ The extraction script (`C:/temp/extract_outsider_mobile.py`) composites each lay
 
 ## Domain / hosting status
 
-- Cloudways: paid subscription active. Update `deploy/cloudways.json` with the live server creds and re-test the deploy toolkit before DNS cutover.
+- **Cloudways is live and serving tacomalittletheatre.com.** DNS cutover is complete. Paid subscription active. `deploy/cloudways.json` points at the live server (`ssh_host: 64.23.180.12`).
+- Cloudways temp URL (`wordpress-1633814-6469148.cloudwaysapps.com`) still works — useful when isolating a Cloudways issue from a DNS issue, otherwise use the real domain.
 - **TODO — apply tax exemption to the Cloudways account.** TLT is a nonprofit; submitting tax-exempt info should drop sales tax off the hosting bill. Blake to supply the tax-exempt cert/details when handy.
-- DNS cutover: not done; tacomalittletheatre.com still on Squarespace. `.com` is registered/DNS at Squarespace — that's where the A/CNAME repoint happens. `.org` and `.net` are on GoDaddy and auto-forward to `.com` (no action needed unless we want them to hit the new host directly).
-- **Launch is happening sooner than the close of Bedroom Farce** (was originally planning to wait until 2026-27 season opens). For launch: static non-animated hero for Bedroom Farce; layered animated heroes kick in with the 2026-27 season.
-- Email: Google Workspace on TLT's own domain; will NOT be touched by DNS changes (MX/SPF/DKIM stay)
+- Domain: `.com` registration + DNS at Squarespace, pointed at Cloudways. `.org` and `.net` at GoDaddy, forwarding to `.com`.
+- Email: Google Workspace on TLT's own domain; MX/SPF/DKIM untouched by the website move.
 
 ## Quick recap of analytics from Squarespace (Jan 2026 YTD)
 
