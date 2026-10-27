@@ -135,6 +135,7 @@ SHIM = r'''
     getContactSheetLink:       (show) => '/contact-sheet-link?show=' + encodeURIComponent(show || ''),
     getSeasonCalendarEvents:   () => '/calendar-events',
     getSeasonCalendarConflicts:() => '/calendar-conflicts',
+    getSeasonCalendarNotes:    () => '/calendar-notes',
     getProgramData:            (show) => '/program?show=' + encodeURIComponent(show || ''),
     verifyApprovalPassword:    (pw)   => '/verify-approval?password=' + encodeURIComponent(pw || ''),
   };
@@ -306,6 +307,16 @@ SHIM = r'''
     purgeCache: {
       path: '/purge-cache',
       body: function () { return {}; },
+    },
+    addSeasonCalendarNote: {
+      path: '/calendar-note-add',
+      // GAS signature: addSeasonCalendarNote(date, note)
+      body: function (date, note) { return { date: date, note: note }; },
+    },
+    deleteSeasonCalendarNote: {
+      path: '/calendar-note-delete',
+      // GAS signature: deleteSeasonCalendarNote(rowNumber)
+      body: function (row) { return { row: row }; },
     },
   };
 

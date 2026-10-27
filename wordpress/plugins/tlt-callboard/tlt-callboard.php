@@ -921,6 +921,7 @@ add_action( 'rest_api_init', function () {
     $auth_route( '/contact-sheet-link',         'tlt_callboard_ep_get_contact_sheet_link' );
     $auth_route( '/calendar-events',            'tlt_callboard_ep_get_calendar_events' );
     $auth_route( '/calendar-conflicts',         'tlt_callboard_ep_get_calendar_conflicts' );
+    $auth_route( '/calendar-notes',             'tlt_callboard_ep_calendar_notes_list' );
     $auth_route( '/program',                    'tlt_callboard_ep_get_program' );
 
     // ----- Approval helper -----
@@ -967,6 +968,8 @@ add_action( 'rest_api_init', function () {
     $post_route( '/contract-send-combined',     'tlt_callboard_ep_contract_send_combined' );
     $post_route( '/contract-resend',            'tlt_callboard_ep_contract_resend' );
     $post_route( '/contract-delete',            'tlt_callboard_ep_contract_delete' );
+    $post_route( '/calendar-note-add',          'tlt_callboard_ep_calendar_note_add' );
+    $post_route( '/calendar-note-delete',       'tlt_callboard_ep_calendar_note_delete' );
     $post_route( '/purge-cache',          'tlt_callboard_ep_purge_cache' );
 } );
 
@@ -7104,10 +7107,21 @@ function tlt_cb_contract_pdf_page_count( $pdf_bytes ) {
  */
 function tlt_cb_contract_opensign_widgets( $template_type ) {
     $checkbox = function ( $x, $y, $w, $h, $value ) {
+        // OpenSign's signing UI renders checkbox widgets by iterating
+        // options.values and emitting one native checkbox per entry; with
+        // no values, the hit area collapses to zero and nothing is
+        // clickable. Give each per-position widget a single-entry values
+        // array so one native checkbox renders at this location.
         return [
             'type' => 'checkbox', 'x' => $x, 'y' => $y, 'w' => $w, 'h' => $h,
             'name' => 'payment_preference', 'value' => $value,
-            'options' => [ 'hidelabel' => true, 'validation' => [ 'minselections' => 0, 'maxselections' => 1 ] ],
+            'options' => [
+                'name'       => 'payment_preference',
+                'values'     => [ $value ],
+                'hidelabel'  => true,
+                'isHideLabel' => true,
+                'validation' => [ 'minselections' => 0, 'maxselections' => 1 ],
+            ],
         ];
     };
     $sig = function ( $x, $y, $w, $h, $required = true ) {
@@ -9865,4 +9879,171 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
             WP_CLI::line( $body );
         }
     } );
+}
+
+/* ===========================================================================
+ * CALENDAR NOTES (free-text per-day planning notes on the Calendar tab)
+ *
+ * Stored on a dedicated "Calendar Notes" tab per season sheet, auto-created
+ * on first use. Row shape:
+ *     A: Date (YYYY-MM-DD)
+ *     B: Note (free text)
+ *     C: Author (user who added — from auth session)
+ *     D: Created (ISO 8601)
+ *
+ * Delete = blank the row's A..D cells. Row indices stay stable so client-
+ * side identifiers (we return the sheet row number) remain valid between
+ * list and delete.
+ * ========================================================================= */
+
+function tlt_cb_notes_ensure_tab( $spreadsheet_id ) {
+    $token = tlt_callboard_google_access_token();
+    if ( is_wp_error( $token ) ) return $token;
+    // Look up current sheets to see if "Calendar Notes" already exists.
+    $meta_url = "https://sheets.googleapis.com/v4/spreadsheets/{$spreadsheet_id}?fields=sheets.properties(sheetId,title)";
+    $meta_resp = wp_remote_get( $meta_url, [ 'timeout' => 15, 'headers' => [ 'Authorization' => 'Bearer ' . $token ] ] );
+    if ( is_wp_error( $meta_resp ) ) return $meta_resp;
+    $meta = json_decode( wp_remote_retrieve_body( $meta_resp ), true );
+    foreach ( ( $meta['sheets'] ?? [] ) as $s ) {
+        if ( ( $s['properties']['title'] ?? '' ) === 'Calendar Notes' ) {
+            return (int) $s['properties']['sheetId'];
+        }
+    }
+    // Create it, then stamp the header row.
+    $batch_url = "https://sheets.googleapis.com/v4/spreadsheets/{$spreadsheet_id}:batchUpdate";
+    $req_body = wp_json_encode( [
+        'requests' => [ [ 'addSheet' => [ 'properties' => [ 'title' => 'Calendar Notes' ] ] ] ],
+    ] );
+    $add_resp = wp_remote_post( $batch_url, [
+        'timeout' => 15,
+        'headers' => [ 'Authorization' => 'Bearer ' . $token, 'Content-Type' => 'application/json' ],
+        'body'    => $req_body,
+    ] );
+    if ( is_wp_error( $add_resp ) ) return $add_resp;
+    $add_code = wp_remote_retrieve_response_code( $add_resp );
+    if ( $add_code < 200 || $add_code >= 300 ) {
+        return new WP_Error( 'notes_tab_create', "addSheet returned {$add_code}: " . wp_remote_retrieve_body( $add_resp ) );
+    }
+    $add_data = json_decode( wp_remote_retrieve_body( $add_resp ), true );
+    $new_id = (int) ( $add_data['replies'][0]['addSheet']['properties']['sheetId'] ?? 0 );
+    // Header row.
+    $header_write = tlt_callboard_sheets_write( $spreadsheet_id, "'Calendar Notes'!A1:D1", [ [ 'Date', 'Note', 'Author', 'Created' ] ] );
+    if ( is_wp_error( $header_write ) ) return $header_write;
+    return $new_id;
+}
+
+function tlt_cb_notes_list( $spreadsheet_id ) {
+    $sheet_id = tlt_cb_notes_ensure_tab( $spreadsheet_id );
+    if ( is_wp_error( $sheet_id ) ) return $sheet_id;
+    $rows = tlt_callboard_sheet_rows( $spreadsheet_id, "'Calendar Notes'!A2:D", 0, true );
+    if ( is_wp_error( $rows ) ) return $rows;
+    $out = [];
+    foreach ( $rows as $i => $r ) {
+        $raw_date = $r[0] ?? '';
+        $date = is_numeric( $raw_date )
+            // Legacy rows written with USER_ENTERED were stored as Sheets
+            // serial numbers (days since 1899-12-30). Convert back to Y-m-d.
+            // 25569 = offset between Sheets epoch and Unix epoch.
+            ? gmdate( 'Y-m-d', (int) ( ( (float) $raw_date - 25569 ) * 86400 ) )
+            : trim( (string) $raw_date );
+        $note = trim( (string) ( $r[1] ?? '' ) );
+        if ( $date === '' || $note === '' ) continue; // soft-deleted or blank
+        $out[] = [
+            'row'     => $i + 2, // 1-based sheet row number
+            'date'    => $date,
+            'note'    => $note,
+            'author'  => trim( (string) ( $r[2] ?? '' ) ),
+            'created' => trim( (string) ( $r[3] ?? '' ) ),
+        ];
+    }
+    return $out;
+}
+
+function tlt_cb_notes_add( $spreadsheet_id, $date, $note, $author ) {
+    $ensured = tlt_cb_notes_ensure_tab( $spreadsheet_id );
+    if ( is_wp_error( $ensured ) ) return $ensured;
+    $token = tlt_callboard_google_access_token();
+    if ( is_wp_error( $token ) ) return $token;
+    $created = gmdate( 'c' );
+    $row = [ $date, $note, $author, $created ];
+    // RAW keeps the date as a text string ("2027-12-25") instead of letting
+    // Sheets parse it to a serial number — which UNFORMATTED_VALUE then
+    // returns as a bare integer on read (e.g. 46743 instead of 2027-12-25).
+    $url = "https://sheets.googleapis.com/v4/spreadsheets/{$spreadsheet_id}/values/"
+         . rawurlencode( "'Calendar Notes'!A:D" )
+         . ':append?valueInputOption=RAW&insertDataOption=INSERT_ROWS';
+    $resp = wp_remote_post( $url, [
+        'timeout' => 20,
+        'headers' => [ 'Authorization' => 'Bearer ' . $token, 'Content-Type' => 'application/json' ],
+        'body'    => wp_json_encode( [ 'values' => [ $row ] ] ),
+    ] );
+    if ( is_wp_error( $resp ) ) return $resp;
+    $code = wp_remote_retrieve_response_code( $resp );
+    if ( $code < 200 || $code >= 300 ) {
+        return new WP_Error( 'notes_add_http', "append returned {$code}: " . wp_remote_retrieve_body( $resp ) );
+    }
+    tlt_cb_bump_cache();
+    // Pull the updated range to find the inserted row number.
+    $body = json_decode( wp_remote_retrieve_body( $resp ), true );
+    $updated_range = $body['updates']['updatedRange'] ?? ''; // e.g. "'Calendar Notes'!A5:D5"
+    $row_num = 0;
+    if ( preg_match( '/![A-Z]+(\d+)/', $updated_range, $m ) ) $row_num = (int) $m[1];
+    return [
+        'row'     => $row_num,
+        'date'    => $date,
+        'note'    => $note,
+        'author'  => $author,
+        'created' => $created,
+    ];
+}
+
+function tlt_cb_notes_delete( $spreadsheet_id, $row_1based ) {
+    $row_1based = (int) $row_1based;
+    if ( $row_1based < 2 ) return new WP_Error( 'bad_row', 'Row must be >= 2.' );
+    $w = tlt_callboard_sheets_write( $spreadsheet_id, "'Calendar Notes'!A{$row_1based}:D{$row_1based}", [ [ '', '', '', '' ] ] );
+    if ( is_wp_error( $w ) ) return $w;
+    return [ 'ok' => true, 'row' => $row_1based ];
+}
+
+/* ---- REST endpoints ---- */
+
+function tlt_callboard_ep_calendar_notes_list( WP_REST_Request $req ) {
+    $notes = tlt_cb_notes_list( tlt_cb_current_sheet_id() );
+    if ( is_wp_error( $notes ) ) return $notes;
+    // Group by date for the client (easier for the day-cell renderer).
+    $by_date = [];
+    foreach ( $notes as $n ) {
+        if ( ! isset( $by_date[ $n['date'] ] ) ) $by_date[ $n['date'] ] = [];
+        $by_date[ $n['date'] ][] = $n;
+    }
+    // Encode empty collection as a JSON object (not []), so client code that
+    // does calendarNotes[iso] doesn't choke on array semantics.
+    if ( empty( $by_date ) ) $by_date = new stdClass();
+    return tlt_cb_ok( $by_date );
+}
+
+function tlt_callboard_ep_calendar_note_add( WP_REST_Request $req ) {
+    $body = $req->get_json_params();
+    $date = isset( $body['date'] ) ? trim( (string) $body['date'] ) : '';
+    $note = isset( $body['note'] ) ? trim( (string) $body['note'] ) : '';
+    if ( ! preg_match( '/^\d{4}-\d{2}-\d{2}$/', $date ) ) {
+        return new WP_Error( 'bad_date', 'Date must be YYYY-MM-DD.', [ 'status' => 400 ] );
+    }
+    if ( $note === '' ) {
+        return new WP_Error( 'empty_note', 'Note cannot be empty.', [ 'status' => 400 ] );
+    }
+    $u = tlt_callboard_current_user( $req );
+    $author = $u ? tlt_cb_s( $u['name'] ?? '' ) : '';
+    $r = tlt_cb_notes_add( tlt_cb_current_sheet_id(), $date, $note, $author );
+    if ( is_wp_error( $r ) ) return $r;
+    return tlt_cb_ok( $r );
+}
+
+function tlt_callboard_ep_calendar_note_delete( WP_REST_Request $req ) {
+    $body = $req->get_json_params();
+    $row = isset( $body['row'] ) ? (int) $body['row'] : 0;
+    if ( $row < 2 ) return new WP_Error( 'bad_row', 'Row must be >= 2.', [ 'status' => 400 ] );
+    $r = tlt_cb_notes_delete( tlt_cb_current_sheet_id(), $row );
+    if ( is_wp_error( $r ) ) return $r;
+    return tlt_cb_ok( $r );
 }
