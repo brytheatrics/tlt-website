@@ -438,25 +438,81 @@ function tlt_callboard_sheets_write( $spreadsheet_id, $range, $values ) {
     $url = "https://sheets.googleapis.com/v4/spreadsheets/{$spreadsheet_id}/values/"
         . rawurlencode( $range ) . '?valueInputOption=USER_ENTERED';
 
-    $resp = wp_remote_request( $url, [
-        'method'  => 'PUT',
-        'timeout' => 30,
-        'headers' => [
-            'Authorization' => 'Bearer ' . $token,
-            'Content-Type'  => 'application/json',
-        ],
-        'body'    => wp_json_encode( [ 'values' => $values ] ),
-    ] );
-    if ( is_wp_error( $resp ) ) return $resp;
-    $code = wp_remote_retrieve_response_code( $resp );
+    // Retry on 429 (write-quota-per-minute = 60/user). Backoff 2s, 4s, 8s, 16s.
+    $delays = [ 0, 2, 4, 8, 16 ];
+    $code   = 0;
+    $body   = '';
+    foreach ( $delays as $d ) {
+        if ( $d > 0 ) sleep( $d );
+        $resp = wp_remote_request( $url, [
+            'method'  => 'PUT',
+            'timeout' => 30,
+            'headers' => [
+                'Authorization' => 'Bearer ' . $token,
+                'Content-Type'  => 'application/json',
+            ],
+            'body'    => wp_json_encode( [ 'values' => $values ] ),
+        ] );
+        if ( is_wp_error( $resp ) ) return $resp;
+        $code = wp_remote_retrieve_response_code( $resp );
+        $body = wp_remote_retrieve_body( $resp );
+        if ( $code !== 429 ) break;
+    }
     if ( $code < 200 || $code >= 300 ) {
-        return new WP_Error( 'sheets_write_http', "Sheets write returned $code: " . wp_remote_retrieve_body( $resp ) );
+        return new WP_Error( 'sheets_write_http', "Sheets write returned $code: " . $body );
     }
 
     // Invalidate every range cache safely — bumps a version number so
     // sessions/tokens/other transients are untouched.
     tlt_cb_bump_cache();
-    return json_decode( wp_remote_retrieve_body( $resp ), true );
+    return json_decode( $body, true );
+}
+
+/**
+ * Batch-write multiple ranges in one HTTP request. Counts as ONE write quota
+ * unit against the Sheets API's 60-writes/min limit no matter how many
+ * cells/ranges are in the batch — the whole reason this exists. Use when
+ * updating more than one cell at a time (e.g. marking a combined contract
+ * Signed across many rows).
+ *
+ * @param string $spreadsheet_id
+ * @param array  $data           [ [ 'range' => "'Tab'!I5", 'values' => [['Signed']] ], ... ]
+ * @return array|WP_Error        API response body on success
+ */
+function tlt_callboard_sheets_batch_write( $spreadsheet_id, $data ) {
+    if ( empty( $data ) ) return [];
+    $token = tlt_callboard_google_access_token();
+    if ( is_wp_error( $token ) ) return $token;
+
+    $url = "https://sheets.googleapis.com/v4/spreadsheets/{$spreadsheet_id}/values:batchUpdate";
+    $payload = wp_json_encode( [
+        'valueInputOption' => 'USER_ENTERED',
+        'data'             => array_values( $data ),
+    ] );
+
+    $delays = [ 0, 2, 4, 8, 16 ];
+    $code   = 0;
+    $body   = '';
+    foreach ( $delays as $d ) {
+        if ( $d > 0 ) sleep( $d );
+        $resp = wp_remote_post( $url, [
+            'timeout' => 30,
+            'headers' => [
+                'Authorization' => 'Bearer ' . $token,
+                'Content-Type'  => 'application/json',
+            ],
+            'body'    => $payload,
+        ] );
+        if ( is_wp_error( $resp ) ) return $resp;
+        $code = wp_remote_retrieve_response_code( $resp );
+        $body = wp_remote_retrieve_body( $resp );
+        if ( $code !== 429 ) break;
+    }
+    if ( $code < 200 || $code >= 300 ) {
+        return new WP_Error( 'sheets_batch_write_http', "Sheets batchUpdate returned $code: " . $body );
+    }
+    tlt_cb_bump_cache();
+    return json_decode( $body, true );
 }
 
 /* ---------------------------------------------------------------------------
@@ -9518,21 +9574,47 @@ function tlt_cb_co_move_pdf_to_contracts_subfolder( $pdf_id, $season_sheet_id, $
 
 function tlt_cb_co_mark_row_signed( $sheet_id, $tab, $row_1based, $pdf_url, $dry_run ) {
     $today = ( new DateTime( 'now', new DateTimeZone( 'America/Los_Angeles' ) ) )->format( 'Y-m-d' );
+    // Only touch I, K, L — J (sent date) stays untouched. One batchUpdate
+    // keeps all three in a single write-quota unit (vs. 3 separate PUTs that
+    // chew through the 60/min Sheets write quota on combined contracts).
+    $data = [
+        [ 'range' => "'{$tab}'!I{$row_1based}", 'values' => [ [ 'Signed' ] ] ],
+        [ 'range' => "'{$tab}'!K{$row_1based}", 'values' => [ [ $today  ] ] ],
+        [ 'range' => "'{$tab}'!L{$row_1based}", 'values' => [ [ $pdf_url ] ] ],
+    ];
     if ( $dry_run ) {
-        return [ 'ok' => true, 'dry_run' => true, 'wouldWrite' => [
-            "'{$tab}'!I{$row_1based}" => 'Signed',
-            "'{$tab}'!K{$row_1based}" => $today,
-            "'{$tab}'!L{$row_1based}" => $pdf_url,
-        ] ];
+        return [ 'ok' => true, 'dry_run' => true, 'wouldWrite' => $data ];
     }
-    // Only touch I, K, L — J (sent date) stays untouched. Three separate
-    // writes keeps the untouched J intact without needing to read/preserve it.
-    $w1 = tlt_callboard_sheets_write( $sheet_id, "'{$tab}'!I{$row_1based}", [ [ 'Signed' ] ] );
-    if ( is_wp_error( $w1 ) ) return [ 'ok' => false, 'error' => 'col I write failed: ' . $w1->get_error_message() ];
-    $w2 = tlt_callboard_sheets_write( $sheet_id, "'{$tab}'!K{$row_1based}", [ [ $today ] ] );
-    if ( is_wp_error( $w2 ) ) return [ 'ok' => false, 'error' => 'col K write failed: ' . $w2->get_error_message() ];
-    $w3 = tlt_callboard_sheets_write( $sheet_id, "'{$tab}'!L{$row_1based}", [ [ $pdf_url ] ] );
-    if ( is_wp_error( $w3 ) ) return [ 'ok' => false, 'error' => 'col L write failed: ' . $w3->get_error_message() ];
+    $w = tlt_callboard_sheets_batch_write( $sheet_id, $data );
+    if ( is_wp_error( $w ) ) return [ 'ok' => false, 'error' => 'batch write failed: ' . $w->get_error_message() ];
+    return [ 'ok' => true, 'wrote' => true ];
+}
+
+/**
+ * Mark many rows Signed in ONE batch write per sheet. Combined contracts can
+ * hit 7+ rows (same sheet, same ccid) — doing per-row writes burns through the
+ * 60-writes/min Sheets quota immediately. This collapses N rows × 3 cells into
+ * one HTTP call per spreadsheet_id = one quota unit.
+ *
+ * @param string $sheet_id    All $rows must share this spreadsheet id.
+ * @param array  $rows        Each: [ 'tab' => ..., 'row_1based' => ... ].
+ * @param string $pdf_url     Signed PDF link (written to col L for each row).
+ * @param bool   $dry_run
+ * @return array              [ 'ok' => bool, 'error' => ... ]
+ */
+function tlt_cb_co_mark_rows_signed_batch( $sheet_id, $rows, $pdf_url, $dry_run ) {
+    $today = ( new DateTime( 'now', new DateTimeZone( 'America/Los_Angeles' ) ) )->format( 'Y-m-d' );
+    $data  = [];
+    foreach ( $rows as $r ) {
+        $tab = $r['tab'];
+        $n   = $r['row_1based'];
+        $data[] = [ 'range' => "'{$tab}'!I{$n}", 'values' => [ [ 'Signed' ] ] ];
+        $data[] = [ 'range' => "'{$tab}'!K{$n}", 'values' => [ [ $today  ] ] ];
+        $data[] = [ 'range' => "'{$tab}'!L{$n}", 'values' => [ [ $pdf_url ] ] ];
+    }
+    if ( $dry_run ) return [ 'ok' => true, 'dry_run' => true, 'wouldWrite' => $data ];
+    $w = tlt_callboard_sheets_batch_write( $sheet_id, $data );
+    if ( is_wp_error( $w ) ) return [ 'ok' => false, 'error' => 'batch write failed: ' . $w->get_error_message() ];
     return [ 'ok' => true, 'wrote' => true ];
 }
 
@@ -9614,16 +9696,23 @@ function tlt_cb_co_process_pdf( $pdf, $dry_run ) {
                 $parsed['showCount'], count( $matched_rows ), count( $matched_rows )
             );
         }
+        // Group rows by sheet_id so each sheet gets ONE batch write — a combined
+        // contract with 7 rows on one sheet becomes 1 write instead of 21.
+        $by_sheet = [];
+        foreach ( $matched_rows as $r ) $by_sheet[ $r['sheet_id'] ][] = $r;
         $any_mark_ok = false;
-        foreach ( $matched_rows as $r ) {
-            $result = tlt_cb_co_mark_row_signed( $r['sheet_id'], $r['tab'], $r['row_1based'], $pdf_url, $dry_run );
-            $report['actions'][] = sprintf(
-                '%s mark signed → %s %s row %d (show=%s, ccid=%s): %s',
-                $dry_run ? '[DRY]' : '[LIVE]',
-                $r['season'], $r['tab'], $r['row_1based'], $r['show'], $r['ccid'] ?: '(none)',
-                $result['ok'] ? 'OK' : 'ERR ' . ( $result['error'] ?? '?' )
-            );
-            if ( $result['ok'] ) $any_mark_ok = true;
+        foreach ( $by_sheet as $sid => $rows_in_sheet ) {
+            $result = tlt_cb_co_mark_rows_signed_batch( $sid, $rows_in_sheet, $pdf_url, $dry_run );
+            $ok     = ! empty( $result['ok'] );
+            foreach ( $rows_in_sheet as $r ) {
+                $report['actions'][] = sprintf(
+                    '%s mark signed → %s %s row %d (show=%s, ccid=%s): %s',
+                    $dry_run ? '[DRY]' : '[LIVE]',
+                    $r['season'], $r['tab'], $r['row_1based'], $r['show'], $r['ccid'] ?: '(none)',
+                    $ok ? 'OK' : 'ERR ' . ( $result['error'] ?? '?' )
+                );
+            }
+            if ( $ok ) $any_mark_ok = true;
         }
         // Move the combined PDF into <Contracts Folder>/Combined/. Use the
         // first matched row's season — all rows in a combined share one season.
