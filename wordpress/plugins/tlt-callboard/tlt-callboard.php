@@ -1343,14 +1343,15 @@ function tlt_cb_build_dashboard() {
         $conflict[ $show ] = ( $conflict[ $show ] ?? 0 ) + 1;
     }
 
-    // Performance count from Dates tab (not Sales — Ludus template-inflates
-    // to 11 rows per show regardless of the actual run length).
+    // Performance count from Sales tab — one row per scheduled Ludus performance,
+    // so adding/removing a performance in Ludus keeps the count accurate without
+    // touching the Dates tab. (Historical note: Ludus used to emit 11 "template"
+    // rows per show regardless of run length; it now returns the real schedule.)
     $perf_count = [];
-    $performance_types = [ 'Performance', 'Opening Performance', 'Closing Performance' ];
-    foreach ( $data['Dates!A2:H'] ?? [] as $r ) {
-        $show = tlt_cb_s( $r[0] ?? '' );
-        $type = tlt_cb_s( $r[1] ?? '' );
-        if ( $show === '' || ! in_array( $type, $performance_types, true ) ) continue;
+    foreach ( $data['Sales!A2:H'] ?? [] as $r ) {
+        if ( tlt_cb_s( $r[2] ?? '' ) !== 'Performance' ) continue;
+        $show = tlt_cb_s( $r[1] ?? '' );
+        if ( $show === '' ) continue;
         $perf_count[ $show ] = ( $perf_count[ $show ] ?? 0 ) + 1;
     }
 
@@ -1416,21 +1417,8 @@ function tlt_callboard_ep_get_actors( WP_REST_Request $req ) {
 function tlt_callboard_ep_get_sales( WP_REST_Request $req ) {
     $data = tlt_callboard_sheets_get( tlt_cb_current_sheet_id(), [
         'Sales!A2:H',
-        'Dates!A2:H',
     ] );
     if ( is_wp_error( $data ) ) return $data;
-
-    // Real per-show performance count comes from the Dates tab (scheduled
-    // performances), not Sales (Ludus template-inflates to 11 rows per show
-    // regardless of the actual run length).
-    $dates_perf_count = [];
-    $performance_types = [ 'Performance', 'Opening Performance', 'Closing Performance' ];
-    foreach ( $data['Dates!A2:H'] ?? [] as $r ) {
-        $show = tlt_cb_s( $r[0] ?? '' );
-        $type = tlt_cb_s( $r[1] ?? '' );
-        if ( $show === '' || ! in_array( $type, $performance_types, true ) ) continue;
-        $dates_perf_count[ $show ] = ( $dates_perf_count[ $show ] ?? 0 ) + 1;
-    }
 
     // Bucket per show.
     $per = [];
@@ -1488,7 +1476,10 @@ function tlt_callboard_ep_get_sales( WP_REST_Request $req ) {
         $row['flexPct']       = (int) round( $row['flexPass']      / $t * 100 );
         $row['compPct']       = (int) round( $row['comp']          / $t * 100 );
         $row['individualPct'] = (int) round( $row['individual']    / $t * 100 );
-        $row['perfCount']     = $dates_perf_count[ $row['show'] ] ?? 0;
+        // Count scheduled performances from the Sales-tab rows we just collected
+        // — the authoritative source once Ludus returns per-performance rows
+        // instead of the old 11-row template.
+        $row['perfCount']     = count( $row['performances'] );
         $row['capacity']      = $row['perfCount'] * 215;
         $row['capacityPct']   = $row['capacity'] > 0
             ? (int) round( $row['totalSold'] / $row['capacity'] * 100 )
@@ -9190,6 +9181,33 @@ function tlt_cb_co_fuzzy_key( $s ) {
 }
 
 /**
+ * OpenSign filenames give us just "cassie_jo_fastabend" with no hint where
+ * the first-name / last-name boundary falls. tlt_cb_co_parse_filename()
+ * defaults to first-word-is-first-name, but the sheet may store the person as
+ * ("Cassie Jo" / "Fastabend"). Enumerate every plausible split so the
+ * row-finders can try each until one matches.
+ *
+ * Input:  ("Cassie", "Jo Fastabend")
+ * Output: [ ["Cassie", "Jo Fastabend"], ["Cassie Jo", "Fastabend"] ]
+ *
+ * A single-token name (no space) has no alternatives; the input is returned
+ * unchanged so callers can treat the result as a non-empty list.
+ */
+function tlt_cb_co_name_splits( $first, $last ) {
+    $full = trim( trim( (string) $first ) . ' ' . trim( (string) $last ) );
+    $bits = preg_split( '/\s+/', $full, -1, PREG_SPLIT_NO_EMPTY );
+    if ( count( $bits ) < 2 ) return [ [ (string) $first, (string) $last ] ];
+    $out = [];
+    for ( $i = 1; $i < count( $bits ); $i++ ) {
+        $out[] = [
+            implode( ' ', array_slice( $bits, 0, $i ) ),
+            implode( ' ', array_slice( $bits, $i ) ),
+        ];
+    }
+    return $out;
+}
+
+/**
  * Email the admin when a signed PDF came in but no sheet row matched.
  * The PDF is still processed (moved per section rules); this alerts a human
  * to flip the row manually.
@@ -9541,15 +9559,24 @@ function tlt_cb_co_process_pdf( $pdf, $dry_run ) {
     }
     $skip_singles = array_filter( array_map( 'trim', explode( ',', TLT_CALLBOARD_CO_SKIP_SEASONS_FOR_SINGLES ) ) );
 
+    // OpenSign slugs don't mark the first/last name boundary; enumerate every
+    // plausible split (e.g. "Cassie" / "Jo Fastabend" vs "Cassie Jo" / "Fastabend")
+    // and let the row-finders try each until one hits.
+    $name_splits = tlt_cb_co_name_splits( $parsed['first'], $parsed['last'] );
+
     if ( $parsed['combined'] ) {
         // Combined contracts: WP CO handles all seasons (that's the whole point —
         // the GAS CO can't mark these). First-pass: find rows sharing a ccid.
         $matched_rows = [];
         foreach ( $registry as $season => $entry ) {
-            $rows = tlt_cb_co_find_combined_rows( $entry['sheetId'], $parsed['first'], $parsed['last'], $parsed['role'] );
-            foreach ( $rows as $r ) {
-                $r['season'] = (string) $season;
-                $matched_rows[] = $r;
+            foreach ( $name_splits as $split ) {
+                $rows = tlt_cb_co_find_combined_rows( $entry['sheetId'], $split[0], $split[1], $parsed['role'] );
+                if ( empty( $rows ) ) continue;
+                foreach ( $rows as $r ) {
+                    $r['season'] = (string) $season;
+                    $matched_rows[] = $r;
+                }
+                break; // this split worked; don't try others for the same season
             }
         }
         // Fallback: no ccid group matched. Fall back to any Production Teams
@@ -9558,10 +9585,14 @@ function tlt_cb_co_process_pdf( $pdf, $dry_run ) {
         $used_fallback = false;
         if ( empty( $matched_rows ) ) {
             foreach ( $registry as $season => $entry ) {
-                $rows = tlt_cb_co_find_person_role_rows( $entry['sheetId'], $parsed['first'], $parsed['last'], $parsed['role'] );
-                foreach ( $rows as $r ) {
-                    $r['season'] = (string) $season;
-                    $matched_rows[] = $r;
+                foreach ( $name_splits as $split ) {
+                    $rows = tlt_cb_co_find_person_role_rows( $entry['sheetId'], $split[0], $split[1], $parsed['role'] );
+                    if ( empty( $rows ) ) continue;
+                    foreach ( $rows as $r ) {
+                        $r['season'] = (string) $season;
+                        $matched_rows[] = $r;
+                    }
+                    break;
                 }
             }
             if ( ! empty( $matched_rows ) ) {
@@ -9611,8 +9642,10 @@ function tlt_cb_co_process_pdf( $pdf, $dry_run ) {
         $found = null;
         foreach ( $registry as $season => $entry ) {
             if ( in_array( (string) $season, $skip_singles, true ) ) continue;
-            $row = tlt_cb_co_find_single_row( $entry['sheetId'], $parsed['show'], $parsed['role'], $parsed['first'], $parsed['last'] );
-            if ( $row ) { $row['season'] = (string) $season; $found = $row; break; }
+            foreach ( $name_splits as $split ) {
+                $row = tlt_cb_co_find_single_row( $entry['sheetId'], $parsed['show'], $parsed['role'], $split[0], $split[1] );
+                if ( $row ) { $row['season'] = (string) $season; $found = $row; break 2; }
+            }
         }
         if ( ! $found ) {
             $report['actions'][] = sprintf(
