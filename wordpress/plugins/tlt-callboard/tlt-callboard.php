@@ -1439,16 +1439,47 @@ function tlt_cb_build_dashboard() {
 function tlt_callboard_ep_get_actors( WP_REST_Request $req ) {
     $rows = tlt_callboard_sheet_rows( tlt_cb_current_sheet_id(), 'Actors!A2:S' );
     if ( is_wp_error( $rows ) ) return $rows;
+
+    // Name → allergies lookup from Contactbook's Emergency Info tab so the
+    // cast list can surface allergies next to each actor. Keyed by a
+    // case-insensitive "first|last" pair (same join as Bios code elsewhere).
+    // Soft-fails to empty on any error — missing allergies shouldn't block
+    // the actors list from rendering.
+    $allergy_lookup = [];
+    $em_rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_CONTACTBOOK_ID, "'" . TLT_CALLBOARD_EMERGENCY_TAB . "'!A2:W" );
+    if ( ! is_wp_error( $em_rows ) ) {
+        foreach ( $em_rows as $er ) {
+            $first_lc = strtolower( trim( tlt_cb_s( $er[1] ?? '' ) ) );
+            $last_lc  = strtolower( trim( tlt_cb_s( $er[3] ?? '' ) ) );
+            if ( $first_lc === '' || $last_lc === '' ) continue;
+            $food  = tlt_cb_emergency_is_truthy( $er[17] ?? false );
+            $cost  = tlt_cb_emergency_is_truthy( $er[19] ?? false );
+            $other = tlt_cb_emergency_is_truthy( $er[21] ?? false );
+            if ( ! $food && ! $cost && ! $other ) continue;
+            $allergy_lookup[ $first_lc . '|' . $last_lc ] = [
+                'food'          => $food,
+                'foodDetail'    => tlt_cb_s( $er[18] ?? '' ),
+                'costume'       => $cost,
+                'costumeDetail' => tlt_cb_s( $er[20] ?? '' ),
+                'other'         => $other,
+                'otherDetail'   => tlt_cb_s( $er[22] ?? '' ),
+            ];
+        }
+    }
+
     $out = [];
     foreach ( $rows as $r ) {
         $show = tlt_cb_s( $r[0] ?? '' );
         if ( $show === '' ) continue;
+        $first = tlt_cb_s( $r[2] ?? '' );
+        $last  = tlt_cb_s( $r[4] ?? '' );
+        $key   = strtolower( trim( $first ) ) . '|' . strtolower( trim( $last ) );
         $out[] = [
             'show'                => $show,
             'character'           => tlt_cb_s( $r[1] ?? '' ),
-            'firstName'           => tlt_cb_s( $r[2] ?? '' ),
+            'firstName'           => $first,
             'middleName'          => tlt_cb_s( $r[3] ?? '' ),
-            'lastName'            => tlt_cb_s( $r[4] ?? '' ),
+            'lastName'            => $last,
             'suffix'              => tlt_cb_s( $r[5] ?? '' ),
             'phone'               => tlt_cb_s( $r[6] ?? '' ),
             'email'               => tlt_cb_s( $r[7] ?? '' ),
@@ -1460,6 +1491,7 @@ function tlt_callboard_ep_get_actors( WP_REST_Request $req ) {
             'bioStatus'           => tlt_cb_s( $r[13] ?? '' ),
             'bioType'             => tlt_cb_s( $r[14] ?? '' ),
             'emergencyInfoStatus' => tlt_cb_s( $r[16] ?? '' ),
+            'allergies'           => $allergy_lookup[ $key ] ?? null,
         ];
     }
     return tlt_cb_ok( $out );

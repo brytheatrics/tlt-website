@@ -6055,10 +6055,23 @@
         const bioLabel = actor.bioStatus === 'Submitted' ? 'Submitted' : 'Awaiting';
         const emClass  = actor.emergencyInfoStatus === 'Submitted' ? 'submitted' : 'pending';
         const emLabel  = actor.emergencyInfoStatus === 'Submitted' ? 'Submitted' : 'Awaiting';
+        // Inline allergy badges after the name. Hover shows detail text.
+        // Only renders when the actor's emergency form flagged at least one.
+        let allergyBadges = '';
+        if (actor.allergies) {
+          const a = actor.allergies;
+          const badge = function (emoji, label, detail) {
+            const title = detail ? (label + ': ' + detail) : label;
+            return '<span title="' + calEscape(title) + '" style="display:inline-block; margin-left:6px; padding:1px 7px; background:#fff1f0; color:#a2242a; border:1px solid #f5c6c6; border-radius:99px; font-size:11px; font-weight:600; vertical-align:middle;">' + emoji + ' ' + calEscape(label) + '</span>';
+          };
+          if (a.food)    allergyBadges += badge('🥜', 'Food',    a.foodDetail    || '');
+          if (a.costume) allergyBadges += badge('🧵', 'Costume', a.costumeDetail || '');
+          if (a.other)   allergyBadges += badge('⚠️', 'Other',   a.otherDetail   || '');
+        }
         const tr = document.createElement('tr');
         tr.innerHTML =
           '<td>' + calEscape(actor.character || '') + '</td>' +
-          '<td>' + calEscape(fullName) + '</td>' +
+          '<td>' + calEscape(fullName) + allergyBadges + '</td>' +
           '<td>' + (actor.phone ? calEscape(formatPhone(actor.phone)) : '') + '</td>' +
           '<td>' + calEscape(actor.email || '') + '</td>' +
           '<td><span class="status-badge ' + statusClass + '">' + calEscape(actor.contractStatus || '') + '</span></td>' +
