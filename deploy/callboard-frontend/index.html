@@ -3597,12 +3597,20 @@
         btn.disabled = false;
         btn.innerText = origText;
         const data = (res && res.data) ? res.data : res;
+        // Keep the success message to ONE line so showAlert renders its
+        // compact green-ish dialog instead of the beefy red Error overlay
+        // (which triggers on any message containing a newline, a brace, or
+        // >240 chars). Copy the bio link to clipboard as the follow-up.
         if (data && data.sent) {
-          showAlert('Bio invite sent to ' + (data.email || contact.email) + '.\n\nBio link:\n' + (data.bioLink || '(none)'));
+          showAlert('Bio invite sent to ' + (data.email || contact.email) + ' — bio link copied to clipboard.');
         } else {
-          showAlert('Token minted and link ready, but the email did not send.\n' +
-                    (data && data.sendError ? 'Error: ' + data.sendError + '\n\n' : '\n') +
-                    'Bio link:\n' + (data && data.bioLink ? data.bioLink : '(none)'));
+          showAlert('Token minted but email did not send: ' + (data && data.sendError ? data.sendError : 'unknown error') + ' (link copied to clipboard)');
+        }
+        // Clipboard copy of the bio link so it's one Ctrl+V away if Blake
+        // wants to paste it into a Slack / manual email.
+        const link = data && data.bioLink ? data.bioLink : '';
+        if (link && navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(link).catch(function () {});
         }
         // Refresh contacts so the new token drives the Reports link row.
         loadContacts(true);

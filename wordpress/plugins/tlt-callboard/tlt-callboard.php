@@ -5294,16 +5294,15 @@ function tlt_cb_bio_email_html( array $ctx ) {
             $fallback_url( $folder );
     }
 
-    // Tech Packet section — same shape as show-folder; shown for all roles
-    // (actors included) since the tech packet is the design/tech overview and
-    // isn't the same as the restricted-access show folder.
+    // Tech Packet section — design/tech overview. Skip for actors; they don't
+    // need it and we don't want the cast asking the TD why they got a design doc.
     $tech_section = '';
-    if ( $tech_raw !== '' ) {
+    if ( $tech_raw !== '' && ! $skip_folder ) {
         $tech_section =
             $divider .
             $section_header( 'Tech Packet' ) .
             '<p style="margin:0 0 4px; font-size:14px;">Design renderings, color palettes, scenic/costume notes, and other tech details for <strong>' . $show . '</strong>.</p>' .
-            $btn( $tech, 'Open Tech Packet' ) .
+            $btn( $tech, 'Open Tech Packet (PDF)' ) .
             $fallback_url( $tech_raw );
     }
 
@@ -5499,6 +5498,25 @@ function tlt_cb_combined_bio_email_html( array $ctx ) {
 }
 
 /**
+ * Convert a Google Doc URL to its PDF-export URL so the email link opens as
+ * a PDF for recipients instead of the editor. Works for anything on
+ * docs.google.com/document/d/<ID>/…; leaves other URLs untouched (so a
+ * Season col N that's already a PDF or a Drive link just passes through).
+ *
+ * Google serves /export?format=pdf without an auth check as long as the Doc
+ * is shared "anyone with the link can view" (or broader). No hosting or
+ * PDF storage on our end required.
+ */
+function tlt_cb_doc_url_to_pdf( $url ) {
+    $url = trim( (string) $url );
+    if ( $url === '' ) return '';
+    if ( preg_match( '#^(https?://docs\.google\.com/document/d/[A-Za-z0-9_\-]+)#', $url, $m ) ) {
+        return $m[1] . '/export?format=pdf';
+    }
+    return $url;
+}
+
+/**
  * Bio email for a single show — assembles context from the sheet, then sends.
  * Called after successful contract send (or from resend/bulk-request paths).
  */
@@ -5523,7 +5541,7 @@ function tlt_cb_send_bio_request_email( $email, $full_name, $first_name, $last_n
             $comp2       = tlt_cb_s( $r[3]  ?? '' );
             $sm_email    = tlt_cb_s( $r[4]  ?? '' );
             $folder      = tlt_cb_s( $r[10] ?? '' );  // col K
-            $tech_packet = tlt_cb_s( $r[13] ?? '' );  // col N
+            $tech_packet = tlt_cb_doc_url_to_pdf( tlt_cb_s( $r[13] ?? '' ) );  // col N
             break;
         }
     }
@@ -5583,7 +5601,7 @@ function tlt_cb_send_combined_bio_request_email( $email, $full_name, $first_name
                 $comp2    = tlt_cb_s( $r[3]  ?? '' );
                 $sm_email = tlt_cb_s( $r[4]  ?? '' );
                 $folder   = tlt_cb_s( $r[10] ?? '' );
-                $tech     = tlt_cb_s( $r[13] ?? '' );  // col N
+                $tech     = tlt_cb_doc_url_to_pdf( tlt_cb_s( $r[13] ?? '' ) );  // col N
                 break;
             }
         }
@@ -5767,7 +5785,7 @@ function tlt_cb_send_staff_bio_request_email( $email, $full_name, $first_name, $
             'show'       => $show,
             'compCode'   => tlt_cb_s( $r[2]  ?? '' ),
             'compCode2'  => tlt_cb_s( $r[3]  ?? '' ),
-            'techPacket' => tlt_cb_s( $r[13] ?? '' ),  // col N
+            'techPacket' => tlt_cb_doc_url_to_pdf( tlt_cb_s( $r[13] ?? '' ) ),  // col N
         ];
     }
 
