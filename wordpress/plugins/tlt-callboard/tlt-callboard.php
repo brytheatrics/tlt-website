@@ -5294,8 +5294,9 @@ function tlt_cb_bio_email_html( array $ctx ) {
             $fallback_url( $folder );
     }
 
-    // Tech Packet section — design/tech overview. Skip for actors; they don't
-    // need it and we don't want the cast asking the TD why they got a design doc.
+    // Tech Packet section — design/tech overview (AKA Tech Schedule; same
+    // artifact at TLT). Skip for actors; they don't need it and we don't
+    // want the cast asking the TD why they got a design doc.
     $tech_section = '';
     if ( $tech_raw !== '' && ! $skip_folder ) {
         $tech_section =
