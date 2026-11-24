@@ -1700,12 +1700,19 @@
     },
     sendBioRequestsForShow: {
       path: '/bios-send-requests',
-      body: function (show) { return { show: show }; },
+      // Accept an optional {dryRun} as the second arg so the preflight
+      // helper can reuse the same route without changing all existing
+      // callers that still pass just show.
+      body: function (show, opts) {
+        opts = opts || {};
+        return { show: show, dryRun: !!opts.dryRun };
+      },
     },
     resendBioRequest: {
       path: '/bios-resend',
-      body: function (show, firstName, lastName, role) {
-        return { show: show, firstName: firstName, lastName: lastName, role: role };
+      body: function (show, firstName, lastName, role, opts) {
+        opts = opts || {};
+        return { show: show, firstName: firstName, lastName: lastName, role: role, dryRun: !!opts.dryRun };
       },
     },
     // Staff bio onboarding — fires the welcome packet for people on the
@@ -1730,16 +1737,20 @@
     // Contracts
     generateContractFromWebapp: {
       path: '/contract-generate',
-      // GAS signature: (show, role, firstName, lastName, character)
-      body: function (show, role, firstName, lastName, character) {
-        return { show: show, role: role, firstName: firstName, lastName: lastName, character: character };
+      // GAS signature: (show, role, firstName, lastName, character, opts?).
+      // opts.dryRun = true → server validates the resulting welcome-email
+      // context and returns { warnings } without creating anything.
+      body: function (show, role, firstName, lastName, character, opts) {
+        opts = opts || {};
+        return { show: show, role: role, firstName: firstName, lastName: lastName, character: character, dryRun: !!opts.dryRun };
       },
     },
     generateCombinedContractFromWebapp: {
       path: '/contract-generate-combined',
-      // GAS signature: (shows[], role, firstName, lastName, character)
-      body: function (shows, role, firstName, lastName, character) {
-        return { shows: shows || [], role: role, firstName: firstName, lastName: lastName, character: character };
+      // GAS signature: (shows[], role, firstName, lastName, character, opts?)
+      body: function (shows, role, firstName, lastName, character, opts) {
+        opts = opts || {};
+        return { shows: shows || [], role: role, firstName: firstName, lastName: lastName, character: character, dryRun: !!opts.dryRun };
       },
     },
     sendContractFromWebapp: {
@@ -2308,19 +2319,27 @@
     e.stopPropagation();
     showConfirm('Send bio request emails to everyone on ' + show + '?', function() {
       btn.disabled  = true;
-      btn.innerText = 'Sending...';
-      google.script.run
-        .withSuccessHandler(function(result) {
-          btn.disabled  = false;
-          btn.innerText = 'Send Bio Requests';
-          showAlert('Sent ' + result.sent + ' emails. Skipped ' + result.skipped + ' (no email on file).');
-        })
-        .withFailureHandler(function(err) {
-          btn.disabled  = false;
-          btn.innerText = 'Send Bio Requests';
-          showAlert('Error: ' + err.message);
-        })
-        .sendBioRequestsForShow(show);
+      btn.innerText = 'Checking…';
+      const resetBtn = function () { btn.disabled = false; btn.innerText = 'Send Bio Requests'; };
+      preflightWelcomeSend({
+        method: 'sendBioRequestsForShow',
+        args:   [show],
+        intro:  'Bio request emails for ' + show + ' are ready to go, but the server flagged the following. Send anyway, or cancel and fix things first.',
+        onProceed: function () {
+          btn.innerText = 'Sending…';
+          google.script.run
+            .withSuccessHandler(function(result) {
+              resetBtn();
+              showAlert('Sent ' + result.sent + ' emails. Skipped ' + result.skipped + ' (no email on file).');
+            })
+            .withFailureHandler(function(err) {
+              resetBtn();
+              showAlert('Error: ' + err.message);
+            })
+            .sendBioRequestsForShow(show);
+        },
+        onFail: function (err) { resetBtn(); showAlert('Error checking: ' + err.message); },
+      });
     });
   }
 
@@ -2359,19 +2378,27 @@
     e.stopPropagation();
     showConfirm('Resend bio request links to everyone on ' + show + ' regardless of status?', function() {
       btn.disabled  = true;
-      btn.innerText = 'Sending...';
-      google.script.run
-        .withSuccessHandler(function(result) {
-          btn.disabled  = false;
-          btn.innerText = 'Resend All Links';
-          showAlert('Sent ' + result.sent + ' emails. Skipped ' + result.skipped + ' (no email on file).');
-        })
-        .withFailureHandler(function(err) {
-          btn.disabled  = false;
-          btn.innerText = 'Resend All Links';
-          showAlert('Error: ' + err.message);
-        })
-        .sendBioRequestsForShow(show);
+      btn.innerText = 'Checking…';
+      const resetBtn = function () { btn.disabled = false; btn.innerText = 'Resend All Links'; };
+      preflightWelcomeSend({
+        method: 'sendBioRequestsForShow',
+        args:   [show],
+        intro:  'Resending bio links for ' + show + '. The server flagged the following — recipients will still get what\'s in their email now, not any updated info.',
+        onProceed: function () {
+          btn.innerText = 'Sending…';
+          google.script.run
+            .withSuccessHandler(function(result) {
+              resetBtn();
+              showAlert('Sent ' + result.sent + ' emails. Skipped ' + result.skipped + ' (no email on file).');
+            })
+            .withFailureHandler(function(err) {
+              resetBtn();
+              showAlert('Error: ' + err.message);
+            })
+            .sendBioRequestsForShow(show);
+        },
+        onFail: function (err) { resetBtn(); showAlert('Error checking: ' + err.message); },
+      });
     });
   }
 
@@ -3663,6 +3690,38 @@
     }
   }
 
+  // Call a server send-method in DRY-RUN mode first. If the server returns
+  // warnings, show them in the shared dialog; the user picks Send Anyway
+  // (runs opts.onProceed) or Cancel (does nothing). No warnings → straight
+  // to onProceed. Used by Send Bio Requests, Resend All, contract-generate,
+  // and combined-contract-generate so every welcome-email path runs the
+  // same preflight.
+  //   opts.method    — GAS method name string (e.g. 'sendBioRequestsForShow')
+  //   opts.args      — positional args array (dryRun opt is appended internally)
+  //   opts.intro     — line of text above the warnings list
+  //   opts.onProceed — called when it's OK to do the real send
+  //   opts.onFail    — called if the dry-run itself errors (optional)
+  function preflightWelcomeSend(opts) {
+    const runner = google.script.run
+      .withSuccessHandler(function (res) {
+        const data = (res && res.data) ? res.data : res;
+        const warnings = (data && data.warnings) || [];
+        if (warnings.length === 0) { opts.onProceed(); return; }
+        showSendWarningsDialog({
+          title: 'Welcome email is missing some pieces',
+          intro: opts.intro,
+          warnings: warnings,
+          onSendAnyway: opts.onProceed,
+        });
+      })
+      .withFailureHandler(function (err) {
+        if (opts.onFail) opts.onFail(err);
+        else showAlert('Error checking: ' + (err && err.message ? err.message : String(err)));
+      });
+    const fn = runner[opts.method];
+    fn.apply(null, (opts.args || []).concat([{ dryRun: true }]));
+  }
+
   // Custom "something's not quite right" dialog for a pending welcome-email
   // send — lists the warnings as bullets with Send Anyway / Cancel buttons.
   // Designed so the same dialog can back the per-show / combined contract
@@ -4545,61 +4604,79 @@
 
   function _doGenerateSingle(contract, tr) {
     const actionsCell = tr.querySelector('.contract-actions');
-    actionsCell.innerHTML = '<span style="font-size:12px; color:#aaa;">Generating...</span>';
-
-    google.script.run
-      .withSuccessHandler(function(result) {
-        if (result.success) {
-          const key = contract.show + '|' + contract.role + '|' + contract.firstName;
-          generatedDocs[key] = result;
-
-          actionsCell.innerHTML = '';
-          _renderPreviewSendButtons(actionsCell, tr, contract, result, false);
-
-          const statusCell = tr.querySelector('.status-badge');
-          if (statusCell) {
-            statusCell.className = 'status-badge generated';
-            statusCell.innerText = 'Generated';
-          }
-        } else {
-          actionsCell.innerHTML = '<span style="font-size:12px; color:#d93025;">' + result.error + '</span>';
-        }
-      })
-      .withFailureHandler(function(err) {
-        actionsCell.innerHTML = '<span style="font-size:12px; color:#d93025;">Error: ' + err.message + '</span>';
-      })
-      .generateContractFromWebapp(contract.show, contract.role, contract.firstName, contract.lastName, contract.character || '');
+    actionsCell.innerHTML = '<span style="font-size:12px; color:#aaa;">Checking…</span>';
+    const whom = (contract.firstName || '') + ' ' + (contract.lastName || '');
+    preflightWelcomeSend({
+      method: 'generateContractFromWebapp',
+      args:   [contract.show, contract.role, contract.firstName, contract.lastName, contract.character || ''],
+      intro:  'Generating the contract for ' + whom.trim() + ' on ' + contract.show + ' will also kick off their welcome email. The server flagged the following:',
+      onProceed: function () {
+        actionsCell.innerHTML = '<span style="font-size:12px; color:#aaa;">Generating...</span>';
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result.success) {
+              const key = contract.show + '|' + contract.role + '|' + contract.firstName;
+              generatedDocs[key] = result;
+              actionsCell.innerHTML = '';
+              _renderPreviewSendButtons(actionsCell, tr, contract, result, false);
+              const statusCell = tr.querySelector('.status-badge');
+              if (statusCell) {
+                statusCell.className = 'status-badge generated';
+                statusCell.innerText = 'Generated';
+              }
+            } else {
+              actionsCell.innerHTML = '<span style="font-size:12px; color:#d93025;">' + result.error + '</span>';
+            }
+          })
+          .withFailureHandler(function(err) {
+            actionsCell.innerHTML = '<span style="font-size:12px; color:#d93025;">Error: ' + err.message + '</span>';
+          })
+          .generateContractFromWebapp(contract.show, contract.role, contract.firstName, contract.lastName, contract.character || '');
+      },
+      onFail: function (err) {
+        actionsCell.innerHTML = '<span style="font-size:12px; color:#d93025;">Error checking: ' + (err && err.message ? err.message : String(err)) + '</span>';
+      },
+    });
   }
 
   function _doGenerateCombined(contract, tr, shows) {
     const actionsCell = tr.querySelector('.contract-actions');
-    actionsCell.innerHTML = '<span style="font-size:12px; color:#aaa;">Generating combined contract...</span>';
-
-    google.script.run
-      .withSuccessHandler(function(result) {
-        if (result.success) {
-          // Cache result for each show in the group so any of them can Send later
-          shows.forEach(function(s) {
-            const key = s + '|' + contract.role + '|' + contract.firstName;
-            generatedDocs[key] = Object.assign({}, result, { show: s, shows: shows });
-          });
-          // Refresh contracts so the other-row statuses update visually
-          setTimeout(function() {
-            google.script.run
-              .withSuccessHandler(function(data) {
-                allContractsData = data;
-                renderContracts(data);
-              })
-              .getContractsData();
-          }, 500);
-        } else {
-          actionsCell.innerHTML = '<span style="font-size:12px; color:#d93025;">' + result.error + '</span>';
-        }
-      })
-      .withFailureHandler(function(err) {
-        actionsCell.innerHTML = '<span style="font-size:12px; color:#d93025;">Error: ' + err.message + '</span>';
-      })
-      .generateCombinedContractFromWebapp(shows, contract.role, contract.firstName, contract.lastName, contract.character || '');
+    actionsCell.innerHTML = '<span style="font-size:12px; color:#aaa;">Checking…</span>';
+    const whom = (contract.firstName || '') + ' ' + (contract.lastName || '');
+    preflightWelcomeSend({
+      method: 'generateCombinedContractFromWebapp',
+      args:   [shows, contract.role, contract.firstName, contract.lastName, contract.character || ''],
+      intro:  'Generating a combined contract for ' + whom.trim() + ' across ' + shows.length + ' shows will also kick off their welcome email. The server flagged the following:',
+      onProceed: function () {
+        actionsCell.innerHTML = '<span style="font-size:12px; color:#aaa;">Generating combined contract...</span>';
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result.success) {
+              shows.forEach(function(s) {
+                const key = s + '|' + contract.role + '|' + contract.firstName;
+                generatedDocs[key] = Object.assign({}, result, { show: s, shows: shows });
+              });
+              setTimeout(function() {
+                google.script.run
+                  .withSuccessHandler(function(data) {
+                    allContractsData = data;
+                    renderContracts(data);
+                  })
+                  .getContractsData();
+              }, 500);
+            } else {
+              actionsCell.innerHTML = '<span style="font-size:12px; color:#d93025;">' + result.error + '</span>';
+            }
+          })
+          .withFailureHandler(function(err) {
+            actionsCell.innerHTML = '<span style="font-size:12px; color:#d93025;">Error: ' + err.message + '</span>';
+          })
+          .generateCombinedContractFromWebapp(shows, contract.role, contract.firstName, contract.lastName, contract.character || '');
+      },
+      onFail: function (err) {
+        actionsCell.innerHTML = '<span style="font-size:12px; color:#d93025;">Error checking: ' + (err && err.message ? err.message : String(err)) + '</span>';
+      },
+    });
   }
 
   function _renderPreviewSendButtons(actionsCell, tr, contract, result, isCombined) {

@@ -5828,21 +5828,74 @@ function tlt_cb_send_staff_bio_request_email( $email, $full_name, $first_name, $
 }
 
 /**
- * Collect "something's missing" warnings for a staff bio invite BEFORE the
- * email goes out. Each entry is { level: 'warn'|'error', message: '…' }.
- * Errors block send; warnings surface in the dry-run dialog so the user
- * can choose Send Anyway or Cancel.
- *
- * Checked: Contactbook row, recipient email, core Season settings
- * (Bio App Url, Current Season), handbook constant, and per current-season
- * show: comp codes + stored Tech Packet PDF.
+ * Shared: check the global welcome-email context (Season settings + handbook
+ * constant). Returns array of warning strings. Used by every send-preflight
+ * (staff invite, per-show bulk bio request, resend, contract-generate).
+ */
+function tlt_cb_validate_welcome_core( $season_rows ) {
+    $warnings = [];
+    if ( tlt_cb_season_setting( $season_rows, 'Current Season' )      === '' ) $warnings[] = 'Season setting "Current Season" is blank.';
+    if ( tlt_cb_season_setting( $season_rows, 'Current Season Long' ) === '' ) $warnings[] = 'Season setting "Current Season Long" is blank (used in subject line).';
+    if ( tlt_cb_season_setting( $season_rows, 'Bio App Url' )         === '' ) $warnings[] = 'Season setting "Bio App Url" is blank — bio links will be broken.';
+    if ( tlt_cb_emergency_info_base( $season_rows )                   === '' ) $warnings[] = 'Emergency info URL could not be derived — emergency links will be broken.';
+    if ( ! defined( 'TLT_CALLBOARD_HANDBOOK_URL' ) || TLT_CALLBOARD_HANDBOOK_URL === '' ) {
+        $warnings[] = 'TLT_CALLBOARD_HANDBOOK_URL is not configured — handbook button will be hidden.';
+    }
+    return $warnings;
+}
+
+/**
+ * Shared: check a single show's welcome-email context. Returns warning
+ * strings. $skip_folder=true for actors — their email omits the Drive
+ * folder + tech packet sections, so we don't warn on those.
+ */
+function tlt_cb_validate_show_welcome( $show, $skip_folder, $season_rows, $team_rows ) {
+    $warnings = [];
+    $found = false;
+    $comp = ''; $sm_email = ''; $folder = '';
+    foreach ( $season_rows as $r ) {
+        if ( tlt_cb_s( $r[1] ?? '' ) === $show ) {
+            $comp     = tlt_cb_s( $r[2]  ?? '' );
+            $sm_email = tlt_cb_s( $r[4]  ?? '' );
+            $folder   = tlt_cb_s( $r[10] ?? '' );
+            $found = true;
+            break;
+        }
+    }
+    if ( ! $found ) {
+        $warnings[] = "No Season row for \"{$show}\" — comp code, SM, folder, tech packet all unavailable.";
+        return $warnings; // short-circuit — the rest of the checks will double up on this
+    }
+    if ( $comp     === '' ) $warnings[] = "Comp code missing for {$show} (Season col C).";
+    if ( $sm_email === '' ) $warnings[] = "Stage Manager email missing for {$show} (Season col E).";
+    // SM assigned on Production Teams.
+    $sm_name_found = false;
+    foreach ( $team_rows as $r ) {
+        if ( tlt_cb_s( $r[0] ?? '' ) === $show && tlt_cb_s( $r[1] ?? '' ) === 'Stage Manager' ) {
+            if ( tlt_cb_s( $r[2] ?? '' ) !== '' ) { $sm_name_found = true; break; }
+        }
+    }
+    if ( ! $sm_name_found ) $warnings[] = "Stage Manager not assigned on Production Teams for {$show}.";
+    if ( ! $skip_folder ) {
+        if ( $folder === '' ) $warnings[] = "Show Drive folder URL missing for {$show} (Season col K).";
+        $season_long = tlt_cb_season_setting( $season_rows, 'Current Season Long' );
+        if ( tlt_cb_resolve_tech_packet_pdf_url( $show, $season_long ) === '' ) {
+            $warnings[] = "Tech Packet PDF not yet generated for {$show} — regenerate the tech schedule to publish the PDF into {$show}/General/.";
+        }
+    }
+    return $warnings;
+}
+
+/**
+ * Collect "something's missing" warnings for a STAFF bio invite BEFORE the
+ * email goes out. Checks Contactbook row + recipient email as blocking
+ * errors, then the shared welcome-core + per-show comp/tech-packet for
+ * every current-season show (staff email table lists every show).
  */
 function tlt_cb_validate_staff_bio_invite( $first, $last ) {
-    $warnings = [];
-    $error    = null;
     $full_name = ''; $email = '';
 
-    // Contactbook lookup.
+    // Contactbook lookup — blocking error if the row doesn't exist.
     $cb_rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_CONTACTBOOK_ID, 'Contactbook!A2:H' );
     if ( is_wp_error( $cb_rows ) ) {
         return [ 'error' => $cb_rows, 'warnings' => [], 'fullName' => '', 'email' => '' ];
@@ -5870,52 +5923,132 @@ function tlt_cb_validate_staff_bio_invite( $first, $last ) {
         ];
     }
 
-    // Season settings.
     $ranges = tlt_callboard_sheets_get( tlt_cb_current_sheet_id(), [ 'Season!A1:N' ] );
     if ( is_wp_error( $ranges ) ) {
         return [ 'error' => $ranges, 'warnings' => [], 'fullName' => $full_name, 'email' => $email ];
     }
     $season_rows = $ranges['Season!A1:N'] ?? [];
-    $season      = tlt_cb_season_setting( $season_rows, 'Current Season' );
+    $warnings    = tlt_cb_validate_welcome_core( $season_rows );
+
+    // Staff email lists EVERY current-season show, so compress per-show
+    // misses into two bullets instead of one per show.
     $season_long = tlt_cb_season_setting( $season_rows, 'Current Season Long' );
-    $bio_app_url = tlt_cb_season_setting( $season_rows, 'Bio App Url' );
-    $emg_url     = tlt_cb_emergency_info_base( $season_rows );
-
-    if ( $season      === '' ) $warnings[] = 'Season setting "Current Season" is blank.';
-    if ( $season_long === '' ) $warnings[] = 'Season setting "Current Season Long" is blank (used in subject line).';
-    if ( $bio_app_url === '' ) $warnings[] = 'Season setting "Bio App Url" is blank — the bio link in the email will be broken.';
-    if ( $emg_url     === '' ) $warnings[] = 'Emergency info URL could not be derived — the emergency-info link in the email will be broken.';
-
-    // Handbook URL constant.
-    if ( ! defined( 'TLT_CALLBOARD_HANDBOOK_URL' ) || TLT_CALLBOARD_HANDBOOK_URL === '' ) {
-        $warnings[] = 'TLT_CALLBOARD_HANDBOOK_URL is not configured — the handbook button will be hidden.';
-    }
-
-    // Per current-season show checks: comp codes + stored tech packet PDF.
     $shows_missing_comp = [];
     $shows_missing_tech = [];
     foreach ( $season_rows as $r ) {
         $slot = tlt_cb_s( $r[0] ?? '' );
         $show = tlt_cb_s( $r[1] ?? '' );
         if ( ! preg_match( '/^Show\d+$/i', $slot ) || $show === '' ) continue;
-        $comp  = tlt_cb_s( $r[2] ?? '' );
-        if ( $comp === '' ) $shows_missing_comp[] = $show;
-        $pdf_url = tlt_cb_resolve_tech_packet_pdf_url( $show, $season_long );
-        if ( $pdf_url === '' ) $shows_missing_tech[] = $show;
+        if ( tlt_cb_s( $r[2] ?? '' ) === '' ) $shows_missing_comp[] = $show;
+        if ( tlt_cb_resolve_tech_packet_pdf_url( $show, $season_long ) === '' ) $shows_missing_tech[] = $show;
     }
-    if ( ! empty( $shows_missing_comp ) ) {
-        $warnings[] = 'Missing comp code for: ' . implode( ', ', $shows_missing_comp );
+    if ( ! empty( $shows_missing_comp ) ) $warnings[] = 'Missing comp code for: ' . implode( ', ', $shows_missing_comp );
+    if ( ! empty( $shows_missing_tech ) ) $warnings[] = 'No generated Tech Packet PDF for: ' . implode( ', ', $shows_missing_tech );
+
+    return [ 'error' => null, 'warnings' => $warnings, 'fullName' => $full_name, 'email' => $email ];
+}
+
+/**
+ * Per-show bio-request bulk preflight. $show is the show name; the bulk
+ * endpoint will send one welcome email per unique first+last on either
+ * Production Teams or Actors for that show.
+ *
+ * Warnings:
+ *  - Global welcome-core (Bio App Url, handbook, etc.)
+ *  - Per-show (comp, SM email + assignment, folder, tech packet — folder
+ *    + tech are skipped if the show's roster is ACTORS-ONLY since the
+ *    email variant for actors doesn't include those sections)
+ *  - Recipients with no email on file (one bullet listing all of them)
+ */
+function tlt_cb_validate_show_bio_send( $show ) {
+    $ranges = tlt_callboard_sheets_get( tlt_cb_current_sheet_id(), [
+        'Season!A1:N',
+        "'Production Teams'!A2:E",
+        'Actors!A2:E',
+    ] );
+    if ( is_wp_error( $ranges ) ) return [ 'error' => $ranges, 'warnings' => [], 'recipients' => 0 ];
+    $season_rows = $ranges['Season!A1:N']              ?? [];
+    $team_rows   = $ranges["'Production Teams'!A2:E"]  ?? [];
+    $actor_rows  = $ranges['Actors!A2:E']              ?? [];
+
+    // Does this show have any crew (non-actor) rows? If so, the folder +
+    // tech-packet sections apply to at least one recipient.
+    $has_crew = false;
+    foreach ( $team_rows as $r ) {
+        if ( tlt_cb_s( $r[0] ?? '' ) === $show && tlt_cb_s( $r[2] ?? '' ) !== '' ) { $has_crew = true; break; }
     }
-    if ( ! empty( $shows_missing_tech ) ) {
-        $warnings[] = 'No generated Tech Packet PDF for: ' . implode( ', ', $shows_missing_tech );
+    $warnings = tlt_cb_validate_welcome_core( $season_rows );
+    $warnings = array_merge( $warnings, tlt_cb_validate_show_welcome( $show, ! $has_crew, $season_rows, $team_rows ) );
+
+    // Recipients: dedup by first+last across both tabs. Then check each
+    // against Contactbook for a non-blank email.
+    $recipients = [];
+    foreach ( [ $team_rows, $actor_rows ] as $rows ) {
+        foreach ( $rows as $r ) {
+            if ( tlt_cb_s( $r[0] ?? '' ) !== $show ) continue;
+            $first = tlt_cb_s( $r[2] ?? '' );
+            if ( $first === '' ) continue;
+            $last  = tlt_cb_s( $r[4] ?? '' );
+            $key   = strtolower( $first ) . '|' . strtolower( $last );
+            if ( ! isset( $recipients[ $key ] ) ) $recipients[ $key ] = [ 'first' => $first, 'last' => $last ];
+        }
+    }
+    $cb_rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_CONTACTBOOK_ID, 'Contactbook!A2:H' );
+    $email_by_key = [];
+    if ( ! is_wp_error( $cb_rows ) ) {
+        foreach ( $cb_rows as $r ) {
+            $k = strtolower( tlt_cb_s( $r[1] ?? '' ) ) . '|' . strtolower( tlt_cb_s( $r[3] ?? '' ) );
+            if ( ! isset( $email_by_key[ $k ] ) ) $email_by_key[ $k ] = tlt_cb_s( $r[7] ?? '' );
+        }
+    }
+    $no_email = [];
+    foreach ( $recipients as $key => $r ) {
+        if ( empty( $email_by_key[ $key ] ) ) $no_email[] = $r['first'] . ' ' . $r['last'];
+    }
+    if ( ! empty( $no_email ) ) {
+        $warnings[] = 'No email on file for: ' . implode( ', ', $no_email ) . ' (they will be skipped).';
     }
 
-    return [
-        'error'    => null,
-        'warnings' => $warnings,
-        'fullName' => $full_name,
-        'email'    => $email,
-    ];
+    return [ 'error' => null, 'warnings' => $warnings, 'recipients' => count( $recipients ) ];
+}
+
+/**
+ * Single-show contract-generate preflight. $role is used to decide whether
+ * this recipient is an actor (so the folder + tech-packet warnings don't
+ * apply to them).
+ */
+function tlt_cb_validate_contract_generate( $show, $role ) {
+    $ranges = tlt_callboard_sheets_get( tlt_cb_current_sheet_id(), [
+        'Season!A1:N',
+        "'Production Teams'!A2:E",
+    ] );
+    if ( is_wp_error( $ranges ) ) return [ 'error' => $ranges, 'warnings' => [] ];
+    $season_rows = $ranges['Season!A1:N']            ?? [];
+    $team_rows   = $ranges["'Production Teams'!A2:E"] ?? [];
+    $skip_folder = strcasecmp( $role, 'Actor' ) === 0;
+    $warnings = tlt_cb_validate_welcome_core( $season_rows );
+    $warnings = array_merge( $warnings, tlt_cb_validate_show_welcome( $show, $skip_folder, $season_rows, $team_rows ) );
+    return [ 'error' => null, 'warnings' => $warnings ];
+}
+
+/**
+ * Combined-contract preflight — runs the per-show check across every show
+ * in the bundle and aggregates the warnings.
+ */
+function tlt_cb_validate_contract_generate_combined( $shows, $role ) {
+    $ranges = tlt_callboard_sheets_get( tlt_cb_current_sheet_id(), [
+        'Season!A1:N',
+        "'Production Teams'!A2:E",
+    ] );
+    if ( is_wp_error( $ranges ) ) return [ 'error' => $ranges, 'warnings' => [] ];
+    $season_rows = $ranges['Season!A1:N']            ?? [];
+    $team_rows   = $ranges["'Production Teams'!A2:E"] ?? [];
+    $skip_folder = strcasecmp( $role, 'Actor' ) === 0;
+    $warnings = tlt_cb_validate_welcome_core( $season_rows );
+    foreach ( $shows as $sh ) {
+        $warnings = array_merge( $warnings, tlt_cb_validate_show_welcome( $sh, $skip_folder, $season_rows, $team_rows ) );
+    }
+    return [ 'error' => null, 'warnings' => $warnings ];
 }
 
 /**
@@ -6023,9 +6156,21 @@ function tlt_callboard_ep_get_schedule_link_v2( WP_REST_Request $req ) {
  * Returns { sent, skipped }.
  */
 function tlt_callboard_ep_bios_send_requests( WP_REST_Request $req ) {
-    $body = $req->get_json_params();
-    $show = tlt_cb_s( is_array( $body ) ? ( $body['show'] ?? '' ) : '' );
+    $body    = $req->get_json_params();
+    $show    = tlt_cb_s( is_array( $body ) ? ( $body['show'] ?? '' ) : '' );
+    $dry_run = is_array( $body ) ? ! empty( $body['dryRun'] ) : false;
     if ( $show === '' ) return new WP_Error( 'missing_show', 'show is required', [ 'status' => 400 ] );
+
+    if ( $dry_run ) {
+        $pre = tlt_cb_validate_show_bio_send( $show );
+        if ( $pre['error'] instanceof WP_Error ) return $pre['error'];
+        return tlt_cb_ok( [
+            'dryRun'     => true,
+            'warnings'   => $pre['warnings'],
+            'recipients' => $pre['recipients'],
+            'show'       => $show,
+        ] );
+    }
 
     $ranges = tlt_callboard_sheets_get( tlt_cb_current_sheet_id(), [
         "'Production Teams'!A2:E",
@@ -6092,13 +6237,27 @@ function tlt_callboard_ep_bios_send_requests( WP_REST_Request $req ) {
  * col S on Production Teams/Actors and sends the combined variant if present.
  */
 function tlt_callboard_ep_bios_resend( WP_REST_Request $req ) {
-    $body = $req->get_json_params() ?: [];
-    $show  = tlt_cb_s( $body['show']      ?? '' );
-    $first = tlt_cb_s( $body['firstName'] ?? '' );
-    $last  = tlt_cb_s( $body['lastName']  ?? '' );
-    $role  = tlt_cb_s( $body['role']      ?? '' );
+    $body    = $req->get_json_params() ?: [];
+    $show    = tlt_cb_s( $body['show']      ?? '' );
+    $first   = tlt_cb_s( $body['firstName'] ?? '' );
+    $last    = tlt_cb_s( $body['lastName']  ?? '' );
+    $role    = tlt_cb_s( $body['role']      ?? '' );
+    $dry_run = ! empty( $body['dryRun'] );
     if ( $show === '' || $first === '' || $last === '' ) {
         return new WP_Error( 'missing_args', 'show, firstName, lastName required', [ 'status' => 400 ] );
+    }
+
+    if ( $dry_run ) {
+        // Which shows the recipient actually ends up receiving — the real
+        // send path upgrades to the combined email if there's a ccid group.
+        $combined_shows = tlt_cb_find_combined_shows_for_row( $show, $role, $first, $last );
+        $pre = tlt_cb_validate_contract_generate_combined( $combined_shows, $role );
+        if ( $pre['error'] instanceof WP_Error ) return $pre['error'];
+        return tlt_cb_ok( [
+            'dryRun'   => true,
+            'warnings' => $pre['warnings'],
+            'shows'    => $combined_shows,
+        ] );
     }
 
     // Look up email.
@@ -7825,14 +7984,20 @@ function tlt_cb_contract_delete( $doc_id, $show, $role, $first_name ) {
 /* -----  Contract endpoints  ----------------------------------------------- */
 
 function tlt_callboard_ep_contract_generate( WP_REST_Request $req ) {
-    $body = $req->get_json_params() ?: [];
-    $show  = tlt_cb_s( $body['show']      ?? '' );
-    $role  = tlt_cb_s( $body['role']      ?? '' );
-    $first = tlt_cb_s( $body['firstName'] ?? '' );
-    $last  = tlt_cb_s( $body['lastName']  ?? '' );
-    $char  = tlt_cb_s( $body['character'] ?? '' );
+    $body    = $req->get_json_params() ?: [];
+    $show    = tlt_cb_s( $body['show']      ?? '' );
+    $role    = tlt_cb_s( $body['role']      ?? '' );
+    $first   = tlt_cb_s( $body['firstName'] ?? '' );
+    $last    = tlt_cb_s( $body['lastName']  ?? '' );
+    $char    = tlt_cb_s( $body['character'] ?? '' );
+    $dry_run = ! empty( $body['dryRun'] );
     if ( $show === '' || $role === '' || $first === '' ) {
         return new WP_Error( 'missing_args', 'show, role, firstName required', [ 'status' => 400 ] );
+    }
+    if ( $dry_run ) {
+        $pre = tlt_cb_validate_contract_generate( $show, $role );
+        if ( $pre['error'] instanceof WP_Error ) return $pre['error'];
+        return tlt_cb_ok( [ 'dryRun' => true, 'warnings' => $pre['warnings'] ] );
     }
     $r = tlt_cb_contract_generate( $show, $role, $first, $last, $char );
     if ( is_wp_error( $r ) ) return $r;
@@ -7845,12 +8010,18 @@ function tlt_callboard_ep_contract_generate_combined( WP_REST_Request $req ) {
     if ( ! is_array( $shows ) || count( $shows ) === 0 ) {
         return new WP_Error( 'missing_shows', 'shows[] required', [ 'status' => 400 ] );
     }
-    $shows = array_map( 'tlt_cb_s', $shows );
-    $role  = tlt_cb_s( $body['role']      ?? '' );
-    $first = tlt_cb_s( $body['firstName'] ?? '' );
-    $last  = tlt_cb_s( $body['lastName']  ?? '' );
-    $char  = tlt_cb_s( $body['character'] ?? '' );
+    $shows   = array_map( 'tlt_cb_s', $shows );
+    $role    = tlt_cb_s( $body['role']      ?? '' );
+    $first   = tlt_cb_s( $body['firstName'] ?? '' );
+    $last    = tlt_cb_s( $body['lastName']  ?? '' );
+    $char    = tlt_cb_s( $body['character'] ?? '' );
+    $dry_run = ! empty( $body['dryRun'] );
     if ( $role === '' || $first === '' ) return new WP_Error( 'missing_args', 'role, firstName required', [ 'status' => 400 ] );
+    if ( $dry_run ) {
+        $pre = tlt_cb_validate_contract_generate_combined( $shows, $role );
+        if ( $pre['error'] instanceof WP_Error ) return $pre['error'];
+        return tlt_cb_ok( [ 'dryRun' => true, 'warnings' => $pre['warnings'] ] );
+    }
     $r = tlt_cb_contract_generate_combined( $shows, $role, $first, $last, $char );
     if ( is_wp_error( $r ) ) return $r;
     return tlt_cb_ok( $r );
