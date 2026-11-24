@@ -5499,22 +5499,24 @@ function tlt_cb_combined_bio_email_html( array $ctx ) {
 }
 
 /**
- * Convert a Google Doc URL to its PDF-export URL so the email link opens as
- * a PDF for recipients instead of the editor. Works for anything on
- * docs.google.com/document/d/<ID>/…; leaves other URLs untouched (so a
- * Season col N that's already a PDF or a Drive link just passes through).
- *
- * Google serves /export?format=pdf without an auth check as long as the Doc
- * is shared "anyone with the link can view" (or broader). No hosting or
- * PDF storage on our end required.
+ * Resolve a show's Tech Packet / Tech Schedule PDF URL. The tech-schedule
+ * generator auto-publishes the Doc → PDF into {season}/{show}/General/
+ * with the name "<Show> - <SeasonLong> Tech Schedule.pdf", so rather than
+ * sending recipients the editable Doc (Season col N), we look up the
+ * actual stored PDF in Drive and link that. Returns '' if the show's
+ * General folder is missing OR the PDF hasn't been generated yet — the
+ * caller then skips the Tech Packet section entirely (better than
+ * dropping a Doc edit link into a welcome email).
  */
-function tlt_cb_doc_url_to_pdf( $url ) {
-    $url = trim( (string) $url );
-    if ( $url === '' ) return '';
-    if ( preg_match( '#^(https?://docs\.google\.com/document/d/[A-Za-z0-9_\-]+)#', $url, $m ) ) {
-        return $m[1] . '/export?format=pdf';
-    }
-    return $url;
+function tlt_cb_resolve_tech_packet_pdf_url( $show, $season_long ) {
+    if ( $show === '' || $season_long === '' ) return '';
+    $general_id = tlt_cb_resolve_show_general_folder( $show );
+    if ( is_wp_error( $general_id ) ) return '';
+    $pdf_name = $show . ' - ' . $season_long . ' Tech Schedule.pdf';
+    $files = tlt_cb_drive_find_in_folder( $general_id, $pdf_name );
+    if ( is_wp_error( $files ) || empty( $files ) ) return '';
+    $id = $files[0]['id'] ?? '';
+    return $id !== '' ? 'https://drive.google.com/file/d/' . $id . '/view' : '';
 }
 
 /**
@@ -5542,10 +5544,14 @@ function tlt_cb_send_bio_request_email( $email, $full_name, $first_name, $last_n
             $comp2       = tlt_cb_s( $r[3]  ?? '' );
             $sm_email    = tlt_cb_s( $r[4]  ?? '' );
             $folder      = tlt_cb_s( $r[10] ?? '' );  // col K
-            $tech_packet = tlt_cb_doc_url_to_pdf( tlt_cb_s( $r[13] ?? '' ) );  // col N
             break;
         }
     }
+    // Resolve the stored Tech Packet PDF from {season}/{show}/General/.
+    // Returns '' if the show hasn't had its tech schedule generated yet —
+    // the email HTML then omits the Tech Packet section.
+    $season_long_for_tech = tlt_cb_season_setting( $season_rows, 'Current Season Long' );
+    $tech_packet = tlt_cb_resolve_tech_packet_pdf_url( $show, $season_long_for_tech );
     // Look up Stage Manager name for this show from Production Teams.
     $sm_name = '';
     foreach ( $team_rows as $r ) {
@@ -5593,6 +5599,7 @@ function tlt_cb_send_combined_bio_request_email( $email, $full_name, $first_name
     $team_rows   = $ranges["'Production Teams'!A2:E"] ?? [];
     $season = tlt_cb_season_setting( $season_rows, 'Current Season' );
 
+    $season_long_for_tech = tlt_cb_season_setting( $season_rows, 'Current Season Long' );
     $per_show = [];
     foreach ( $shows as $sh ) {
         $sm_email = ''; $comp = ''; $comp2 = ''; $folder = ''; $tech = '';
@@ -5602,10 +5609,10 @@ function tlt_cb_send_combined_bio_request_email( $email, $full_name, $first_name
                 $comp2    = tlt_cb_s( $r[3]  ?? '' );
                 $sm_email = tlt_cb_s( $r[4]  ?? '' );
                 $folder   = tlt_cb_s( $r[10] ?? '' );
-                $tech     = tlt_cb_doc_url_to_pdf( tlt_cb_s( $r[13] ?? '' ) );  // col N
                 break;
             }
         }
+        $tech = tlt_cb_resolve_tech_packet_pdf_url( $sh, $season_long_for_tech );
         $sm_name = '';
         foreach ( $team_rows as $r ) {
             if ( tlt_cb_s( $r[0] ?? '' ) === $sh && tlt_cb_s( $r[1] ?? '' ) === 'Stage Manager' ) {
@@ -5786,7 +5793,7 @@ function tlt_cb_send_staff_bio_request_email( $email, $full_name, $first_name, $
             'show'       => $show,
             'compCode'   => tlt_cb_s( $r[2]  ?? '' ),
             'compCode2'  => tlt_cb_s( $r[3]  ?? '' ),
-            'techPacket' => tlt_cb_doc_url_to_pdf( tlt_cb_s( $r[13] ?? '' ) ),  // col N
+            'techPacket' => tlt_cb_resolve_tech_packet_pdf_url( $show, $season_long ),
         ];
     }
 
