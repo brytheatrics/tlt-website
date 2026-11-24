@@ -5828,29 +5828,27 @@ function tlt_cb_send_staff_bio_request_email( $email, $full_name, $first_name, $
 }
 
 /**
- * POST /callboard/v1/staff-bio-invite
+ * Collect "something's missing" warnings for a staff bio invite BEFORE the
+ * email goes out. Each entry is { level: 'warn'|'error', message: '…' }.
+ * Errors block send; warnings surface in the dry-run dialog so the user
+ * can choose Send Anyway or Cancel.
  *
- * Body: { firstName, lastName, staffRole? }
- *
- * Looks up the Contactbook row by first+last (case-insensitive), mints a bio
- * token if the row doesn't have one, and sends the staff-flavor welcome
- * email. Returns the minted/existing token and the bio/emergency links so
- * the UI can show the "already sent" state immediately.
+ * Checked: Contactbook row, recipient email, core Season settings
+ * (Bio App Url, Current Season), handbook constant, and per current-season
+ * show: comp codes + stored Tech Packet PDF.
  */
-function tlt_callboard_ep_staff_bio_invite( WP_REST_Request $req ) {
-    $body       = $req->get_json_params() ?: [];
-    $first      = tlt_cb_s( $body['firstName'] ?? '' );
-    $last       = tlt_cb_s( $body['lastName']  ?? '' );
-    $staff_role = tlt_cb_s( $body['staffRole'] ?? '' );
-    if ( $first === '' || $last === '' ) {
-        return new WP_Error( 'missing_name', 'firstName and lastName both required', [ 'status' => 400 ] );
-    }
-    // Find the contact to get their on-file email.
+function tlt_cb_validate_staff_bio_invite( $first, $last ) {
+    $warnings = [];
+    $error    = null;
+    $full_name = ''; $email = '';
+
+    // Contactbook lookup.
     $cb_rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_CONTACTBOOK_ID, 'Contactbook!A2:H' );
-    if ( is_wp_error( $cb_rows ) ) return $cb_rows;
+    if ( is_wp_error( $cb_rows ) ) {
+        return [ 'error' => $cb_rows, 'warnings' => [], 'fullName' => '', 'email' => '' ];
+    }
     $first_lc = strtolower( $first );
     $last_lc  = strtolower( $last );
-    $full_name = ''; $email = '';
     foreach ( $cb_rows as $r ) {
         if ( strtolower( tlt_cb_s( $r[1] ?? '' ) ) === $first_lc &&
              strtolower( tlt_cb_s( $r[3] ?? '' ) ) === $last_lc ) {
@@ -5860,15 +5858,109 @@ function tlt_callboard_ep_staff_bio_invite( WP_REST_Request $req ) {
         }
     }
     if ( $full_name === '' ) {
-        return new WP_Error( 'no_contact', "No Contactbook row for {$first} {$last}.", [ 'status' => 404 ] );
+        return [
+            'error' => new WP_Error( 'no_contact', "No Contactbook row for {$first} {$last}.", [ 'status' => 404 ] ),
+            'warnings' => [], 'fullName' => '', 'email' => '',
+        ];
     }
     if ( $email === '' ) {
-        return new WP_Error( 'no_email', "No email on file for {$full_name}. Add one before sending the invite.", [ 'status' => 400 ] );
+        return [
+            'error' => new WP_Error( 'no_email', "No email on file for {$full_name}. Add one before sending the invite.", [ 'status' => 400 ] ),
+            'warnings' => [], 'fullName' => $full_name, 'email' => '',
+        ];
     }
-    $res = tlt_cb_send_staff_bio_request_email( $email, $full_name, $first, $last, $staff_role );
+
+    // Season settings.
+    $ranges = tlt_callboard_sheets_get( tlt_cb_current_sheet_id(), [ 'Season!A1:N' ] );
+    if ( is_wp_error( $ranges ) ) {
+        return [ 'error' => $ranges, 'warnings' => [], 'fullName' => $full_name, 'email' => $email ];
+    }
+    $season_rows = $ranges['Season!A1:N'] ?? [];
+    $season      = tlt_cb_season_setting( $season_rows, 'Current Season' );
+    $season_long = tlt_cb_season_setting( $season_rows, 'Current Season Long' );
+    $bio_app_url = tlt_cb_season_setting( $season_rows, 'Bio App Url' );
+    $emg_url     = tlt_cb_emergency_info_base( $season_rows );
+
+    if ( $season      === '' ) $warnings[] = 'Season setting "Current Season" is blank.';
+    if ( $season_long === '' ) $warnings[] = 'Season setting "Current Season Long" is blank (used in subject line).';
+    if ( $bio_app_url === '' ) $warnings[] = 'Season setting "Bio App Url" is blank — the bio link in the email will be broken.';
+    if ( $emg_url     === '' ) $warnings[] = 'Emergency info URL could not be derived — the emergency-info link in the email will be broken.';
+
+    // Handbook URL constant.
+    if ( ! defined( 'TLT_CALLBOARD_HANDBOOK_URL' ) || TLT_CALLBOARD_HANDBOOK_URL === '' ) {
+        $warnings[] = 'TLT_CALLBOARD_HANDBOOK_URL is not configured — the handbook button will be hidden.';
+    }
+
+    // Per current-season show checks: comp codes + stored tech packet PDF.
+    $shows_missing_comp = [];
+    $shows_missing_tech = [];
+    foreach ( $season_rows as $r ) {
+        $slot = tlt_cb_s( $r[0] ?? '' );
+        $show = tlt_cb_s( $r[1] ?? '' );
+        if ( ! preg_match( '/^Show\d+$/i', $slot ) || $show === '' ) continue;
+        $comp  = tlt_cb_s( $r[2] ?? '' );
+        if ( $comp === '' ) $shows_missing_comp[] = $show;
+        $pdf_url = tlt_cb_resolve_tech_packet_pdf_url( $show, $season_long );
+        if ( $pdf_url === '' ) $shows_missing_tech[] = $show;
+    }
+    if ( ! empty( $shows_missing_comp ) ) {
+        $warnings[] = 'Missing comp code for: ' . implode( ', ', $shows_missing_comp );
+    }
+    if ( ! empty( $shows_missing_tech ) ) {
+        $warnings[] = 'No generated Tech Packet PDF for: ' . implode( ', ', $shows_missing_tech );
+    }
+
+    return [
+        'error'    => null,
+        'warnings' => $warnings,
+        'fullName' => $full_name,
+        'email'    => $email,
+    ];
+}
+
+/**
+ * POST /callboard/v1/staff-bio-invite
+ *
+ * Body: { firstName, lastName, staffRole?, dryRun? }
+ *
+ * - dryRun=true  → validate only; return { warnings, email, fullName, dryRun:true }
+ * - dryRun=false → send the email; return { bioLink, sent, token, warnings:[] }
+ *
+ * The frontend calls dryRun first, surfaces warnings in a confirm dialog,
+ * then calls again without dryRun on "Send Anyway". Blocking errors
+ * (contact missing, no email) short-circuit either path with a WP_Error.
+ */
+function tlt_callboard_ep_staff_bio_invite( WP_REST_Request $req ) {
+    $body       = $req->get_json_params() ?: [];
+    $first      = tlt_cb_s( $body['firstName'] ?? '' );
+    $last       = tlt_cb_s( $body['lastName']  ?? '' );
+    $staff_role = tlt_cb_s( $body['staffRole'] ?? '' );
+    $dry_run    = ! empty( $body['dryRun'] );
+    if ( $first === '' || $last === '' ) {
+        return new WP_Error( 'missing_name', 'firstName and lastName both required', [ 'status' => 400 ] );
+    }
+    $pre = tlt_cb_validate_staff_bio_invite( $first, $last );
+    if ( $pre['error'] instanceof WP_Error ) return $pre['error'];
+
+    if ( $dry_run ) {
+        return tlt_cb_ok( [
+            'dryRun'   => true,
+            'warnings' => $pre['warnings'],
+            'email'    => $pre['email'],
+            'fullName' => $pre['fullName'],
+        ] );
+    }
+
+    $res = tlt_cb_send_staff_bio_request_email(
+        $pre['email'], $pre['fullName'], $first, $last, $staff_role
+    );
     if ( is_wp_error( $res ) ) return $res;
     tlt_cb_bump_cache();
-    return tlt_cb_ok( array_merge( $res, [ 'email' => $email, 'fullName' => $full_name ] ) );
+    return tlt_cb_ok( array_merge( $res, [
+        'email'    => $pre['email'],
+        'fullName' => $pre['fullName'],
+        'warnings' => $pre['warnings'], // report what was flagged even on a real send
+    ] ) );
 }
 
 /**

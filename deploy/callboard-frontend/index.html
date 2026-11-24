@@ -1714,7 +1714,12 @@
       path: '/staff-bio-invite',
       body: function (opts) {
         opts = opts || {};
-        return { firstName: opts.firstName || '', lastName: opts.lastName || '', staffRole: opts.staffRole || '' };
+        return {
+          firstName: opts.firstName || '',
+          lastName:  opts.lastName  || '',
+          staffRole: opts.staffRole || '',
+          dryRun:    !!opts.dryRun,
+        };
       },
     },
     // Program export
@@ -3589,42 +3594,106 @@
       ''
     );
     if (staffRole === null) return; // cancel
-    btn.disabled = true;
+
     const origText = btn.innerText;
-    btn.innerText = 'Sending…';
+    const setBusy = function (label) {
+      btn.disabled = !!label;
+      btn.innerText = label || origText;
+    };
+
+    // Phase 1: dry-run. Server validates and returns warnings without sending.
+    setBusy('Checking…');
     google.script.run
-      .withSuccessHandler(function(res) {
-        btn.disabled = false;
-        btn.innerText = origText;
+      .withSuccessHandler(function (res) {
         const data = (res && res.data) ? res.data : res;
-        // Keep the success message to ONE line so showAlert renders its
-        // compact green-ish dialog instead of the beefy red Error overlay
-        // (which triggers on any message containing a newline, a brace, or
-        // >240 chars). Copy the bio link to clipboard as the follow-up.
-        if (data && data.sent) {
-          showAlert('Bio invite sent to ' + (data.email || contact.email) + ' — bio link copied to clipboard.');
-        } else {
-          showAlert('Token minted but email did not send: ' + (data && data.sendError ? data.sendError : 'unknown error') + ' (link copied to clipboard)');
+        const warnings = (data && data.warnings) || [];
+        if (warnings.length === 0) {
+          // Nothing flagged — send straight through.
+          doRealSend();
+          return;
         }
-        // Clipboard copy of the bio link so it's one Ctrl+V away if Blake
-        // wants to paste it into a Slack / manual email.
-        const link = data && data.bioLink ? data.bioLink : '';
-        if (link && navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(link).catch(function () {});
-        }
-        // Refresh contacts so the new token drives the Reports link row.
-        loadContacts(true);
+        setBusy(null);
+        showSendWarningsDialog({
+          title: 'Welcome email is missing some pieces',
+          intro: 'The bio invite to ' + fullName + ' is ready, but the server flagged the following. Send anyway, or cancel and fix things first.',
+          warnings: warnings,
+          onSendAnyway: doRealSend,
+        });
       })
-      .withFailureHandler(function(err) {
-        btn.disabled = false;
-        btn.innerText = origText;
-        showAlert('Error sending bio invite: ' + (err && err.message ? err.message : String(err)));
+      .withFailureHandler(function (err) {
+        setBusy(null);
+        showAlert('Error checking bio invite: ' + (err && err.message ? err.message : String(err)));
       })
       .sendStaffBioInvite({
         firstName: contact.firstName || '',
         lastName:  contact.lastName  || '',
-        staffRole: staffRole || ''
+        staffRole: staffRole || '',
+        dryRun:    true,
       });
+
+    function doRealSend() {
+      setBusy('Sending…');
+      google.script.run
+        .withSuccessHandler(function (res) {
+          setBusy(null);
+          const data = (res && res.data) ? res.data : res;
+          // Keep success alert to ONE line (newlines trigger the beefy red
+          // Error overlay from the long-message override).
+          if (data && data.sent) {
+            showAlert('Bio invite sent to ' + (data.email || contact.email) + ' — bio link copied to clipboard.');
+          } else {
+            showAlert('Token minted but email did not send: ' + (data && data.sendError ? data.sendError : 'unknown error') + ' (link copied to clipboard)');
+          }
+          const link = data && data.bioLink ? data.bioLink : '';
+          if (link && navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(link).catch(function () {});
+          }
+          loadContacts(true);
+        })
+        .withFailureHandler(function (err) {
+          setBusy(null);
+          showAlert('Error sending bio invite: ' + (err && err.message ? err.message : String(err)));
+        })
+        .sendStaffBioInvite({
+          firstName: contact.firstName || '',
+          lastName:  contact.lastName  || '',
+          staffRole: staffRole || '',
+          dryRun:    false,
+        });
+    }
+  }
+
+  // Custom "something's not quite right" dialog for a pending welcome-email
+  // send — lists the warnings as bullets with Send Anyway / Cancel buttons.
+  // Designed so the same dialog can back the per-show / combined contract
+  // preflights when we add them next.
+  function showSendWarningsDialog(opts) {
+    // opts: { title, intro, warnings: string[], onSendAnyway, onCancel }
+    const prior = document.getElementById('cb-send-warning-modal');
+    if (prior) prior.remove();
+    const overlay = document.createElement('div');
+    overlay.id = 'cb-send-warning-modal';
+    overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:99998; display:flex; align-items:center; justify-content:center; padding:20px;';
+    const warningsHtml = (opts.warnings || [])
+      .map(function (w) { return '<li style="margin:0 0 6px;">' + calEscape(w) + '</li>'; })
+      .join('');
+    overlay.innerHTML =
+      '<div style="background:#fff; border-radius:10px; padding:22px 24px; max-width:540px; width:100%; box-shadow:0 8px 32px rgba(0,0,0,0.22);">' +
+        '<h3 style="margin:0 0 12px; font-size:17px; color:#a2242a;">' + calEscape(opts.title || 'Heads up') + '</h3>' +
+        '<p style="margin:0 0 10px; font-size:14px; color:#333;">' + calEscape(opts.intro || '') + '</p>' +
+        '<ul style="margin:0 0 18px 20px; padding:0; font-size:13px; color:#444;">' + warningsHtml + '</ul>' +
+        '<div style="display:flex; justify-content:flex-end; gap:10px;">' +
+          '<button id="cb-warn-cancel" class="btn btn-secondary" style="font-size:13px; padding:6px 14px;">Cancel &amp; Fix</button>' +
+          '<button id="cb-warn-send" class="btn btn-danger" style="font-size:13px; padding:6px 14px;">Send Anyway</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(overlay);
+    const close = function () { overlay.remove(); };
+    document.getElementById('cb-warn-cancel').onclick = function () { close(); if (opts.onCancel) opts.onCancel(); };
+    document.getElementById('cb-warn-send').onclick   = function () { close(); if (opts.onSendAnyway) opts.onSendAnyway(); };
+    overlay.addEventListener('click', function (ev) { if (ev.target === overlay) { close(); if (opts.onCancel) opts.onCancel(); } });
+    const esc = function (ev) { if (ev.key === 'Escape') { close(); if (opts.onCancel) opts.onCancel(); document.removeEventListener('keydown', esc); } };
+    document.addEventListener('keydown', esc);
   }
 
   document.addEventListener('DOMContentLoaded', function() {
