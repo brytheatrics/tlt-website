@@ -1015,6 +1015,10 @@ add_action( 'rest_api_init', function () {
     $post_route( '/bios-doc-compile',         'tlt_callboard_ep_bios_doc_compile' );
     $post_route( '/bios-send-requests',       'tlt_callboard_ep_bios_send_requests' );
     $post_route( '/bios-resend',              'tlt_callboard_ep_bios_resend' );
+    // Staff bio onboarding (for people not on a specific show's Production Teams
+    // row — admin staff, shop techs, etc. Mints a token if missing and sends
+    // the season's staff-flavor welcome email.)
+    $post_route( '/staff-bio-invite',         'tlt_callboard_ep_staff_bio_invite' );
     // Program export
     $post_route( '/program-export',           'tlt_callboard_ep_program_export' );
     // Contracts
@@ -5248,9 +5252,11 @@ function tlt_cb_bio_email_html( array $ctx ) {
     $emg_link_raw = (string) ( $ctx['emergencyLink'] ?? '' );
     $handbook_raw = (string) ( $ctx['handbookUrl'] ?? '' );
     $folder       = trim( (string) ( $ctx['showFolderUrl'] ?? '' ) );
+    $tech_raw = (string) ( $ctx['techPacketUrl'] ?? '' );
     $bio_link = htmlspecialchars( $bio_link_raw, ENT_QUOTES );
     $emg_link = htmlspecialchars( $emg_link_raw, ENT_QUOTES );
     $handbook = htmlspecialchars( $handbook_raw, ENT_QUOTES );
+    $tech     = htmlspecialchars( $tech_raw, ENT_QUOTES );
     $sm_name  = htmlspecialchars( $ctx['smName']  ?? '', ENT_QUOTES );
     $sm_email = htmlspecialchars( $ctx['smEmail'] ?? '', ENT_QUOTES );
     $comp     = htmlspecialchars( $ctx['compCode']  ?? '', ENT_QUOTES );
@@ -5286,6 +5292,19 @@ function tlt_cb_bio_email_html( array $ctx ) {
             '<p style="margin:0 0 4px; font-size:14px;">Scripts, design packets, and other production materials for <strong>' . $show . '</strong> live here.</p>' .
             $btn( $folder_esc, 'Open Show Folder' ) .
             $fallback_url( $folder );
+    }
+
+    // Tech Packet section — same shape as show-folder; shown for all roles
+    // (actors included) since the tech packet is the design/tech overview and
+    // isn't the same as the restricted-access show folder.
+    $tech_section = '';
+    if ( $tech_raw !== '' ) {
+        $tech_section =
+            $divider .
+            $section_header( 'Tech Packet' ) .
+            '<p style="margin:0 0 4px; font-size:14px;">Design renderings, color palettes, scenic/costume notes, and other tech details for <strong>' . $show . '</strong>.</p>' .
+            $btn( $tech, 'Open Tech Packet' ) .
+            $fallback_url( $tech_raw );
     }
 
     // Stage manager — soft light-red panel, no hard border.
@@ -5358,6 +5377,7 @@ function tlt_cb_bio_email_html( array $ctx ) {
         $fallback_url( $handbook_raw ) .
 
         $show_folder_section .
+        $tech_section .
         $sm_section .
         $comp_section .
 
@@ -5413,12 +5433,16 @@ function tlt_cb_combined_bio_email_html( array $ctx ) {
         if ( $sm_email !== '' ) $sm_html .= '<br><a href="mailto:' . $sm_email . '" style="color:' . $red . '; font-size:12px;">' . $sm_email . '</a>';
         $comp   = htmlspecialchars( $ps['compCode']  ?? '', ENT_QUOTES );
         $comp2  = htmlspecialchars( $ps['compCode2'] ?? '', ENT_QUOTES );
+        $tech   = trim( (string) ( $ps['techPacket'] ?? '' ) );
+        $tech_html = $tech !== ''
+            ? '<a href="' . htmlspecialchars( $tech, ENT_QUOTES ) . '" style="color:' . $red . '; font-size:12px;">Tech packet</a>' : '';
         $rows_html .=
             '<tr style="border-top:1px solid #eee;">' .
             '<td style="padding:10px 8px; vertical-align:top;"><strong>' . $show_esc . '</strong>' . $folder_html . '</td>' .
             '<td style="padding:10px 8px; vertical-align:top;">' . $sm_html . '</td>' .
             '<td style="padding:10px 8px; vertical-align:top; font-family:monospace;">' . $comp . '</td>' .
             '<td style="padding:10px 8px; vertical-align:top; font-family:monospace;">' . $comp2 . '</td>' .
+            '<td style="padding:10px 8px; vertical-align:top;">' . $tech_html . '</td>' .
             '</tr>';
     }
 
@@ -5468,7 +5492,7 @@ function tlt_cb_combined_bio_email_html( array $ctx ) {
         '<p style="margin:0 0 12px; font-size:14px;">Stage managers, drive folders, and comp codes for each show:</p>' .
         '<table style="border-collapse:collapse; width:100%; font-size:13px;">' .
         '<thead><tr style="border-bottom:2px solid ' . $red . '; text-align:left;">' .
-        '<th style="padding:8px;">Show</th><th style="padding:8px;">Stage Manager</th><th style="padding:8px;">Comp Code</th><th style="padding:8px;">Future-Shows Comp Code</th>' .
+        '<th style="padding:8px;">Show</th><th style="padding:8px;">Stage Manager</th><th style="padding:8px;">Comp Code</th><th style="padding:8px;">Future-Shows Comp Code</th><th style="padding:8px;">Tech</th>' .
         '</tr></thead><tbody>' . $rows_html . '</tbody></table>' .
         '<p style="margin:24px 0 0; font-size:13px; color:#666;">Questions? Reply to this email or reach us at <a href="mailto:' . $footer_email . '" style="color:' . $red . ';">' . $footer_email . '</a>.</p>' .
         '</div></div>';
@@ -5491,14 +5515,15 @@ function tlt_cb_send_bio_request_email( $email, $full_name, $first_name, $last_n
     $team_rows   = $ranges["'Production Teams'!A2:E"] ?? [];
 
     $season = tlt_cb_season_setting( $season_rows, 'Current Season' );
-    // Find this show's Season row (SM email, comp codes, folder URL).
-    $sm_email = ''; $comp = ''; $comp2 = ''; $folder = '';
+    // Find this show's Season row (SM email, comp codes, folder URL, tech packet).
+    $sm_email = ''; $comp = ''; $comp2 = ''; $folder = ''; $tech_packet = '';
     foreach ( $season_rows as $r ) {
         if ( tlt_cb_s( $r[1] ?? '' ) === $show ) {
-            $comp     = tlt_cb_s( $r[2]  ?? '' );
-            $comp2    = tlt_cb_s( $r[3]  ?? '' );
-            $sm_email = tlt_cb_s( $r[4]  ?? '' );
-            $folder   = tlt_cb_s( $r[10] ?? '' );  // col K
+            $comp        = tlt_cb_s( $r[2]  ?? '' );
+            $comp2       = tlt_cb_s( $r[3]  ?? '' );
+            $sm_email    = tlt_cb_s( $r[4]  ?? '' );
+            $folder      = tlt_cb_s( $r[10] ?? '' );  // col K
+            $tech_packet = tlt_cb_s( $r[13] ?? '' );  // col N
             break;
         }
     }
@@ -5525,6 +5550,7 @@ function tlt_cb_send_bio_request_email( $email, $full_name, $first_name, $last_n
         'bioLink' => $bio_link, 'emergencyLink' => $emergency_link,
         'handbookUrl'   => TLT_CALLBOARD_HANDBOOK_URL,
         'showFolderUrl' => $folder,
+        'techPacketUrl' => $tech_packet,
         'smName' => $sm_name, 'smEmail' => $sm_email,
         'compCode' => $comp, 'compCode2' => $comp2,
     ] );
@@ -5550,13 +5576,14 @@ function tlt_cb_send_combined_bio_request_email( $email, $full_name, $first_name
 
     $per_show = [];
     foreach ( $shows as $sh ) {
-        $sm_email = ''; $comp = ''; $comp2 = ''; $folder = '';
+        $sm_email = ''; $comp = ''; $comp2 = ''; $folder = ''; $tech = '';
         foreach ( $season_rows as $r ) {
             if ( tlt_cb_s( $r[1] ?? '' ) === $sh ) {
                 $comp     = tlt_cb_s( $r[2]  ?? '' );
                 $comp2    = tlt_cb_s( $r[3]  ?? '' );
                 $sm_email = tlt_cb_s( $r[4]  ?? '' );
                 $folder   = tlt_cb_s( $r[10] ?? '' );
+                $tech     = tlt_cb_s( $r[13] ?? '' );  // col N
                 break;
             }
         }
@@ -5568,12 +5595,13 @@ function tlt_cb_send_combined_bio_request_email( $email, $full_name, $first_name
             }
         }
         $per_show[] = [
-            'show'      => $sh,
-            'folder'    => $folder,
-            'smName'    => $sm_name,
-            'smEmail'   => $sm_email,
-            'compCode'  => $comp,
-            'compCode2' => $comp2,
+            'show'       => $sh,
+            'folder'     => $folder,
+            'smName'     => $sm_name,
+            'smEmail'    => $sm_email,
+            'compCode'   => $comp,
+            'compCode2'  => $comp2,
+            'techPacket' => $tech,
         ];
     }
 
@@ -5597,6 +5625,224 @@ function tlt_cb_send_combined_bio_request_email( $email, $full_name, $first_name
     ] );
     $subject = 'TLT Season ' . $season . ' — Welcome to ' . $shows_display;
     return tlt_cb_send_mail( $email, $subject, $html );
+}
+
+/**
+ * Staff variant of the bio email. Sent to administrative / shop staff who
+ * aren't on a specific mainstage show but still need their bio + emergency
+ * info on file and want the season's comp codes + tech packets handy.
+ *
+ * Same visual layout as the combined-contract email. No "your contract has
+ * been sent" line, no per-show SM block, no "bio-per-show" note — just the
+ * bio + emergency links + handbook + a season reference table covering every
+ * current-season show (comp codes + tech packets).
+ *
+ * $ctx: firstName, bioLink, emergencyLink, handbookUrl, perShow, season,
+ *       role (optional, e.g. "Shop Technician"), contactEmail
+ */
+function tlt_cb_staff_bio_email_html( array $ctx ) {
+    $red   = '#a2242a';
+    $first = htmlspecialchars( $ctx['firstName']  ?? '', ENT_QUOTES );
+    $role  = htmlspecialchars( $ctx['role']       ?? '', ENT_QUOTES );
+    $season_long = htmlspecialchars( $ctx['seasonLong'] ?? ( $ctx['season'] ?? '' ), ENT_QUOTES );
+    $bio_link_raw = (string) ( $ctx['bioLink']       ?? '' );
+    $emg_link_raw = (string) ( $ctx['emergencyLink'] ?? '' );
+    $handbook_raw = (string) ( $ctx['handbookUrl']   ?? '' );
+    $bio_link = htmlspecialchars( $bio_link_raw, ENT_QUOTES );
+    $emg_link = htmlspecialchars( $emg_link_raw, ENT_QUOTES );
+    $handbook = htmlspecialchars( $handbook_raw, ENT_QUOTES );
+    $footer_email = htmlspecialchars( $ctx['contactEmail'] ?? 'tlt@tacomalittletheatre.com', ENT_QUOTES );
+    $per_show = $ctx['perShow'] ?? [];
+
+    $btn = function ( $url, $label ) use ( $red ) {
+        if ( $url === '' ) return '';
+        return '<div style="text-align:center; margin:14px 0;"><a href="' . $url . '" style="display:inline-block; padding:12px 28px; background:' . $red . '; color:#fff; text-decoration:none; border-radius:4px; font-weight:600; font-size:14px;">' . $label . '</a></div>';
+    };
+    $fallback_url = function ( $url ) {
+        if ( $url === '' ) return '';
+        $esc = htmlspecialchars( $url, ENT_QUOTES );
+        return '<p style="margin:8px 0 0; font-size:12px; color:#888; word-break:break-all; text-align:center;">If the button doesn\'t work, copy and paste:<br><a href="' . $esc . '" style="color:#888;">' . $esc . '</a></p>';
+    };
+    $section_header = function ( $title ) {
+        return '<h3 style="margin:0 0 8px; font-size:16px; font-weight:600; color:#222;">' . htmlspecialchars( $title, ENT_QUOTES ) . '</h3>';
+    };
+    $divider = '<div style="height:1px; background:#eee; margin:24px 0;"></div>';
+
+    // Season reference table: Show | Comp | Future-Shows Comp | Tech Packet.
+    // Staff aren't tied to a specific SM, so that column is dropped vs. the
+    // combined email's table.
+    $rows_html = '';
+    foreach ( $per_show as $ps ) {
+        $show_esc = htmlspecialchars( $ps['show'] ?? '', ENT_QUOTES );
+        $comp     = htmlspecialchars( $ps['compCode']  ?? '', ENT_QUOTES );
+        $comp2    = htmlspecialchars( $ps['compCode2'] ?? '', ENT_QUOTES );
+        $tech     = trim( (string) ( $ps['techPacket'] ?? '' ) );
+        $tech_html = $tech !== ''
+            ? '<a href="' . htmlspecialchars( $tech, ENT_QUOTES ) . '" style="color:' . $red . '; font-size:12px;">Open</a>'
+            : '<span style="color:#999; font-size:12px;">—</span>';
+        $rows_html .=
+            '<tr style="border-top:1px solid #eee;">' .
+            '<td style="padding:10px 8px; vertical-align:top;"><strong>' . $show_esc . '</strong></td>' .
+            '<td style="padding:10px 8px; vertical-align:top; font-family:monospace;">' . $comp . '</td>' .
+            '<td style="padding:10px 8px; vertical-align:top; font-family:monospace;">' . $comp2 . '</td>' .
+            '<td style="padding:10px 8px; vertical-align:top;">' . $tech_html . '</td>' .
+            '</tr>';
+    }
+
+    $role_phrase = $role !== '' ? ' as our <strong>' . $role . '</strong>' : '';
+    $season_phrase = $season_long !== '' ? ' for the <strong>' . $season_long . '</strong> season' : '';
+
+    return
+        '<div style="font-family:Arial,Helvetica,sans-serif; max-width:680px; margin:auto; color:#222; line-height:1.55; background:#fff;">' .
+        '<div style="background:' . $red . '; color:#fff; padding:18px 24px; font-size:18px; font-weight:600;">Tacoma Little Theatre</div>' .
+        '<div style="padding:24px;">' .
+
+        '<p style="margin:0 0 14px; font-size:14px;"><strong>Hi ' . $first . ',</strong></p>' .
+        '<p style="margin:0 0 14px; font-size:14px;">Welcome to the TLT team' . $role_phrase . $season_phrase . '! A couple of things to take care of at your convenience so we have you on file alongside the cast and crew.</p>' .
+        '<p style="margin:0 0 14px; font-size:13px; color:#555;"><strong>Note:</strong> If the buttons below don\'t open correctly, try opening them in Firefox, Safari, or a private/incognito window.</p>' .
+
+        $divider .
+
+        $section_header( 'Your Bio' ) .
+        '<p style="margin:0 0 6px; font-size:14px;">We need a bio for our programs and promotional materials. Submit or update yours here.</p>' .
+        $btn( $bio_link, 'Submit Your Bio' ) .
+        $fallback_url( $bio_link_raw ) .
+        '<p style="margin:16px 0 8px; font-size:14px;">A few things to know:</p>' .
+        '<ul style="margin:0 0 4px 20px; padding:0; font-size:14px; color:#333;">' .
+            '<li style="margin:0 0 6px;">If you\'ve submitted a bio before, it will be pre-filled — just confirm or update it.</li>' .
+            '<li style="margin:0;">Your link is unique to you — please don\'t share it.</li>' .
+        '</ul>' .
+
+        $divider .
+
+        $section_header( 'Emergency Info & Background Check Release' ) .
+        '<p style="margin:0 0 6px; font-size:14px;">Please also complete this single form covering emergency contacts, medical info, and a Washington State Patrol background check release.</p>' .
+        $btn( $emg_link, 'Submit Emergency Info' ) .
+        $fallback_url( $emg_link_raw ) .
+
+        $divider .
+
+        $section_header( 'Cast & Crew Handbook' ) .
+        '<p style="margin:0 0 6px; font-size:14px;">Please review our Cast &amp; Crew Handbook — it covers policies, comp codes, and what to expect around the building.</p>' .
+        $btn( $handbook, 'Read Handbook' ) .
+        $fallback_url( $handbook_raw ) .
+
+        $divider .
+
+        $section_header( 'Season Reference' ) .
+        '<p style="margin:0 0 12px; font-size:14px;">Comp codes and tech packets for each show this season — handy when you want to see a performance or need design context.</p>' .
+        '<table style="border-collapse:collapse; width:100%; font-size:13px;">' .
+        '<thead><tr style="border-bottom:2px solid ' . $red . '; text-align:left;">' .
+        '<th style="padding:8px;">Show</th><th style="padding:8px;">Comp Code</th><th style="padding:8px;">Future-Shows Comp Code</th><th style="padding:8px;">Tech Packet</th>' .
+        '</tr></thead><tbody>' . $rows_html . '</tbody></table>' .
+        '<p style="margin:24px 0 0; font-size:13px; color:#666;">Questions? Reply to this email or reach us at <a href="mailto:' . $footer_email . '" style="color:' . $red . ';">' . $footer_email . '</a>.</p>' .
+        '</div></div>';
+}
+
+/**
+ * Send the staff bio-invite email. Mints a bioToken if the person doesn't
+ * have one. Pulls every current-season show's comp codes + tech packet off
+ * the Season sheet so the email carries what mainstage casts & crews get,
+ * without pretending the staff person is attached to a specific show.
+ *
+ * @return array|WP_Error  [ 'bioLink', 'emergencyLink', 'sent' => bool ]
+ */
+function tlt_cb_send_staff_bio_request_email( $email, $full_name, $first_name, $last_name, $staff_role = '' ) {
+    if ( trim( (string) $email ) === '' ) {
+        return new WP_Error( 'no_email', "No email on file for $full_name." );
+    }
+    $ranges = tlt_callboard_sheets_get( tlt_cb_current_sheet_id(), [ 'Season!A1:N' ] );
+    if ( is_wp_error( $ranges ) ) return $ranges;
+    $season_rows = $ranges['Season!A1:N'] ?? [];
+    $season      = tlt_cb_season_setting( $season_rows, 'Current Season' );
+    $season_long = tlt_cb_season_setting( $season_rows, 'Current Season Long' );
+
+    // Walk Season for per-show rows (col A matches "Show<N>").
+    $per_show = [];
+    foreach ( $season_rows as $r ) {
+        $slot = tlt_cb_s( $r[0] ?? '' );
+        $show = tlt_cb_s( $r[1] ?? '' );
+        if ( ! preg_match( '/^Show\d+$/i', $slot ) || $show === '' ) continue;
+        $per_show[] = [
+            'show'       => $show,
+            'compCode'   => tlt_cb_s( $r[2]  ?? '' ),
+            'compCode2'  => tlt_cb_s( $r[3]  ?? '' ),
+            'techPacket' => tlt_cb_s( $r[13] ?? '' ),  // col N
+        ];
+    }
+
+    $tok = tlt_cb_ensure_bio_token( $first_name, $last_name, $email );
+    if ( is_wp_error( $tok ) ) return $tok;
+    $bio_app_url = tlt_cb_season_setting( $season_rows, 'Bio App Url' );
+    if ( $bio_app_url === '' ) return new WP_Error( 'no_bio_app', 'Bio App Url not set in Season config.' );
+    $bio_link = $bio_app_url . '?token=' . rawurlencode( $tok['token'] );
+    $emergency_base = tlt_cb_emergency_info_base( $season_rows );
+    $emergency_link = $emergency_base !== '' ? $emergency_base . '?token=' . rawurlencode( $tok['token'] ) : '';
+
+    $html = tlt_cb_staff_bio_email_html( [
+        'firstName'     => $first_name,
+        'role'          => $staff_role,
+        'season'        => $season,
+        'seasonLong'    => $season_long,
+        'bioLink'       => $bio_link,
+        'emergencyLink' => $emergency_link,
+        'handbookUrl'   => TLT_CALLBOARD_HANDBOOK_URL,
+        'perShow'       => $per_show,
+    ] );
+    $season_label = $season_long !== '' ? $season_long : $season;
+    $subject = 'TLT ' . $season_label . ' — Staff Onboarding';
+    $sent = tlt_cb_send_mail( $email, $subject, $html );
+    return [
+        'bioLink'       => $bio_link,
+        'emergencyLink' => $emergency_link,
+        'sent'          => ! is_wp_error( $sent ),
+        'sendError'     => is_wp_error( $sent ) ? $sent->get_error_message() : '',
+        'token'         => $tok['token'],
+    ];
+}
+
+/**
+ * POST /callboard/v1/staff-bio-invite
+ *
+ * Body: { firstName, lastName, staffRole? }
+ *
+ * Looks up the Contactbook row by first+last (case-insensitive), mints a bio
+ * token if the row doesn't have one, and sends the staff-flavor welcome
+ * email. Returns the minted/existing token and the bio/emergency links so
+ * the UI can show the "already sent" state immediately.
+ */
+function tlt_callboard_ep_staff_bio_invite( WP_REST_Request $req ) {
+    $body       = $req->get_json_params() ?: [];
+    $first      = tlt_cb_s( $body['firstName'] ?? '' );
+    $last       = tlt_cb_s( $body['lastName']  ?? '' );
+    $staff_role = tlt_cb_s( $body['staffRole'] ?? '' );
+    if ( $first === '' || $last === '' ) {
+        return new WP_Error( 'missing_name', 'firstName and lastName both required', [ 'status' => 400 ] );
+    }
+    // Find the contact to get their on-file email.
+    $cb_rows = tlt_callboard_sheet_rows( TLT_CALLBOARD_CONTACTBOOK_ID, 'Contactbook!A2:H' );
+    if ( is_wp_error( $cb_rows ) ) return $cb_rows;
+    $first_lc = strtolower( $first );
+    $last_lc  = strtolower( $last );
+    $full_name = ''; $email = '';
+    foreach ( $cb_rows as $r ) {
+        if ( strtolower( tlt_cb_s( $r[1] ?? '' ) ) === $first_lc &&
+             strtolower( tlt_cb_s( $r[3] ?? '' ) ) === $last_lc ) {
+            $full_name = trim( tlt_cb_s( $r[1] ?? '' ) . ' ' . tlt_cb_s( $r[3] ?? '' ) );
+            $email     = tlt_cb_s( $r[7] ?? '' );
+            break;
+        }
+    }
+    if ( $full_name === '' ) {
+        return new WP_Error( 'no_contact', "No Contactbook row for {$first} {$last}.", [ 'status' => 404 ] );
+    }
+    if ( $email === '' ) {
+        return new WP_Error( 'no_email', "No email on file for {$full_name}. Add one before sending the invite.", [ 'status' => 400 ] );
+    }
+    $res = tlt_cb_send_staff_bio_request_email( $email, $full_name, $first, $last, $staff_role );
+    if ( is_wp_error( $res ) ) return $res;
+    tlt_cb_bump_cache();
+    return tlt_cb_ok( array_merge( $res, [ 'email' => $email, 'fullName' => $full_name ] ) );
 }
 
 /**

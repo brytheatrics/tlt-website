@@ -1708,6 +1708,15 @@
         return { show: show, firstName: firstName, lastName: lastName, role: role };
       },
     },
+    // Staff bio onboarding — fires the welcome packet for people on the
+    // Contactbook who aren't attached to a Production Teams row.
+    sendStaffBioInvite: {
+      path: '/staff-bio-invite',
+      body: function (opts) {
+        opts = opts || {};
+        return { firstName: opts.firstName || '', lastName: opts.lastName || '', staffRole: opts.staffRole || '' };
+      },
+    },
     // Program export
     exportProgramFile: {
       path: '/program-export',
@@ -3541,6 +3550,18 @@
         openEditContactModal(contact);
       });
 
+      // Staff bio invite — mints a token if needed and emails the full
+      // onboarding packet (bio + emergency + handbook + season reference).
+      // Use for people not attached to a specific show's Production Teams
+      // row (admin staff, shop techs, APD, etc.).
+      const bioInviteBtn = document.createElement('button');
+      bioInviteBtn.className = 'btn btn-secondary';
+      bioInviteBtn.innerText = 'Send Bio Invite';
+      bioInviteBtn.title = 'Mint a bio token (if needed) and email the staff welcome packet';
+      bioInviteBtn.addEventListener('click', function() {
+        sendStaffBioInvite(contact, bioInviteBtn);
+      });
+
       const deleteBtn = document.createElement('button');
       deleteBtn.className = 'btn btn-danger';
       deleteBtn.innerText = 'Delete';
@@ -3550,9 +3571,52 @@
       });
 
       card.querySelector('.row-actions').appendChild(editBtn);
+      card.querySelector('.row-actions').appendChild(bioInviteBtn);
       card.querySelector('.row-actions').appendChild(deleteBtn);
       container.appendChild(card);
     });
+  }
+
+  function sendStaffBioInvite(contact, btn) {
+    const fullName = [contact.firstName, contact.lastName].filter(Boolean).join(' ') || '(no name)';
+    if (!contact.email) {
+      showAlert('No email on file for ' + fullName + '. Add one via Edit before sending.');
+      return;
+    }
+    const staffRole = window.prompt(
+      'Send bio onboarding email to ' + fullName + ' at ' + contact.email + '?\n\n' +
+      'Optionally add a staff role to include in the greeting (e.g. "Shop Technician"). Leave blank to skip.',
+      ''
+    );
+    if (staffRole === null) return; // cancel
+    btn.disabled = true;
+    const origText = btn.innerText;
+    btn.innerText = 'Sending…';
+    google.script.run
+      .withSuccessHandler(function(res) {
+        btn.disabled = false;
+        btn.innerText = origText;
+        const data = (res && res.data) ? res.data : res;
+        if (data && data.sent) {
+          showAlert('Bio invite sent to ' + (data.email || contact.email) + '.\n\nBio link:\n' + (data.bioLink || '(none)'));
+        } else {
+          showAlert('Token minted and link ready, but the email did not send.\n' +
+                    (data && data.sendError ? 'Error: ' + data.sendError + '\n\n' : '\n') +
+                    'Bio link:\n' + (data && data.bioLink ? data.bioLink : '(none)'));
+        }
+        // Refresh contacts so the new token drives the Reports link row.
+        loadContacts(true);
+      })
+      .withFailureHandler(function(err) {
+        btn.disabled = false;
+        btn.innerText = origText;
+        showAlert('Error sending bio invite: ' + (err && err.message ? err.message : String(err)));
+      })
+      .sendStaffBioInvite({
+        firstName: contact.firstName || '',
+        lastName:  contact.lastName  || '',
+        staffRole: staffRole || ''
+      });
   }
 
   document.addEventListener('DOMContentLoaded', function() {
